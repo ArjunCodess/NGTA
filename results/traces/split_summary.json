@@ -1,0 +1,31 @@
+{
+  "rows": 149,
+  "train_rows": 80,
+  "val_rows": 21,
+  "test_rows": 48,
+  "train_positive": 43,
+  "val_positive": 11,
+  "test_positive": 19,
+  "test_studies": [
+    "study_2",
+    "study_8"
+  ],
+  "feature_names": [
+    "gender",
+    "ret_variant",
+    "ret_risk_level",
+    "calcitonin_elevated",
+    "cea_elevated",
+    "cea_imputed_flag",
+    "thyroid_nodules_present",
+    "family_history_mtc",
+    "c_cell_disease",
+    "men2_syndrome",
+    "pheochromocytoma",
+    "hyperparathyroidism",
+    "age_group",
+    "age",
+    "calcitonin_level_numeric",
+    "cea_level_numeric"
+  ]
+}
