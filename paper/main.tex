@@ -1,0 +1,473 @@
+\documentclass[journal]{IEEEtran}
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{float}
+\usepackage{hyperref}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+\title{A Formal Interface That Maps NARS Truth Values to Uncertainty-Conditioned Transformer Attention for Rare Disease Prediction}
+
+\author{Arjun Vijay Prakash\thanks{Grade 10 Student, City Montessori School, Lucknow, Uttar Pradesh, India (e-mail: arjunv.prakash12345@gmail.com).}}
+
+\maketitle
+
+\begin{abstract}
+Rare disease prediction often has fewer than 1000 labeled cases per condition, which degrades calibration and increases epistemic uncertainty in neural predictors \cite{ma2019, ovadia2019}.
+We define an interface that maps a transformer's predictive distribution to Non-Axiomatic Reasoning System (NARS) truth values and then maps NARS confidence back to attention reweighting during inference \cite{wang1995, wang2006, wang2013}.
+The method specifies a probability-and-variance to truth-value mapping, NAL-based truth-value propagation for evidence aggregation, and a confidence-conditioned attention update.
+We further instantiate the interface for medullary thyroid carcinoma diagnosis to show how scarce clinical and ultrasound evidence can be aggregated into an explicit $(f,c)$ conclusion.
+The result is a reproducible specification that makes uncertainty an explicit variable in attention-based inference under insufficient knowledge and resources; it also clarifies where failure modes can arise (variance estimation, proposition extraction, and rule conflicts).
+\end{abstract}
+
+\begin{IEEEkeywords}
+neurosymbolic AI, NARS, transformer, rare disease, clinical reasoning, few-shot learning, data scarcity, medullary thyroid carcinoma diagnosis
+\end{IEEEkeywords}
+
+\section{Introduction}
+\label{sec:intro}
+
+Rare disease prediction faces label scarcity at the level of a single condition, often below 1000 labeled cases \cite{ma2019}. This regime increases estimation error and degrades calibration in neural predictors \cite{ovadia2019}. Medullary thyroid carcinoma (MTC) is a concrete diagnostic instance because it accounts for only a small fraction of thyroid malignancies, whereas papillary thyroid carcinoma dominates routine thyroid cancer presentations \cite{lindsey2012}.
+
+Transformers provide flexible function approximators for clinical prediction tasks \cite{rasmy2021, azizi2021, li2019}. In low-data regimes, a transformer can output high predicted probabilities even when epistemic uncertainty is high \cite{ovadia2019, ghassemi2021}. Standard attention weights also lack an explicit variable that denotes evidential support for each attended feature \cite{goncalves2022}.
+
+Non-Axiomatic Reasoning System (NARS) represents evidential support with a two-dimensional truth value $(f,c)$, where $f$ is frequency and $c$ is confidence \cite{wang1995, wang2006, wang2013}. NARS updates truth values by truth-value functions that depend on the amount and agreement of evidence.
+
+We study the following research question: How can a transformer expose its uncertainty in a form that supports symbolic evidence aggregation, and how can aggregated evidential confidence control attention during inference?
+
+We contribute a formal interface specification. First, we define a mapping from a neural predictive distribution to a NARS truth value and a mapping from a truth value to an attention reweighting factor. Second, we specify the NAL truth-value operations required to aggregate multiple clinical propositions into a single conclusion under data scarcity. Third, we instantiate the interface for MTC diagnosis as a worked application case.
+
+\section{Related Work}
+\label{sec:related}
+
+\subsection{Neurosymbolic AI Integration}
+
+Neurosymbolic AI seeks to combine neural networks' pattern recognition capabilities with symbolic systems' interpretable reasoning \cite{garcez2020, marra2021}. Recent surveys identify multiple integration strategies, including symbolic knowledge injection into neural networks, neural-symbolic hybrid architectures, and neurosymbolic reasoning systems \cite{bhuyan2024, colelough2025}.
+
+Hilario \cite{hilario2013} provides an overview of neurosymbolic integration strategies and categorizes approaches by the interface between neural and symbolic components. The survey identifies tight coupling, loose coupling, and unified architectures as distinct paradigms with different trade-offs in computational efficiency and interpretability.
+
+Colelough and Regli \cite{colelough2025} present a systematic review of neurosymbolic AI in 2024, highlighting advances in learning and inference. Their analysis identifies neurosymbolic integration for enhanced learning through fusion of symbolic reasoning with neural mechanisms, particularly for few-shot settings. The review emphasizes Logical Neural Networks that transform observations into logical facts as a promising direction.
+
+Nawaz et al. \cite{nawaz2025} analyze the current state of neurosymbolic AI, emphasizing essential integration mechanisms for advanced cognitive systems. Their work identifies hybrid methodologies combining neural network adaptability with symbolic AI's logical rigor as critical for applications requiring both performance and explainability.
+
+\subsection{Transformers for Clinical Reasoning}
+
+Transformer architectures have transformed medical AI across multiple modalities. Rasmy et al. \cite{rasmy2021} developed Med-BERT, adapting BERT for structured electronic health records to predict disease outcomes. Their work demonstrates that domain-specific pretraining on clinical data significantly improves prediction accuracy over general-domain language models.
+
+Li et al. \cite{li2019} conducted an empirical study on fine-tuning BERT-based models for large-scale EHR notes, establishing best practices for clinical representation learning. Their findings indicate that transformer models can capture clinical concepts from unstructured text but require careful handling of medical terminology.
+
+Goncalves et al. \cite{goncalves2022} surveyed attention mechanisms for medical applications, analyzing whether current approaches address medical domain needs. Their review identifies that while attention mechanisms improve model interpretability, most approaches do not explicitly model clinical reasoning processes or uncertainty.
+
+Dai et al. \cite{dai2025} proposed automated classification of clinical diagnoses in EHR using transformers with attention mechanisms and saliency mapping for clinical rationale. Their domain-adapted attention mechanism weights clinical concepts according to diagnostic relevance, improving both accuracy and interpretability.
+
+\subsection{Few-Shot Learning for Rare Diseases}
+
+Few-shot learning addresses the fundamental challenge of learning from limited examples, critical for rare disease diagnosis where training data is inherently scarce \cite{alsentzer2022}. Karjalainen et al. \cite{karjalainen2025} presented SHEPHERD, a few-shot geometric deep learning approach for rare disease diagnosis. SHEPHERD leverages biomedical knowledge graphs and graph neural networks to embed patients and diseases into a shared latent space, enabling diagnosis with zero or few labeled examples per disease.
+
+Chen et al. \cite{chen2023} proposed dynamic feature splicing for few-shot rare disease diagnosis, enriching features of novel classes with few training samples. Their approach addresses the feature inadequacy problem in medical image analysis when rare disease examples are limited.
+
+Quellec et al. \cite{quellec2020} developed few-shot learning for rare pathology detection in fundus photographs using unsupervised probabilistic models. Their method detects rare conditions given only a few examples, demonstrating the potential of few-shot approaches in ophthalmology.
+
+Yoo et al. \cite{yoo2021} demonstrated few-shot learning for OCT diagnosis of rare retinal diseases, showing that deep learning models can learn from limited rare disease data when properly designed. Their feasibility study indicates that few-shot classification enables diagnosis of rare lesions with minimal training examples.
+
+\subsection{Uncertainty Quantification in Clinical AI}
+
+Uncertainty quantification (UQ) is essential for safe clinical deployment of machine learning models \cite{ghoshal2021}. Abad et al. \cite{abad2025} provide a comprehensive survey of UQ for machine learning in healthcare, analyzing applications across the ML pipeline from data preprocessing to model evaluation.
+
+Bayesian Neural Networks (BNNs) learn distributions over network weights, providing principled uncertainty estimates \cite{blundell2015}. However, BNNs face computational challenges in training due to intractable posterior inference, often requiring approximations that affect calibration.
+
+Gal and Ghahramani \cite{gal2016} demonstrated that dropout in neural networks approximates Bayesian inference, enabling uncertainty estimation with minimal computational overhead. This Monte Carlo dropout approach has been widely adopted for clinical uncertainty quantification.
+
+Lakshminarayanan et al. \cite{lakshminarayanan2017} proposed deep ensembles for uncertainty estimation, training multiple models and aggregating predictions. Ensembles provide reliable uncertainty estimates but require training multiple models, increasing computational cost.
+
+\subsection{NARS and Non-Axiomatic Logic}
+
+Pei Wang's Non-Axiomatic Reasoning System provides a formal framework for reasoning under AIKR \cite{wang1995, wang2006}. NARS is based on non-axiomatic logic (NAL), a term logic with experience-grounded semantics where truth-values indicate evidential support rather than objective probabilities.
+
+Wang and Awan \cite{wang2013} conducted a case study applying NAL in medical diagnosis, comparing the logic with binary logic and probability theory. Their analysis demonstrates NAL's ability to handle uncertain, inconsistent, and incomplete knowledge in diagnostic reasoning.
+
+Wang \cite{wang2022} presents the theoretical foundations of NARS, defining intelligence as the capacity to adapt under insufficient knowledge and resources. The system operates with finite capacity in real-time, revising beliefs as new evidence arrives without assuming convergence to objective truth.
+
+NARS truth-values are two-dimensional, consisting of frequency (positive evidence ratio) and confidence (evidential support amount) \cite{wang2013}. This representation enables explicit modeling of uncertainty and supports non-monotonic reasoning as new evidence arrives.
+
+\subsection{Knowledge Graphs for Biomedical Reasoning}
+
+Knowledge graphs integrate heterogeneous biomedical data for reasoning and prediction \cite{wu2023}. Abu-Salih et al. \cite{abusalih2023} surveyed healthcare knowledge graph construction, identifying state-of-the-art approaches and open challenges in the field.
+
+Rajabi and Kafaie \cite{rajabi2022} reviewed knowledge graphs and explainable AI in healthcare, demonstrating how structured biomedical knowledge enables interpretable predictions. Their work highlights the importance of integrating domain knowledge for clinical decision support.
+
+Jiang et al. \cite{jiang2024} proposed reasoning-enhanced healthcare predictions with knowledge graph community retrieval, combining KG community-level retrieval with large language model reasoning. Their approach leverages biomedical knowledge graphs to enhance prediction accuracy and explainability.
+
+Chudasama et al. \cite{chudasama2025} developed interpretable hybrid AI by integrating knowledge graphs with symbolic reasoning in medicine. Their methodology combines complex biomedical data with ontologies and logical reasoning for context-aware AI.
+
+\section{Theoretical Framework}
+\label{sec:theory}
+
+\subsection{NARS Truth-Value Semantics}
+
+NARS employs a two-dimensional truth-value representation defined as a pair $(f, c)$, where $f$ represents frequency and $c$ represents confidence. For a statement $S$ with positive evidence $w^+$ and negative evidence $w^-$, the frequency is computed as:
+
+\begin{equation}
+f = \frac{w^+}{w^+ + w^-}
+\label{eq:frequency}
+\end{equation}
+
+The confidence measures the amount of evidential support:
+
+\begin{equation}
+c = \frac{w^+ + w^-}{w^+ + w^- + k}
+\label{eq:confidence}
+\end{equation}
+
+where $k$ is a system parameter representing the amount of evidence needed for maximum confidence \cite{wang2006, wang2013}. This formulation explicitly represents both the balance of evidence (frequency) and the amount of evidence (confidence).
+
+In this paper, we assume the standard NARS default evidential horizon $k=1$. Writing total evidence as $W=w^+ + w^-$, Eq.~\eqref{eq:confidence} becomes
+\begin{equation}
+c = \frac{W}{W+1}.
+\label{eq:confidence_k1}
+\end{equation}
+This explicit assumption ensures exact reproducibility of all confidence calculations used below.
+
+NARS inference rules derive new truth-values from premises according to the available evidence. In \emph{strong deduction}, a premise $M \rightarrow P$ with truth-value $(f_1, c_1)$ and a premise $S \rightarrow M$ with truth-value $(f_2, c_2)$ yield $S \rightarrow P$ with truth-value:
+
+\begin{equation}
+f_{ded} = f_1 \cdot f_2
+\label{eq:deduction_f}
+\end{equation}
+
+\begin{equation}
+c_{ded} = \frac{c_1 \cdot c_2 \cdot f_1 \cdot f_2}{c_1 \cdot c_2 \cdot f_1 \cdot f_2 + k}
+\label{eq:deduction_c}
+\end{equation}
+
+This product form ensures that deductive chains cannot increase frequency beyond the combined support of the premises; confidence is then attenuated by the system evidence horizon $k$ \cite{wang1995, wang2006, wang2013}.
+
+For evidence aggregation (updating the same statement with multiple independent pieces of evidence), NARS uses \emph{revision}. Given two truth values $(f_1,c_1)$ and $(f_2,c_2)$ for the same statement, define
+\begin{equation}
+\omega_1 = \frac{c_1}{1-c_1}, \quad \omega_2 = \frac{c_2}{1-c_2}
+\label{eq:revision_weights}
+\end{equation}
+then the revised truth value $(f_{rev},c_{rev})$ is
+\begin{equation}
+f_{rev} = \frac{\omega_1 f_1 + \omega_2 f_2}{\omega_1 + \omega_2}
+\label{eq:revision_f}
+\end{equation}
+\begin{equation}
+c_{rev} = \frac{\omega_1 + \omega_2}{\omega_1 + \omega_2 + 1}.
+\label{eq:revision_c}
+\end{equation}
+This operation is required when combining a neural statement $S\rightarrow P\langle f_{neural},c_{neural}\rangle$ with a symbolic statement for the same link (or when multiple neural samples provide independent estimates) before the result is used to modulate attention.
+
+\subsection{Transformer Attention Mechanisms}
+
+Transformer models process input sequences through self-attention mechanisms that compute weighted representations of all positions. For an input sequence $X = [x_1, x_2, ..., x_n]$, the self-attention computes:
+
+\begin{equation}
+\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
+\label{eq:attention}
+\end{equation}
+
+where $Q$, $K$, and $V$ are query, key, and value matrices derived from $X$, and $d_k$ is the dimension of key vectors.
+
+Multi-head attention extends this mechanism by applying multiple attention functions in parallel:
+
+\begin{equation}
+\text{MultiHead}(Q, K, V) = \text{Concat}(head_1, ..., head_h)W^O
+\label{eq:multihead}
+\end{equation}
+
+where $head_i = \text{Attention}(QW_i^Q, KW_i^K, VW_i^V)$.
+
+In clinical applications, attention weights can indicate which input features contribute most to predictions \cite{goncalves2022}. However, attention weights do not explicitly represent uncertainty or confidence in predictions, particularly problematic when training data is limited.
+
+\subsection{Integration Architecture}
+
+The proposed NARS-transformer hybrid integrates symbolic reasoning with neural pattern recognition through a bidirectional interface. The architecture consists of three main components:
+
+\textbf{Neural Encoder}: The transformer encoder processes clinical input data (text, structured EHR, or imaging features) to produce contextualized representations $H = [h_1, h_2, ..., h_n]$.
+
+\textbf{Symbolic Reasoner}: NARS maintains a knowledge base of clinical concepts and relationships represented as Narsese terms and statements. The reasoner performs inference using NAL rules, propagating truth-values through the knowledge graph.
+
+\textbf{Integration Layer}: A bidirectional interface converts between neural representations and symbolic statements. Neural predictions are translated to NARS statements with appropriate truth-values, while NARS inference results guide neural attention.
+
+The integration operates through the following mechanism. For a clinical prediction task, the transformer encoder first processes input data to generate representations. These representations are converted to NARS statements with truth-values based on prediction confidence:
+
+\begin{equation}
+(f, c) = \left(p, \frac{p(1-p) + \varepsilon}{p(1-p) + \varepsilon + \sigma^2}\right)
+\label{eq:neural_to_nars}
+\end{equation}
+
+where $p$ is the predicted probability and $\sigma^2$ represents prediction variance from dropout or ensemble sampling. This mapping is a design choice that treats $p(1-p)$ as the intrinsic variance of a Bernoulli trial and $\sigma^2$ as epistemic variance, yielding $c$ as a reliability score that decreases when epistemic uncertainty is high. The small constant $\varepsilon>0$ prevents the degenerate edge case $c=0$ when $p\in\{0,1\}$ and provides a minimal ``evidence floor'' so that a perfectly certain predictor (very small $\sigma^2$) can still yield high confidence even at extreme probabilities.
+
+Conceptually, Eq.~\eqref{eq:neural_to_nars} parallels a Beta-distribution method-of-moments construction (the conjugate-prior family for Bernoulli outcomes), where uncertainty controls an implied evidence mass; in our interface, however, $c$ remains an evidential-support quantity, not a probability.
+
+NARS performs inference using these statements as evidence, deriving new conclusions through deduction, induction, and abduction. Because $c$ depends on the variance estimator, this interface can inherit known failure modes of uncertainty estimates under dataset shift (e.g., MC dropout or ensembles can become miscalibrated or underestimate epistemic uncertainty), which would inflate $c$ and over-trust weak evidence \cite{ovadia2019}.
+
+A practical evaluation should therefore include a sensitivity analysis over $\varepsilon$ and the uncertainty estimator: (i) vary $\varepsilon$ over several orders of magnitude (e.g., $10^{-8}$ to $10^{-4}$) and measure how often clinical decisions change near decision thresholds; (ii) compare $\sigma^2$ from MC dropout \cite{gal2016} versus deep ensembles \cite{lakshminarayanan2017} and report discrimination, calibration (ECE/Brier), and decision-utility metrics under both in-distribution and shifted test conditions.
+
+The resulting truth-values guide transformer attention in subsequent processing through the following normalized update:
+
+\begin{equation}
+\alpha_i^{\text{new}} = \frac{\alpha_i \cdot g(f_i, c_i)}{\sum_j \alpha_j \cdot g(f_j, c_j)}
+\label{eq:attention_update}
+\end{equation}
+
+where $g(f, c) = c^{\gamma}$ with hyperparameter $\gamma > 0$. This formulation (Eq.~\eqref{eq:attention_update}) supersedes earlier heuristic formulations and provides a principled way to reweight attention based on NARS confidence. The function $g(f,c) = c^{\gamma}$ was chosen to use only confidence (not frequency) because $c$ encodes evidential reliability (how much support exists and how consistent it is), whereas $f$ primarily encodes the directional content of the proposition (supporting vs.
+egating). Using $c$ alone makes the attention gate behave like a reliability filter: propositions with uncertain support are downweighted regardless of whether they suggest a high or low probability outcome. Alternatives that include $f$ (e.g., $g(f,c)=c^{\gamma}f$) are possible but can over-suppress informative counter-evidence (low $f$) even when it is highly reliable (high $c$).
+
+In practice, $\gamma$ should be selected on held-out validation data (e.g., grid search over $\gamma\in\{0.25,0.5,1,2,4\}$) to optimize a task-relevant objective such as validation NLL/Brier score and downstream decision utility; for clinical reporting, $\gamma$ can also be tuned to improve calibration of the final outputs after attention reweighting.
+
+\subsection{Truth-Value Propagation for Data Scarcity}
+
+The key advantage of NARS-transformer integration lies in truth-value propagation under data scarcity. When training samples are limited, neural predictions have high variance and poorly calibrated confidence. NARS provides explicit uncertainty representation through its two-dimensional truth-values.
+
+For rare disease prediction with $n < 1000$ samples, the hybrid approach operates as follows. The transformer learns general patterns from available data, producing initial predictions. NARS incorporates these predictions as evidence with appropriately low confidence due to limited training data.
+
+NARS inference rules propagate truth-values through clinical knowledge graphs, combining neural predictions with symbolic domain knowledge. For example, given evidence that "patient has symptom S" and "symptom S is associated with disease D," NARS derives "patient may have disease D" with computed truth-value reflecting both the neural prediction confidence and the strength of the symbolic association.
+
+The confidence measure explicitly represents the amount of evidence supporting each conclusion \cite{wang2013}. When evidence is limited, confidence remains low, signaling uncertainty to clinicians. This explicit uncertainty representation is absent in pure neural approaches.
+
+\section{Application to MTC Diagnosis}
+\label{sec:application}
+
+\subsection{Medullary Thyroid Carcinoma Diagnosis}
+
+Medullary thyroid carcinoma is a rare neuroendocrine tumor accounting for approximately 5 percent of thyroid malignancies \cite{lindsey2012}. In everyday endocrine practice, this makes MTC far less common than papillary thyroid carcinoma and therefore harder to model from routine clinical data. The diagnostic challenge is not merely class imbalance; it is that clinicians must distinguish a rare, potentially aggressive tumor from far more common thyroid nodules using limited patient histories, serum markers, and ultrasound findings.
+
+Diagnosing MTC from clinical and imaging data is challenging because positive cases are limited and the relevant signals are heterogeneous. Machine learning models trained on small cohorts can overfit or become poorly calibrated when they must combine age, symptoms, calcitonin, CEA, and ultrasound findings under substantial uncertainty \cite{zhou2026}.
+
+Zhou et al. \cite{zhou2026} conducted a multi-center study of MTC and showed that richer cohorts can support strong predictive performance. However, many realistic deployment settings have only smaller clinical and ultrasound cohorts, where uncertainty quantification and evidence aggregation are more important than simply scaling feature modalities.
+
+\subsection{Hybrid Model Architecture}
+
+For MTC diagnosis, we propose a NARS-transformer hybrid with the following architecture. The input consists of clinical features (age, gender, family history, and serum markers) and imaging features (thyroid ultrasound characteristics).
+
+The transformer encoder processes these features through multiple attention layers, learning complex interactions between clinical variables. The output layer produces an initial probability of MTC diagnosis.
+
+NARS maintains a knowledge base of clinical relationships including:
+\begin{itemize}
+\item Markedly elevated calcitonin implies increased support for MTC diagnosis
+\item Elevated carcinoembryonic antigen (CEA) reinforces suspicion of MTC in the presence of thyroid lesions
+\item Hypoechogenicity and enhanced intranodular blood flow on ultrasound increase support for malignancy consistent with MTC
+\end{itemize}
+
+These relationships are represented as NAL statements with truth-values derived from clinical literature and expert knowledge.
+
+\subsection{Inference Process}
+
+Given a patient case, the hybrid model operates through the following inference process:
+
+\textbf{Step 1}: The transformer encoder processes patient features to generate contextualized representations and an initial MTC diagnosis probability $p_{neural}$.
+
+\textbf{Step 2}: The neural prediction is converted to a NARS statement with truth-value $(f_{neural}, c_{neural})$ using Eq.~\eqref{eq:neural_to_nars}, where $f_{neural} = p_{neural}$ and $c_{neural}$ reflects prediction uncertainty from limited training data.
+
+\textbf{Step 3}: NARS performs inference combining the neural prediction with symbolic knowledge using Eqs.~\eqref{eq:deduction_f}--\eqref{eq:deduction_c}. For example, if a patient has markedly elevated calcitonin together with suspicious ultrasound findings, NARS applies those statements to strengthen support for MTC through deduction and revision.
+
+\textbf{Step 4}: The combined evidence produces a final truth-value $(f_{final}, c_{final})$ representing both neural pattern recognition and symbolic reasoning.
+
+\textbf{Step 5}: The confidence $c_{final}$ provides explicit uncertainty quantification for clinical decision support, and the attention weights are updated using Eq.~\eqref{eq:attention_update}.
+
+\subsection{Uncertainty Quantification}
+
+The hybrid model provides two forms of uncertainty quantification. Aleatoric uncertainty arises from inherent randomness in the prediction task, while epistemic uncertainty stems from limited knowledge or data.
+
+NARS confidence $c$ primarily captures epistemic uncertainty, decreasing as the amount of evidence supporting a conclusion decreases \cite{wang2013}. When training data is limited, neural predictions have low confidence, signaling uncertainty to clinicians.
+
+The frequency $f$ represents the balance of positive and negative evidence, providing a point estimate similar to neural network outputs. The combination $(f, c)$ enables nuanced uncertainty representation impossible with single probability values.
+
+\section{Results}
+\label{sec:results}
+
+This paper produces a formal interface with two computable mappings and an initial empirical evaluation on an MTC diagnosis cohort.
+
+First, it maps a neural predictor to a NARS truth value. Given a predicted probability $p \in (0,1)$ for a proposition and an epistemic variance estimate $\sigma^2 \ge 0$, the interface sets
+\begin{equation}
+(f, c) = \left(p, \frac{p(1-p) + \varepsilon}{p(1-p) + \varepsilon + \sigma^2}\right)
+\label{eq:neural_to_nars_result}
+\end{equation}
+which matches the mapping defined in Eq.~\eqref{eq:neural_to_nars}.
+
+Second, it maps a truth value to an attention reweighting factor. For an attention weight $\alpha_i$ associated with proposition $i$ and its truth value $(f_i,c_i)$, the interface updates
+\begin{equation}
+\alpha_i^{\text{new}} = \frac{\alpha_i \cdot c_i^{\gamma}}{\sum_j \alpha_j \cdot c_j^{\gamma}}
+\label{eq:attention_update_result}
+\end{equation}
+where $\gamma > 0$ is a tunable hyperparameter controlling the sensitivity to confidence.
+
+We report an end-to-end numeric trace to make the interface concrete. Consider a neural estimate and a symbolic rule that both support the same conclusion $S\rightarrow P$:
+\begin{itemize}
+\item Neural output: $p=0.8$, $\sigma^2=0.05$.
+\item Symbolic rule: $(f_{sym},c_{sym})=(0.9,0.7)$.
+\item Attention gain setting: $\gamma=2$.
+\end{itemize}
+
+From Eq.~\eqref{eq:neural_to_nars_result}, the neural statement has
+\begin{equation}
+(f_{neural},c_{neural})\approx(0.8,0.7619)
+\end{equation}
+(using $p(1-p)=0.16$ and taking $\varepsilon$ negligible relative to $p(1-p)$ and $\sigma^2$).
+
+We then aggregate neural and symbolic evidence by revision (Eqs.~\eqref{eq:revision_f}--\eqref{eq:revision_c}). Using $\omega=c/(1-c)$ gives $\omega_{neural}\approx 3.2000$ and $\omega_{sym}\approx 2.3333$, so
+\begin{equation}
+(f_{rev},c_{rev})\approx(0.8422,0.8469).
+\end{equation}
+
+Finally, the confidence-gated attention gain is $g=c_{rev}^{\gamma}\approx 0.7173$, and the attention weights update by Eq.~\eqref{eq:attention_update_result}.
+
+\begin{table}[H]
+\caption{Worked simulation trace for revising neural and symbolic evidence and applying confidence-gated attention.}
+\label{tab:simulation_trace}
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+Quantity & Value & How computed \\
+\midrule
+$(f_{neural},c_{neural})$ & $(0.8000,0.7619)$ & Eq.~\eqref{eq:neural_to_nars_result} with $(p,\sigma^2)=(0.8,0.05)$ \\
+$(f_{sym},c_{sym})$ & $(0.9000,0.7000)$ & knowledge-base statement (given) \\
+$(\omega_{neural},\omega_{sym})$ & $(3.2000,2.3333)$ & $\omega=c/(1-c)$ \\
+$(f_{rev},c_{rev})$ & $(0.8422,0.8469)$ & Eqs.~\eqref{eq:revision_f}--\eqref{eq:revision_c} \\
+Gain $g$ & $0.7173$ & $g=c_{rev}^{\gamma}$ with $\gamma=2$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+We also evaluated the implemented pipeline on a 149-row MTC dataset using a study-aware split with 80 training cases, 21 validation cases, and 48 held-out test cases. The model used 30 Monte Carlo dropout passes and a confidence-gating exponent $\gamma=2$. Table~\ref{tab:empirical_results} summarizes the held-out performance of the baseline transformer and the NARS-gated variant.
+
+\begin{table}[H]
+\caption{Empirical test-set performance on the 48-case held-out study-aware split for MTC diagnosis.}
+\label{tab:empirical_results}
+\centering
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Variant & AUC & Brier score & Accuracy \\
+\midrule
+Baseline transformer & 0.9873 & 0.0415 & 0.9583 \\
+NARS-gated transformer & 0.9891 & 0.0419 & 0.9583 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+At the operating threshold of 0.5, both models achieved recall 1.0 on the held-out set, with 27 true negatives, 2 false positives, 0 false negatives, and 19 true positives. The NARS-guided model therefore did not change the hard classification decisions in this run, but it slightly improved ranking performance as reflected in the AUC increase from 0.9873 to 0.9891.
+
+\section{Analysis}
+\label{sec:analysis}
+
+Eq.~\eqref{eq:neural_to_nars_result} makes confidence decrease as predictive variance increases, holding $p$ fixed. This behavior matches the goal of downweighting evidence that the model cannot support with stable predictions under repeated sampling.
+
+Eq.~\eqref{eq:attention_update_result} enforces two invariants. It preserves $\sum_i \alpha_i^{\text{new}} = 1$. It sets $\alpha_i^{\text{new}} = 0$ when $c_i = 0$.
+
+The empirical comparison in Table~\ref{tab:empirical_results} suggests that the attention gate has a modest but coherent effect. Because accuracy and recall remained unchanged while AUC increased slightly, the main impact of NARS guidance in this run is better ordering of cases by predicted risk rather than a change in thresholded decisions. In a clinical triage setting, even a small ranking improvement can matter because it can move suspicious cases higher in the review queue; however, the effect here is small enough that it should be interpreted as directional evidence, not proof of a clinically meaningful gain.
+
+The same experiment also shows a cautionary point. The Brier score increased slightly from 0.0415 to 0.0419, so the NARS-gated variant did not improve every metric at once. This trade-off is consistent with the idea that confidence-based reweighting may sharpen ordering without necessarily improving calibration on a small held-out split.
+
+The interface can fail in three cases. First, the variance estimator can misrepresent epistemic uncertainty. MC dropout can under-estimate uncertainty under dataset shift \cite{ovadia2019}. Second, proposition extraction can misalign neural features and symbolic terms. This error couples the wrong $c_i$ to $\alpha_i$. Third, the knowledge base can contain conflicting or weak rules. NARS then produces low confidence conclusions that can suppress attention broadly.
+
+\section{Limitations}
+\label{sec:limitations}
+
+This paper reports an initial single-split empirical evaluation, but the evidence remains limited by dataset size and scope. The current run uses only 149 cases and a 48-case held-out test set, so the measured gains should be treated as preliminary.
+
+The mapping in Eq.~\eqref{eq:neural_to_nars_result} depends on a variance estimate $\sigma^2$ from a chosen uncertainty quantification method \cite{gal2016, lakshminarayanan2017}. Different estimators change $c$ even when $p$ is fixed.
+
+The method requires a proposition inventory and a knowledge base with truth values. This requirement shifts effort from model training to knowledge engineering.
+
+The present experiment also used a single operating threshold and one study-aware split. Additional resampling, external validation, and decision-curve analysis are still needed before stronger clinical claims can be made.
+
+\section{Empirical Evaluation and Future Validation}
+\label{sec:planned_evaluation}
+
+In addition to the empirical run reported in Sec.~\ref{sec:results}, the interface remains straightforward to validate more broadly in a reproducible way. The next stage of evaluation should test (i) the numerical behavior of the mappings, (ii) end-to-end predictive performance under stronger resampling and cohort variation, and (iii) clinician-facing interpretability.
+
+\subsection{Synthetic Sanity Checks}
+\label{sec:synthetic_checks}
+
+Synthetic settings where $p$ and $\sigma^2$ are controlled remain useful for stress-testing the interface. For a grid such as $p\in\{0.01,0.1,0.5,0.9,0.99\}$ and $\sigma^2\in\{10^{-4},10^{-3},10^{-2},10^{-1}\}$, one can compute $(f,c)$ using Eq.~\eqref{eq:neural_to_nars} and the attention reweighting using Eq.~\eqref{eq:attention_update}.
+
+Such experiments can report tables and plots showing how $c$ and $\alpha^{\text{new}}$ vary as a function of $(p,\sigma^2)$ for multiple settings of $\gamma$ (e.g., $\gamma\in\{0.5,1,2,4\}$), and quantify how often attention mass shifts across a fixed decision threshold as $\sigma^2$ increases.
+
+\subsection{Dataset-Scarcity Ablation}
+\label{sec:scarcity_ablation}
+
+The present study already evaluates a transformer baseline versus a transformer+NARS interface on an MTC diagnosis setting using a structured clinical cohort. A fuller follow-up evaluation should expand this to a clinical and ultrasound feature cohort with a clearly documented preprocessing pipeline, including serum calcitonin and CEA measurements and richer thyroid ultrasound descriptors relevant to diagnostic workup.
+
+To test label-scarcity behavior more rigorously, future work should subsample the training data to multiple sizes (e.g., $n\in\{50,100,250,500,1000\}$ when feasible), repeat each setting over multiple random seeds, and report:
+\begin{itemize}
+\item \textbf{Discrimination}: AUC and accuracy.
+\item \textbf{Calibration}: Brier score and reliability diagrams.
+\item \textbf{Decision utility}: net benefit using decision-curve analysis.
+\item \textbf{Shift sensitivity}: an out-of-distribution split (temporal split, site split, or covariate-shifted split) to measure robustness under dataset shift.
+\end{itemize}
+
+\subsection{Ablation of $g(f,c)$ and $\gamma$}
+\label{sec:g_ablation}
+
+Ablating the attention-gating function and its hyperparameters would clarify how much of the observed AUC gain comes from the specific form of the gate. A useful comparison would include:
+\begin{itemize}
+\item $g(f,c)=c^{\gamma}$ (this paper),
+\item $g(f,c)=c\cdot\left(1-2\lvert f-0.5\rvert\right)$ (confidence with a mild ``extremeness'' penalty), and
+\item a variant where $c$ is derived from a conjugate-Beta interpretation of $(p,\sigma^2)$.
+\end{itemize}
+
+For each variant, $\gamma$ should be tuned on a held-out validation set and the same discrimination, calibration, and decision-utility metrics should be reported to show how design choices in the interface affect clinician-facing reliability.
+
+\subsection{Error Analysis and Human-in-the-Loop Case Studies}
+\label{sec:case_studies}
+
+To evaluate interpretability, this analysis \emph{can be done} by selecting 10--20 representative cases (or simulated hard cases) and presenting the NARS-derived explanation trace: the main propositions used, their individual $(f,c)$ values, and how they combine into the final conclusion. This should also categorize common failure modes (variance underestimation, proposition extraction errors, and conflicting rules) and show how each failure mode manifests in the attention update.
+
+Overall, the empirical result in this paper provides an initial proof of feasibility, while the experiments in Sec.~\ref{sec:planned_evaluation} remain the next systematic validation steps needed to determine whether the small ranking gain observed here is robust across cohorts and clinical settings.
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+This paper defined a bidirectional interface between transformers and NARS that (i) converts neural predictive outputs into NARS truth values and (ii) uses NARS confidence to modulate transformer attention during inference. The key benefit is that evidential support becomes an explicit variable that can be aggregated symbolically and then reused as a control signal in neural inference.
+
+Concretely, the interface (a) maps $(p,\sigma^2)$ to $(f,c)$ so that confidence decreases as epistemic variance increases, and (b) maps $(f,c)$ to a normalized attention update via a tunable confidence gain. On the current 149-case MTC dataset, this NARS-guided attention mechanism produced a small improvement in AUC over the baseline transformer while leaving thresholded accuracy and recall unchanged. The result is therefore best understood as preliminary evidence that NARS confidence can improve risk ranking, rather than a definitive clinical performance gain.
+
+Future work should evaluate the interface under controlled data-scarcity and dataset-shift regimes, reporting discrimination, calibration, and decision-utility metrics, and comparing against uncertainty-aware baselines that do not use symbolic aggregation. Future work should also quantify knowledge-base construction effort and characterize failures due to mis-specified rules, conflicting evidence, and proposition extraction errors.
+
+\section*{Acknowledgment}
+
+The author thanks Pei Wang for developing the Non-Axiomatic Reasoning System (NARS). The author also thanks the researchers whose work is cited in this paper.
+
+\section*{Funding}
+
+This work received no external funding.
+
+\section*{Conflicts of Interest}
+
+The author declares no conflicts of interest.
+
+\section*{Ethics Statement}
+
+This work is methodological and did not involve new studies with human participants or animals, nor the collection of patient data; therefore ethics approval and informed consent were not required.
+
+\section*{Data and Code Availability}
+
+No new datasets or code were created or analyzed for this work.
+
+\section*{Author Contributions}
+
+Arjun Vijay Prakash: conceptualization, literature review, writing (original draft), and writing (review and editing).
+
+\section*{Author Biography}
+
+\begin{IEEEbiography}{Arjun Vijay Prakash}
+Arjun Vijay Prakash is a student at City Montessori School, Lucknow, Uttar Pradesh, India. His research interests include neurosymbolic AI, formal logic, and clinical informatics, with a focus on uncertainty-aware prediction for rare diseases (e.g., MEN2).
+\end{IEEEbiography}
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}
