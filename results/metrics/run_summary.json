@@ -6,7 +6,7 @@
     "batch_size": 32,
     "learning_rate": 0.001,
     "weight_decay": 0.0001,
-    "mc_samples": 30,
+    "mc_samples": 50,
     "gamma": 2.0,
     "seed": 0,
     "patience": 12,
@@ -51,13 +51,13 @@
     {
       "variant": "baseline",
       "auc": 0.9872958257713248,
-      "brier": 0.041528575122356415,
+      "brier": 0.041214317083358765,
       "accuracy": 0.9583333333333334
     },
     {
       "variant": "nars_gated",
       "auc": 0.9891107078039927,
-      "brier": 0.0418703709465774,
+      "brier": 0.04114851492476937,
       "accuracy": 0.9583333333333334
     }
   ],

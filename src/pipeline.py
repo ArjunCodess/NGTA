@@ -29,7 +29,7 @@ class PipelineConfig:
     batch_size: int = 32
     learning_rate: float = 1e-3
     weight_decay: float = 1e-4
-    mc_samples: int = 30
+    mc_samples: int = 50
     gamma: float = 2.0
     seed: int = 0
     patience: int = 12

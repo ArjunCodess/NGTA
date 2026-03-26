@@ -41,7 +41,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-dir", default=".", help="Base directory for charts and results.")
     parser.add_argument("--epochs", type=int, default=60, help="Maximum number of training epochs.")
     parser.add_argument("--batch-size", type=int, default=32, help="Batch size for training and evaluation.")
-    parser.add_argument("--mc-samples", type=int, default=30, help="Number of MC dropout inference passes.")
+    parser.add_argument("--mc-samples", type=int, default=50, help="Number of MC dropout inference passes.")
     parser.add_argument("--gamma", type=float, default=2.0, help="Confidence gating exponent.")
     parser.add_argument("--seed", type=int, default=0, help="Random seed.")
     parser.add_argument("--learning-rate", type=float, default=1e-3, help="Optimizer learning rate.")
