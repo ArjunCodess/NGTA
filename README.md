@@ -74,6 +74,7 @@ Saved metrics:
 | Variant | AUC | Brier Score | ECE | Accuracy | Recall | Precision | F1 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | Baseline Transformer | 0.9873 | 0.04121 | 0.04758 | 95.83% | 100.00% | 90.48% | 0.9500 |
+| Flat-Confidence Transformer | 0.9891 | 0.04127 | 0.04985 | 95.83% | 100.00% | 90.48% | 0.9500 |
 | NARS-Gated Transformer | 0.9891 | 0.04115 | 0.04962 | 95.83% | 100.00% | 90.48% | 0.9500 |
 
 ### Bootstrap AUC Confidence Intervals
@@ -83,24 +84,26 @@ Using `1000` bootstrap resamples of the `48` held-out test cases, the saved run 
 | Variant | AUC | 95% Bootstrap CI |
 | --- | ---: | ---: |
 | Baseline Transformer | 0.9873 | 0.9590 to 1.0000 |
+| Flat-Confidence Transformer | 0.9891 | 0.9637 to 1.0000 |
 | NARS-Gated Transformer | 0.9891 | 0.9637 to 1.0000 |
 
 ### Interpretation
 
-The main empirical effect is a **small ranking improvement** from the NARS-guided attention layer: AUC rises from `0.9873` to `0.9891`, and the Brier score improves slightly from `0.04121` to `0.04115`. The thresholded predictions on this held-out split remain the same, but the important contribution is that NGTA makes epistemic uncertainty explicit through NARS confidence and uses that confidence to produce slightly better risk ordering.
+The main empirical effect is a **small ranking improvement** over the baseline transformer: AUC rises from `0.9873` to `0.9891`, while thresholded predictions on this held-out split remain the same. Adding the flat-confidence control makes the interpretation sharper: the flat-confidence and NARS-gated variants have the same AUC on this split, so the variance-to-confidence mapping does not produce an additional ranking lift beyond generic attention reweighting here. The important contribution is therefore a more explicit uncertainty representation, with a slight Brier/ECE advantage for the variance-based NARS gate over the flat-confidence control.
 
 The bootstrap intervals also matter for interpretation. The baseline interval (`0.9590` to `1.0000`) and the NARS-gated interval (`0.9637` to `1.0000`) **do overlap**, so this run should be described as showing an observed improvement, but not a clearly separated one by the bootstrap-CI check. In other words, the result is promising but still uncertain on a `48`-case test set.
 
 ### Calibration Reliability
 
-The calibration figure is now a reliability diagram built with `10` equal-frequency bins, with the baseline and NARS-gated variants plotted on the same axes. The underlying bucket summaries are exported to [results/metrics/calibration_reliability.csv](results/metrics/calibration_reliability.csv), and the figure remains [charts/calibration_curve.png](charts/calibration_curve.png).
+The calibration figure is now a reliability diagram built with `10` equal-frequency bins, with the baseline, flat-confidence, and NARS-gated variants plotted on the same axes. The underlying bucket summaries are exported to [results/metrics/calibration_reliability.csv](results/metrics/calibration_reliability.csv), and the figure remains [charts/calibration_curve.png](charts/calibration_curve.png).
 
 The saved ECE values are:
 
 - Baseline: `0.04758`
+- Flat-confidence: `0.04985`
 - NARS-gated: `0.04962`
 
-On this split, the NARS-gated model improves Brier score slightly but has a slightly worse ECE than the baseline. That means the calibration result is mixed rather than uniformly better for the gated model.
+On this split, the NARS-gated model improves Brier score slightly but has a slightly worse ECE than the baseline. Compared with the flat-confidence control, however, the variance-based NARS gate is marginally better on both Brier (`0.04115` vs `0.04127`) and ECE (`0.04962` vs `0.04985`). That means the calibration result is mixed overall, but the explicit variance-to-confidence mapping does slightly outperform a constant-confidence gating control.
 
 ### Gamma Ablation
 

@@ -242,15 +242,26 @@ def _bootstrap_auc_intervals(
 
     baseline_interval = intervals["baseline"]
     gated_interval = intervals["nars_gated"]
-    overlap = not (
+    flat_interval = intervals["flat_confidence"]
+    baseline_vs_gated_overlap = not (
         baseline_interval["auc_ci_95_upper"] < gated_interval["auc_ci_95_lower"]
         or gated_interval["auc_ci_95_upper"] < baseline_interval["auc_ci_95_lower"]
     )
+    flat_vs_gated_overlap = not (
+        flat_interval["auc_ci_95_upper"] < gated_interval["auc_ci_95_lower"]
+        or gated_interval["auc_ci_95_upper"] < flat_interval["auc_ci_95_lower"]
+    )
     intervals["comparison"] = {
-        "ci_overlap": overlap,
-        "interpretation": (
+        "baseline_vs_nars_gated_ci_overlap": baseline_vs_gated_overlap,
+        "flat_confidence_vs_nars_gated_ci_overlap": flat_vs_gated_overlap,
+        "baseline_vs_nars_gated_interpretation": (
             "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain."
-            if overlap
+            if baseline_vs_gated_overlap
+            else "The 95% bootstrap AUC confidence intervals do not overlap, so the observed difference is likely real on this test split."
+        ),
+        "flat_confidence_vs_nars_gated_interpretation": (
+            "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain."
+            if flat_vs_gated_overlap
             else "The 95% bootstrap AUC confidence intervals do not overlap, so the observed difference is likely real on this test split."
         ),
     }
@@ -260,14 +271,17 @@ def _bootstrap_auc_intervals(
 def _save_roc_plot(
     y_true: np.ndarray,
     baseline_probabilities: np.ndarray,
+    flat_probabilities: np.ndarray,
     gated_probabilities: np.ndarray,
     output_path: Path,
 ) -> None:
     baseline_fpr, baseline_tpr, _ = roc_curve(y_true, baseline_probabilities)
+    flat_fpr, flat_tpr, _ = roc_curve(y_true, flat_probabilities)
     gated_fpr, gated_tpr, _ = roc_curve(y_true, gated_probabilities)
 
     plt.figure(figsize=(7, 5))
     plt.plot(baseline_fpr, baseline_tpr, label="Baseline")
+    plt.plot(flat_fpr, flat_tpr, label="Flat-confidence")
     plt.plot(gated_fpr, gated_tpr, label="NARS-gated")
     plt.plot([0, 1], [0, 1], linestyle="--", color="gray", linewidth=1)
     plt.xlabel("False Positive Rate")
@@ -282,12 +296,14 @@ def _save_roc_plot(
 def _save_calibration_plot(
     y_true: np.ndarray,
     baseline_probabilities: np.ndarray,
+    flat_probabilities: np.ndarray,
     gated_probabilities: np.ndarray,
     output_path: Path,
 ) -> None:
     plt.figure(figsize=(7, 5))
     for label, probabilities in (
         ("Baseline", baseline_probabilities),
+        ("Flat-confidence", flat_probabilities),
         ("NARS-gated", gated_probabilities),
     ):
         reliability = _build_reliability_frame(y_true, probabilities, n_bins=10)
@@ -347,6 +363,7 @@ def _compute_net_benefit(y_true: np.ndarray, probabilities: np.ndarray, threshol
 def _build_decision_curve_frame(
     y_true: np.ndarray,
     baseline_probabilities: np.ndarray,
+    flat_probabilities: np.ndarray,
     gated_probabilities: np.ndarray,
 ) -> pd.DataFrame:
     thresholds = np.arange(0.05, 1.0, 0.05, dtype=np.float64)
@@ -359,6 +376,7 @@ def _build_decision_curve_frame(
             {
                 "threshold": float(threshold),
                 "baseline_net_benefit": _compute_net_benefit(y_true, baseline_probabilities, float(threshold)),
+                "flat_confidence_net_benefit": _compute_net_benefit(y_true, flat_probabilities, float(threshold)),
                 "nars_gated_net_benefit": _compute_net_benefit(y_true, gated_probabilities, float(threshold)),
                 "treat_all_net_benefit": float(treat_all_net_benefit),
                 "treat_none_net_benefit": 0.0,
@@ -375,6 +393,12 @@ def _save_decision_curve_plot(decision_curve_frame: pd.DataFrame, output_path: P
         decision_curve_frame["baseline_net_benefit"],
         marker="o",
         label="Baseline transformer",
+    )
+    plt.plot(
+        decision_curve_frame["threshold"],
+        decision_curve_frame["flat_confidence_net_benefit"],
+        marker="o",
+        label="Flat-confidence transformer",
     )
     plt.plot(
         decision_curve_frame["threshold"],
@@ -520,6 +544,17 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         feature_confidence,
         gamma=config.gamma,
     )
+    flat_feature_confidence = np.full_like(feature_confidence, 0.5, dtype=np.float64)
+    flat_attention = apply_confidence_gate(
+        summary.attention_mean,
+        flat_feature_confidence,
+        gamma=config.gamma,
+    )
+    flat_logits = summary.cls_logit_mean + np.sum(
+        flat_attention * summary.token_score_mean,
+        axis=1,
+    )
+    flat_probabilities = _sigmoid(flat_logits)
     gated_logits = summary.cls_logit_mean + np.sum(
         gated_attention * summary.token_score_mean,
         axis=1,
@@ -528,10 +563,12 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
 
     y_true = summary.labels.astype(int)
     baseline_reliability = _build_reliability_frame(y_true, summary.probabilities_mean, n_bins=10)
+    flat_reliability = _build_reliability_frame(y_true, flat_probabilities, n_bins=10)
     gated_reliability = _build_reliability_frame(y_true, gated_probabilities, n_bins=10)
     reliability_frame = pd.concat(
         [
             baseline_reliability.assign(variant="baseline"),
+            flat_reliability.assign(variant="flat_confidence"),
             gated_reliability.assign(variant="nars_gated"),
         ],
         ignore_index=True,
@@ -540,6 +577,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         y_true=y_true,
         probability_map={
             "baseline": summary.probabilities_mean,
+            "flat_confidence": flat_probabilities,
             "nars_gated": gated_probabilities,
         },
         iterations=1000,
@@ -552,6 +590,12 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
                 **_compute_metrics(y_true, summary.probabilities_mean),
                 "auc_ci_95_lower": auc_bootstrap["baseline"]["auc_ci_95_lower"],
                 "auc_ci_95_upper": auc_bootstrap["baseline"]["auc_ci_95_upper"],
+            },
+            {
+                "variant": "flat_confidence",
+                **_compute_metrics(y_true, flat_probabilities),
+                "auc_ci_95_lower": auc_bootstrap["flat_confidence"]["auc_ci_95_lower"],
+                "auc_ci_95_upper": auc_bootstrap["flat_confidence"]["auc_ci_95_upper"],
             },
             {
                 "variant": "nars_gated",
@@ -593,6 +637,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
     decision_curve_frame = _build_decision_curve_frame(
         y_true=y_true,
         baseline_probabilities=summary.probabilities_mean,
+        flat_probabilities=flat_probabilities,
         gated_probabilities=gated_probabilities,
     )
     decision_curve_frame.to_csv(output_dirs["metrics"] / "decision_curve.csv", index=False)
@@ -601,12 +646,14 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
     _save_roc_plot(
         y_true,
         summary.probabilities_mean,
+        flat_probabilities,
         gated_probabilities,
         output_dirs["charts"] / "roc_curve.png",
     )
     _save_calibration_plot(
         y_true,
         summary.probabilities_mean,
+        flat_probabilities,
         gated_probabilities,
         output_dirs["charts"] / "calibration_curve.png",
     )

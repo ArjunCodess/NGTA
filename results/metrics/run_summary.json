@@ -58,6 +58,15 @@
       "auc_ci_95_upper": 1.0
     },
     {
+      "variant": "flat_confidence",
+      "auc": 0.9891107078039927,
+      "brier": 0.041266809706909234,
+      "accuracy": 0.9583333333333334,
+      "ece": 0.04984991801526196,
+      "auc_ci_95_lower": 0.9636919681951441,
+      "auc_ci_95_upper": 1.0
+    },
+    {
       "variant": "nars_gated",
       "auc": 0.9891107078039927,
       "brier": 0.04114851492476937,
@@ -74,6 +83,12 @@
       "auc_ci_95_lower": 0.9589829799107142,
       "auc_ci_95_upper": 1.0
     },
+    "flat_confidence": {
+      "iterations": 1000,
+      "auc_samples_mean": 0.9890457760094628,
+      "auc_ci_95_lower": 0.9636919681951441,
+      "auc_ci_95_upper": 1.0
+    },
     "nars_gated": {
       "iterations": 1000,
       "auc_samples_mean": 0.9890457760094628,
@@ -81,8 +96,10 @@
       "auc_ci_95_upper": 1.0
     },
     "comparison": {
-      "ci_overlap": true,
-      "interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain."
+      "baseline_vs_nars_gated_ci_overlap": true,
+      "flat_confidence_vs_nars_gated_ci_overlap": true,
+      "baseline_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain.",
+      "flat_confidence_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain."
     }
   },
   "gamma_ablation": [
@@ -151,6 +168,7 @@
     {
       "threshold": 0.05,
       "baseline_net_benefit": 0.3925438596491228,
+      "flat_confidence_net_benefit": 0.39364035087719296,
       "nars_gated_net_benefit": 0.39364035087719296,
       "treat_all_net_benefit": 0.3640350877192982,
       "treat_none_net_benefit": 0.0
@@ -158,6 +176,7 @@
     {
       "threshold": 0.1,
       "baseline_net_benefit": 0.3888888888888889,
+      "flat_confidence_net_benefit": 0.39120370370370366,
       "nars_gated_net_benefit": 0.39120370370370366,
       "treat_all_net_benefit": 0.32870370370370366,
       "treat_none_net_benefit": 0.0
@@ -165,6 +184,7 @@
     {
       "threshold": 0.15000000000000002,
       "baseline_net_benefit": 0.3848039215686274,
+      "flat_confidence_net_benefit": 0.3884803921568627,
       "nars_gated_net_benefit": 0.3884803921568627,
       "treat_all_net_benefit": 0.2892156862745098,
       "treat_none_net_benefit": 0.0
@@ -172,6 +192,7 @@
     {
       "threshold": 0.2,
       "baseline_net_benefit": 0.38541666666666663,
+      "flat_confidence_net_benefit": 0.38541666666666663,
       "nars_gated_net_benefit": 0.38541666666666663,
       "treat_all_net_benefit": 0.24479166666666663,
       "treat_none_net_benefit": 0.0
@@ -179,6 +200,7 @@
     {
       "threshold": 0.25,
       "baseline_net_benefit": 0.3819444444444444,
+      "flat_confidence_net_benefit": 0.3819444444444444,
       "nars_gated_net_benefit": 0.3819444444444444,
       "treat_all_net_benefit": 0.19444444444444442,
       "treat_none_net_benefit": 0.0
@@ -186,6 +208,7 @@
     {
       "threshold": 0.3,
       "baseline_net_benefit": 0.37797619047619047,
+      "flat_confidence_net_benefit": 0.37797619047619047,
       "nars_gated_net_benefit": 0.37797619047619047,
       "treat_all_net_benefit": 0.13690476190476186,
       "treat_none_net_benefit": 0.0
@@ -193,6 +216,7 @@
     {
       "threshold": 0.35000000000000003,
       "baseline_net_benefit": 0.3733974358974359,
+      "flat_confidence_net_benefit": 0.3733974358974359,
       "nars_gated_net_benefit": 0.3733974358974359,
       "treat_all_net_benefit": 0.07051282051282043,
       "treat_none_net_benefit": 0.0
@@ -200,6 +224,7 @@
     {
       "threshold": 0.4,
       "baseline_net_benefit": 0.3680555555555555,
+      "flat_confidence_net_benefit": 0.3680555555555555,
       "nars_gated_net_benefit": 0.3680555555555555,
       "treat_all_net_benefit": -0.006944444444444531,
       "treat_none_net_benefit": 0.0
@@ -207,6 +232,7 @@
     {
       "threshold": 0.45,
       "baseline_net_benefit": 0.3617424242424242,
+      "flat_confidence_net_benefit": 0.3617424242424242,
       "nars_gated_net_benefit": 0.3617424242424242,
       "treat_all_net_benefit": -0.09848484848484851,
       "treat_none_net_benefit": 0.0
@@ -214,6 +240,7 @@
     {
       "threshold": 0.5,
       "baseline_net_benefit": 0.35416666666666663,
+      "flat_confidence_net_benefit": 0.35416666666666663,
       "nars_gated_net_benefit": 0.35416666666666663,
       "treat_all_net_benefit": -0.20833333333333343,
       "treat_none_net_benefit": 0.0
@@ -221,6 +248,7 @@
     {
       "threshold": 0.55,
       "baseline_net_benefit": 0.3449074074074074,
+      "flat_confidence_net_benefit": 0.3449074074074074,
       "nars_gated_net_benefit": 0.3449074074074074,
       "treat_all_net_benefit": -0.34259259259259295,
       "treat_none_net_benefit": 0.0
@@ -228,6 +256,7 @@
     {
       "threshold": 0.6000000000000001,
       "baseline_net_benefit": 0.33333333333333326,
+      "flat_confidence_net_benefit": 0.33333333333333326,
       "nars_gated_net_benefit": 0.33333333333333326,
       "treat_all_net_benefit": -0.5104166666666672,
       "treat_none_net_benefit": 0.0
@@ -235,6 +264,7 @@
     {
       "threshold": 0.6500000000000001,
       "baseline_net_benefit": 0.29761904761904756,
+      "flat_confidence_net_benefit": 0.3184523809523809,
       "nars_gated_net_benefit": 0.3184523809523809,
       "treat_all_net_benefit": -0.7261904761904772,
       "treat_none_net_benefit": 0.0
@@ -242,6 +272,7 @@
     {
       "threshold": 0.7000000000000001,
       "baseline_net_benefit": 0.2777777777777778,
+      "flat_confidence_net_benefit": 0.2777777777777778,
       "nars_gated_net_benefit": 0.2777777777777778,
       "treat_all_net_benefit": -1.0138888888888895,
       "treat_none_net_benefit": 0.0
@@ -249,6 +280,7 @@
     {
       "threshold": 0.7500000000000001,
       "baseline_net_benefit": 0.24999999999999994,
+      "flat_confidence_net_benefit": 0.24999999999999994,
       "nars_gated_net_benefit": 0.24999999999999994,
       "treat_all_net_benefit": -1.416666666666668,
       "treat_none_net_benefit": 0.0
@@ -256,6 +288,7 @@
     {
       "threshold": 0.8,
       "baseline_net_benefit": 0.16666666666666663,
+      "flat_confidence_net_benefit": 0.1875,
       "nars_gated_net_benefit": 0.1875,
       "treat_all_net_benefit": -2.020833333333334,
       "treat_none_net_benefit": 0.0
@@ -263,6 +296,7 @@
     {
       "threshold": 0.8500000000000001,
       "baseline_net_benefit": 0.09722222222222204,
+      "flat_confidence_net_benefit": 0.09722222222222204,
       "nars_gated_net_benefit": 0.09722222222222204,
       "treat_all_net_benefit": -3.0277777777777803,
       "treat_none_net_benefit": 0.0
@@ -270,6 +304,7 @@
     {
       "threshold": 0.9000000000000001,
       "baseline_net_benefit": 0.14583333333333304,
+      "flat_confidence_net_benefit": -0.04166666666666724,
       "nars_gated_net_benefit": -0.04166666666666724,
       "treat_all_net_benefit": -5.041666666666676,
       "treat_none_net_benefit": 0.0
@@ -277,6 +312,7 @@
     {
       "threshold": 0.9500000000000001,
       "baseline_net_benefit": 0.3125,
+      "flat_confidence_net_benefit": -0.06250000000000061,
       "nars_gated_net_benefit": -0.06250000000000061,
       "treat_all_net_benefit": -11.083333333333352,
       "treat_none_net_benefit": 0.0
@@ -342,6 +378,66 @@
       "fraction_positives": 1.0,
       "count": 5,
       "variant": "baseline"
+    },
+    {
+      "mean_predicted_probability": 0.0019107947401120957,
+      "fraction_positives": 0.0,
+      "count": 5,
+      "variant": "flat_confidence"
+    },
+    {
+      "mean_predicted_probability": 0.0023783049173839977,
+      "fraction_positives": 0.0,
+      "count": 5,
+      "variant": "flat_confidence"
+    },
+    {
+      "mean_predicted_probability": 0.0036804203751323837,
+      "fraction_positives": 0.0,
+      "count": 5,
+      "variant": "flat_confidence"
+    },
+    {
+      "mean_predicted_probability": 0.00431125583534063,
+      "fraction_positives": 0.0,
+      "count": 4,
+      "variant": "flat_confidence"
+    },
+    {
+      "mean_predicted_probability": 0.00507904076448413,
+      "fraction_positives": 0.0,
+      "count": 5,
+      "variant": "flat_confidence"
+    },
+    {
+      "mean_predicted_probability": 0.2988244864955337,
+      "fraction_positives": 0.4,
+      "count": 5,
+      "variant": "flat_confidence"
+    },
+    {
+      "mean_predicted_probability": 0.9180020371229887,
+      "fraction_positives": 0.5,
+      "count": 4,
+      "variant": "flat_confidence"
+    },
+    {
+      "mean_predicted_probability": 0.9844898288216555,
+      "fraction_positives": 1.0,
+      "count": 5,
+      "variant": "flat_confidence"
+    },
+    {
+      "mean_predicted_probability": 0.9927310988129523,
+      "fraction_positives": 1.0,
+      "count": 5,
+      "variant": "flat_confidence"
+    },
+    {
+      "mean_predicted_probability": 0.9962945680871197,
+      "fraction_positives": 1.0,
+      "count": 5,
+      "variant": "flat_confidence"
     },
     {
       "mean_predicted_probability": 0.0019114414724494834,
