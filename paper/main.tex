@@ -24,11 +24,7 @@
 \maketitle
 
 \begin{abstract}
-Rare disease prediction often has fewer than 1000 labeled cases per condition, which degrades calibration and increases epistemic uncertainty in neural predictors \cite{ma2019, ovadia2019}.
-We define an interface that maps a transformer's predictive distribution to Non-Axiomatic Reasoning System (NARS) truth values and then maps NARS confidence back to attention reweighting during inference \cite{wang1995, wang2006, wang2013}.
-The method specifies a probability-and-variance to truth-value mapping, NAL-based truth-value propagation for evidence aggregation, and a confidence-conditioned attention update.
-We further instantiate the interface for medullary thyroid carcinoma diagnosis to show how scarce clinical and ultrasound evidence can be aggregated into an explicit $(f,c)$ conclusion.
-The result is a reproducible specification that makes uncertainty an explicit variable in attention-based inference under insufficient knowledge and resources; it also clarifies where failure modes can arise (variance estimation, proposition extraction, and rule conflicts).
+Rare-disease prediction is limited by small cohorts and unstable uncertainty estimates \cite{ma2019, ovadia2019}. We define a formal interface that maps transformer outputs to Non-Axiomatic Reasoning System (NARS) truth values and then uses NARS confidence to modulate attention during inference \cite{wang1995, wang2006, wang2013}. The method makes uncertainty an explicit, inspectable variable and specifies where failures can arise in variance estimation, proposition extraction, and rule conflict handling. We instantiate the interface for medullary thyroid carcinoma diagnosis on a 149-case structured cohort. On a 48-case held-out split, the NARS-guided model slightly improved AUC from 0.9873 to 0.9891 without changing thresholded decisions, showing feasibility and directional ranking benefit under severe data scarcity.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -45,6 +41,8 @@ Transformers provide flexible function approximators for clinical prediction tas
 Non-Axiomatic Reasoning System (NARS) represents evidential support with a two-dimensional truth value $(f,c)$, where $f$ is frequency and $c$ is confidence \cite{wang1995, wang2006, wang2013}. NARS updates truth values by truth-value functions that depend on the amount and agreement of evidence.
 
 We study the following research question: How can a transformer expose its uncertainty in a form that supports symbolic evidence aggregation, and how can aggregated evidential confidence control attention during inference?
+
+This paper does not claim that NARS broadly outperforms neural baselines for MTC diagnosis. The claim is narrower: NARS truth values provide a principled, inspectable uncertainty variable that can slightly improve risk ranking on the current cohort and can be extended as data grows.
 
 We contribute a formal interface specification. First, we define a mapping from a neural predictive distribution to a NARS truth value and a mapping from a truth value to an attention reweighting factor. Second, we specify the NAL truth-value operations required to aggregate multiple clinical propositions into a single conclusion under data scarcity. Third, we instantiate the interface for MTC diagnosis as a worked application case.
 
@@ -223,8 +221,7 @@ The resulting truth-values guide transformer attention in subsequent processing 
 \label{eq:attention_update}
 \end{equation}
 
-where $g(f, c) = c^{\gamma}$ with hyperparameter $\gamma > 0$. This formulation (Eq.~\eqref{eq:attention_update}) supersedes earlier heuristic formulations and provides a principled way to reweight attention based on NARS confidence. The function $g(f,c) = c^{\gamma}$ was chosen to use only confidence (not frequency) because $c$ encodes evidential reliability (how much support exists and how consistent it is), whereas $f$ primarily encodes the directional content of the proposition (supporting vs.
-egating). Using $c$ alone makes the attention gate behave like a reliability filter: propositions with uncertain support are downweighted regardless of whether they suggest a high or low probability outcome. Alternatives that include $f$ (e.g., $g(f,c)=c^{\gamma}f$) are possible but can over-suppress informative counter-evidence (low $f$) even when it is highly reliable (high $c$).
+where $g(f, c) = c^{\gamma}$ with hyperparameter $\gamma > 0$. The function $g(f,c) = c^{\gamma}$ was chosen to use only confidence (not frequency) because $c$ encodes evidential reliability (how much support exists and how consistent it is), whereas $f$ primarily encodes the directional content of the proposition (supporting vs. negating). Using $c$ alone makes the attention gate behave like a reliability filter: propositions with uncertain support are downweighted regardless of whether they suggest a high or low probability outcome. Alternatives that include $f$ (e.g., $g(f,c)=c^{\gamma}f$) are possible but can over-suppress informative counter-evidence (low $f$) even when it is highly reliable (high $c$).
 
 In practice, $\gamma$ should be selected on held-out validation data (e.g., grid search over $\gamma\in\{0.25,0.5,1,2,4\}$) to optimize a task-relevant objective such as validation NLL/Brier score and downstream decision utility; for clinical reporting, $\gamma$ can also be tuned to improve calibration of the final outputs after attention reweighting.
 
@@ -266,6 +263,27 @@ NARS maintains a knowledge base of clinical relationships including:
 
 These relationships are represented as NAL statements with truth-values derived from clinical literature and expert knowledge.
 
+\subsection{Proposition Extraction and Symbolic Rules}
+
+To make the symbolic layer reproducible, each structured or imaging feature is mapped to a NAL-style proposition before revision and attention gating. Table~\ref{tab:proposition_extraction} shows the small prototype knowledge base used in this paper. The assigned $(f_{sym},c_{sym})$ values are literature-anchored expert priors for the current prototype rather than cohort-fitted estimates, so they should be interpreted as transparent initial rule weights, not as definitive clinical truth values.
+
+\begin{table}[H]
+\caption{Prototype MTC knowledge-base rules used for proposition extraction and symbolic support.}
+\label{tab:proposition_extraction}
+\centering
+\begin{tabular}{@{}p{2.2cm}p{3.5cm}p{2.5cm}p{1.3cm}@{}}
+\toprule
+Feature cue & Proposition / rule & Source & $(f_{sym},c_{sym})$ \\
+\midrule
+Calcitonin elevated & $\langle$patient $\rightarrow$ calcitonin\_high$\rangle \Rightarrow \langle$patient $\rightarrow$ MTC\_likely$\rangle$ & \cite{zhou2026} & $(0.90,0.80)$ \\
+CEA elevated with thyroid lesion & $\langle$patient $\rightarrow$ CEA\_high$\rangle \wedge \langle$patient $\rightarrow$ thyroid\_lesion$\rangle \Rightarrow \langle$patient $\rightarrow$ MTC\_supported$\rangle$ & \cite{zhou2026} & $(0.78,0.65)$ \\
+Hypoechogenic ultrasound pattern & $\langle$patient $\rightarrow$ hypoechoic\_nodule$\rangle \Rightarrow \langle$patient $\rightarrow$ malignant\_suspicion$\rangle$ & \cite{zhou2026} & $(0.70,0.55)$ \\
+Enhanced intranodular blood flow & $\langle$patient $\rightarrow$ increased\_vascularity$\rangle \Rightarrow \langle$patient $\rightarrow$ malignant\_suspicion$\rangle$ & \cite{zhou2026} & $(0.68,0.50)$ \\
+Familial MEN2 / hereditary context & $\langle$patient $\rightarrow$ hereditary\_MEN2\_context$\rangle \Rightarrow \langle$patient $\rightarrow$ MTC\_risk\_elevated$\rangle$ & \cite{mtc_prophylactic_eje_2006, schulte2010jcem} & $(0.85,0.75)$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Inference Process}
 
 Given a patient case, the hybrid model operates through the following inference process:
@@ -291,30 +309,17 @@ The frequency $f$ represents the balance of positive and negative evidence, prov
 \section{Results}
 \label{sec:results}
 
-This paper produces a formal interface with two computable mappings and an initial empirical evaluation on an MTC diagnosis cohort.
+The central empirical question is whether NARS confidence improves risk ranking on a small MTC cohort. On the 48-case held-out split, the answer is directionally yes: AUC increased from 0.9873 to 0.9891, an absolute gain of $+0.0018$, while thresholded decisions at 0.5 did not change. This pattern indicates a small ranking benefit rather than a change in hard classification behavior.
 
-First, it maps a neural predictor to a NARS truth value. Given a predicted probability $p \in (0,1)$ for a proposition and an epistemic variance estimate $\sigma^2 \ge 0$, the interface sets
-\begin{equation}
-(f, c) = \left(p, \frac{p(1-p) + \varepsilon}{p(1-p) + \varepsilon + \sigma^2}\right)
-\label{eq:neural_to_nars_result}
-\end{equation}
-which matches the mapping defined in Eq.~\eqref{eq:neural_to_nars}.
-
-Second, it maps a truth value to an attention reweighting factor. For an attention weight $\alpha_i$ associated with proposition $i$ and its truth value $(f_i,c_i)$, the interface updates
-\begin{equation}
-\alpha_i^{\text{new}} = \frac{\alpha_i \cdot c_i^{\gamma}}{\sum_j \alpha_j \cdot c_j^{\gamma}}
-\label{eq:attention_update_result}
-\end{equation}
-where $\gamma > 0$ is a tunable hyperparameter controlling the sensitivity to confidence.
-
-We report an end-to-end numeric trace to make the interface concrete. Consider a neural estimate and a symbolic rule that both support the same conclusion $S\rightarrow P$:
+To make the interface concrete, we also report an end-to-end numeric trace using the mappings from Eqs.~\eqref{eq:neural_to_nars} and \eqref{eq:attention_update}.
+\par Consider a neural estimate and a symbolic rule that both support the same conclusion $S\rightarrow P$:
 \begin{itemize}
 \item Neural output: $p=0.8$, $\sigma^2=0.05$.
 \item Symbolic rule: $(f_{sym},c_{sym})=(0.9,0.7)$.
 \item Attention gain setting: $\gamma=2$.
 \end{itemize}
 
-From Eq.~\eqref{eq:neural_to_nars_result}, the neural statement has
+From Eq.~\eqref{eq:neural_to_nars}, the neural statement has
 \begin{equation}
 (f_{neural},c_{neural})\approx(0.8,0.7619)
 \end{equation}
@@ -325,7 +330,7 @@ We then aggregate neural and symbolic evidence by revision (Eqs.~\eqref{eq:revis
 (f_{rev},c_{rev})\approx(0.8422,0.8469).
 \end{equation}
 
-Finally, the confidence-gated attention gain is $g=c_{rev}^{\gamma}\approx 0.7173$, and the attention weights update by Eq.~\eqref{eq:attention_update_result}.
+Finally, the confidence-gated attention gain is $g=c_{rev}^{\gamma}\approx 0.7173$, and the attention weights update by Eq.~\eqref{eq:attention_update}.
 
 \begin{table}[H]
 \caption{Worked simulation trace for revising neural and symbolic evidence and applying confidence-gated attention.}
@@ -335,7 +340,7 @@ Finally, the confidence-gated attention gain is $g=c_{rev}^{\gamma}\approx 0.717
 \toprule
 Quantity & Value & How computed \\
 \midrule
-$(f_{neural},c_{neural})$ & $(0.8000,0.7619)$ & Eq.~\eqref{eq:neural_to_nars_result} with $(p,\sigma^2)=(0.8,0.05)$ \\
+$(f_{neural},c_{neural})$ & $(0.8000,0.7619)$ & Eq.~\eqref{eq:neural_to_nars} with $(p,\sigma^2)=(0.8,0.05)$ \\
 $(f_{sym},c_{sym})$ & $(0.9000,0.7000)$ & knowledge-base statement (given) \\
 $(\omega_{neural},\omega_{sym})$ & $(3.2000,2.3333)$ & $\omega=c/(1-c)$ \\
 $(f_{rev},c_{rev})$ & $(0.8422,0.8469)$ & Eqs.~\eqref{eq:revision_f}--\eqref{eq:revision_c} \\
@@ -350,12 +355,12 @@ We also evaluated the implemented pipeline on a 149-row MTC dataset using a stud
 \caption{Empirical test-set performance on the 48-case held-out study-aware split for MTC diagnosis.}
 \label{tab:empirical_results}
 \centering
-\begin{tabular}{@{}lcccccc@{}}
+\begin{tabular}{@{}lcccc@{}}
 \toprule
-Variant & AUC & Brier score & ECE & Accuracy & 95\% CI (Baseline) & 95\% CI (NARS-Gated) \\
+Variant & AUC [95\% CI] & Brier score & ECE & Accuracy \\
 \midrule
-Baseline transformer & 0.9873 & 0.0412 & 0.0476 & 0.9583 & [0.9590, 1.0000] & [0.9637, 1.0000] \\
-NARS-gated transformer & 0.9891 & 0.0411 & 0.0496 & 0.9583 & [0.9590, 1.0000] & [0.9637, 1.0000] \\
+Baseline transformer & 0.9873 [0.9590, 1.0000] & 0.0412 & 0.0476 & 0.9583 \\
+NARS-gated transformer & 0.9891 [0.9637, 1.0000] & 0.0411 & 0.0496 & 0.9583 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -388,9 +393,9 @@ Calibration was assessed with a reliability diagram using 10 equal-frequency bin
 \section{Analysis}
 \label{sec:analysis}
 
-Eq.~\eqref{eq:neural_to_nars_result} makes confidence decrease as predictive variance increases, holding $p$ fixed. This behavior matches the goal of downweighting evidence that the model cannot support with stable predictions under repeated sampling.
+Eq.~\eqref{eq:neural_to_nars} makes confidence decrease as predictive variance increases, holding $p$ fixed. This behavior matches the goal of downweighting evidence that the model cannot support with stable predictions under repeated sampling.
 
-Eq.~\eqref{eq:attention_update_result} enforces two invariants. It preserves $\sum_i \alpha_i^{\text{new}} = 1$. It sets $\alpha_i^{\text{new}} = 0$ when $c_i = 0$.
+Eq.~\eqref{eq:attention_update} enforces two invariants. It preserves $\sum_i \alpha_i^{\text{new}} = 1$. It sets $\alpha_i^{\text{new}} = 0$ when $c_i = 0$.
 
 The empirical comparison in Table~\ref{tab:empirical_results} suggests that the direction of the AUC change is consistent with the method's intent. Because accuracy and recall remained unchanged while AUC increased slightly, the main impact of NARS guidance in this run is better ordering of cases by predicted risk rather than a change in thresholded decisions. In a clinical triage setting, even a small ranking improvement can matter because it can move suspicious cases higher in the review queue; however, the overlapping bootstrap intervals indicate that this cannot be treated as a confirmed performance gain on the current test split.
 
@@ -398,7 +403,9 @@ The same experiment also shows a cautionary point. The Brier score changed only 
 
 The decision-curve analysis sharpens that interpretation. The gain from NARS guidance is better described as local clinical-utility improvement at selected thresholds than as a uniform improvement across all decision settings. The high-threshold tail is unstable on this 48-case test set, with the NARS-gated curve dropping below baseline at 0.90 and 0.95, so those regions should not be over-interpreted. Taken together, the ranking, calibration, and decision-utility results support feasibility and selective benefit, but not a blanket claim of superiority across all threshold choices.
 
-The interface can fail in three cases. First, the variance estimator can misrepresent epistemic uncertainty. MC dropout can under-estimate uncertainty under dataset shift \cite{ovadia2019}. Second, proposition extraction can misalign neural features and symbolic terms. This error couples the wrong $c_i$ to $\alpha_i$. Third, the knowledge base can contain conflicting or weak rules. NARS then produces low confidence conclusions that can suppress attention broadly.
+Compared with simply using MC dropout output as a soft confidence signal, the present interface adds an explicit revision step that can combine neural and symbolic evidence in a shared $(f,c)$ space before attention is updated. This differs from approaches such as SHEPHERD and other knowledge-graph-augmented predictors \cite{karjalainen2025, jiang2024}, which enrich representations or retrieval but do not expose a NARS-style evidential confidence variable that can be revised and then fed back into attention. The contribution here is therefore not a larger knowledge graph or a different uncertainty estimator by itself, but a formal rule for turning uncertainty into revisable symbolic support and then reusing that support as a control signal in inference.
+
+The interface can fail in three cases. First, the variance estimator can misrepresent epistemic uncertainty. MC dropout can under-estimate uncertainty under dataset shift \cite{ovadia2019}; for example, if a new cohort has a different prevalence of hereditary RET-associated presentations, $c$ may be inflated and the attention gate may over-weight uncertain predictions. Second, proposition extraction can misalign neural features and symbolic terms; for example, if a mildly elevated calcitonin measurement is incorrectly mapped to the strong proposition calcitonin\_high, the wrong $c_i$ will be coupled to the attention update. Third, the knowledge base can contain conflicting or weak rules; for example, one rule may strongly favor MTC because of hereditary context while another weak imaging rule suppresses suspicion, producing a diluted revised confidence that downweights all related features.
 
 \section{Limitations}
 \label{sec:limitations}
@@ -407,13 +414,17 @@ This paper reports an initial single-split empirical evaluation, but the evidenc
 
 The 48-case test set has insufficient statistical power to distinguish AUC gains smaller than approximately 0.03 at the 95\% level. This follows from the rough standard-error scale $0.5/\sqrt{n_{pos}n_{neg}}$, which is about 0.03 for 19 positive and 29 negative test cases.
 
-The mapping in Eq.~\eqref{eq:neural_to_nars_result} depends on a variance estimate $\sigma^2$ from a chosen uncertainty quantification method \cite{gal2016, lakshminarayanan2017}. Different estimators change $c$ even when $p$ is fixed.
+The mapping in Eq.~\eqref{eq:neural_to_nars} depends on a variance estimate $\sigma^2$ from a chosen uncertainty quantification method \cite{gal2016, lakshminarayanan2017}. Different estimators change $c$ even when $p$ is fixed.
 
-The method requires a proposition inventory and a knowledge base with truth values. This requirement shifts effort from model training to knowledge engineering.
+\subsection{Knowledge Engineering Cost}
+
+The method requires a proposition inventory and a knowledge base with truth values. This requirement shifts effort from model training to knowledge engineering. Even in the present prototype, defining the five symbolic MTC rules in Table~\ref{tab:proposition_extraction} required manual literature review, proposition design, and assignment of initial $(f_{sym},c_{sym})$ values. A practical first-pass rule set of this size therefore already demands a several-hour expert curation pass plus iteration on wording and confidence values. The required expertise is not only machine-learning knowledge but also domain judgment about which clinical findings deserve strong or weak symbolic support.
+
+This also creates an inter-rater problem. If two clinicians disagree on the appropriate truth value for a rule such as elevated CEA in the presence of a thyroid lesion, the system has no automatic way to decide which prior is correct. In practice, such disagreements would need either consensus review, sensitivity analysis over rule weights, or explicit reporting of alternative rule sets.
 
 The present experiment also used a single operating threshold and one study-aware split. Additional resampling, external validation, and decision-curve analysis are still needed before stronger clinical claims can be made.
 
-\section{Empirical Evaluation and Future Validation}
+\section{Discussion and Future Work}
 \label{sec:planned_evaluation}
 
 In addition to the empirical run reported in Sec.~\ref{sec:results}, the interface remains straightforward to validate more broadly in a reproducible way. The next stage of evaluation should test (i) the numerical behavior of the mappings, (ii) end-to-end predictive performance under stronger resampling and cohort variation, and (iii) clinician-facing interpretability.
@@ -485,10 +496,6 @@ This work is methodological and did not involve new studies with human participa
 \section*{Data and Code Availability}
 
 The code for the implemented pipeline is available in the public repository \url{https://github.com/ArjunCodess/NGTA}. The structured dataset analyzed in this work was assembled from previously published studies of hereditary MTC and MEN2 \cite{mtc_k666n_thyroid_2016, mtc_prophylactic_eje_2006, qi2015oncotarget, florescu2024clinpract, lagreca2024edm, vijayan2021ijc, zhang2024wjcc, shankar2012ijpe, schulte2010jcem, qi2014biosci}; no new patient data were collected.
-
-\section*{Author Contributions}
-
-Arjun Vijay Prakash: conceptualization, literature review, writing (original draft), and writing (review and editing).
 
 \section*{Author Biography}
 
