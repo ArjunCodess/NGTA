@@ -365,7 +365,7 @@ NARS-gated transformer & 0.9891 [0.9637, 1.0000] & 0.0411 & 0.0496 & 0.9583 \\
 \end{tabular}
 \end{table}
 
-At the operating threshold of 0.5, both models achieved recall 1.0 on the held-out set, with 27 true negatives, 2 false positives, 0 false negatives, and 19 true positives. The NARS-guided model therefore did not change the hard classification decisions in this run, but it slightly improved ranking performance as reflected in the AUC increase from 0.9873 to 0.9891, an absolute gain of $+0.0018$. However, the bootstrap intervals in Table~\ref{tab:empirical_results} overlap, so the observed AUC difference should be treated as uncertain rather than as a clearly separated performance gain on this test split. This overlap is consistent with the expected statistical power of a 48-case test set; a gap this small requires a substantially larger cohort to resolve.
+At the operating threshold of 0.5, both models achieved recall 1.0 on the held-out set, with 27 true negatives, 2 false positives, 0 false negatives, and 19 true positives. The NARS-guided model therefore did not change the hard classification decisions in this run, but it slightly improved ranking performance as reflected in the AUC increase from 0.9873 to 0.9891, an absolute gain of $+0.0018$. However, the bootstrap intervals in Table~\ref{tab:empirical_results} overlap, so the observed AUC difference should be treated as uncertain rather than as a clearly separated performance gain on this test split. This overlap is expected: the approximate standard error of AUC for 19 positive and 29 negative test cases is about 0.03, so gaps smaller than that are undetectable at the 95\% level on this split.
 
 \begin{table}[H]
 \caption{Gamma ablation on the 48-case held-out test split.}
@@ -375,18 +375,18 @@ At the operating threshold of 0.5, both models achieved recall 1.0 on the held-o
 \toprule
 $\gamma$ & Baseline AUC & NARS-gated AUC & Baseline Brier & NARS-gated Brier \\
 \midrule
-0.25 & 0.9873 & 0.9891 & 0.0412 & 0.0413 \\
-0.5 & 0.9873 & 0.9891 & 0.0412 & 0.0412 \\
-1.0 & 0.9873 & 0.9891 & 0.0412 & 0.0412 \\
-2.0 & 0.9873 & 0.9891 & 0.0412 & 0.0411 \\
-4.0 & 0.9873 & 0.9891 & 0.0412 & 0.0410 \\
+0.25 & 0.9873 & 0.9891 & 0.04121 & 0.04125 \\
+0.5 & 0.9873 & 0.9891 & 0.04121 & 0.04124 \\
+1.0 & 0.9873 & 0.9891 & 0.04121 & 0.04121 \\
+2.0 & 0.9873 & 0.9891 & 0.04121 & 0.04115 \\
+4.0 & 0.9873 & 0.9891 & 0.04121 & 0.04104 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 The gamma ablation in Table~\ref{tab:gamma_ablation} shows that, on this test split, changing $\gamma$ does not alter AUC or accuracy: the NARS-gated model remains at 0.9891 AUC across the tested values. The main effect of increasing $\gamma$ is instead a modest improvement in Brier score, with the best calibration-oriented result among the tested values occurring at $\gamma=4$.
 
-We also computed decision-curve analysis over threshold probabilities from 0.05 to 0.95 to assess clinical utility in terms of net benefit. Across a broad middle range of thresholds, both learned models outperform the treat-all and treat-none strategies. The NARS-gated model matches the baseline at many thresholds and exceeds it slightly at several decision points, including 0.65 and 0.80. At threshold 0.65, for example, net benefit increases from 0.2976 to 0.3185, corresponding to roughly 2.08 additional true-positive-equivalent decisions per 100 patients after accounting for threshold-weighted false positives.
+We also computed decision-curve analysis over threshold probabilities from 0.05 to 0.95 to assess clinical utility in terms of net benefit. Across a broad middle range of thresholds, both learned models outperform the treat-all and treat-none strategies. The NARS-gated model matches the baseline at many thresholds and exceeds it slightly at several decision points, including 0.65 and 0.80. At threshold 0.65, for example, net benefit increases from 0.2976 to 0.3185, corresponding to roughly 2.08 additional true-positive-equivalent decisions per 100 patients after accounting for threshold-weighted false positives. A similar gain of about 2.08 per 100 patients appears at threshold 0.80.
 
 Calibration was assessed with a reliability diagram using 10 equal-frequency bins and by expected calibration error. On this split, ECE was 0.0476 for the baseline model and 0.0496 for the NARS-gated model. Thus, while the gated model improved Brier score slightly, it did not improve ECE on the same held-out set, indicating a mixed calibration result rather than a uniform gain.
 
@@ -403,7 +403,7 @@ The same experiment also shows a cautionary point. The Brier score changed only 
 
 The decision-curve analysis sharpens that interpretation. The gain from NARS guidance is better described as local clinical-utility improvement at selected thresholds than as a uniform improvement across all decision settings. The high-threshold tail is unstable on this 48-case test set, with the NARS-gated curve dropping below baseline at 0.90 and 0.95, so those regions should not be over-interpreted. Taken together, the ranking, calibration, and decision-utility results support feasibility and selective benefit, but not a blanket claim of superiority across all threshold choices.
 
-Compared with simply using MC dropout output as a soft confidence signal, the present interface adds an explicit revision step that can combine neural and symbolic evidence in a shared $(f,c)$ space before attention is updated. This differs from approaches such as SHEPHERD and other knowledge-graph-augmented predictors \cite{karjalainen2025, jiang2024}, which enrich representations or retrieval but do not expose a NARS-style evidential confidence variable that can be revised and then fed back into attention. The contribution here is therefore not a larger knowledge graph or a different uncertainty estimator by itself, but a formal rule for turning uncertainty into revisable symbolic support and then reusing that support as a control signal in inference.
+Compared with simply using MC dropout output as a soft confidence signal, the present interface adds an explicit revision step that can combine neural and symbolic evidence in a shared $(f,c)$ space before attention is updated. More directly, simply scaling the logits by raw MC-dropout confidence would not provide the revision step that combines neural and symbolic support in a shared evidential space. That distinction is what Table~\ref{tab:proposition_extraction} makes concrete. This differs from approaches such as SHEPHERD and other knowledge-graph-augmented predictors \cite{karjalainen2025, jiang2024}, which enrich representations or retrieval but do not expose a NARS-style evidential confidence variable that can be revised and then fed back into attention. The contribution here is therefore not a larger knowledge graph or a different uncertainty estimator by itself, but a formal rule for turning uncertainty into revisable symbolic support and then reusing that support as a control signal in inference.
 
 The interface can fail in three cases. First, the variance estimator can misrepresent epistemic uncertainty. MC dropout can under-estimate uncertainty under dataset shift \cite{ovadia2019}; for example, if a new cohort has a different prevalence of hereditary RET-associated presentations, $c$ may be inflated and the attention gate may over-weight uncertain predictions. Second, proposition extraction can misalign neural features and symbolic terms; for example, if a mildly elevated calcitonin measurement is incorrectly mapped to the strong proposition calcitonin\_high, the wrong $c_i$ will be coupled to the attention update. Third, the knowledge base can contain conflicting or weak rules; for example, one rule may strongly favor MTC because of hereditary context while another weak imaging rule suppresses suspicion, producing a diluted revised confidence that downweights all related features.
 
@@ -464,7 +464,7 @@ For each variant, $\gamma$ should be tuned on a held-out validation set and the 
 \subsection{Error Analysis and Human-in-the-Loop Case Studies}
 \label{sec:case_studies}
 
-To evaluate interpretability, this analysis \emph{can be done} by selecting 10--20 representative cases (or simulated hard cases) and presenting the NARS-derived explanation trace: the main propositions used, their individual $(f,c)$ values, and how they combine into the final conclusion. This should also categorize common failure modes (variance underestimation, proposition extraction errors, and conflicting rules) and show how each failure mode manifests in the attention update.
+To evaluate interpretability, future work should select 10--20 representative cases (or simulated hard cases) and present the NARS-derived explanation trace: the main propositions used, their individual $(f,c)$ values, and how they combine into the final conclusion. This should also categorize common failure modes (variance underestimation, proposition extraction errors, and conflicting rules) and show how each failure mode manifests in the attention update.
 
 Overall, the empirical result in this paper provides an initial proof of feasibility, while the experiments in Sec.~\ref{sec:planned_evaluation} remain the next systematic validation steps needed to determine whether the small ranking gain observed here is robust across cohorts and clinical settings.
 
