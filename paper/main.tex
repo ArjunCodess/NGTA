@@ -249,6 +249,8 @@ Diagnosing MTC from clinical and imaging data is challenging because positive ca
 
 Zhou et al. \cite{zhou2026} conducted a multi-center study of MTC and showed that richer cohorts can support strong predictive performance. However, many realistic deployment settings have only smaller clinical and ultrasound cohorts, where uncertainty quantification and evidence aggregation are more important than simply scaling feature modalities.
 
+The structured dataset used in the present implementation was assembled from ten published hereditary MTC and MEN2 studies, including family cohorts, case series, and case reports \cite{mtc_k666n_thyroid_2016, mtc_prophylactic_eje_2006, qi2015oncotarget, florescu2024clinpract, lagreca2024edm, vijayan2021ijc, zhang2024wjcc, shankar2012ijpe, schulte2010jcem, qi2014biosci}. This provenance matters because the resulting cohort reflects the sparse, heterogeneous evidence base that often characterizes rare-disease modeling in practice.
+
 \subsection{Hybrid Model Architecture}
 
 For MTC diagnosis, we propose a NARS-transformer hybrid with the following architecture. The input consists of clinical features (age, gender, family history, and serum markers) and imaging features (thyroid ultrasound characteristics).
@@ -342,7 +344,7 @@ Gain $g$ & $0.7173$ & $g=c_{rev}^{\gamma}$ with $\gamma=2$ \\
 \end{tabular}
 \end{table}
 
-We also evaluated the implemented pipeline on a 149-row MTC dataset using a study-aware split with 80 training cases, 21 validation cases, and 48 held-out test cases. The model used 30 Monte Carlo dropout passes and a confidence-gating exponent $\gamma=2$. Table~\ref{tab:empirical_results} summarizes the held-out performance of the baseline transformer and the NARS-gated variant.
+We also evaluated the implemented pipeline on a 149-row MTC dataset using a study-aware split with 80 training cases, 21 validation cases, and 48 held-out test cases. The reported run uses the default experimental setting of 50 Monte Carlo dropout passes with $\gamma=2$, together with a transformer architecture of $d_{model}=64$, 4 heads, and 2 encoder layers. Table~\ref{tab:empirical_results} summarizes the held-out performance of that configuration.
 
 \begin{table}[H]
 \caption{Empirical test-set performance on the 48-case held-out study-aware split for MTC diagnosis.}
@@ -352,13 +354,13 @@ We also evaluated the implemented pipeline on a 149-row MTC dataset using a stud
 \toprule
 Variant & AUC & Brier score & Accuracy \\
 \midrule
-Baseline transformer & 0.9873 & 0.0415 & 0.9583 \\
-NARS-gated transformer & 0.9891 & 0.0419 & 0.9583 \\
+Baseline transformer & 0.9873 & 0.0412 & 0.9583 \\
+NARS-gated transformer & 0.9891 & 0.0411 & 0.9583 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-At the operating threshold of 0.5, both models achieved recall 1.0 on the held-out set, with 27 true negatives, 2 false positives, 0 false negatives, and 19 true positives. The NARS-guided model therefore did not change the hard classification decisions in this run, but it slightly improved ranking performance as reflected in the AUC increase from 0.9873 to 0.9891.
+At the operating threshold of 0.5, both models achieved recall 1.0 on the held-out set, with 27 true negatives, 2 false positives, 0 false negatives, and 19 true positives. The NARS-guided model therefore did not change the hard classification decisions in this run, but it slightly improved ranking performance as reflected in the AUC increase from 0.9873 to 0.9891, an absolute gain of $+0.0018$.
 
 \section{Analysis}
 \label{sec:analysis}
@@ -369,7 +371,7 @@ Eq.~\eqref{eq:attention_update_result} enforces two invariants. It preserves $\s
 
 The empirical comparison in Table~\ref{tab:empirical_results} suggests that the attention gate has a modest but coherent effect. Because accuracy and recall remained unchanged while AUC increased slightly, the main impact of NARS guidance in this run is better ordering of cases by predicted risk rather than a change in thresholded decisions. In a clinical triage setting, even a small ranking improvement can matter because it can move suspicious cases higher in the review queue; however, the effect here is small enough that it should be interpreted as directional evidence, not proof of a clinically meaningful gain.
 
-The same experiment also shows a cautionary point. The Brier score increased slightly from 0.0415 to 0.0419, so the NARS-gated variant did not improve every metric at once. This trade-off is consistent with the idea that confidence-based reweighting may sharpen ordering without necessarily improving calibration on a small held-out split.
+The same experiment also shows a cautionary point. The Brier score changed only slightly, from 0.0412 to 0.0411 in the selected configuration, so the calibration effect is minor compared with the ranking effect. This trade-off is consistent with the idea that confidence-based reweighting may help prioritize cases without necessarily changing hard decisions on a small held-out split.
 
 The interface can fail in three cases. First, the variance estimator can misrepresent epistemic uncertainty. MC dropout can under-estimate uncertainty under dataset shift \cite{ovadia2019}. Second, proposition extraction can misalign neural features and symbolic terms. This error couples the wrong $c_i$ to $\alpha_i$. Third, the knowledge base can contain conflicting or weak rules. NARS then produces low confidence conclusions that can suppress attention broadly.
 
@@ -433,13 +435,13 @@ Overall, the empirical result in this paper provides an initial proof of feasibi
 
 This paper defined a bidirectional interface between transformers and NARS that (i) converts neural predictive outputs into NARS truth values and (ii) uses NARS confidence to modulate transformer attention during inference. The key benefit is that evidential support becomes an explicit variable that can be aggregated symbolically and then reused as a control signal in neural inference.
 
-Concretely, the interface (a) maps $(p,\sigma^2)$ to $(f,c)$ so that confidence decreases as epistemic variance increases, and (b) maps $(f,c)$ to a normalized attention update via a tunable confidence gain. On the current 149-case MTC dataset, this NARS-guided attention mechanism produced a small improvement in AUC over the baseline transformer while leaving thresholded accuracy and recall unchanged. The result is therefore best understood as preliminary evidence that NARS confidence can improve risk ranking, rather than a definitive clinical performance gain.
+Concretely, the interface (a) maps $(p,\sigma^2)$ to $(f,c)$ so that confidence decreases as epistemic variance increases, and (b) maps $(f,c)$ to a normalized attention update via a tunable confidence gain. On the current 149-case MTC dataset, the default parameter setting produced a small improvement in AUC over the baseline transformer while leaving thresholded accuracy and recall unchanged. The result is therefore best understood as preliminary evidence that NARS confidence can improve risk ranking, rather than a definitive clinical performance gain.
 
 Future work should evaluate the interface under controlled data-scarcity and dataset-shift regimes, reporting discrimination, calibration, and decision-utility metrics, and comparing against uncertainty-aware baselines that do not use symbolic aggregation. Future work should also quantify knowledge-base construction effort and characterize failures due to mis-specified rules, conflicting evidence, and proposition extraction errors.
 
 \section*{Acknowledgment}
 
-The author thanks Pei Wang for developing the Non-Axiomatic Reasoning System (NARS). The author also thanks the researchers whose work is cited in this paper.
+The author thanks Pei Wang for developing the Non-Axiomatic Reasoning System (NARS). The author also thanks the researchers whose published hereditary MTC and MEN2 studies provided the clinical source material used to assemble the structured dataset analyzed in this work \cite{mtc_k666n_thyroid_2016, mtc_prophylactic_eje_2006, qi2015oncotarget, florescu2024clinpract, lagreca2024edm, vijayan2021ijc, zhang2024wjcc, shankar2012ijpe, schulte2010jcem, qi2014biosci}.
 
 \section*{Funding}
 
@@ -455,7 +457,7 @@ This work is methodological and did not involve new studies with human participa
 
 \section*{Data and Code Availability}
 
-No new datasets or code were created or analyzed for this work.
+The code for the implemented pipeline is contained in this repository. The structured dataset analyzed in this work was assembled from previously published studies of hereditary MTC and MEN2 \cite{mtc_k666n_thyroid_2016, mtc_prophylactic_eje_2006, qi2015oncotarget, florescu2024clinpract, lagreca2024edm, vijayan2021ijc, zhang2024wjcc, shankar2012ijpe, schulte2010jcem, qi2014biosci}; no new patient data were collected.
 
 \section*{Author Contributions}
 

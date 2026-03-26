@@ -54,10 +54,23 @@ Verified setup from [results/metrics/run_summary.json](results/metrics/run_summa
 - `21` validation rows
 - `48` test rows
 - held-out test studies: `study_2`, `study_8`
-- `30` MC-dropout inference passes
+- `50` MC-dropout inference passes
 - Transformer config: `d_model=64`, `num_heads=4`, `num_layers=2`, `dropout=0.2`
 - NARS attention gate: `gamma=2.0`
 - `16` features used in the saved run
+
+The current default configuration is the `mc_50` setting:
+
+- `mc_samples=50`
+- `gamma=2.0`
+- `d_model=64`
+- `num_heads=4`
+- `num_layers=2`
+- `dropout=0.2`
+- `epochs=60`
+- `batch_size=32`
+- `learning_rate=0.001`
+- `patience=12`
 
 The saved feature set is:
 
@@ -78,6 +91,21 @@ The saved feature set is:
 - `calcitonin_level_numeric`
 - `cea_level_numeric`
 
+## Dataset Provenance
+
+The structured dataset in [data.csv](data.csv) was assembled from ten published hereditary MTC and MEN2 case reports, family cohorts, and clinical follow-up studies. Special thanks are due to the authors of these studies for reporting the clinical details that made this small structured cohort possible.
+
+- `study_1`: *Medullary Thyroid Carcinoma Associated with Germline RETK666N Mutation*. *Thyroid* (2016). DOI: `10.1089/thy.2016.0374`
+- `study_2`: *Long-term outcome in 46 gene carriers of hereditary medullary thyroid carcinoma after prophylactic thyroidectomy: impact of individual RET genotype*. *European Journal of Endocrinology* (2006). DOI: `10.1530/eje.1.02216`
+- `study_3`: Qi et al. *RET mutation p.S891A in a Chinese family with familial medullary thyroid carcinoma and associated cutaneous amyloidosis binding OSMR variant p.G513D*. *Oncotarget* (2015). DOI: `10.18632/oncotarget.4992`
+- `study_4`: Florescu et al. *Endocrine Perspective of Cutaneous Lichen Amyloidosis: RET-C634 Pathogenic Variant in Multiple Endocrine Neoplasia Type 2*. *Clinics and Practice* (2024). DOI: `10.3390/clinpract14060179`
+- `study_5`: La Greca et al. *MEN2 phenotype in a family with germline heterozygous rare RET K666N variant*. *Endocrinology, Diabetes & Metabolism Case Reports* (2024). DOI: `10.1530/EDM-24-0009`
+- `study_6`: Vijayan et al. *A rare RET mutation in an Indian pedigree with familial medullary thyroid carcinoma*. *Indian Journal of Cancer* (2021). DOI: `10.4103/ijc.IJC_639_19`
+- `study_7`: Zhang et al. *C634Y mutation in RET-induced multiple endocrine neoplasia type 2A: A case report*. *World Journal of Clinical Cases* (2024). DOI: `10.12998/wjcc.v12.i15.2627`
+- `study_8`: Shankar et al. *Medullary thyroid cancer in a 9-week-old infant with familial MEN 2B: Implications for timing of prophylactic thyroidectomy*. *International Journal of Pediatric Endocrinology* (2012). DOI: `10.1186/1687-9856-2012-25`
+- `study_9`: Schulte et al. *The Clinical Spectrum of Multiple Endocrine Neoplasia Type 2a Caused by the Rare Intracellular RET Mutation S891A*. *The Journal of Clinical Endocrinology & Metabolism* (2010). DOI: `10.1210/jc.2010-0375`
+- `study_10`: Qi et al. *The rare intracellular RET mutation p.S891A in a Chinese Han family with familial medullary thyroid carcinoma*. *Journal of Biosciences* (2014). DOI: `10.1007/s12038-014-9428-x`
+
 ## Results
 
 The latest full run was:
@@ -92,8 +120,8 @@ The saved metrics are in [results/metrics/metrics.csv](results/metrics/metrics.c
 
 | Variant | AUC | Brier Score | Accuracy | Recall | Precision | F1 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Baseline Transformer | 0.9873 | 0.04153 | 95.83% | 100.00% | 90.48% | 0.9500 |
-| NARS-Gated Transformer | 0.9891 | 0.04187 | 95.83% | 100.00% | 90.48% | 0.9500 |
+| Baseline Transformer | 0.9873 | 0.04121 | 95.83% | 100.00% | 90.48% | 0.9500 |
+| NARS-Gated Transformer | 0.9891 | 0.04115 | 95.83% | 100.00% | 90.48% | 0.9500 |
 
 ### What changed with NARS gating
 
@@ -102,7 +130,7 @@ The saved metrics are in [results/metrics/metrics.csv](results/metrics/metrics.c
 - Recall stayed the same at `100%`.
 - Precision stayed the same at `90.48%`.
 - F1 stayed the same at `0.95`.
-- Brier score changed slightly in the wrong direction, from `0.04153` to `0.04187`.
+- Brier score improved slightly, from `0.04121` to `0.04115`.
 
 ### Practical interpretation
 
@@ -114,6 +142,23 @@ The saved run shows a **small ranking improvement** from NARS-guided attention, 
 - true positives: `19`
 
 That means the current evidence supports a narrow claim: in this run, NARS gating slightly improved ordering of cases by score, but it did **not** change the final hard predictions. This is still useful because rare-disease workflows often depend on ranking and triage, but the effect should be interpreted as **modest and preliminary**, not as a dramatic performance jump.
+
+### Default parameter setting
+
+The model defaults are:
+
+- `epochs=60`
+- `batch_size=32`
+- `learning_rate=0.001`
+- `mc_samples=50`
+- `gamma=2.0`
+- `d_model=64`
+- `num_heads=4`
+- `num_layers=2`
+- `dropout=0.2`
+- `patience=12`
+
+These values are the defaults in the CLI and pipeline, and the saved results in this repository were generated with this configuration.
 
 ## How The Method Works
 
@@ -178,7 +223,7 @@ python main.py --run-all
 Useful overrides:
 
 ```bash
-python main.py --run-all --epochs 60 --mc-samples 30 --gamma 2.0
+python main.py --run-all --epochs 60 --mc-samples 50 --gamma 2.0
 python main.py --run-all --batch-size 16 --seed 0
 ```
 
