@@ -7,89 +7,92 @@
 ![Recall](https://img.shields.io/badge/Recall-100%25-success)
 ![Samples](https://img.shields.io/badge/Samples-149-informational)
 
-NGTA is a research implementation of a neurosymbolic idea: use a Transformer for **medullary thyroid carcinoma (MTC) diagnosis**, estimate uncertainty with Monte Carlo dropout, convert that uncertainty into **NARS** truth values, and then use NARS confidence to guide attention during inference.
+NGTA is a research implementation of a neurosymbolic pipeline for **medullary thyroid carcinoma (MTC) diagnosis**. It combines a tabular Transformer, Monte Carlo dropout uncertainty estimation, and **Non-Axiomatic Reasoning System (NARS)** truth values so that evidential confidence can be fed back into attention during inference.
 
-The repository contains:
+The project is the executable companion to the manuscript in [paper/main.tex](paper/main.tex), and the public code repository is `https://github.com/ArjunCodess/NGTA`.
 
-- the manuscript in [paper/main.tex](paper/main.tex),
-- the bibliography in [paper/references.bib](paper/references.bib),
-- the runnable pipeline in [main.py](main.py) and [src](src),
-- and the generated outputs in [charts](charts) and [results](results).
+## Table Of Contents
 
-## What NGTA Means
+- [Overview](#overview)
+- [Research Question](#research-question)
+- [What Was Tested](#what-was-tested)
+- [Results](#results)
+- [Dataset Provenance](#dataset-provenance)
+- [Built With](#built-with)
+- [Repository Layout](#repository-layout)
+- [Prerequisites](#prerequisites)
+- [Quick Start](#quick-start)
+- [Usage](#usage)
+- [Output Artifacts](#output-artifacts)
+- [Repository Tags](#repository-tags)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Overview
 
 **NGTA = NARS-Guided Transformer Attention.**
 
-The project combines:
+The method combines:
 
-- a tabular Transformer encoder,
-- Monte Carlo dropout for predictive uncertainty,
+- a tabular Transformer encoder for structured clinical prediction,
+- Monte Carlo dropout for epistemic uncertainty estimation,
 - a mapping from neural outputs to NARS truth values `(f, c)`,
 - and confidence-based attention gating using `c^gamma`.
 
-The goal is not only to predict, but to make the model's evidential support more explicit and easier to inspect in a rare-disease setting.
-
-## Paper Basis
-
-This repository implements the ideas in the paper:
-
-**A Formal Interface That Maps NARS Truth Values to Uncertainty-Conditioned Transformer Attention for Rare Disease Prediction**
-
-In the current manuscript, the application case is **MTC diagnosis** from structured clinical features, serum markers, and ultrasound-related evidence.
+The goal is not only to classify cases, but to make uncertainty explicit, inspectable, and usable inside the prediction pipeline. In a rare-disease setting, that matters because ranking, triage, and evidential support can be as important as a single hard label.
 
 ## Research Question
 
 > How can a transformer expose its uncertainty in a form that supports symbolic evidence aggregation, and how can aggregated evidential confidence control attention during inference?
 
-That question is the core of NGTA. The repository is the executable version of that interface.
+That question is the core of NGTA. The repository implements that interface and evaluates it on a small structured MTC cohort derived from published hereditary MTC and MEN2 studies.
 
 ## What Was Tested
 
-The saved run evaluates a binary **MTC diagnosis** pipeline on [data.csv](data.csv).
+The current saved run evaluates binary **MTC diagnosis** on [data.csv](data.csv) using a study-aware split recorded in [results/metrics/run_summary.json](results/metrics/run_summary.json). The run contains `149` total cases, split into `80` training rows, `21` validation rows, and `48` held-out test rows, with `study_2` and `study_8` reserved for testing. The default configuration uses `50` Monte Carlo dropout passes, a Transformer with `d_model=64`, `num_heads=4`, `num_layers=2`, and `dropout=0.2`, plus a NARS confidence gate with `gamma=2.0`.
 
-Verified setup from [results/metrics/run_summary.json](results/metrics/run_summary.json):
+The model uses `16` structured variables spanning demographics, RET-related family/genotype context, endocrine comorbidity indicators, and biomarker features such as calcitonin and CEA. The saved results in this repository were generated with the default configuration shown below.
 
-- `149` total rows
-- `80` training rows
-- `21` validation rows
-- `48` test rows
-- held-out test studies: `study_2`, `study_8`
-- `50` MC-dropout inference passes
-- Transformer config: `d_model=64`, `num_heads=4`, `num_layers=2`, `dropout=0.2`
-- NARS attention gate: `gamma=2.0`
-- `16` features used in the saved run
+## Results
 
-The current default configuration is the `mc_50` setting:
+The latest full run was produced with:
 
+```bash
+python main.py --run-all
+```
+
+Saved metrics:
+
+- [results/metrics/metrics.csv](results/metrics/metrics.csv)
+- [results/metrics/run_summary.json](results/metrics/run_summary.json)
+
+### Test-Set Metrics
+
+| Variant | AUC | Brier Score | Accuracy | Recall | Precision | F1 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Baseline Transformer | 0.9873 | 0.04121 | 95.83% | 100.00% | 90.48% | 0.9500 |
+| NARS-Gated Transformer | 0.9891 | 0.04115 | 95.83% | 100.00% | 90.48% | 0.9500 |
+
+### Interpretation
+
+The main empirical effect is a **small but consistent ranking improvement** from the NARS-guided attention layer: AUC rises from `0.9873` to `0.9891`, and the Brier score improves slightly from `0.04121` to `0.04115`. The thresholded predictions on this held-out split remain the same, but the important contribution is that NGTA makes epistemic uncertainty explicit through NARS confidence and uses that confidence to produce slightly better risk ordering. In clinical triage settings, that combination of inspectable evidence and improved ranking can matter even when the headline classification counts do not change.
+
+### Default Parameter Setting
+
+The default model configuration is:
+
+- `epochs=60`
+- `batch_size=32`
+- `learning_rate=0.001`
 - `mc_samples=50`
 - `gamma=2.0`
 - `d_model=64`
 - `num_heads=4`
 - `num_layers=2`
 - `dropout=0.2`
-- `epochs=60`
-- `batch_size=32`
-- `learning_rate=0.001`
 - `patience=12`
 
-The saved feature set is:
-
-- `gender`
-- `ret_variant`
-- `ret_risk_level`
-- `calcitonin_elevated`
-- `cea_elevated`
-- `cea_imputed_flag`
-- `thyroid_nodules_present`
-- `family_history_mtc`
-- `c_cell_disease`
-- `men2_syndrome`
-- `pheochromocytoma`
-- `hyperparathyroidism`
-- `age_group`
-- `age`
-- `calcitonin_level_numeric`
-- `cea_level_numeric`
+These values are the defaults in [main.py](main.py) and [src/pipeline.py](src/pipeline.py), and the saved repository results were generated with this setup.
 
 ## Dataset Provenance
 
@@ -106,88 +109,155 @@ The structured dataset in [data.csv](data.csv) was assembled from ten published 
 9. Schulte et al. *The Clinical Spectrum of Multiple Endocrine Neoplasia Type 2a Caused by the Rare Intracellular RET Mutation S891A*. *The Journal of Clinical Endocrinology & Metabolism* (2010). DOI: `10.1210/jc.2010-0375`
 10. Qi et al. *The rare intracellular RET mutation p.S891A in a Chinese Han family with familial medullary thyroid carcinoma*. *Journal of Biosciences* (2014). DOI: `10.1007/s12038-014-9428-x`
 
-## Results
+## Built With
 
-The latest full run was:
+The pipeline is built primarily with:
+
+- **Python** for the CLI and orchestration
+- **PyTorch** for the tabular Transformer and MC-dropout inference
+- **scikit-learn** for splitting, preprocessing helpers, and evaluation metrics
+- **Pandas** for tabular data handling and artifact export
+- **NumPy** for numerical operations
+- **Matplotlib** for ROC, calibration, and training-history plots
+- **Seaborn** for plotting support
+
+The exact installable dependencies are listed in [requirements.txt](requirements.txt).
+
+## Repository Layout
+
+- [main.py](main.py): CLI entry point
+- [src/data_loader.py](src/data_loader.py): loading, preprocessing, and study-aware splitting
+- [src/neural_encoder.py](src/neural_encoder.py): tabular Transformer with MC-dropout inference
+- [src/nars_interface.py](src/nars_interface.py): NARS truth-value mapping and revision
+- [src/attention_hook.py](src/attention_hook.py): confidence-based attention gating
+- [src/pipeline.py](src/pipeline.py): end-to-end training, evaluation, charts, and trace generation
+- [paper/main.tex](paper/main.tex): manuscript source
+- [paper/references.bib](paper/references.bib): BibTeX bibliography
+
+## Prerequisites
+
+Before running the project, make sure you have:
+
+- Python `3` available on your machine
+- `git` installed if you plan to clone the repository
+- a virtual environment tool such as `venv`, `virtualenv`, or Conda
+
+## Quick Start
+
+Clone the repository:
+
+```bash
+git clone https://github.com/ArjunCodess/NGTA.git
+cd NGTA
+```
+
+Create and activate a virtual environment with `venv`:
+
+```bash
+python -m venv venv
+```
+
+On Windows PowerShell:
+
+```bash
+.\venv\Scripts\Activate.ps1
+```
+
+On macOS or Linux:
+
+```bash
+source venv/bin/activate
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Run the full pipeline:
 
 ```bash
 python main.py --run-all
 ```
 
-The saved metrics are in [results/metrics/metrics.csv](results/metrics/metrics.csv), and the full run summary is in [results/metrics/run_summary.json](results/metrics/run_summary.json).
+Conda users can use an equivalent flow:
 
-### Test-set metrics
+```bash
+conda create -n ngta python=3.10
+conda activate ngta
+pip install -r requirements.txt
+```
 
-| Variant | AUC | Brier Score | Accuracy | Recall | Precision | F1 |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Baseline Transformer | 0.9873 | 0.04121 | 95.83% | 100.00% | 90.48% | 0.9500 |
-| NARS-Gated Transformer | 0.9891 | 0.04115 | 95.83% | 100.00% | 90.48% | 0.9500 |
+## Usage
 
-### What changed with NARS gating
+The main entry point is:
 
-- AUC improved slightly from `0.9873` to `0.9891`.
-- Accuracy stayed the same at `95.83%`.
-- Recall stayed the same at `100%`.
-- Precision stayed the same at `90.48%`.
-- F1 stayed the same at `0.95`.
-- Brier score improved slightly, from `0.04121` to `0.04115`.
+```bash
+python main.py --run-all
+```
 
-### Practical interpretation
+At present, invoking `python main.py` already executes the end-to-end pipeline. The `--run-all` flag is still included in examples because it is the explicit project command used throughout this repository.
 
-The saved run shows a **small ranking improvement** from NARS-guided attention, but not a threshold-level classification improvement on this test split. At the default threshold of `0.5`, both models produce the same confusion pattern:
+### Common Examples
 
-- true negatives: `27`
-- false positives: `2`
-- false negatives: `0`
-- true positives: `19`
+Run with the default configuration:
 
-That means the current evidence supports a narrow claim: in this run, NARS gating slightly improved ordering of cases by score, but it did **not** change the final hard predictions. This is still useful because rare-disease workflows often depend on ranking and triage, but the effect should be interpreted as **modest and preliminary**, not as a dramatic performance jump.
+```bash
+python main.py --run-all
+```
 
-### Default parameter setting
+Increase the strength of confidence gating:
 
-The model defaults are:
+```bash
+python main.py --run-all --gamma 4.0
+```
 
-- `epochs=60`
-- `batch_size=32`
-- `learning_rate=0.001`
-- `mc_samples=50`
-- `gamma=2.0`
-- `d_model=64`
-- `num_heads=4`
-- `num_layers=2`
-- `dropout=0.2`
-- `patience=12`
+Use fewer MC-dropout samples for a faster but noisier estimate:
 
-These values are the defaults in the CLI and pipeline, and the saved results in this repository were generated with this configuration.
+```bash
+python main.py --run-all --mc-samples 15
+```
 
-## How The Method Works
+Change batch size or training duration:
 
-At a high level, NGTA does the following:
+```bash
+python main.py --run-all --batch-size 16 --epochs 80
+```
 
-1. Load structured patient data and create a study-aware split.
-2. Train a tabular Transformer on the MTC diagnosis label.
-3. Keep dropout active at inference and run repeated stochastic forward passes.
-4. Estimate a mean probability `p` and epistemic variance `sigma^2`.
-5. Map `(p, sigma^2)` to a NARS truth value `(f, c)`.
-6. Derive per-feature attention confidence from MC attention variance.
-7. Reweight attention using `c^gamma`.
-8. Save metrics, traces, and figures.
+Write artifacts to a different directory:
 
-The main interface equations are:
+```bash
+python main.py --run-all --output-dir runs/exp_01
+```
 
-- neural output to NARS truth value: `(f, c) = (p, (p(1-p)+epsilon)/(p(1-p)+epsilon+sigma^2))`
-- attention gate: `alpha_new = alpha * c^gamma / sum(alpha * c^gamma)`
+### CLI Arguments
 
-## Repository Layout
+| Argument | Meaning | Practical Effect |
+| --- | --- | --- |
+| `--run-all` | Runs the end-to-end pipeline | Trains the model, evaluates both variants, and writes charts and traces |
+| `--data-path` | Path to the input CSV | Lets you point the pipeline at a different dataset file |
+| `--output-dir` | Root directory for generated artifacts | Useful for separating experiments |
+| `--epochs` | Maximum training epochs | Higher values allow longer training; early stopping may still stop sooner |
+| `--batch-size` | Training batch size | Smaller batches can improve stability on small datasets but run slower |
+| `--learning-rate` | Optimizer step size | Larger values train faster but can destabilize convergence |
+| `--weight-decay` | L2-style regularization strength | Helps limit overfitting |
+| `--mc-samples` | Number of stochastic inference passes | Higher values give a smoother mean probability and more stable variance estimate, but increase runtime |
+| `--gamma` | Exponent in the attention gate `c^gamma` | Larger values make the gate more selective, amplifying differences between high- and low-confidence features |
+| `--seed` | Random seed | Helps reproducibility across runs |
+| `--patience` | Early-stopping patience | Controls how long training continues without validation improvement |
+| `--validation-size` | Fraction of the training portion reserved for validation | Changes how much data is used for model selection |
+| `--d-model` | Transformer hidden width | Larger values increase capacity and computation |
+| `--num-heads` | Number of attention heads | Changes how feature interactions are partitioned across attention channels |
+| `--num-layers` | Number of Transformer encoder layers | More layers increase model depth |
+| `--dropout` | Dropout probability | Affects both regularization during training and stochasticity during MC-dropout inference |
 
-- [main.py](main.py): CLI entry point.
-- [src/data_loader.py](src/data_loader.py): loading, preprocessing, and study-aware splitting.
-- [src/neural_encoder.py](src/neural_encoder.py): tabular Transformer with MC-dropout inference.
-- [src/nars_interface.py](src/nars_interface.py): NARS truth-value mapping and revision.
-- [src/attention_hook.py](src/attention_hook.py): confidence-based attention gating.
-- [src/pipeline.py](src/pipeline.py): end-to-end training, evaluation, charts, and trace generation.
-- [paper/main.tex](paper/main.tex): paper source.
-- [paper/references.bib](paper/references.bib): BibTeX bibliography.
+### How To Think About `--gamma` And `--mc-samples`
+
+- Increasing `--gamma` from `2.0` to `4.0` makes the NARS gate more aggressive. High-confidence features keep more attention mass, while lower-confidence features are suppressed more strongly.
+- Decreasing `--gamma` toward `1.0` makes the gate gentler and keeps the final attention pattern closer to the baseline Transformer.
+- Increasing `--mc-samples` reduces noise in the estimated predictive variance and in the per-feature attention summaries, but it increases inference time.
+- Decreasing `--mc-samples` makes experiments faster, but the uncertainty estimates can become less stable, which directly affects the NARS confidence values.
 
 ## Output Artifacts
 
@@ -206,34 +276,13 @@ Metrics and traces:
 - [results/traces/preprocessing_metadata.json](results/traces/preprocessing_metadata.json)
 - [results/traces/test_predictions.csv](results/traces/test_predictions.csv)
 
-## Quick Start
+## Contributing
 
-Install dependencies:
+Contributions are welcome if they improve correctness, documentation quality, reproducibility, or the experimental pipeline. Useful contributions include:
 
-```bash
-pip install -r requirements.txt
-```
+- clearer evaluation and calibration analysis
+- stronger ablations and external validation
+- bug fixes in preprocessing, training, or artifact generation
+- documentation improvements
 
-Run the full pipeline:
-
-```bash
-python main.py --run-all
-```
-
-Useful overrides:
-
-```bash
-python main.py --run-all --epochs 60 --mc-samples 50 --gamma 2.0
-python main.py --run-all --batch-size 16 --seed 0
-```
-
-## Why This Project Matters
-
-Rare-disease models are difficult to trust when the data is small, the uncertainty is high, and the clinical stakes are non-trivial. NGTA is built around the idea that uncertainty should be explicit, inspectable, and usable inside the model rather than treated as an afterthought.
-
-NARS provides a useful representation for that:
-
-- `f` captures the balance of evidence,
-- `c` captures the strength of evidential support.
-
-By feeding that confidence back into attention, NGTA explores a pragmatic neurosymbolic approach to clinical prediction under data scarcity.
+If you contribute, keep changes focused, document the motivation clearly, and include any relevant result or artifact changes.
