@@ -95,16 +95,16 @@ The saved feature set is:
 
 The structured dataset in [data.csv](data.csv) was assembled from ten published hereditary MTC and MEN2 case reports, family cohorts, and clinical follow-up studies. Special thanks are due to the authors of these studies for reporting the clinical details that made this small structured cohort possible.
 
-- `study_1`: *Medullary Thyroid Carcinoma Associated with Germline RETK666N Mutation*. *Thyroid* (2016). DOI: `10.1089/thy.2016.0374`
-- `study_2`: *Long-term outcome in 46 gene carriers of hereditary medullary thyroid carcinoma after prophylactic thyroidectomy: impact of individual RET genotype*. *European Journal of Endocrinology* (2006). DOI: `10.1530/eje.1.02216`
-- `study_3`: Qi et al. *RET mutation p.S891A in a Chinese family with familial medullary thyroid carcinoma and associated cutaneous amyloidosis binding OSMR variant p.G513D*. *Oncotarget* (2015). DOI: `10.18632/oncotarget.4992`
-- `study_4`: Florescu et al. *Endocrine Perspective of Cutaneous Lichen Amyloidosis: RET-C634 Pathogenic Variant in Multiple Endocrine Neoplasia Type 2*. *Clinics and Practice* (2024). DOI: `10.3390/clinpract14060179`
-- `study_5`: La Greca et al. *MEN2 phenotype in a family with germline heterozygous rare RET K666N variant*. *Endocrinology, Diabetes & Metabolism Case Reports* (2024). DOI: `10.1530/EDM-24-0009`
-- `study_6`: Vijayan et al. *A rare RET mutation in an Indian pedigree with familial medullary thyroid carcinoma*. *Indian Journal of Cancer* (2021). DOI: `10.4103/ijc.IJC_639_19`
-- `study_7`: Zhang et al. *C634Y mutation in RET-induced multiple endocrine neoplasia type 2A: A case report*. *World Journal of Clinical Cases* (2024). DOI: `10.12998/wjcc.v12.i15.2627`
-- `study_8`: Shankar et al. *Medullary thyroid cancer in a 9-week-old infant with familial MEN 2B: Implications for timing of prophylactic thyroidectomy*. *International Journal of Pediatric Endocrinology* (2012). DOI: `10.1186/1687-9856-2012-25`
-- `study_9`: Schulte et al. *The Clinical Spectrum of Multiple Endocrine Neoplasia Type 2a Caused by the Rare Intracellular RET Mutation S891A*. *The Journal of Clinical Endocrinology & Metabolism* (2010). DOI: `10.1210/jc.2010-0375`
-- `study_10`: Qi et al. *The rare intracellular RET mutation p.S891A in a Chinese Han family with familial medullary thyroid carcinoma*. *Journal of Biosciences* (2014). DOI: `10.1007/s12038-014-9428-x`
+1. *Medullary Thyroid Carcinoma Associated with Germline RETK666N Mutation*. *Thyroid* (2016). DOI: `10.1089/thy.2016.0374`
+2. *Long-term outcome in 46 gene carriers of hereditary medullary thyroid carcinoma after prophylactic thyroidectomy: impact of individual RET genotype*. *European Journal of Endocrinology* (2006). DOI: `10.1530/eje.1.02216`
+3. Qi et al. *RET mutation p.S891A in a Chinese family with familial medullary thyroid carcinoma and associated cutaneous amyloidosis binding OSMR variant p.G513D*. *Oncotarget* (2015). DOI: `10.18632/oncotarget.4992`
+4. Florescu et al. *Endocrine Perspective of Cutaneous Lichen Amyloidosis: RET-C634 Pathogenic Variant in Multiple Endocrine Neoplasia Type 2*. *Clinics and Practice* (2024). DOI: `10.3390/clinpract14060179`
+5. La Greca et al. *MEN2 phenotype in a family with germline heterozygous rare RET K666N variant*. *Endocrinology, Diabetes & Metabolism Case Reports* (2024). DOI: `10.1530/EDM-24-0009`
+6. Vijayan et al. *A rare RET mutation in an Indian pedigree with familial medullary thyroid carcinoma*. *Indian Journal of Cancer* (2021). DOI: `10.4103/ijc.IJC_639_19`
+7. Zhang et al. *C634Y mutation in RET-induced multiple endocrine neoplasia type 2A: A case report*. *World Journal of Clinical Cases* (2024). DOI: `10.12998/wjcc.v12.i15.2627`
+8. Shankar et al. *Medullary thyroid cancer in a 9-week-old infant with familial MEN 2B: Implications for timing of prophylactic thyroidectomy*. *International Journal of Pediatric Endocrinology* (2012). DOI: `10.1186/1687-9856-2012-25`
+9. Schulte et al. *The Clinical Spectrum of Multiple Endocrine Neoplasia Type 2a Caused by the Rare Intracellular RET Mutation S891A*. *The Journal of Clinical Endocrinology & Metabolism* (2010). DOI: `10.1210/jc.2010-0375`
+10. Qi et al. *The rare intracellular RET mutation p.S891A in a Chinese Han family with familial medullary thyroid carcinoma*. *Journal of Biosciences* (2014). DOI: `10.1007/s12038-014-9428-x`
 
 ## Results
 
