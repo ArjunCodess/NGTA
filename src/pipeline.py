@@ -11,7 +11,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import torch
-from sklearn.calibration import calibration_curve
 from sklearn.metrics import accuracy_score, brier_score_loss, roc_auc_score, roc_curve
 from torch import nn
 
@@ -164,11 +163,46 @@ def _sigmoid(values: np.ndarray) -> np.ndarray:
 def _compute_metrics(y_true: np.ndarray, probabilities: np.ndarray) -> dict[str, float]:
     clipped_probabilities = np.clip(probabilities, 1e-6, 1.0 - 1e-6)
     predictions = (clipped_probabilities >= 0.5).astype(int)
+    reliability = _build_reliability_frame(y_true, clipped_probabilities, n_bins=10)
     return {
         "auc": float(roc_auc_score(y_true, clipped_probabilities)),
         "brier": float(brier_score_loss(y_true, clipped_probabilities)),
         "accuracy": float(accuracy_score(y_true, predictions)),
+        "ece": _compute_ece(reliability),
     }
+
+
+def _build_reliability_frame(
+    y_true: np.ndarray,
+    probabilities: np.ndarray,
+    n_bins: int = 10,
+) -> pd.DataFrame:
+    frame = pd.DataFrame(
+        {
+            "probability": np.asarray(probabilities, dtype=np.float64),
+            "label": np.asarray(y_true, dtype=np.float64),
+        }
+    ).sort_values("probability", kind="mergesort").reset_index(drop=True)
+    frame["bin"] = pd.qcut(frame.index, q=n_bins, labels=False, duplicates="drop")
+    reliability = (
+        frame.groupby("bin", observed=True)
+        .agg(
+            mean_predicted_probability=("probability", "mean"),
+            fraction_positives=("label", "mean"),
+            count=("label", "size"),
+        )
+        .reset_index(drop=True)
+    )
+    return reliability
+
+
+def _compute_ece(reliability_frame: pd.DataFrame) -> float:
+    total = float(reliability_frame["count"].sum())
+    weighted_error = (
+        (reliability_frame["count"] / total)
+        * np.abs(reliability_frame["fraction_positives"] - reliability_frame["mean_predicted_probability"])
+    ).sum()
+    return float(weighted_error)
 
 
 def _bootstrap_auc_intervals(
@@ -256,17 +290,17 @@ def _save_calibration_plot(
         ("Baseline", baseline_probabilities),
         ("NARS-gated", gated_probabilities),
     ):
-        fraction_positives, mean_predicted_value = calibration_curve(
-            y_true,
-            probabilities,
-            n_bins=8,
-            strategy="uniform",
+        reliability = _build_reliability_frame(y_true, probabilities, n_bins=10)
+        plt.plot(
+            reliability["mean_predicted_probability"],
+            reliability["fraction_positives"],
+            marker="o",
+            label=label,
         )
-        plt.plot(mean_predicted_value, fraction_positives, marker="o", label=label)
     plt.plot([0, 1], [0, 1], linestyle="--", color="gray", linewidth=1)
     plt.xlabel("Mean Predicted Probability")
     plt.ylabel("Observed Frequency")
-    plt.title("Calibration Curve")
+    plt.title("Calibration Reliability Diagram (10 Equal-Frequency Bins)")
     plt.legend()
     plt.tight_layout()
     plt.savefig(output_path, dpi=200)
@@ -493,6 +527,15 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
     gated_probabilities = _sigmoid(gated_logits)
 
     y_true = summary.labels.astype(int)
+    baseline_reliability = _build_reliability_frame(y_true, summary.probabilities_mean, n_bins=10)
+    gated_reliability = _build_reliability_frame(y_true, gated_probabilities, n_bins=10)
+    reliability_frame = pd.concat(
+        [
+            baseline_reliability.assign(variant="baseline"),
+            gated_reliability.assign(variant="nars_gated"),
+        ],
+        ignore_index=True,
+    )
     auc_bootstrap = _bootstrap_auc_intervals(
         y_true=y_true,
         probability_map={
@@ -519,6 +562,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         ]
     )
     metrics_frame.to_csv(output_dirs["metrics"] / "metrics.csv", index=False)
+    reliability_frame.to_csv(output_dirs["metrics"] / "calibration_reliability.csv", index=False)
 
     trace_frame = _build_trace_frame(
         bundle=bundle,
@@ -574,11 +618,13 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         "auc_bootstrap": auc_bootstrap,
         "gamma_ablation": gamma_ablation_frame.to_dict(orient="records"),
         "decision_curve": decision_curve_frame.to_dict(orient="records"),
+        "calibration_reliability": reliability_frame.to_dict(orient="records"),
         "artifacts": {
             "metrics_csv": str(output_dirs["metrics"] / "metrics.csv"),
             "training_history_csv": str(output_dirs["metrics"] / "training_history.csv"),
             "gamma_ablation_csv": str(output_dirs["metrics"] / "gamma_ablation.csv"),
             "decision_curve_csv": str(output_dirs["metrics"] / "decision_curve.csv"),
+            "calibration_reliability_csv": str(output_dirs["metrics"] / "calibration_reliability.csv"),
             "trace_csv": str(output_dirs["traces"] / "test_predictions.csv"),
             "roc_curve": str(output_dirs["charts"] / "roc_curve.png"),
             "calibration_curve": str(output_dirs["charts"] / "calibration_curve.png"),

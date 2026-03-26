@@ -53,6 +53,7 @@
       "auc": 0.9872958257713248,
       "brier": 0.041214317083358765,
       "accuracy": 0.9583333333333334,
+      "ece": 0.04758404627743099,
       "auc_ci_95_lower": 0.9589829799107142,
       "auc_ci_95_upper": 1.0
     },
@@ -61,6 +62,7 @@
       "auc": 0.9891107078039927,
       "brier": 0.04114851492476937,
       "accuracy": 0.9583333333333334,
+      "ece": 0.04961881118330721,
       "auc_ci_95_lower": 0.9636919681951441,
       "auc_ci_95_upper": 1.0
     }
@@ -280,11 +282,134 @@
       "treat_none_net_benefit": 0.0
     }
   ],
+  "calibration_reliability": [
+    {
+      "mean_predicted_probability": 0.001998214912600815,
+      "fraction_positives": 0.0,
+      "count": 5,
+      "variant": "baseline"
+    },
+    {
+      "mean_predicted_probability": 0.002700516069307923,
+      "fraction_positives": 0.0,
+      "count": 5,
+      "variant": "baseline"
+    },
+    {
+      "mean_predicted_probability": 0.0060278776101768015,
+      "fraction_positives": 0.0,
+      "count": 5,
+      "variant": "baseline"
+    },
+    {
+      "mean_predicted_probability": 0.008858139510266483,
+      "fraction_positives": 0.0,
+      "count": 4,
+      "variant": "baseline"
+    },
+    {
+      "mean_predicted_probability": 0.013232975825667381,
+      "fraction_positives": 0.0,
+      "count": 5,
+      "variant": "baseline"
+    },
+    {
+      "mean_predicted_probability": 0.31776891723275186,
+      "fraction_positives": 0.4,
+      "count": 5,
+      "variant": "baseline"
+    },
+    {
+      "mean_predicted_probability": 0.8884819447994232,
+      "fraction_positives": 0.5,
+      "count": 4,
+      "variant": "baseline"
+    },
+    {
+      "mean_predicted_probability": 0.9799884200096131,
+      "fraction_positives": 1.0,
+      "count": 5,
+      "variant": "baseline"
+    },
+    {
+      "mean_predicted_probability": 0.9913660883903503,
+      "fraction_positives": 1.0,
+      "count": 5,
+      "variant": "baseline"
+    },
+    {
+      "mean_predicted_probability": 0.9959013819694519,
+      "fraction_positives": 1.0,
+      "count": 5,
+      "variant": "baseline"
+    },
+    {
+      "mean_predicted_probability": 0.0019114414724494834,
+      "fraction_positives": 0.0,
+      "count": 5,
+      "variant": "nars_gated"
+    },
+    {
+      "mean_predicted_probability": 0.002378685192629131,
+      "fraction_positives": 0.0,
+      "count": 5,
+      "variant": "nars_gated"
+    },
+    {
+      "mean_predicted_probability": 0.003597672448096169,
+      "fraction_positives": 0.0,
+      "count": 5,
+      "variant": "nars_gated"
+    },
+    {
+      "mean_predicted_probability": 0.004189364709394065,
+      "fraction_positives": 0.0,
+      "count": 4,
+      "variant": "nars_gated"
+    },
+    {
+      "mean_predicted_probability": 0.004999545531614683,
+      "fraction_positives": 0.0,
+      "count": 5,
+      "variant": "nars_gated"
+    },
+    {
+      "mean_predicted_probability": 0.2989440005610099,
+      "fraction_positives": 0.4,
+      "count": 5,
+      "variant": "nars_gated"
+    },
+    {
+      "mean_predicted_probability": 0.9153364317258902,
+      "fraction_positives": 0.5,
+      "count": 4,
+      "variant": "nars_gated"
+    },
+    {
+      "mean_predicted_probability": 0.9843582283377049,
+      "fraction_positives": 1.0,
+      "count": 5,
+      "variant": "nars_gated"
+    },
+    {
+      "mean_predicted_probability": 0.9926339311228836,
+      "fraction_positives": 1.0,
+      "count": 5,
+      "variant": "nars_gated"
+    },
+    {
+      "mean_predicted_probability": 0.9962312344116693,
+      "fraction_positives": 1.0,
+      "count": 5,
+      "variant": "nars_gated"
+    }
+  ],
   "artifacts": {
     "metrics_csv": "results\\metrics\\metrics.csv",
     "training_history_csv": "results\\metrics\\training_history.csv",
     "gamma_ablation_csv": "results\\metrics\\gamma_ablation.csv",
     "decision_curve_csv": "results\\metrics\\decision_curve.csv",
+    "calibration_reliability_csv": "results\\metrics\\calibration_reliability.csv",
     "trace_csv": "results\\traces\\test_predictions.csv",
     "roc_curve": "charts\\roc_curve.png",
     "calibration_curve": "charts\\calibration_curve.png",

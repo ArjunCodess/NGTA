@@ -344,18 +344,18 @@ Gain $g$ & $0.7173$ & $g=c_{rev}^{\gamma}$ with $\gamma=2$ \\
 \end{tabular}
 \end{table}
 
-We also evaluated the implemented pipeline on a 149-row MTC dataset using a study-aware split with 80 training cases, 21 validation cases, and 48 held-out test cases. The reported run uses the default experimental setting of 50 Monte Carlo dropout passes with $\gamma=2$, together with a transformer architecture of $d_{model}=64$, 4 heads, and 2 encoder layers. Table~\ref{tab:empirical_results} summarizes the held-out performance of that configuration together with bootstrap confidence intervals for AUC. In addition, a gamma ablation was run over $\gamma\in\{0.25,0.5,1,2,4\}$ using the same trained model and held-out split to examine how the confidence gate changes the final outputs.
+We also evaluated the implemented pipeline on a 149-row MTC dataset using a study-aware split with 80 training cases, 21 validation cases, and 48 held-out test cases. The reported run uses the default experimental setting of 50 Monte Carlo dropout passes with $\gamma=2$, together with a transformer architecture of $d_{model}=64$, 4 heads, and 2 encoder layers. Table~\ref{tab:empirical_results} summarizes the held-out performance of that configuration together with bootstrap confidence intervals for AUC and expected calibration error (ECE) from a 10-bin equal-frequency reliability diagram. In addition, a gamma ablation was run over $\gamma\in\{0.25,0.5,1,2,4\}$ using the same trained model and held-out split to examine how the confidence gate changes the final outputs.
 
 \begin{table}[H]
 \caption{Empirical test-set performance on the 48-case held-out study-aware split for MTC diagnosis.}
 \label{tab:empirical_results}
 \centering
-\begin{tabular}{@{}lccccc@{}}
+\begin{tabular}{@{}lcccccc@{}}
 \toprule
-Variant & AUC & Brier score & Accuracy & 95\% CI (Baseline) & 95\% CI (NARS-Gated) \\
+Variant & AUC & Brier score & ECE & Accuracy & 95\% CI (Baseline) & 95\% CI (NARS-Gated) \\
 \midrule
-Baseline transformer & 0.9873 & 0.0412 & 0.9583 & [0.9590, 1.0000] & [0.9637, 1.0000] \\
-NARS-gated transformer & 0.9891 & 0.0411 & 0.9583 & [0.9590, 1.0000] & [0.9637, 1.0000] \\
+Baseline transformer & 0.9873 & 0.0412 & 0.0476 & 0.9583 & [0.9590, 1.0000] & [0.9637, 1.0000] \\
+NARS-gated transformer & 0.9891 & 0.0411 & 0.0496 & 0.9583 & [0.9590, 1.0000] & [0.9637, 1.0000] \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -383,6 +383,8 @@ The gamma ablation in Table~\ref{tab:gamma_ablation} shows that, on this test sp
 
 We also computed decision-curve analysis over threshold probabilities from 0.05 to 0.95 to assess clinical utility in terms of net benefit. Across a broad middle range of thresholds, both learned models outperform the treat-all and treat-none strategies. The NARS-gated model matches the baseline at many thresholds and exceeds it slightly at several decision points, including 0.65 and 0.80. At threshold 0.65, for example, net benefit increases from 0.2976 to 0.3185, corresponding to roughly 2.08 additional true-positive-equivalent decisions per 100 patients after accounting for threshold-weighted false positives.
 
+Calibration was assessed with a reliability diagram using 10 equal-frequency bins and by expected calibration error. On this split, ECE was 0.0476 for the baseline model and 0.0496 for the NARS-gated model. Thus, while the gated model improved Brier score slightly, it did not improve ECE on the same held-out set, indicating a mixed calibration result rather than a uniform gain.
+
 \section{Analysis}
 \label{sec:analysis}
 
@@ -392,7 +394,7 @@ Eq.~\eqref{eq:attention_update_result} enforces two invariants. It preserves $\s
 
 The empirical comparison in Table~\ref{tab:empirical_results} suggests that the direction of the AUC change is consistent with the method's intent. Because accuracy and recall remained unchanged while AUC increased slightly, the main impact of NARS guidance in this run is better ordering of cases by predicted risk rather than a change in thresholded decisions. In a clinical triage setting, even a small ranking improvement can matter because it can move suspicious cases higher in the review queue; however, the overlapping bootstrap intervals indicate that this cannot be treated as a confirmed performance gain on the current test split.
 
-The same experiment also shows a cautionary point. The Brier score changed only slightly, from 0.0412 to 0.0411 in the selected configuration, so the calibration effect is minor compared with the ranking effect. At the same time, the gamma ablation indicates that stronger gating can improve Brier score modestly even when AUC and accuracy stay fixed. This trade-off is consistent with the idea that confidence-based reweighting may help prioritize cases and smooth probabilities without necessarily changing hard decisions on a small held-out split.
+The same experiment also shows a cautionary point. The Brier score changed only slightly, from 0.0412 to 0.0411 in the selected configuration, so the calibration effect is minor compared with the ranking effect. At the same time, the gamma ablation indicates that stronger gating can improve Brier score modestly even when AUC and accuracy stay fixed, whereas the equal-frequency ECE estimate slightly worsened from 0.0476 to 0.0496. This trade-off is consistent with the idea that confidence-based reweighting may help prioritize cases and smooth probabilities without necessarily improving every calibration summary on a small held-out split.
 
 The decision-curve analysis sharpens that interpretation. The gain from NARS guidance is better described as local clinical-utility improvement at selected thresholds than as a uniform improvement across all decision settings. The high-threshold tail is unstable on this 48-case test set, with the NARS-gated curve dropping below baseline at 0.90 and 0.95, so those regions should not be over-interpreted. Taken together, the ranking, calibration, and decision-utility results support feasibility and selective benefit, but not a blanket claim of superiority across all threshold choices.
 
