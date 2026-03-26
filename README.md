@@ -89,7 +89,7 @@ Using `1000` bootstrap resamples of the `48` held-out test cases, the saved run 
 
 ### Interpretation
 
-The main empirical effect is a **small ranking improvement** over the baseline transformer: AUC rises from `0.9873` to `0.9891`, while thresholded predictions on this held-out split remain the same. Adding the flat-confidence control makes the interpretation sharper: the flat-confidence and NARS-gated variants have the same AUC on this split, so the variance-to-confidence mapping does not produce an additional ranking lift beyond generic attention reweighting here. The important contribution is therefore a more explicit uncertainty representation, with a slight Brier/ECE advantage for the variance-based NARS gate over the flat-confidence control.
+The main empirical effect is a **small ranking improvement** over the baseline transformer: AUC rises from `0.9873` to `0.9891`, while thresholded predictions on this held-out split remain the same. Adding the flat-confidence control makes the interpretation sharper: the flat-confidence and NARS-gated variants have the same AUC on this split, so the variance-to-confidence mapping does not produce an additional ranking lift beyond generic attention reweighting here. What the variance-based gate does add is a small calibration advantage over flat-confidence gating, as seen in the Brier score and ECE columns. The important contribution is therefore a more explicit uncertainty representation, with a slight Brier/ECE advantage for the variance-based NARS gate over the flat-confidence control.
 
 The bootstrap intervals also matter for interpretation. The baseline interval (`0.9590` to `1.0000`) and the NARS-gated interval (`0.9637` to `1.0000`) **do overlap**, so this run should be described as showing an observed improvement, but not a clearly separated one by the bootstrap-CI check. In other words, the result is promising but still uncertain on a `48`-case test set.
 
@@ -285,7 +285,7 @@ python main.py --run-all --output-dir runs/exp_01
 
 | Argument | Meaning | Practical Effect |
 | --- | --- | --- |
-| `--run-all` | Runs the end-to-end pipeline | Trains the model, evaluates both variants, and writes charts and traces |
+| `--run-all` | Runs the end-to-end pipeline | Trains the model, evaluates all saved comparison variants, and writes charts and traces |
 | `--data-path` | Path to the input CSV | Lets you point the pipeline at a different dataset file |
 | `--output-dir` | Root directory for generated artifacts | Useful for separating experiments |
 | `--epochs` | Maximum training epochs | Higher values allow longer training; early stopping may still stop sooner |
