@@ -65,6 +65,7 @@ Saved metrics:
 
 - [results/metrics/metrics.csv](results/metrics/metrics.csv)
 - [results/metrics/run_summary.json](results/metrics/run_summary.json)
+- [results/metrics/gamma_ablation.csv](results/metrics/gamma_ablation.csv)
 
 ### Test-Set Metrics
 
@@ -87,6 +88,20 @@ Using `1000` bootstrap resamples of the `48` held-out test cases, the saved run 
 The main empirical effect is a **small ranking improvement** from the NARS-guided attention layer: AUC rises from `0.9873` to `0.9891`, and the Brier score improves slightly from `0.04121` to `0.04115`. The thresholded predictions on this held-out split remain the same, but the important contribution is that NGTA makes epistemic uncertainty explicit through NARS confidence and uses that confidence to produce slightly better risk ordering.
 
 The bootstrap intervals also matter for interpretation. The baseline interval (`0.9590` to `1.0000`) and the NARS-gated interval (`0.9637` to `1.0000`) **do overlap**, so this run should be described as showing an observed improvement, but not a clearly separated one by the bootstrap-CI check. In other words, the result is promising but still uncertain on a `48`-case test set.
+
+### Gamma Ablation
+
+The pipeline now also runs a fixed gamma ablation over `gamma ∈ {0.25, 0.5, 1.0, 2.0, 4.0}` on every full run and saves the results to [results/metrics/gamma_ablation.csv](results/metrics/gamma_ablation.csv), with a companion plot in [charts/gamma_ablation_auc.png](charts/gamma_ablation_auc.png).
+
+| Gamma | Baseline AUC | NARS-Gated AUC | Baseline Brier | NARS-Gated Brier | Accuracy |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 0.25 | 0.9873 | 0.9891 | 0.04121 | 0.04125 | 95.83% |
+| 0.5 | 0.9873 | 0.9891 | 0.04121 | 0.04124 | 95.83% |
+| 1.0 | 0.9873 | 0.9891 | 0.04121 | 0.04121 | 95.83% |
+| 2.0 | 0.9873 | 0.9891 | 0.04121 | 0.04115 | 95.83% |
+| 4.0 | 0.9873 | 0.9891 | 0.04121 | 0.04104 | 95.83% |
+
+On this held-out split, the gamma sweep does **not** separate the models on AUC or accuracy: the NARS-gated AUC remains `0.9891` and accuracy remains `95.83%` across all tested gamma values. What does move is the Brier score, which improves modestly as gamma increases and is best at `gamma=4.0` (`0.04104`). The current default reported run remains `gamma=2.0`, but the ablation shows that stronger confidence gating helps calibration slightly more than ranking on this dataset.
 
 ### Default Parameter Setting
 
@@ -283,9 +298,11 @@ Metrics and traces:
 - [results/metrics/metrics.csv](results/metrics/metrics.csv)
 - [results/metrics/run_summary.json](results/metrics/run_summary.json)
 - [results/metrics/training_history.csv](results/metrics/training_history.csv)
+- [results/metrics/gamma_ablation.csv](results/metrics/gamma_ablation.csv)
 - [results/traces/split_summary.json](results/traces/split_summary.json)
 - [results/traces/preprocessing_metadata.json](results/traces/preprocessing_metadata.json)
 - [results/traces/test_predictions.csv](results/traces/test_predictions.csv)
+- [charts/gamma_ablation_auc.png](charts/gamma_ablation_auc.png)
 
 ## Contributing
 

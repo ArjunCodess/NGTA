@@ -20,6 +20,8 @@ from .data_loader import load_data_bundle
 from .nars_interface import neural_to_nars
 from .neural_encoder import TabularTransformerClassifier
 
+GAMMA_ABLATION_VALUES = (0.25, 0.5, 1.0, 2.0, 4.0)
+
 
 @dataclass
 class PipelineConfig:
@@ -284,6 +286,21 @@ def _save_training_plot(history: pd.DataFrame, output_path: Path) -> None:
     plt.close()
 
 
+def _save_gamma_ablation_plot(ablation_frame: pd.DataFrame, output_path: Path) -> None:
+    plt.figure(figsize=(7, 5))
+    plt.plot(ablation_frame["gamma"], ablation_frame["baseline_auc"], marker="o", label="Baseline AUC")
+    plt.plot(ablation_frame["gamma"], ablation_frame["nars_gated_auc"], marker="o", label="NARS-gated AUC")
+    plt.xscale("log", base=2)
+    plt.xticks(ablation_frame["gamma"], [str(gamma) for gamma in ablation_frame["gamma"]])
+    plt.xlabel("Gamma")
+    plt.ylabel("AUC")
+    plt.title("Gamma Ablation: AUC vs Gamma")
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=200)
+    plt.close()
+
+
 def _build_trace_frame(
     bundle,
     probabilities_mean: np.ndarray,
@@ -314,6 +331,44 @@ def _build_trace_frame(
         trace_frame[f"token_score__{safe_feature_name}"] = token_score_mean[:, index]
 
     return trace_frame
+
+
+def _build_gamma_ablation_frame(
+    y_true: np.ndarray,
+    baseline_probabilities: np.ndarray,
+    attention_mean: np.ndarray,
+    feature_confidence: np.ndarray,
+    cls_logit_mean: np.ndarray,
+    token_score_mean: np.ndarray,
+) -> pd.DataFrame:
+    baseline_metrics = _compute_metrics(y_true, baseline_probabilities)
+    rows: list[dict[str, float]] = []
+
+    for gamma in GAMMA_ABLATION_VALUES:
+        gated_attention = apply_confidence_gate(
+            attention_mean,
+            feature_confidence,
+            gamma=gamma,
+        )
+        gated_logits = cls_logit_mean + np.sum(gated_attention * token_score_mean, axis=1)
+        gated_probabilities = _sigmoid(gated_logits)
+        gated_metrics = _compute_metrics(y_true, gated_probabilities)
+        rows.append(
+            {
+                "gamma": float(gamma),
+                "baseline_auc": baseline_metrics["auc"],
+                "baseline_brier": baseline_metrics["brier"],
+                "baseline_accuracy": baseline_metrics["accuracy"],
+                "nars_gated_auc": gated_metrics["auc"],
+                "nars_gated_brier": gated_metrics["brier"],
+                "nars_gated_accuracy": gated_metrics["accuracy"],
+                "auc_delta_gated_minus_baseline": gated_metrics["auc"] - baseline_metrics["auc"],
+                "brier_delta_gated_minus_baseline": gated_metrics["brier"] - baseline_metrics["brier"],
+                "accuracy_delta_gated_minus_baseline": gated_metrics["accuracy"] - baseline_metrics["accuracy"],
+            }
+        )
+
+    return pd.DataFrame(rows)
 
 
 def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
@@ -412,6 +467,17 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
     )
     trace_frame.to_csv(output_dirs["traces"] / "test_predictions.csv", index=False)
 
+    gamma_ablation_frame = _build_gamma_ablation_frame(
+        y_true=y_true,
+        baseline_probabilities=summary.probabilities_mean,
+        attention_mean=summary.attention_mean,
+        feature_confidence=np.asarray(feature_confidence),
+        cls_logit_mean=summary.cls_logit_mean,
+        token_score_mean=summary.token_score_mean,
+    )
+    gamma_ablation_frame.to_csv(output_dirs["metrics"] / "gamma_ablation.csv", index=False)
+    _save_gamma_ablation_plot(gamma_ablation_frame, output_dirs["charts"] / "gamma_ablation_auc.png")
+
     _save_roc_plot(
         y_true,
         summary.probabilities_mean,
@@ -430,13 +496,16 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         "split_summary": bundle.split_summary,
         "metrics": metrics_frame.to_dict(orient="records"),
         "auc_bootstrap": auc_bootstrap,
+        "gamma_ablation": gamma_ablation_frame.to_dict(orient="records"),
         "artifacts": {
             "metrics_csv": str(output_dirs["metrics"] / "metrics.csv"),
             "training_history_csv": str(output_dirs["metrics"] / "training_history.csv"),
+            "gamma_ablation_csv": str(output_dirs["metrics"] / "gamma_ablation.csv"),
             "trace_csv": str(output_dirs["traces"] / "test_predictions.csv"),
             "roc_curve": str(output_dirs["charts"] / "roc_curve.png"),
             "calibration_curve": str(output_dirs["charts"] / "calibration_curve.png"),
             "training_history_plot": str(output_dirs["charts"] / "training_history.png"),
+            "gamma_ablation_plot": str(output_dirs["charts"] / "gamma_ablation_auc.png"),
         },
     }
     (output_dirs["metrics"] / "run_summary.json").write_text(

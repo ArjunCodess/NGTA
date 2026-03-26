@@ -83,12 +83,76 @@
       "interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain."
     }
   },
+  "gamma_ablation": [
+    {
+      "gamma": 0.25,
+      "baseline_auc": 0.9872958257713248,
+      "baseline_brier": 0.041214317083358765,
+      "baseline_accuracy": 0.9583333333333334,
+      "nars_gated_auc": 0.9891107078039927,
+      "nars_gated_brier": 0.041251552457659386,
+      "nars_gated_accuracy": 0.9583333333333334,
+      "auc_delta_gated_minus_baseline": 0.001814882032667886,
+      "brier_delta_gated_minus_baseline": 3.723537430062179e-05,
+      "accuracy_delta_gated_minus_baseline": 0.0
+    },
+    {
+      "gamma": 0.5,
+      "baseline_auc": 0.9872958257713248,
+      "baseline_brier": 0.041214317083358765,
+      "baseline_accuracy": 0.9583333333333334,
+      "nars_gated_auc": 0.9891107078039927,
+      "nars_gated_brier": 0.04123643145698802,
+      "nars_gated_accuracy": 0.9583333333333334,
+      "auc_delta_gated_minus_baseline": 0.001814882032667886,
+      "brier_delta_gated_minus_baseline": 2.2114373629256168e-05,
+      "accuracy_delta_gated_minus_baseline": 0.0
+    },
+    {
+      "gamma": 1.0,
+      "baseline_auc": 0.9872958257713248,
+      "baseline_brier": 0.041214317083358765,
+      "baseline_accuracy": 0.9583333333333334,
+      "nars_gated_auc": 0.9891107078039927,
+      "nars_gated_brier": 0.04120659450153135,
+      "nars_gated_accuracy": 0.9583333333333334,
+      "auc_delta_gated_minus_baseline": 0.001814882032667886,
+      "brier_delta_gated_minus_baseline": -7.72258182741431e-06,
+      "accuracy_delta_gated_minus_baseline": 0.0
+    },
+    {
+      "gamma": 2.0,
+      "baseline_auc": 0.9872958257713248,
+      "baseline_brier": 0.041214317083358765,
+      "baseline_accuracy": 0.9583333333333334,
+      "nars_gated_auc": 0.9891107078039927,
+      "nars_gated_brier": 0.04114851492476937,
+      "nars_gated_accuracy": 0.9583333333333334,
+      "auc_delta_gated_minus_baseline": 0.001814882032667886,
+      "brier_delta_gated_minus_baseline": -6.580215858939531e-05,
+      "accuracy_delta_gated_minus_baseline": 0.0
+    },
+    {
+      "gamma": 4.0,
+      "baseline_auc": 0.9872958257713248,
+      "baseline_brier": 0.041214317083358765,
+      "baseline_accuracy": 0.9583333333333334,
+      "nars_gated_auc": 0.9891107078039927,
+      "nars_gated_brier": 0.041038526411125285,
+      "nars_gated_accuracy": 0.9583333333333334,
+      "auc_delta_gated_minus_baseline": 0.001814882032667886,
+      "brier_delta_gated_minus_baseline": -0.00017579067223347927,
+      "accuracy_delta_gated_minus_baseline": 0.0
+    }
+  ],
   "artifacts": {
     "metrics_csv": "results\\metrics\\metrics.csv",
     "training_history_csv": "results\\metrics\\training_history.csv",
+    "gamma_ablation_csv": "results\\metrics\\gamma_ablation.csv",
     "trace_csv": "results\\traces\\test_predictions.csv",
     "roc_curve": "charts\\roc_curve.png",
     "calibration_curve": "charts\\calibration_curve.png",
-    "training_history_plot": "charts\\training_history.png"
+    "training_history_plot": "charts\\training_history.png",
+    "gamma_ablation_plot": "charts\\gamma_ablation_auc.png"
   }
 }
