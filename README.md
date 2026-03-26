@@ -73,9 +73,20 @@ Saved metrics:
 | Baseline Transformer | 0.9873 | 0.04121 | 95.83% | 100.00% | 90.48% | 0.9500 |
 | NARS-Gated Transformer | 0.9891 | 0.04115 | 95.83% | 100.00% | 90.48% | 0.9500 |
 
+### Bootstrap AUC Confidence Intervals
+
+Using `1000` bootstrap resamples of the `48` held-out test cases, the saved run gives the following 95% AUC confidence intervals:
+
+| Variant | AUC | 95% Bootstrap CI |
+| --- | ---: | ---: |
+| Baseline Transformer | 0.9873 | 0.9590 to 1.0000 |
+| NARS-Gated Transformer | 0.9891 | 0.9637 to 1.0000 |
+
 ### Interpretation
 
-The main empirical effect is a **small but consistent ranking improvement** from the NARS-guided attention layer: AUC rises from `0.9873` to `0.9891`, and the Brier score improves slightly from `0.04121` to `0.04115`. The thresholded predictions on this held-out split remain the same, but the important contribution is that NGTA makes epistemic uncertainty explicit through NARS confidence and uses that confidence to produce slightly better risk ordering. In clinical triage settings, that combination of inspectable evidence and improved ranking can matter even when the headline classification counts do not change.
+The main empirical effect is a **small ranking improvement** from the NARS-guided attention layer: AUC rises from `0.9873` to `0.9891`, and the Brier score improves slightly from `0.04121` to `0.04115`. The thresholded predictions on this held-out split remain the same, but the important contribution is that NGTA makes epistemic uncertainty explicit through NARS confidence and uses that confidence to produce slightly better risk ordering.
+
+The bootstrap intervals also matter for interpretation. The baseline interval (`0.9590` to `1.0000`) and the NARS-gated interval (`0.9637` to `1.0000`) **do overlap**, so this run should be described as showing an observed improvement, but not a clearly separated one by the bootstrap-CI check. In other words, the result is promising but still uncertain on a `48`-case test set.
 
 ### Default Parameter Setting
 

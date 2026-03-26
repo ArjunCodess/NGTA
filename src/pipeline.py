@@ -169,6 +169,58 @@ def _compute_metrics(y_true: np.ndarray, probabilities: np.ndarray) -> dict[str,
     }
 
 
+def _bootstrap_auc_intervals(
+    y_true: np.ndarray,
+    probability_map: dict[str, np.ndarray],
+    iterations: int = 1000,
+    seed: int = 0,
+) -> dict[str, Any]:
+    rng = np.random.default_rng(seed)
+    n_samples = len(y_true)
+    bootstrap_indices: list[np.ndarray] = []
+    max_attempts = iterations * 100
+    attempts = 0
+
+    while len(bootstrap_indices) < iterations:
+        if attempts >= max_attempts:
+            raise RuntimeError("Unable to generate enough valid bootstrap samples for AUC estimation.")
+        sampled_indices = rng.integers(0, n_samples, size=n_samples)
+        sampled_labels = y_true[sampled_indices]
+        attempts += 1
+        if np.unique(sampled_labels).size < 2:
+            continue
+        bootstrap_indices.append(sampled_indices)
+
+    intervals: dict[str, Any] = {}
+    for variant, probabilities in probability_map.items():
+        auc_samples = np.asarray(
+            [roc_auc_score(y_true[index_set], probabilities[index_set]) for index_set in bootstrap_indices],
+            dtype=np.float64,
+        )
+        intervals[variant] = {
+            "iterations": iterations,
+            "auc_samples_mean": float(np.mean(auc_samples)),
+            "auc_ci_95_lower": float(np.percentile(auc_samples, 2.5)),
+            "auc_ci_95_upper": float(np.percentile(auc_samples, 97.5)),
+        }
+
+    baseline_interval = intervals["baseline"]
+    gated_interval = intervals["nars_gated"]
+    overlap = not (
+        baseline_interval["auc_ci_95_upper"] < gated_interval["auc_ci_95_lower"]
+        or gated_interval["auc_ci_95_upper"] < baseline_interval["auc_ci_95_lower"]
+    )
+    intervals["comparison"] = {
+        "ci_overlap": overlap,
+        "interpretation": (
+            "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain."
+            if overlap
+            else "The 95% bootstrap AUC confidence intervals do not overlap, so the observed difference is likely real on this test split."
+        ),
+    }
+    return intervals
+
+
 def _save_roc_plot(
     y_true: np.ndarray,
     baseline_probabilities: np.ndarray,
@@ -318,10 +370,29 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
     gated_probabilities = _sigmoid(gated_logits)
 
     y_true = summary.labels.astype(int)
+    auc_bootstrap = _bootstrap_auc_intervals(
+        y_true=y_true,
+        probability_map={
+            "baseline": summary.probabilities_mean,
+            "nars_gated": gated_probabilities,
+        },
+        iterations=1000,
+        seed=config.seed,
+    )
     metrics_frame = pd.DataFrame(
         [
-            {"variant": "baseline", **_compute_metrics(y_true, summary.probabilities_mean)},
-            {"variant": "nars_gated", **_compute_metrics(y_true, gated_probabilities)},
+            {
+                "variant": "baseline",
+                **_compute_metrics(y_true, summary.probabilities_mean),
+                "auc_ci_95_lower": auc_bootstrap["baseline"]["auc_ci_95_lower"],
+                "auc_ci_95_upper": auc_bootstrap["baseline"]["auc_ci_95_upper"],
+            },
+            {
+                "variant": "nars_gated",
+                **_compute_metrics(y_true, gated_probabilities),
+                "auc_ci_95_lower": auc_bootstrap["nars_gated"]["auc_ci_95_lower"],
+                "auc_ci_95_upper": auc_bootstrap["nars_gated"]["auc_ci_95_upper"],
+            },
         ]
     )
     metrics_frame.to_csv(output_dirs["metrics"] / "metrics.csv", index=False)
@@ -358,6 +429,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         "config": asdict(config),
         "split_summary": bundle.split_summary,
         "metrics": metrics_frame.to_dict(orient="records"),
+        "auc_bootstrap": auc_bootstrap,
         "artifacts": {
             "metrics_csv": str(output_dirs["metrics"] / "metrics.csv"),
             "training_history_csv": str(output_dirs["metrics"] / "training_history.csv"),

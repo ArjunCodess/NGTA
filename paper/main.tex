@@ -344,23 +344,23 @@ Gain $g$ & $0.7173$ & $g=c_{rev}^{\gamma}$ with $\gamma=2$ \\
 \end{tabular}
 \end{table}
 
-We also evaluated the implemented pipeline on a 149-row MTC dataset using a study-aware split with 80 training cases, 21 validation cases, and 48 held-out test cases. The reported run uses the default experimental setting of 50 Monte Carlo dropout passes with $\gamma=2$, together with a transformer architecture of $d_{model}=64$, 4 heads, and 2 encoder layers. Table~\ref{tab:empirical_results} summarizes the held-out performance of that configuration.
+We also evaluated the implemented pipeline on a 149-row MTC dataset using a study-aware split with 80 training cases, 21 validation cases, and 48 held-out test cases. The reported run uses the default experimental setting of 50 Monte Carlo dropout passes with $\gamma=2$, together with a transformer architecture of $d_{model}=64$, 4 heads, and 2 encoder layers. Table~\ref{tab:empirical_results} summarizes the held-out performance of that configuration together with bootstrap confidence intervals for AUC.
 
 \begin{table}[H]
 \caption{Empirical test-set performance on the 48-case held-out study-aware split for MTC diagnosis.}
 \label{tab:empirical_results}
 \centering
-\begin{tabular}{@{}lccc@{}}
+\begin{tabular}{@{}lccccc@{}}
 \toprule
-Variant & AUC & Brier score & Accuracy \\
+Variant & AUC & Brier score & Accuracy & 95\% CI (Baseline) & 95\% CI (NARS-Gated) \\
 \midrule
-Baseline transformer & 0.9873 & 0.0412 & 0.9583 \\
-NARS-gated transformer & 0.9891 & 0.0411 & 0.9583 \\
+Baseline transformer & 0.9873 & 0.0412 & 0.9583 & [0.9590, 1.0000] & [0.9637, 1.0000] \\
+NARS-gated transformer & 0.9891 & 0.0411 & 0.9583 & [0.9590, 1.0000] & [0.9637, 1.0000] \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-At the operating threshold of 0.5, both models achieved recall 1.0 on the held-out set, with 27 true negatives, 2 false positives, 0 false negatives, and 19 true positives. The NARS-guided model therefore did not change the hard classification decisions in this run, but it slightly improved ranking performance as reflected in the AUC increase from 0.9873 to 0.9891, an absolute gain of $+0.0018$.
+At the operating threshold of 0.5, both models achieved recall 1.0 on the held-out set, with 27 true negatives, 2 false positives, 0 false negatives, and 19 true positives. The NARS-guided model therefore did not change the hard classification decisions in this run, but it slightly improved ranking performance as reflected in the AUC increase from 0.9873 to 0.9891, an absolute gain of $+0.0018$. However, the bootstrap intervals in Table~\ref{tab:empirical_results} overlap, so the observed AUC difference should be treated as uncertain rather than as a clearly separated performance gain on this test split. This overlap is consistent with the expected statistical power of a 48-case test set; a gap this small requires a substantially larger cohort to resolve.
 
 \section{Analysis}
 \label{sec:analysis}
@@ -369,7 +369,7 @@ Eq.~\eqref{eq:neural_to_nars_result} makes confidence decrease as predictive var
 
 Eq.~\eqref{eq:attention_update_result} enforces two invariants. It preserves $\sum_i \alpha_i^{\text{new}} = 1$. It sets $\alpha_i^{\text{new}} = 0$ when $c_i = 0$.
 
-The empirical comparison in Table~\ref{tab:empirical_results} suggests that the attention gate has a modest but coherent effect. Because accuracy and recall remained unchanged while AUC increased slightly, the main impact of NARS guidance in this run is better ordering of cases by predicted risk rather than a change in thresholded decisions. In a clinical triage setting, even a small ranking improvement can matter because it can move suspicious cases higher in the review queue; however, the effect here is small enough that it should be interpreted as directional evidence, not proof of a clinically meaningful gain.
+The empirical comparison in Table~\ref{tab:empirical_results} suggests that the direction of the AUC change is consistent with the method's intent. Because accuracy and recall remained unchanged while AUC increased slightly, the main impact of NARS guidance in this run is better ordering of cases by predicted risk rather than a change in thresholded decisions. In a clinical triage setting, even a small ranking improvement can matter because it can move suspicious cases higher in the review queue; however, the overlapping bootstrap intervals indicate that this cannot be treated as a confirmed performance gain on the current test split.
 
 The same experiment also shows a cautionary point. The Brier score changed only slightly, from 0.0412 to 0.0411 in the selected configuration, so the calibration effect is minor compared with the ranking effect. This trade-off is consistent with the idea that confidence-based reweighting may help prioritize cases without necessarily changing hard decisions on a small held-out split.
 
@@ -379,6 +379,8 @@ The interface can fail in three cases. First, the variance estimator can misrepr
 \label{sec:limitations}
 
 This paper reports an initial single-split empirical evaluation, but the evidence remains limited by dataset size and scope. The current run uses only 149 cases and a 48-case held-out test set, so the measured gains should be treated as preliminary.
+
+The 48-case test set has insufficient statistical power to distinguish AUC gains smaller than approximately 0.03 at the 95\% level. This follows from the rough standard-error scale $0.5/\sqrt{n_{pos}n_{neg}}$, which is about 0.03 for 19 positive and 29 negative test cases.
 
 The mapping in Eq.~\eqref{eq:neural_to_nars_result} depends on a variance estimate $\sigma^2$ from a chosen uncertainty quantification method \cite{gal2016, lakshminarayanan2017}. Different estimators change $c$ even when $p$ is fixed.
 
@@ -435,7 +437,7 @@ Overall, the empirical result in this paper provides an initial proof of feasibi
 
 This paper defined a bidirectional interface between transformers and NARS that (i) converts neural predictive outputs into NARS truth values and (ii) uses NARS confidence to modulate transformer attention during inference. The key benefit is that evidential support becomes an explicit variable that can be aggregated symbolically and then reused as a control signal in neural inference.
 
-Concretely, the interface (a) maps $(p,\sigma^2)$ to $(f,c)$ so that confidence decreases as epistemic variance increases, and (b) maps $(f,c)$ to a normalized attention update via a tunable confidence gain. On the current 149-case MTC dataset, the default parameter setting produced a small improvement in AUC over the baseline transformer while leaving thresholded accuracy and recall unchanged. The result is therefore best understood as preliminary evidence that NARS confidence can improve risk ranking, rather than a definitive clinical performance gain.
+Concretely, the interface (a) maps $(p,\sigma^2)$ to $(f,c)$ so that confidence decreases as epistemic variance increases, and (b) maps $(f,c)$ to a normalized attention update via a tunable confidence gain. On the current 149-case MTC dataset, the default parameter setting produced a small improvement in AUC over the baseline transformer while leaving thresholded accuracy and recall unchanged. Bootstrap AUC intervals overlapped between the two variants, so the result is best understood as preliminary evidence that NARS confidence can improve risk ranking, rather than a definitive clinical performance gain. This is not incidental to the application setting: the same rare-disease data scarcity that motivates a NARS-guided uncertainty interface also limits the statistical power available to confirm small AUC gains on a cohort of this size.
 
 Future work should evaluate the interface under controlled data-scarcity and dataset-shift regimes, reporting discrimination, calibration, and decision-utility metrics, and comparing against uncertainty-aware baselines that do not use symbolic aggregation. Future work should also quantify knowledge-base construction effort and characterize failures due to mis-specified rules, conflicting evidence, and proposition extraction errors.
 

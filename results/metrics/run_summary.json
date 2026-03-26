@@ -52,15 +52,37 @@
       "variant": "baseline",
       "auc": 0.9872958257713248,
       "brier": 0.041214317083358765,
-      "accuracy": 0.9583333333333334
+      "accuracy": 0.9583333333333334,
+      "auc_ci_95_lower": 0.9589829799107142,
+      "auc_ci_95_upper": 1.0
     },
     {
       "variant": "nars_gated",
       "auc": 0.9891107078039927,
       "brier": 0.04114851492476937,
-      "accuracy": 0.9583333333333334
+      "accuracy": 0.9583333333333334,
+      "auc_ci_95_lower": 0.9636919681951441,
+      "auc_ci_95_upper": 1.0
     }
   ],
+  "auc_bootstrap": {
+    "baseline": {
+      "iterations": 1000,
+      "auc_samples_mean": 0.9871414082605684,
+      "auc_ci_95_lower": 0.9589829799107142,
+      "auc_ci_95_upper": 1.0
+    },
+    "nars_gated": {
+      "iterations": 1000,
+      "auc_samples_mean": 0.9890457760094628,
+      "auc_ci_95_lower": 0.9636919681951441,
+      "auc_ci_95_upper": 1.0
+    },
+    "comparison": {
+      "ci_overlap": true,
+      "interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain."
+    }
+  },
   "artifacts": {
     "metrics_csv": "results\\metrics\\metrics.csv",
     "training_history_csv": "results\\metrics\\training_history.csv",
