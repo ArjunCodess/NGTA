@@ -3,8 +3,8 @@
 **NARS-Guided Transformer Attention**
 
 ![AUC](https://img.shields.io/badge/AUC%20(NARS--Gated)-0.9891-blue)
-![Accuracy](https://img.shields.io/badge/Accuracy-95.83%25-brightgreen)
 ![Recall](https://img.shields.io/badge/Recall-100%25-success)
+![Test Prevalence](https://img.shields.io/badge/Test%20Prevalence-39.58%25-informational)
 ![Samples](https://img.shields.io/badge/Samples-149-informational)
 
 NGTA is a research implementation of a neurosymbolic pipeline for **medullary thyroid carcinoma (MTC) diagnosis**. It combines a tabular Transformer, Monte Carlo dropout uncertainty estimation, and **Non-Axiomatic Reasoning System (NARS)** truth values so that evidential confidence can be fed back into attention during inference.
