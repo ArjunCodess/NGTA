@@ -301,6 +301,74 @@ def _save_gamma_ablation_plot(ablation_frame: pd.DataFrame, output_path: Path) -
     plt.close()
 
 
+def _compute_net_benefit(y_true: np.ndarray, probabilities: np.ndarray, threshold: float) -> float:
+    predictions = probabilities >= threshold
+    n_samples = len(y_true)
+    true_positives = float(np.sum((predictions == 1) & (y_true == 1)))
+    false_positives = float(np.sum((predictions == 1) & (y_true == 0)))
+    odds = threshold / (1.0 - threshold)
+    return (true_positives / n_samples) - (false_positives / n_samples) * odds
+
+
+def _build_decision_curve_frame(
+    y_true: np.ndarray,
+    baseline_probabilities: np.ndarray,
+    gated_probabilities: np.ndarray,
+) -> pd.DataFrame:
+    thresholds = np.arange(0.05, 1.0, 0.05, dtype=np.float64)
+    prevalence = float(np.mean(y_true))
+    rows: list[dict[str, float]] = []
+
+    for threshold in thresholds:
+        treat_all_net_benefit = prevalence - (1.0 - prevalence) * (threshold / (1.0 - threshold))
+        rows.append(
+            {
+                "threshold": float(threshold),
+                "baseline_net_benefit": _compute_net_benefit(y_true, baseline_probabilities, float(threshold)),
+                "nars_gated_net_benefit": _compute_net_benefit(y_true, gated_probabilities, float(threshold)),
+                "treat_all_net_benefit": float(treat_all_net_benefit),
+                "treat_none_net_benefit": 0.0,
+            }
+        )
+
+    return pd.DataFrame(rows)
+
+
+def _save_decision_curve_plot(decision_curve_frame: pd.DataFrame, output_path: Path) -> None:
+    plt.figure(figsize=(7, 5))
+    plt.plot(
+        decision_curve_frame["threshold"],
+        decision_curve_frame["baseline_net_benefit"],
+        marker="o",
+        label="Baseline transformer",
+    )
+    plt.plot(
+        decision_curve_frame["threshold"],
+        decision_curve_frame["nars_gated_net_benefit"],
+        marker="o",
+        label="NARS-gated transformer",
+    )
+    plt.plot(
+        decision_curve_frame["threshold"],
+        decision_curve_frame["treat_all_net_benefit"],
+        linestyle="--",
+        label="Treat all",
+    )
+    plt.plot(
+        decision_curve_frame["threshold"],
+        decision_curve_frame["treat_none_net_benefit"],
+        linestyle=":",
+        label="Treat none",
+    )
+    plt.xlabel("Threshold Probability")
+    plt.ylabel("Net Benefit")
+    plt.title("Decision Curve Analysis")
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=200)
+    plt.close()
+
+
 def _build_trace_frame(
     bundle,
     probabilities_mean: np.ndarray,
@@ -478,6 +546,14 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
     gamma_ablation_frame.to_csv(output_dirs["metrics"] / "gamma_ablation.csv", index=False)
     _save_gamma_ablation_plot(gamma_ablation_frame, output_dirs["charts"] / "gamma_ablation_auc.png")
 
+    decision_curve_frame = _build_decision_curve_frame(
+        y_true=y_true,
+        baseline_probabilities=summary.probabilities_mean,
+        gated_probabilities=gated_probabilities,
+    )
+    decision_curve_frame.to_csv(output_dirs["metrics"] / "decision_curve.csv", index=False)
+    _save_decision_curve_plot(decision_curve_frame, output_dirs["charts"] / "decision_curve.png")
+
     _save_roc_plot(
         y_true,
         summary.probabilities_mean,
@@ -497,15 +573,18 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         "metrics": metrics_frame.to_dict(orient="records"),
         "auc_bootstrap": auc_bootstrap,
         "gamma_ablation": gamma_ablation_frame.to_dict(orient="records"),
+        "decision_curve": decision_curve_frame.to_dict(orient="records"),
         "artifacts": {
             "metrics_csv": str(output_dirs["metrics"] / "metrics.csv"),
             "training_history_csv": str(output_dirs["metrics"] / "training_history.csv"),
             "gamma_ablation_csv": str(output_dirs["metrics"] / "gamma_ablation.csv"),
+            "decision_curve_csv": str(output_dirs["metrics"] / "decision_curve.csv"),
             "trace_csv": str(output_dirs["traces"] / "test_predictions.csv"),
             "roc_curve": str(output_dirs["charts"] / "roc_curve.png"),
             "calibration_curve": str(output_dirs["charts"] / "calibration_curve.png"),
             "training_history_plot": str(output_dirs["charts"] / "training_history.png"),
             "gamma_ablation_plot": str(output_dirs["charts"] / "gamma_ablation_auc.png"),
+            "decision_curve_plot": str(output_dirs["charts"] / "decision_curve.png"),
         },
     }
     (output_dirs["metrics"] / "run_summary.json").write_text(

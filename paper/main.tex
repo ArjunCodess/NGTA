@@ -381,6 +381,8 @@ $\gamma$ & Baseline AUC & NARS-gated AUC & Baseline Brier & NARS-gated Brier \\
 
 The gamma ablation in Table~\ref{tab:gamma_ablation} shows that, on this test split, changing $\gamma$ does not alter AUC or accuracy: the NARS-gated model remains at 0.9891 AUC across the tested values. The main effect of increasing $\gamma$ is instead a modest improvement in Brier score, with the best calibration-oriented result among the tested values occurring at $\gamma=4$.
 
+We also computed decision-curve analysis over threshold probabilities from 0.05 to 0.95 to assess clinical utility in terms of net benefit. Across a broad middle range of thresholds, both learned models outperform the treat-all and treat-none strategies. The NARS-gated model matches the baseline at many thresholds and exceeds it slightly at several decision points, including 0.65 and 0.80. At threshold 0.65, for example, net benefit increases from 0.2976 to 0.3185, corresponding to roughly 2.08 additional true-positive-equivalent decisions per 100 patients after accounting for threshold-weighted false positives.
+
 \section{Analysis}
 \label{sec:analysis}
 
@@ -391,6 +393,8 @@ Eq.~\eqref{eq:attention_update_result} enforces two invariants. It preserves $\s
 The empirical comparison in Table~\ref{tab:empirical_results} suggests that the direction of the AUC change is consistent with the method's intent. Because accuracy and recall remained unchanged while AUC increased slightly, the main impact of NARS guidance in this run is better ordering of cases by predicted risk rather than a change in thresholded decisions. In a clinical triage setting, even a small ranking improvement can matter because it can move suspicious cases higher in the review queue; however, the overlapping bootstrap intervals indicate that this cannot be treated as a confirmed performance gain on the current test split.
 
 The same experiment also shows a cautionary point. The Brier score changed only slightly, from 0.0412 to 0.0411 in the selected configuration, so the calibration effect is minor compared with the ranking effect. At the same time, the gamma ablation indicates that stronger gating can improve Brier score modestly even when AUC and accuracy stay fixed. This trade-off is consistent with the idea that confidence-based reweighting may help prioritize cases and smooth probabilities without necessarily changing hard decisions on a small held-out split.
+
+The decision-curve analysis sharpens that interpretation. The gain from NARS guidance is better described as local clinical-utility improvement at selected thresholds than as a uniform improvement across all decision settings. The high-threshold tail is unstable on this 48-case test set, with the NARS-gated curve dropping below baseline at 0.90 and 0.95, so those regions should not be over-interpreted. Taken together, the ranking, calibration, and decision-utility results support feasibility and selective benefit, but not a blanket claim of superiority across all threshold choices.
 
 The interface can fail in three cases. First, the variance estimator can misrepresent epistemic uncertainty. MC dropout can under-estimate uncertainty under dataset shift \cite{ovadia2019}. Second, proposition extraction can misalign neural features and symbolic terms. This error couples the wrong $c_i$ to $\alpha_i$. Third, the knowledge base can contain conflicting or weak rules. NARS then produces low confidence conclusions that can suppress attention broadly.
 

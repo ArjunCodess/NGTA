@@ -66,6 +66,7 @@ Saved metrics:
 - [results/metrics/metrics.csv](results/metrics/metrics.csv)
 - [results/metrics/run_summary.json](results/metrics/run_summary.json)
 - [results/metrics/gamma_ablation.csv](results/metrics/gamma_ablation.csv)
+- [results/metrics/decision_curve.csv](results/metrics/decision_curve.csv)
 
 ### Test-Set Metrics
 
@@ -102,6 +103,14 @@ The pipeline now also runs a fixed gamma ablation over `gamma ∈ {0.25, 0.5, 1.
 | 4.0 | 0.9873 | 0.9891 | 0.04121 | 0.04104 | 95.83% |
 
 On this held-out split, the gamma sweep does **not** separate the models on AUC or accuracy: the NARS-gated AUC remains `0.9891` and accuracy remains `95.83%` across all tested gamma values. What does move is the Brier score, which improves modestly as gamma increases and is best at `gamma=4.0` (`0.04104`). The current default reported run remains `gamma=2.0`, but the ablation shows that stronger confidence gating helps calibration slightly more than ranking on this dataset.
+
+### Decision Curve Analysis
+
+The pipeline also computes decision-curve analysis across threshold probabilities from `0.05` to `0.95` and saves the results to [results/metrics/decision_curve.csv](results/metrics/decision_curve.csv), with the plot exported to [charts/decision_curve.png](charts/decision_curve.png).
+
+On this held-out split, both model-based strategies outperform `treat-all` and `treat-none` across a broad threshold range. The NARS-gated model provides slightly higher net benefit than the baseline at a few thresholds, including `0.05`, `0.10`, `0.15`, `0.65`, and `0.80`, while matching the baseline across much of the middle range. For example, at threshold `0.65`, net benefit rises from `0.2976` to `0.3185`, which corresponds to about `2.08` additional true-positive-equivalent decisions per 100 patients after accounting for threshold-weighted false positives. At threshold `0.80`, the gain is again about `2.08` per 100 patients.
+
+The high-threshold tail is unstable on a `48`-case test set: at thresholds `0.90` and `0.95`, the NARS-gated curve falls below the baseline. That should be interpreted as a small-sample effect rather than a strong clinical conclusion, and it matches the same sample-size limitation already seen in the overlapping bootstrap AUC intervals.
 
 ### Default Parameter Setting
 
@@ -299,10 +308,12 @@ Metrics and traces:
 - [results/metrics/run_summary.json](results/metrics/run_summary.json)
 - [results/metrics/training_history.csv](results/metrics/training_history.csv)
 - [results/metrics/gamma_ablation.csv](results/metrics/gamma_ablation.csv)
+- [results/metrics/decision_curve.csv](results/metrics/decision_curve.csv)
 - [results/traces/split_summary.json](results/traces/split_summary.json)
 - [results/traces/preprocessing_metadata.json](results/traces/preprocessing_metadata.json)
 - [results/traces/test_predictions.csv](results/traces/test_predictions.csv)
 - [charts/gamma_ablation_auc.png](charts/gamma_ablation_auc.png)
+- [charts/decision_curve.png](charts/decision_curve.png)
 
 ## Contributing
 
