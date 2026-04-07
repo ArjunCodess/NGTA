@@ -24,27 +24,27 @@
 \maketitle
 
 \begin{abstract}
-Rare-disease prediction is limited by small cohorts and unstable uncertainty estimates \cite{ma2019, ovadia2019}. We define a formal interface that maps transformer outputs to Non-Axiomatic Reasoning System (NARS) truth values and then uses NARS confidence to modulate attention during inference \cite{wang1995, wang2006, wang2013}. The method makes uncertainty an explicit, inspectable variable and specifies where failures can arise in variance estimation, proposition extraction, and rule conflict handling. We instantiate the interface for medullary thyroid carcinoma diagnosis on a 149-case structured cohort. On a 48-case held-out split, the NARS-guided model slightly improved AUC from 0.9873 to 0.9891 without changing thresholded decisions, showing feasibility and directional ranking benefit under severe data scarcity.
+Uncertainty-aware clinical prediction remains difficult when tabular oncology data are heterogeneous, partially missing, and only moderately sized \cite{ma2019, ovadia2019}. We define a formal interface that maps transformer outputs to Non-Axiomatic Reasoning System (NARS) truth values and then uses NARS confidence to modulate attention during inference \cite{wang1995, wang2006, wang2013}. The method makes uncertainty an explicit, inspectable variable and specifies where failures can arise in variance estimation, case-level proposition extraction, and confidence gating. We instantiate the interface on TCGA-THCA to predict lymph node metastasis from merged clinicopathologic tables. After case-level merging and target filtering, 457 labeled cases remain and are split into 319 training, 69 validation, and 69 test cases. On the held-out test split, a random-forest baseline reached an AUC of 0.6563, the baseline transformer reached 0.7311, the flat-confidence control reached 0.7345, and the NARS-gated variant reached 0.7336 with the best Brier score of 0.2059. The 95\% bootstrap AUC intervals overlap across all variants, so the benchmark should be read as a feasibility study of the uncertainty interface and its reliability semantics rather than a definitive performance gain.
 \end{abstract}
 
 \begin{IEEEkeywords}
-neurosymbolic AI, NARS, transformer, rare disease, clinical reasoning, few-shot learning, data scarcity, medullary thyroid carcinoma diagnosis
+neurosymbolic AI, NARS, transformer, thyroid carcinoma, lymph node metastasis, clinical prediction, uncertainty quantification, TCGA
 \end{IEEEkeywords}
 
 \section{Introduction}
 \label{sec:intro}
 
-Rare disease prediction faces label scarcity at the level of a single condition, often below 1000 labeled cases \cite{ma2019}. This regime increases estimation error and degrades calibration in neural predictors \cite{ovadia2019}. Medullary thyroid carcinoma (MTC) is a concrete diagnostic instance because it accounts for only a small fraction of thyroid malignancies, whereas papillary thyroid carcinoma dominates routine thyroid cancer presentations \cite{lindsey2012}.
+Clinical prediction still encounters data-scarcity-like behavior even when a benchmark is larger than a boutique case-series dataset. Structured oncology tables contain heavy missingness, repeated diagnosis rows, and substantial post-processing requirements before they can support reliable prediction \cite{ma2019}. These issues increase estimation error and degrade calibration in neural predictors \cite{ovadia2019}. In this paper, we move from a hand-curated rare-disease cohort to TCGA-THCA, a larger and more standard thyroid oncology benchmark, and study lymph node metastasis as the binary endpoint.
 
-Transformers provide flexible function approximators for clinical prediction tasks \cite{rasmy2021, azizi2021, li2019}. In low-data regimes, a transformer can output high predicted probabilities even when epistemic uncertainty is high \cite{ovadia2019, ghassemi2021}. Standard attention weights also lack an explicit variable that denotes evidential support for each attended feature \cite{goncalves2022}.
+Transformers provide flexible function approximators for clinical prediction tasks \cite{rasmy2021, azizi2021, li2019}. In low-data regimes, a transformer can output high predicted probabilities even when epistemic uncertainty is high \cite{ovadia2019, ghassemi2021}. Standard attention weights also lack an explicit variable that denotes evidential support for each attended feature \cite{goncalves2022}. This matters clinically because a black-box score without an explicit uncertainty channel is difficult to audit, defer, or hand off to a human decision-maker.
 
 Non-Axiomatic Reasoning System (NARS) represents evidential support with a two-dimensional truth value $(f,c)$, where $f$ is frequency and $c$ is confidence \cite{wang1995, wang2006, wang2013}. NARS updates truth values by truth-value functions that depend on the amount and agreement of evidence.
 
 We study the following research question: How can a transformer expose its uncertainty in a form that supports symbolic evidence aggregation, and how can aggregated evidential confidence control attention during inference?
 
-This paper does not claim that NARS broadly outperforms neural baselines for MTC diagnosis. The claim is narrower: NARS truth values provide a principled, inspectable uncertainty variable that can slightly improve risk ranking on the current cohort and can be extended as data grows.
+This paper does not claim that NARS broadly outperforms neural baselines for thyroid oncology prediction. The claim is narrower: NARS truth values provide a principled, inspectable uncertainty variable that can be coupled to attention and evaluated transparently on a clinically relevant benchmark. The clinical motivation is therefore reliability and inspectability first, not ranking performance alone.
 
-We contribute a formal interface specification. First, we define a mapping from a neural predictive distribution to a NARS truth value and a mapping from a truth value to an attention reweighting factor. Second, we specify the NAL truth-value operations required to aggregate multiple clinical propositions into a single conclusion under data scarcity. Third, we instantiate the interface for MTC diagnosis as a worked application case.
+We contribute a formal interface specification. First, we define a mapping from a neural predictive distribution to a NARS truth value and a mapping from a truth value to an attention reweighting factor. Second, we specify the NAL truth-value operations required to aggregate multiple clinical propositions into a single conclusion under uncertainty. Third, we instantiate the interface for TCGA-THCA lymph node metastasis prediction as a worked application case.
 
 \section{Related Work}
 \label{sec:related}
@@ -235,81 +235,49 @@ NARS inference rules propagate truth-values through clinical knowledge graphs, c
 
 The confidence measure explicitly represents the amount of evidence supporting each conclusion \cite{wang2013}. When evidence is limited, confidence remains low, signaling uncertainty to clinicians. This explicit uncertainty representation is absent in pure neural approaches.
 
-\section{Application to MTC Diagnosis}
+\section{Application to TCGA-THCA Lymph Node Metastasis Prediction}
 \label{sec:application}
 
-\subsection{Medullary Thyroid Carcinoma Diagnosis}
+\subsection{Benchmark Definition}
 
-Medullary thyroid carcinoma is a rare neuroendocrine tumor accounting for approximately 5 percent of thyroid malignancies \cite{lindsey2012}. In everyday endocrine practice, this makes MTC far less common than papillary thyroid carcinoma and therefore harder to model from routine clinical data. The diagnostic challenge is not merely class imbalance; it is that clinicians must distinguish a rare, potentially aggressive tumor from far more common thyroid nodules using limited patient histories, serum markers, and ultrasound findings.
+The current implementation uses the TCGA-THCA clinical tables to predict lymph node metastasis from structured clinicopathologic information. The raw repository dataset consists of five tab-separated files: \texttt{clinical.tsv}, \texttt{exposure.tsv}, \texttt{family\_history.tsv}, \texttt{follow\_up.tsv}, and \texttt{pathology\_detail.tsv}. These files are not case-level as distributed, so the preprocessing pipeline first normalizes TCGA missing-value placeholders such as \texttt{--}, \texttt{'--}, \texttt{Not Reported}, and \texttt{Unknown}, filters the clinical table to the primary diagnosis rows, collapses repeated records to one row per \texttt{case\_submitter\_id}, and then left-joins the auxiliary tables onto that clinical base. After placeholder normalization, columns with more than 70\% missingness are removed before modeling.
 
-Diagnosing MTC from clinical and imaging data is challenging because positive cases are limited and the relevant signals are heterogeneous. Machine learning models trained on small cohorts can overfit or become poorly calibrated when they must combine age, symptoms, calcitonin, CEA, and ultrasound findings under substantial uncertainty \cite{zhou2026}.
-
-Zhou et al. \cite{zhou2026} conducted a multi-center study of MTC and showed that richer cohorts can support strong predictive performance. However, many realistic deployment settings have only smaller clinical and ultrasound cohorts, where uncertainty quantification and evidence aggregation are more important than simply scaling feature modalities.
-
-The structured dataset used in the present implementation was assembled from ten published hereditary MTC and MEN2 studies, including family cohorts, case series, and case reports \cite{mtc_k666n_thyroid_2016, mtc_prophylactic_eje_2006, qi2015oncotarget, florescu2024clinpract, lagreca2024edm, vijayan2021ijc, zhang2024wjcc, shankar2012ijpe, schulte2010jcem, qi2014biosci}. This provenance matters because the resulting cohort reflects the sparse, heterogeneous evidence base that often characterizes rare-disease modeling in practice.
+The binary target is derived from \texttt{diagnoses.ajcc\_pathologic\_n}. We map $N0\rightarrow 0$ and $N1/N1a/N1b\rightarrow 1$, while cases with $NX$ or missing nodal status are excluded before splitting. On the current snapshot, this leaves 457 labeled TCGA-THCA cases from 507 merged case rows. The resulting benchmark is substantially larger and more standardized than the earlier repository cohort, while still preserving the tabular missingness and uncertainty challenges that motivate the NARS interface.
 
 \subsection{Hybrid Model Architecture}
 
-For MTC diagnosis, we propose a NARS-transformer hybrid with the following architecture. The input consists of clinical features (age, gender, family history, and serum markers) and imaging features (thyroid ultrasound characteristics).
+For TCGA-THCA lymph node metastasis prediction, we use a NARS-transformer hybrid with a case-level tabular input. The selected feature set contains five numerical variables (age at diagnosis, year of diagnosis, and three tumor-dimension measurements) together with thirteen categorical clinicopathologic variables, including gender, race, ethnicity, pathologic T category, prior malignancy, morphology, laterality, tumor focality, residual disease, and extrathyroid extension. These predictors are clinicopathologic retrospective benchmark variables, not a strictly non-invasive baseline-only panel. Numerical variables are imputed with KNN imputation, categorical variables with most-frequent imputation, and all imputers are fit on the training split only to avoid leakage. After train-only imputation, scaling, and one-hot encoding, the model receives a 55-dimensional numeric feature vector.
 
-The transformer encoder processes these features through multiple attention layers, learning complex interactions between clinical variables. The output layer produces an initial probability of MTC diagnosis.
+The transformer encoder processes these features through multiple attention layers, learning interactions among the encoded variables. The output layer produces an initial probability of lymph node metastasis.
 
-NARS maintains a knowledge base of clinical relationships including:
-\begin{itemize}
-\item Markedly elevated calcitonin implies increased support for MTC diagnosis
-\item Elevated carcinoembryonic antigen (CEA) reinforces suspicion of MTC in the presence of thyroid lesions
-\item Hypoechogenicity and enhanced intranodular blood flow on ultrasound increase support for malignancy consistent with MTC
-\end{itemize}
-
-These relationships are represented as NAL statements with truth-values derived from clinical literature and expert knowledge.
-
-\subsection{Proposition Extraction and Symbolic Rules}
-
-To make the symbolic layer reproducible, each structured or imaging feature is mapped to a NAL-style proposition before revision and attention gating. Table~\ref{tab:proposition_extraction} shows the small prototype knowledge base used in this paper. The assigned $(f_{sym},c_{sym})$ values are literature-anchored expert priors for the current prototype rather than cohort-fitted estimates, so they should be interpreted as transparent initial rule weights, not as definitive clinical truth values.
-
-\begin{table}[H]
-\caption{Prototype MTC knowledge-base rules used for proposition extraction and symbolic support.}
-\label{tab:proposition_extraction}
-\centering
-\begin{tabular}{@{}p{2.2cm}p{3.5cm}p{2.5cm}p{1.3cm}@{}}
-\toprule
-Feature cue & Proposition / rule & Source & $(f_{sym},c_{sym})$ \\
-\midrule
-Calcitonin elevated & $\langle$patient $\rightarrow$ calcitonin\_high$\rangle \Rightarrow \langle$patient $\rightarrow$ MTC\_likely$\rangle$ & \cite{zhou2026} & $(0.90,0.80)$ \\
-CEA elevated with thyroid lesion & $\langle$patient $\rightarrow$ CEA\_high$\rangle \wedge \langle$patient $\rightarrow$ thyroid\_lesion$\rangle \Rightarrow \langle$patient $\rightarrow$ MTC\_supported$\rangle$ & \cite{zhou2026} & $(0.78,0.65)$ \\
-Hypoechogenic ultrasound pattern & $\langle$patient $\rightarrow$ hypoechoic\_nodule$\rangle \Rightarrow \langle$patient $\rightarrow$ malignant\_suspicion$\rangle$ & \cite{zhou2026} & $(0.70,0.55)$ \\
-Enhanced intranodular blood flow & $\langle$patient $\rightarrow$ increased\_vascularity$\rangle \Rightarrow \langle$patient $\rightarrow$ malignant\_suspicion$\rangle$ & \cite{zhou2026} & $(0.68,0.50)$ \\
-Familial MEN2 / hereditary context & $\langle$patient $\rightarrow$ hereditary\_MEN2\_context$\rangle \Rightarrow \langle$patient $\rightarrow$ MTC\_risk\_elevated$\rangle$ & \cite{mtc_prophylactic_eje_2006, schulte2010jcem} & $(0.85,0.75)$ \\
-\bottomrule
-\end{tabular}
-\end{table}
+The current repository version does not add a handcrafted THCA-specific symbolic rule base. Instead, it isolates the uncertainty-to-NARS and confidence-gated attention path: predictive means and variances are mapped into NARS truth values, per-feature attention variance is converted into confidence estimates, and those confidences reweight the attention distribution during inference.
 
 \subsection{Inference Process}
 
 Given a patient case, the hybrid model operates through the following inference process:
 
-\textbf{Step 1}: The transformer encoder processes patient features to generate contextualized representations and an initial MTC diagnosis probability $p_{neural}$.
+\textbf{Step 1}: The transformer encoder processes the encoded case features to generate contextualized representations and an initial lymph node metastasis probability $p_{neural}$.
 
 \textbf{Step 2}: The neural prediction is converted to a NARS statement with truth-value $(f_{neural}, c_{neural})$ using Eq.~\eqref{eq:neural_to_nars}, where $f_{neural} = p_{neural}$ and $c_{neural}$ reflects prediction uncertainty from limited training data.
 
-\textbf{Step 3}: NARS performs inference combining the neural prediction with symbolic knowledge using Eqs.~\eqref{eq:deduction_f}--\eqref{eq:deduction_c}. For example, if a patient has markedly elevated calcitonin together with suspicious ultrasound findings, NARS applies those statements to strengthen support for MTC through deduction and revision.
+\textbf{Step 3}: Monte Carlo dropout is also used to summarize feature-level attention mean and variance. Those attention statistics are mapped into per-feature NARS confidence values that serve as reliability estimates for the attention update.
 
-\textbf{Step 4}: The combined evidence produces a final truth-value $(f_{final}, c_{final})$ representing both neural pattern recognition and symbolic reasoning.
+\textbf{Step 4}: The attention weights are reweighted by a tunable confidence gate of the form $c^\gamma$ and renormalized over features.
 
-\textbf{Step 5}: The confidence $c_{final}$ provides explicit uncertainty quantification for clinical decision support, and the attention weights are updated using Eq.~\eqref{eq:attention_update}.
+\textbf{Step 5}: The gated attention and token scores produce the final probability, while the resulting $(f, c)$ values provide explicit uncertainty estimates for inspection and export.
 
 \subsection{Uncertainty Quantification}
 
 The hybrid model provides two forms of uncertainty quantification. Aleatoric uncertainty arises from inherent randomness in the prediction task, while epistemic uncertainty stems from limited knowledge or data.
 
-NARS confidence $c$ primarily captures epistemic uncertainty, decreasing as the amount of evidence supporting a conclusion decreases \cite{wang2013}. When training data is limited, neural predictions have low confidence, signaling uncertainty to clinicians.
+NARS confidence $c$ primarily captures epistemic uncertainty, decreasing as the amount of evidence supporting a conclusion decreases \cite{wang2013}. In the present TCGA benchmark, this confidence is driven by predictive and attention variance rather than by a manually curated disease rule base.
 
 The frequency $f$ represents the balance of positive and negative evidence, providing a point estimate similar to neural network outputs. The combination $(f, c)$ enables nuanced uncertainty representation impossible with single probability values.
 
 \section{Results}
 \label{sec:results}
 
-The central empirical question is whether NARS confidence improves risk ranking on a small MTC cohort. On the 48-case held-out split, the answer is directionally yes: AUC increased from 0.9873 to 0.9891, an absolute gain of $+0.0018$, while thresholded decisions at 0.5 did not change. This pattern indicates a small ranking benefit rather than a change in hard classification behavior.
+The central empirical question is whether NARS confidence improves discrimination or calibration on the TCGA-THCA lymph node metastasis benchmark. On the 69-case held-out test split, the answer is mixed rather than decisive: the flat-confidence control reaches the highest AUC at 0.7345, the NARS-gated variant reaches 0.7336 and the best Brier score at 0.2059, the baseline reaches 0.7311, and a random-forest baseline reaches 0.6563. Thus the transformer family clearly outperforms the tested classical tree baseline on this split, but the differences among transformer variants remain small. All bootstrap AUC intervals overlap, so the experiment supports feasibility and close comparability among the transformer variants rather than a confirmed superiority claim for any one of them.
 
 To make the interface concrete, we also report an end-to-end numeric trace using the mappings from Eqs.~\eqref{eq:neural_to_nars} and \eqref{eq:attention_update}.
 \par Consider a neural estimate and a symbolic rule that both support the same conclusion $S\rightarrow P$:
@@ -349,47 +317,48 @@ Gain $g$ & $0.7173$ & $g=c_{rev}^{\gamma}$ with $\gamma=2$ \\
 \end{tabular}
 \end{table}
 
-We also evaluated the implemented pipeline on a 149-row MTC dataset using a study-aware split with 80 training cases, 21 validation cases, and 48 held-out test cases. The reported run uses the default experimental setting of 50 Monte Carlo dropout passes with $\gamma=2$, together with a transformer architecture of $d_{model}=64$, 4 heads, and 2 encoder layers. Table~\ref{tab:empirical_results} summarizes the held-out performance of that configuration together with bootstrap confidence intervals for AUC and expected calibration error (ECE) from a 10-bin equal-frequency reliability diagram. To isolate whether the variance-to-confidence mapping itself matters, we also evaluated a flat-confidence control that uses the same gated architecture but assigns a constant feature confidence $c=0.5$ before attention renormalization. In addition, a gamma ablation was run over $\gamma\in\{0.25,0.5,1,2,4\}$ using the same trained model and held-out split to examine how the confidence gate changes the final outputs.
+We evaluated the implemented pipeline on the merged TCGA-THCA benchmark using the default experimental setting of 50 Monte Carlo dropout passes with $\gamma=2$, together with a transformer architecture of $d_{model}=64$, 4 heads, and 2 encoder layers. The labeled cohort contains 457 cases in total, split into 319 training cases, 69 validation cases, and 69 held-out test cases. Table~\ref{tab:empirical_results} summarizes the held-out performance of that configuration together with bootstrap confidence intervals for AUC and expected calibration error (ECE) from a 10-bin equal-frequency reliability diagram. To address the standard tabular-learning objection that tree ensembles may outperform transformers, we also train a random-forest baseline on the exact same split and the exact same post-imputation encoded design matrix, selecting its hyperparameters by validation Brier score. To isolate whether the variance-to-confidence mapping itself matters, we additionally evaluate a flat-confidence control that uses the same gated architecture but assigns a constant feature confidence $c=0.5$ before attention renormalization. A gamma ablation is then run over $\gamma\in\{0.25,0.5,1,2,4\}$ using the same trained model and held-out split to examine how the confidence gate changes the final outputs.
 
 \begin{table}[H]
-\caption{Empirical test-set performance on the 48-case held-out study-aware split for MTC diagnosis.}
+\caption{Empirical test-set performance on the 69-case TCGA-THCA held-out split for lymph node metastasis prediction.}
 \label{tab:empirical_results}
 \centering
 \begin{tabular}{@{}lcccc@{}}
 \toprule
 Variant & AUC [95\% CI] & Brier score & ECE & Accuracy \\
 \midrule
-Baseline transformer & 0.9873 [0.9590, 1.0000] & 0.0412 & 0.0476 & 0.9583 \\
-Flat-confidence transformer & 0.9891 [0.9637, 1.0000] & 0.0413 & 0.0498 & 0.9583 \\
-NARS-gated transformer & 0.9891 [0.9637, 1.0000] & 0.0411 & 0.0496 & 0.9583 \\
+Random forest & 0.6563 [0.5158, 0.7816] & 0.2309 & 0.1389 & 0.5652 \\
+Baseline transformer & 0.7311 [0.5991, 0.8504] & 0.2062 & 0.1280 & 0.6957 \\
+Flat-confidence transformer & 0.7345 [0.6026, 0.8511] & 0.2060 & 0.1284 & 0.6957 \\
+NARS-gated transformer & 0.7336 [0.6025, 0.8509] & 0.2059 & 0.1287 & 0.6957 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-At the operating threshold of 0.5, all three models achieved recall 1.0 on the held-out set, with 27 true negatives, 2 false positives, 0 false negatives, and 19 true positives. Relative to the baseline transformer, both the flat-confidence and NARS-gated variants improved AUC from 0.9873 to 0.9891, an absolute gain of $+0.0018$, without changing hard classification decisions. However, the bootstrap intervals in Table~\ref{tab:empirical_results} overlap, so the observed AUC difference should be treated as uncertain rather than as a clearly separated performance gain on this test split. This overlap is expected: the approximate standard error of AUC for 19 positive and 29 negative test cases is about 0.03, so gaps smaller than that are undetectable at the 95\% level on this split.
+At the operating threshold of 0.5, all three transformer variants achieved the same accuracy of 0.6957 on the held-out set, compared with 0.5652 for the random forest. Relative to the baseline transformer, the flat-confidence and NARS-gated variants improve AUC by 0.0034 and 0.0025 respectively, but the corresponding bootstrap intervals in Table~\ref{tab:empirical_results} overlap almost completely. On this test split, the ranking effect is therefore real only in the descriptive sense and should not be interpreted as a statistically separated gain.
 
 \begin{table}[H]
-\caption{Gamma ablation on the 48-case held-out test split.}
+\caption{Gamma ablation on the 69-case held-out TCGA-THCA test split.}
 \label{tab:gamma_ablation}
 \centering
 \begin{tabular}{@{}ccccc@{}}
 \toprule
 $\gamma$ & Baseline AUC & NARS-gated AUC & Baseline Brier & NARS-gated Brier \\
 \midrule
-0.25 & 0.9873 & 0.9891 & 0.04121 & 0.04125 \\
-0.5 & 0.9873 & 0.9891 & 0.04121 & 0.04124 \\
-1.0 & 0.9873 & 0.9891 & 0.04121 & 0.04121 \\
-2.0 & 0.9873 & 0.9891 & 0.04121 & 0.04115 \\
-4.0 & 0.9873 & 0.9891 & 0.04121 & 0.04104 \\
+0.25 & 0.7311 & 0.7336 & 0.20619 & 0.20601 \\
+0.5 & 0.7311 & 0.7336 & 0.20619 & 0.20599 \\
+1.0 & 0.7311 & 0.7336 & 0.20619 & 0.20596 \\
+2.0 & 0.7311 & 0.7336 & 0.20619 & 0.20590 \\
+4.0 & 0.7311 & 0.7361 & 0.20619 & 0.20584 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The gamma ablation in Table~\ref{tab:gamma_ablation} shows that, on this test split, changing $\gamma$ does not alter AUC or accuracy: the NARS-gated model remains at 0.9891 AUC across the tested values. The main effect of increasing $\gamma$ is instead a modest improvement in Brier score, with the best calibration-oriented result among the tested values occurring at $\gamma=4$.
+The gamma ablation in Table~\ref{tab:gamma_ablation} shows that stronger confidence gating modestly improves the NARS-gated Brier score throughout the tested range and produces the best NARS-gated AUC at $\gamma=4$. Accuracy remains unchanged throughout the sweep.
 
-We also computed decision-curve analysis over threshold probabilities from 0.05 to 0.95 to assess clinical utility in terms of net benefit. Across a broad middle range of thresholds, the learned comparison models outperform the treat-all and treat-none strategies. The NARS-gated model matches the baseline at many thresholds and exceeds it slightly at several decision points, including 0.65 and 0.80. At threshold 0.65, for example, net benefit increases from 0.2976 to 0.3185, corresponding to roughly 2.08 additional true-positive-equivalent decisions per 100 patients after accounting for threshold-weighted false positives. A similar gain of about 2.08 per 100 patients appears at threshold 0.80.
+We also computed decision-curve analysis over threshold probabilities from 0.05 to 0.95 to assess clinical utility in terms of net benefit. On this benchmark, the baseline and NARS-gated variants are numerically identical across almost the entire threshold range, while the flat-confidence control differs only at 0.70 and 0.80. The decision-curve result is therefore best read as showing that the three variants make very similar threshold-level decisions on the present split.
 
-Calibration was assessed with a reliability diagram using 10 equal-frequency bins and by expected calibration error. On this split, ECE was 0.0476 for the baseline model, 0.0498 for the flat-confidence control, and 0.0496 for the NARS-gated model. Thus, while the gated model improved Brier score slightly, it did not improve ECE relative to the baseline. However, compared with the flat-confidence control, the variance-based NARS mapping was marginally better on both Brier score and ECE, suggesting that the variance-to-confidence step contributes a small calibration-oriented benefit even though it does not add further AUC lift on this split.
+Calibration was assessed with a reliability diagram using 10 equal-frequency bins and by expected calibration error. On this split, ECE was 0.1389 for the random forest, 0.1280 for the baseline model, 0.1284 for the flat-confidence control, and 0.1287 for the NARS-gated model. Thus, while the NARS-gated model achieved the best Brier score, it did not improve ECE relative to the baseline. The current empirical pattern is therefore a small calibration trade-off rather than a consistent gain across all calibration summaries. The most defensible deployment-oriented reading is that the NARS gate slightly improves probabilistic reliability as measured by Brier score while preserving the transformer family's stronger discrimination relative to the tested tree baseline.
 
 \section{Analysis}
 \label{sec:analysis}
@@ -398,32 +367,34 @@ Eq.~\eqref{eq:neural_to_nars} makes confidence decrease as predictive variance i
 
 Eq.~\eqref{eq:attention_update} enforces two invariants. It preserves $\sum_i \alpha_i^{\text{new}} = 1$. It sets $\alpha_i^{\text{new}} = 0$ when $c_i = 0$.
 
-The empirical comparison in Table~\ref{tab:empirical_results} suggests that the direction of the AUC change is consistent with the method's intent, but the flat-confidence control also matters for interpretation. Because accuracy and recall remained unchanged while AUC increased slightly, the main impact of the gated variants in this run is better ordering of cases by predicted risk rather than a change in thresholded decisions. In a clinical triage setting, even a small ranking improvement can matter because it can move suspicious cases higher in the review queue; however, the overlapping bootstrap intervals indicate that this cannot be treated as a confirmed performance gain on the current test split. Moreover, because the flat-confidence and NARS-gated variants achieved the same AUC here, the variance-to-confidence mapping cannot yet be claimed to improve ranking beyond generic attention reweighting on this cohort.
+The empirical comparison in Table~\ref{tab:empirical_results} suggests that the direction of the AUC change is consistent with the method's intent, but the flat-confidence control also matters for interpretation. Because accuracy remained unchanged while AUC increased only slightly, the main impact of the gated variants in this run is modest reordering of cases by predicted risk rather than a change in thresholded decisions. In a clinical triage setting, even a small ranking improvement can matter, but the overlapping bootstrap intervals indicate that this cannot be treated as a confirmed performance gain on the current test split. Moreover, because the flat-confidence control slightly exceeds the NARS-gated variant on AUC here, the variance-to-confidence mapping cannot yet be claimed to improve ranking beyond generic confidence-weighted attention reweighting on this cohort.
 
-The same experiment also shows a cautionary point. The Brier score changed only slightly, from 0.0412 to 0.0411 in the selected configuration, so the calibration effect is minor compared with the ranking effect. At the same time, the gamma ablation indicates that stronger gating can improve Brier score modestly even when AUC and accuracy stay fixed, whereas the equal-frequency ECE estimate slightly worsened from 0.0476 to 0.0496. This trade-off is consistent with the idea that confidence-based reweighting may help prioritize cases and smooth probabilities without necessarily improving every calibration summary on a small held-out split.
+The same experiment also shows a cautionary point. The Brier score changed only slightly, from 0.2062 to 0.2059 in the selected configuration, so the calibration effect is modest compared with the uncertainty around AUC. At the same time, the gamma ablation indicates that stronger gating can improve Brier score gradually even when accuracy stays fixed, whereas the equal-frequency ECE estimate is lowest for the baseline model. This trade-off is consistent with the idea that confidence-based reweighting may smooth probabilities without necessarily improving every calibration summary on a moderately sized held-out split.
 
-The decision-curve analysis sharpens that interpretation. The gain from NARS guidance is better described as local clinical-utility improvement at selected thresholds than as a uniform improvement across all decision settings. The high-threshold tail is unstable on this 48-case test set, with the NARS-gated curve dropping below baseline at 0.90 and 0.95, so those regions should not be over-interpreted. Taken together, the ranking, calibration, and decision-utility results support feasibility and selective benefit, but not a blanket claim of superiority across all threshold choices.
+The random-forest comparison also clarifies the benchmark narrative. On this split, the transformer family substantially outperforms the tested tree baseline on AUC, Brier score, ECE, and accuracy, so the paper can defend the use of a transformer encoder empirically rather than only theoretically. However, that result does not imply that the NARS gate itself is the main reason for the transformer advantage; it only shows that, under the current preprocessing and split, the implemented transformer pipeline is materially stronger than the selected random-forest comparator.
 
-Compared with simply using MC dropout output as a soft confidence signal, the present interface adds an explicit revision step that can combine neural and symbolic evidence in a shared $(f,c)$ space before attention is updated. More directly, simply scaling the logits by raw MC-dropout confidence would not provide the revision step that combines neural and symbolic support in a shared evidential space. That distinction is what Table~\ref{tab:proposition_extraction} makes concrete. The flat-confidence control in Table~\ref{tab:empirical_results} sharpens this point: constant-confidence gating can match the observed AUC gain on this split, but it does not capture the same variance-conditioned evidential semantics and is slightly worse on Brier score and ECE. This differs from approaches such as SHEPHERD and other knowledge-graph-augmented predictors \cite{karjalainen2025, jiang2024}, which enrich representations or retrieval but do not expose a NARS-style evidential confidence variable that can be revised and then fed back into attention. The contribution here is therefore not a larger knowledge graph or a different uncertainty estimator by itself, but a formal rule for turning uncertainty into revisable symbolic support and then reusing that support as a control signal in inference.
+The decision-curve analysis sharpens the within-family interpretation. The gain from NARS guidance is not a uniform threshold-level utility improvement on this benchmark. Instead, the baseline and NARS-gated curves are effectively identical across almost all thresholds, while the flat-confidence control differs only at two high-threshold operating points. Taken together, the ranking, calibration, and decision-utility results support feasibility and close behavioral similarity among the compared variants, but not a blanket claim of superiority across all threshold choices.
 
-The interface can fail in three cases. First, the variance estimator can misrepresent epistemic uncertainty. MC dropout can under-estimate uncertainty under dataset shift \cite{ovadia2019}; for example, if a new cohort has a different prevalence of hereditary RET-associated presentations, $c$ may be inflated and the attention gate may over-weight uncertain predictions. Second, proposition extraction can misalign neural features and symbolic terms; for example, if a mildly elevated calcitonin measurement is incorrectly mapped to the strong proposition calcitonin\_high, the wrong $c_i$ will be coupled to the attention update. Third, the knowledge base can contain conflicting or weak rules; for example, one rule may strongly favor MTC because of hereditary context while another weak imaging rule suppresses suspicion, producing a diluted revised confidence that downweights all related features.
+Compared with simply using MC dropout output as a soft confidence signal, the present interface still adds an explicit evidential variable in the shared $(f,c)$ space before attention is updated. In the current TCGA-THCA benchmark, the implementation isolates that variance-conditioned confidence path rather than adding a handcrafted disease-specific rule base. The flat-confidence control in Table~\ref{tab:empirical_results} sharpens this point: constant-confidence gating can slightly exceed the NARS-gated variant on AUC, but it does not preserve the same variance-conditioned evidential semantics and is slightly worse on Brier score. This differs from approaches such as SHEPHERD and other knowledge-graph-augmented predictors \cite{karjalainen2025, jiang2024}, which enrich representations or retrieval but do not expose a NARS-style evidential confidence variable that can be exported and fed back into attention. The contribution here is therefore not a larger knowledge graph or a different uncertainty estimator by itself, but a formal rule for turning uncertainty into an inspectable control signal in inference. In clinical terms, that is the paper's answer to the black-box problem: the model does not only emit a risk score, it also emits a confidence-like evidential state that can justify downweighting or deferring brittle predictions.
+
+The interface can fail in three cases. First, the variance estimator can misrepresent epistemic uncertainty. MC dropout can under-estimate uncertainty under dataset shift \cite{ovadia2019}; for example, if a new cohort has a different pathology mix or staging distribution, $c$ may be inflated and the attention gate may over-weight uncertain predictions. Second, case-level proposition extraction can misalign source variables and encoded features; for example, if repeated diagnosis rows or missing-value placeholders are collapsed incorrectly, the wrong $c_i$ will be coupled to the attention update. Third, a future clinical rule base could contain conflicting or weak rules, producing diluted revised confidence that downweights informative features.
 
 \section{Limitations}
 \label{sec:limitations}
 
-This paper reports an initial single-split empirical evaluation, but the evidence remains limited by dataset size and scope. The current run uses only 149 cases and a 48-case held-out test set, so the measured gains should be treated as preliminary.
+This paper reports an initial single-split empirical evaluation, but the evidence remains limited by dataset size and scope. The current run uses 457 labeled TCGA-THCA cases and a 69-case held-out test set, so the measured differences should still be treated as preliminary.
 
-The 48-case test set has insufficient statistical power to distinguish AUC gains smaller than approximately 0.03 at the 95\% level. This follows from the rough standard-error scale $0.5/\sqrt{n_{pos}n_{neg}}$, which is about 0.03 for 19 positive and 29 negative test cases.
+The 69-case test set still has limited statistical power to distinguish very small AUC gains at the 95\% level. With 34 positive and 35 negative test cases, the benchmark is more informative than the earlier small-cohort setup but still too small to support strong claims from changes on the order of a few thousandths of AUC.
 
 The mapping in Eq.~\eqref{eq:neural_to_nars} depends on a variance estimate $\sigma^2$ from a chosen uncertainty quantification method \cite{gal2016, lakshminarayanan2017}. Different estimators change $c$ even when $p$ is fixed.
 
 \subsection{Knowledge Engineering Cost}
 
-The method requires a proposition inventory and a knowledge base with truth values. This requirement shifts effort from model training to knowledge engineering. Even in the present prototype, defining the five symbolic MTC rules in Table~\ref{tab:proposition_extraction} required manual literature review, proposition design, and assignment of initial $(f_{sym},c_{sym})$ values. A practical first-pass rule set of this size therefore already demands a several-hour expert curation pass plus iteration on wording and confidence values. The required expertise is not only machine-learning knowledge but also domain judgment about which clinical findings deserve strong or weak symbolic support.
+The method can require a proposition inventory and a knowledge base with truth values when it is deployed with explicit symbolic rules. That requirement shifts effort from model training to knowledge engineering. The present TCGA-THCA benchmark intentionally does not add a handcrafted thyroid rule base, which keeps the experiment focused on the neural-to-NARS and confidence-gating interface. A fuller clinical deployment would still need expert curation of proposition wording and initial $(f_{sym},c_{sym})$ assignments.
 
-This also creates an inter-rater problem. If two clinicians disagree on the appropriate truth value for a rule such as elevated CEA in the presence of a thyroid lesion, the system has no automatic way to decide which prior is correct. In practice, such disagreements would need either consensus review, sensitivity analysis over rule weights, or explicit reporting of alternative rule sets.
+This also creates an inter-rater problem. If two clinicians disagree on the appropriate truth value for a thyroid-cancer rule, the system has no automatic way to decide which prior is correct. In practice, such disagreements would need either consensus review, sensitivity analysis over rule weights, or explicit reporting of alternative rule sets.
 
-The present experiment also used a single operating threshold and one study-aware split. Additional resampling, external validation, and decision-curve analysis are still needed before stronger clinical claims can be made.
+The present experiment also used a single operating threshold and one stratified split. Additional resampling and external validation are still needed before stronger clinical claims can be made.
 
 \section{Discussion and Future Work}
 \label{sec:planned_evaluation}
@@ -440,7 +411,7 @@ Such experiments can report tables and plots showing how $c$ and $\alpha^{\text{
 \subsection{Dataset-Scarcity Ablation}
 \label{sec:scarcity_ablation}
 
-The present study already evaluates a transformer baseline versus a transformer+NARS interface on an MTC diagnosis setting using a structured clinical cohort. A fuller follow-up evaluation should expand this to a clinical and ultrasound feature cohort with a clearly documented preprocessing pipeline, including serum calcitonin and CEA measurements and richer thyroid ultrasound descriptors relevant to diagnostic workup.
+The present study already evaluates a transformer baseline versus a transformer+NARS interface on a TCGA-THCA lymph node metastasis setting using a structured clinical benchmark. A fuller follow-up evaluation should expand this to external thyroid oncology cohorts and should report sensitivity to feature selection, target definition, and missing-data handling.
 
 To test label-scarcity behavior more rigorously, future work should subsample the training data to multiple sizes (e.g., $n\in\{50,100,250,500,1000\}$ when feasible), repeat each setting over multiple random seeds, and report:
 \begin{itemize}
@@ -472,15 +443,15 @@ Overall, the empirical result in this paper provides an initial proof of feasibi
 \section{Conclusion}
 \label{sec:conclusion}
 
-This paper defined a bidirectional interface between transformers and NARS that (i) converts neural predictive outputs into NARS truth values and (ii) uses NARS confidence to modulate transformer attention during inference. The key benefit is that evidential support becomes an explicit variable that can be aggregated symbolically and then reused as a control signal in neural inference.
+This paper defined a bidirectional interface between transformers and NARS that (i) converts neural predictive outputs into NARS truth values and (ii) uses NARS confidence to modulate transformer attention during inference. The key benefit is that evidential support becomes an explicit variable that can be aggregated symbolically and then reused as a control signal in neural inference. That explicit uncertainty channel is the main proposed mitigation for the clinical black-box problem: the model can expose what it does not confidently know instead of only returning a scalar risk score.
 
-Concretely, the interface (a) maps $(p,\sigma^2)$ to $(f,c)$ so that confidence decreases as epistemic variance increases, and (b) maps $(f,c)$ to a normalized attention update via a tunable confidence gain. On the current 149-case MTC dataset, the default parameter setting produced a small improvement in AUC over the baseline transformer while leaving thresholded accuracy and recall unchanged. Bootstrap AUC intervals overlapped across all three compared variants, so the result is best understood as preliminary evidence that NARS confidence can improve risk ranking, rather than a definitive clinical performance gain. This is not incidental to the application setting: the same rare-disease data scarcity that motivates a NARS-guided uncertainty interface also limits the statistical power available to confirm small AUC gains on a cohort of this size.
+Concretely, the interface (a) maps $(p,\sigma^2)$ to $(f,c)$ so that confidence decreases as epistemic variance increases, and (b) maps $(f,c)$ to a normalized attention update via a tunable confidence gain. On the current TCGA-THCA benchmark, the default parameter setting outperformed the tested random-forest baseline and produced closely matched results across the baseline, flat-confidence, and NARS-gated transformer variants: AUC values were 0.6563, 0.7311, 0.7345, and 0.7336 respectively, while the NARS-gated variant achieved the best Brier score at 0.2059. Bootstrap AUC intervals overlapped across the transformer variants, so the result is best understood as preliminary evidence that the uncertainty interface is feasible on a larger standard oncology benchmark, rather than as a definitive clinical performance gain.
 
-Future work should evaluate the interface under controlled data-scarcity and dataset-shift regimes, reporting discrimination, calibration, and decision-utility metrics, and comparing against uncertainty-aware baselines that do not use symbolic aggregation. Future work should also quantify knowledge-base construction effort and characterize failures due to mis-specified rules, conflicting evidence, and proposition extraction errors.
+Future work should evaluate the interface under controlled data-scarcity and dataset-shift regimes, reporting discrimination, calibration, and decision-utility metrics, and comparing against stronger uncertainty-aware baselines such as gradient-boosted trees and ensemble-based tabular predictors that do not use symbolic aggregation. Future work should also quantify knowledge-base construction effort and characterize failures due to mis-specified rules, conflicting evidence, and proposition extraction errors.
 
 \section*{Acknowledgment}
 
-The author thanks Pei Wang for developing the Non-Axiomatic Reasoning System (NARS). The author also thanks the researchers whose published hereditary MTC and MEN2 studies provided the clinical source material used to assemble the structured dataset analyzed in this work \cite{mtc_k666n_thyroid_2016, mtc_prophylactic_eje_2006, qi2015oncotarget, florescu2024clinpract, lagreca2024edm, vijayan2021ijc, zhang2024wjcc, shankar2012ijpe, schulte2010jcem, qi2014biosci}.
+The author thanks Pei Wang for developing the Non-Axiomatic Reasoning System (NARS). The author also acknowledges The Cancer Genome Atlas Research Network for making the TCGA-THCA clinical data publicly available through the NCI Genomic Data Commons.
 
 \section*{Funding}
 
@@ -496,12 +467,12 @@ This work is methodological and did not involve new studies with human participa
 
 \section*{Data and Code Availability}
 
-The code for the implemented pipeline is available in the public repository \url{https://github.com/ArjunCodess/NGTA}. The structured dataset analyzed in this work was assembled from previously published studies of hereditary MTC and MEN2 \cite{mtc_k666n_thyroid_2016, mtc_prophylactic_eje_2006, qi2015oncotarget, florescu2024clinpract, lagreca2024edm, vijayan2021ijc, zhang2024wjcc, shankar2012ijpe, schulte2010jcem, qi2014biosci}; no new patient data were collected.
+The code for the implemented pipeline is available in the public repository \url{https://github.com/ArjunCodess/NGTA}. The benchmark analyzed in this work is derived from the TCGA-THCA clinical tables distributed through the NCI Genomic Data Commons; no new patient data were collected.
 
 \section*{Author Biography}
 
 \begin{IEEEbiography}{Arjun Vijay Prakash}
-Arjun Vijay Prakash is a student at City Montessori School, Lucknow, Uttar Pradesh, India. His research interests include neurosymbolic AI, formal logic, and clinical informatics, with a focus on uncertainty-aware prediction for rare diseases (e.g., MEN2).
+Arjun Vijay Prakash is a student at City Montessori School, Lucknow, Uttar Pradesh, India. His research interests include neurosymbolic AI, formal logic, and clinical informatics, with a focus on uncertainty-aware prediction for structured medical datasets.
 \end{IEEEbiography}
 
 \bibliographystyle{IEEEtran}
