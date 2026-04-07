@@ -3,6 +3,8 @@
 ## Summary
 Refactor the pipeline from a single `data.csv` MTC task to a case-level TCGA-THCA lymph node metastasis task built from the five TSV files under `data/`. The implementation should produce one row per `cases.submitter_id`, derive the binary target from `diagnoses.ajcc_pathologic_n`, run a leakage-safe stratified 70/15/15 split, preprocess features into numeric tensors for the existing NGTA model, then rerun the pipeline and refresh README plus a focused subset of paper sections/results.
 
+Add a strong tree-based tabular baseline on the exact same split so the final paper can defend the Transformer choice, and strengthen the manuscript framing around calibration, reliability, and black-box mitigation rather than pure AUC.
+
 ## Implementation Changes
 - Replace root `data.csv` usage entirely.
   - Delete `data.csv`.
@@ -71,10 +73,18 @@ Refactor the pipeline from a single `data.csv` MTC task to a case-level TCGA-THC
   - If the current transformer class is kept, adapt its input path to accept the new fully numeric matrix. If that is more invasive than warranted, replace the mixed categorical/numeric tokenization with a numeric-only tabular encoder wrapper and keep the NGTA uncertainty/attention logic unchanged.
   - Update artifact labels, print statements, summaries, and chart titles to use “Lymph Node Metastasis” as the positive class.
   - Regenerate split summary and preprocessing metadata to describe TCGA case counts and selected features instead of study IDs.
+- Add at least one classical tabular baseline on the identical split and label definition.
+  - Preferred baseline order: `XGBoost`, `LightGBM`, then `RandomForestClassifier` if gradient-boosting dependencies are unavailable.
+  - Train the baseline on the exact same train/val/test partition and post-imputation numeric design matrix used by the Transformer.
+  - Save baseline AUC, Brier score, ECE, and accuracy into the same metrics artifacts and include it in the manuscript results table.
+  - If the tree baseline wins on AUC, keep that result and use it to justify NGTA on uncertainty semantics, calibration behavior, and inspectability rather than ranking alone.
 - Update docs with a focused refresh.
   - `README.md`: replace the old task/dataset/results narrative with TCGA-THCA lymph node metastasis wording, new cohort counts, new split description, new feature list, and rerun-derived metrics/artifact paths.
   - `paper/main.tex`: update abstract, task framing, dataset/application description, empirical results text/tables/captions, and conclusion passages to describe TCGA-THCA lymph node metastasis instead of the old MTC cohort.
   - Remove or rewrite the MTC-specific handcrafted rule examples/table so the paper does not claim a disease-specific symbolic rule base that the current THCA codepath does not implement; replace with a brief statement that the present benchmark evaluates the uncertainty-to-NARS attention interface on structured TCGA clinicopathologic variables.
+  - Explicitly frame Brier score and ECE as deployment-relevant metrics, and avoid an AUC-first narrative if the results do not support it.
+  - Strengthen the introduction, discussion, and conclusion so they state that NGTA addresses the black-box problem by quantifying and propagating uncertainty instead of only emitting a risk score.
+  - Do not describe the current v1 benchmark as “strictly non-invasive” or “baseline-only”; the retained predictors are clinicopathologic and include pathologic/post-surgical variables.
 
 ## Test Plan
 - Loader validation:
@@ -94,6 +104,10 @@ Refactor the pipeline from a single `data.csv` MTC task to a case-level TCGA-THC
   - confirm stratified split sizes are 319/69/69 with seed 0 on the current data snapshot
   - confirm model input width matches the transformed feature matrix width at runtime
   - run the full pipeline end-to-end and regenerate metrics CSVs, trace CSV, ROC, calibration, decision-curve, and training-history artifacts
+- Baseline validation:
+  - confirm the tree baseline uses the exact same split and target filtering as NGTA
+  - confirm the baseline appears in the same saved metrics table with AUC, Brier, ECE, and accuracy
+  - confirm the manuscript text follows the actual metric winners instead of forcing a Transformer-wins-on-AUC story
 - Documentation validation:
   - confirm README and focused paper sections no longer mention the 149-row MTC cohort, 10 studies, or study-aware splitting
   - confirm reported metrics/counts in docs match the rerun outputs
@@ -103,4 +117,5 @@ Refactor the pipeline from a single `data.csv` MTC task to a case-level TCGA-THC
 - The actual missing placeholder present in this repo includes `'--`; handle that in addition to the user-listed tokens.
 - `diagnoses.classification_of_tumor == "primary"` is the canonical way to resolve multi-diagnosis clinical rows before case-level collapsing.
 - The implementation should prioritize leakage-safe predictors, even if some user examples such as `ajcc_pathologic_stage` are excluded.
+- The current selected predictors are not a strictly non-invasive or prospective baseline feature set; they are clinicopathologic retrospective benchmark features.
 - Paper scope is a focused refresh, not a full theoretical rewrite; generic NARS theory sections can stay, but MTC-specific application/results content must be updated or removed.
