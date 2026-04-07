@@ -1,0 +1,106 @@
+# TCGA-THCA Migration for NGTA Lymph Node Metastasis
+
+## Summary
+Refactor the pipeline from a single `data.csv` MTC task to a case-level TCGA-THCA lymph node metastasis task built from the five TSV files under `data/`. The implementation should produce one row per `cases.submitter_id`, derive the binary target from `diagnoses.ajcc_pathologic_n`, run a leakage-safe stratified 70/15/15 split, preprocess features into numeric tensors for the existing NGTA model, then rerun the pipeline and refresh README plus a focused subset of paper sections/results.
+
+## Implementation Changes
+- Replace root `data.csv` usage entirely.
+  - Delete `data.csv`.
+  - Remove all `data.csv`, `149`-sample, `10 studies`, `study-aware split`, `MTC`, and hereditary MEN2 dataset references from `README.md`, `main.py`, and `src/pipeline.py`.
+- Update the entrypoint/config interface.
+  - Change `PipelineConfig.data_path` to `data_dir` with default `data`.
+  - Change CLI flag from `--data-path` to `--data-dir`.
+  - Update CLI/help text and printed summaries to describe TCGA-THCA lymph node metastasis prediction.
+- Rebuild `src/data_loader.py` around TCGA tables.
+  - Read `clinical.tsv`, `exposure.tsv`, `family_history.tsv`, `follow_up.tsv`, and `pathology_detail.tsv` with `sep="\t"` and string dtype.
+  - Normalize the join key by renaming `cases.submitter_id` to `case_submitter_id` in each table.
+  - Add a metadata-row guard: inspect row 0 and drop it only if it matches a descriptor/CDE pattern rather than real data. For the current repo snapshot, row 0 appears to be real data, so the implemented heuristic should leave all rows intact.
+  - Normalize missing placeholders globally before further processing: `--`, `'--`, `Not Reported`, `not reported`, `Unknown`, `unknown` -> `np.nan`.
+  - Build a one-row-per-case clinical base table:
+    - Filter `clinical.tsv` to primary-diagnosis rows using `diagnoses.classification_of_tumor == "primary"` (this removes prior-primary / recurrence rows and resolves observed target conflicts).
+    - Collapse remaining duplicate case rows by case using first non-null per column for diagnosis-level fields.
+    - For repeated yes/no treatment flags in clinical, derive `derived.any_treatment_or_therapy` as `yes` if any row says yes, else `no` if any row says no, else null.
+  - Collapse the other tables to one row per `case_submitter_id` with deterministic first-non-null per column, then left-join them onto the clinical base in this order: exposure, family_history, follow_up, pathology_detail.
+  - After merging, drop columns with more than 70% missingness.
+- Define the target before splitting.
+  - Use `diagnoses.ajcc_pathologic_n`.
+  - Map `N0 -> 0`, `N1/N1a/N1b -> 1`.
+  - Drop any case with `NX`, null, or unmapped target before splitting.
+  - On the current data snapshot, this should leave 457 labeled cases.
+- Lock a leakage-safe feature set for v1.
+  - Numerical features:
+    - `diagnoses.age_at_diagnosis`
+    - `diagnoses.year_of_diagnosis`
+    - `pathology_details.tumor_length_measurement`
+    - `pathology_details.tumor_width_measurement`
+    - `pathology_details.tumor_depth_measurement`
+  - Categorical features:
+    - `demographic.gender`
+    - `demographic.race`
+    - `demographic.ethnicity`
+    - `diagnoses.ajcc_pathologic_t`
+    - `diagnoses.prior_malignancy`
+    - `diagnoses.synchronous_malignancy`
+    - `diagnoses.prior_treatment`
+    - `diagnoses.primary_diagnosis`
+    - `diagnoses.morphology`
+    - `diagnoses.laterality`
+    - `diagnoses.tumor_focality`
+    - `diagnoses.residual_disease`
+    - `pathology_details.extrathyroid_extension`
+  - Explicitly exclude leakage-prone variables from the model matrix:
+    - `diagnoses.ajcc_pathologic_n`
+    - `diagnoses.ajcc_pathologic_stage`
+    - any lymph-node count / involvement columns
+    - recurrence / disease-response / follow-up outcome fields
+- Replace the old split/preprocessing path.
+  - Use a two-stage `StratifiedShuffleSplit` with the configured seed:
+    - stage 1: 70% train / 30% holdout
+    - stage 2: split holdout 50/50 into val/test
+  - With the current filtered cohort this should yield 319 train, 69 val, 69 test.
+  - Fit imputers/encoders/scalers on train only, then transform val/test:
+    - `KNNImputer` for numeric columns
+    - `SimpleImputer(strategy="most_frequent")` for categorical columns
+    - `StandardScaler` for numeric columns
+    - `OneHotEncoder(handle_unknown="ignore")` for categorical columns
+  - Convert the final processed matrices and labels to `torch.float32` tensors for loaders.
+  - Update `DataBundle` / preprocessing metadata so downstream code can access final numeric feature dimension and transformed feature names.
+- Adjust `src/pipeline.py` to the new tabular shape and task wording.
+  - Remove all study-based split assumptions and `study_id` logging.
+  - Compute model input dimension from the transformed feature matrix; the neural encoder should receive the post-encoding feature width instead of assuming the old mixed categorical-token schema.
+  - If the current transformer class is kept, adapt its input path to accept the new fully numeric matrix. If that is more invasive than warranted, replace the mixed categorical/numeric tokenization with a numeric-only tabular encoder wrapper and keep the NGTA uncertainty/attention logic unchanged.
+  - Update artifact labels, print statements, summaries, and chart titles to use “Lymph Node Metastasis” as the positive class.
+  - Regenerate split summary and preprocessing metadata to describe TCGA case counts and selected features instead of study IDs.
+- Update docs with a focused refresh.
+  - `README.md`: replace the old task/dataset/results narrative with TCGA-THCA lymph node metastasis wording, new cohort counts, new split description, new feature list, and rerun-derived metrics/artifact paths.
+  - `paper/main.tex`: update abstract, task framing, dataset/application description, empirical results text/tables/captions, and conclusion passages to describe TCGA-THCA lymph node metastasis instead of the old MTC cohort.
+  - Remove or rewrite the MTC-specific handcrafted rule examples/table so the paper does not claim a disease-specific symbolic rule base that the current THCA codepath does not implement; replace with a brief statement that the present benchmark evaluates the uncertainty-to-NARS attention interface on structured TCGA clinicopathologic variables.
+
+## Test Plan
+- Loader validation:
+  - confirm all five TSVs load from `data/`
+  - confirm the join key is normalized to `case_submitter_id`
+  - confirm no row-0 drop occurs on the current files
+  - confirm the merged frame is one row per case
+- Target validation:
+  - confirm only `N0`, `N1`, `N1a`, `N1b` survive into the labeled cohort
+  - confirm `NX` and null targets are removed before splitting
+  - confirm current labeled count is 457 with near-balanced classes
+- Preprocessing validation:
+  - confirm columns over 70% missing are removed
+  - confirm imputers/scalers/encoders are fit on train only
+  - confirm transformed train/val/test matrices contain no NaNs and are strictly numeric
+- Split/model validation:
+  - confirm stratified split sizes are 319/69/69 with seed 0 on the current data snapshot
+  - confirm model input width matches the transformed feature matrix width at runtime
+  - run the full pipeline end-to-end and regenerate metrics CSVs, trace CSV, ROC, calibration, decision-curve, and training-history artifacts
+- Documentation validation:
+  - confirm README and focused paper sections no longer mention the 149-row MTC cohort, 10 studies, or study-aware splitting
+  - confirm reported metrics/counts in docs match the rerun outputs
+
+## Assumptions And Defaults
+- The current TCGA files use real data in row 0; the metadata-row logic should be heuristic and conservative, not unconditional.
+- The actual missing placeholder present in this repo includes `'--`; handle that in addition to the user-listed tokens.
+- `diagnoses.classification_of_tumor == "primary"` is the canonical way to resolve multi-diagnosis clinical rows before case-level collapsing.
+- The implementation should prioritize leakage-safe predictors, even if some user examples such as `ajcc_pathologic_stage` are excluded.
+- Paper scope is a focused refresh, not a full theoretical rewrite; generic NARS theory sections can stay, but MTC-specific application/results content must be updated or removed.
