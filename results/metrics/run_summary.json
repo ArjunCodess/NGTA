@@ -629,7 +629,7 @@
       "auc": 0.6613445378151261,
       "brier": 0.21997575273834533,
       "accuracy": 0.5942028985507246,
-      "ece": 0.15966664988761545,
+      "ece": 0.15966664988761547,
       "auc_ci_95_lower": 0.5100720984441915,
       "auc_ci_95_upper": 0.7907666818849781
     },
@@ -654,13 +654,68 @@
     {
       "variant": "nars_gated",
       "auc": 0.7260504201680673,
-      "brier": 0.21219180711118052,
+      "brier": 0.21210238317094554,
       "accuracy": 0.6666666666666666,
-      "ece": 0.1402709990373255,
+      "ece": 0.13997611436609347,
       "auc_ci_95_lower": 0.5956742424242424,
       "auc_ci_95_upper": 0.8459660682454799
     }
   ],
+  "symbolic_rules": {
+    "definitions": {
+      "braf_mutation": {
+        "description": "BRAF mutation strongly predicts lymph node metastasis.",
+        "source_column": "genomic_mutation__BRAF",
+        "target_mode": "direct",
+        "truth_value": {
+          "frequency": 0.85,
+          "confidence": 0.75
+        }
+      },
+      "age_ge_55_years": {
+        "description": "Age at diagnosis >= 55 years increases metastasis risk.",
+        "source_column": "diagnoses.age_at_diagnosis",
+        "target_mode": "direct",
+        "truth_value": {
+          "frequency": 0.7,
+          "confidence": 0.6
+        }
+      },
+      "pathologic_t_t3_t4": {
+        "description": "Pathologic T3/T4 disease strongly predicts nodal spread.",
+        "source_column": "diagnoses.ajcc_pathologic_t",
+        "target_mode": "categorical_active",
+        "truth_value": {
+          "frequency": 0.9,
+          "confidence": 0.85
+        }
+      },
+      "extrathyroid_extension_present": {
+        "description": "Any recorded extrathyroid extension increases metastasis risk.",
+        "source_column": "pathology_details.extrathyroid_extension",
+        "target_mode": "categorical_active",
+        "truth_value": {
+          "frequency": 0.85,
+          "confidence": 0.8
+        }
+      }
+    },
+    "total_trigger_count": 79,
+    "mapped_feature_trigger_count": 79,
+    "cases_with_any_trigger": 42,
+    "per_rule_trigger_counts": {
+      "braf_mutation": 0,
+      "age_ge_55_years": 25,
+      "pathologic_t_t3_t4": 29,
+      "extrathyroid_extension_present": 25
+    },
+    "per_rule_mapped_trigger_counts": {
+      "braf_mutation": 0,
+      "age_ge_55_years": 25,
+      "pathologic_t_t3_t4": 29,
+      "extrathyroid_extension_present": 25
+    }
+  },
   "classical_baseline": {
     "variant": "random_forest",
     "selection_objective": "validation_brier",
@@ -670,7 +725,7 @@
       "min_samples_leaf": 1
     },
     "validation_auc": 0.7529411764705882,
-    "validation_brier": 0.20979110015441182
+    "validation_brier": 0.20979110015441177
   },
   "auc_bootstrap": {
     "random_forest": {
@@ -713,10 +768,10 @@
       "baseline_brier": 0.2118353396654129,
       "baseline_accuracy": 0.6666666666666666,
       "nars_gated_auc": 0.7260504201680673,
-      "nars_gated_brier": 0.21187482220601134,
+      "nars_gated_brier": 0.21186477889398792,
       "nars_gated_accuracy": 0.6811594202898551,
       "auc_delta_gated_minus_baseline": 0.0008403361344537785,
-      "brier_delta_gated_minus_baseline": 3.948254059843448e-05,
+      "brier_delta_gated_minus_baseline": 2.9439228575012244e-05,
       "accuracy_delta_gated_minus_baseline": 0.01449275362318847
     },
     {
@@ -725,10 +780,10 @@
       "baseline_brier": 0.2118353396654129,
       "baseline_accuracy": 0.6666666666666666,
       "nars_gated_auc": 0.7260504201680673,
-      "nars_gated_brier": 0.2119158529899425,
+      "nars_gated_brier": 0.2118954322242124,
       "nars_gated_accuracy": 0.6811594202898551,
       "auc_delta_gated_minus_baseline": 0.0008403361344537785,
-      "brier_delta_gated_minus_baseline": 8.051332452960192e-05,
+      "brier_delta_gated_minus_baseline": 6.009255879949049e-05,
       "accuracy_delta_gated_minus_baseline": 0.01449275362318847
     },
     {
@@ -737,10 +792,10 @@
       "baseline_brier": 0.2118353396654129,
       "baseline_accuracy": 0.6666666666666666,
       "nars_gated_auc": 0.7260504201680673,
-      "nars_gated_brier": 0.21200219830261297,
+      "nars_gated_brier": 0.21196003936618402,
       "nars_gated_accuracy": 0.6811594202898551,
       "auc_delta_gated_minus_baseline": 0.0008403361344537785,
-      "brier_delta_gated_minus_baseline": 0.00016685863720006244,
+      "brier_delta_gated_minus_baseline": 0.0001246997007711137,
       "accuracy_delta_gated_minus_baseline": 0.01449275362318847
     },
     {
@@ -749,10 +804,10 @@
       "baseline_brier": 0.2118353396654129,
       "baseline_accuracy": 0.6666666666666666,
       "nars_gated_auc": 0.7260504201680673,
-      "nars_gated_brier": 0.21219180711118052,
+      "nars_gated_brier": 0.21210238317094554,
       "nars_gated_accuracy": 0.6666666666666666,
       "auc_delta_gated_minus_baseline": 0.0008403361344537785,
-      "brier_delta_gated_minus_baseline": 0.00035646744576761646,
+      "brier_delta_gated_minus_baseline": 0.0002670435055326381,
       "accuracy_delta_gated_minus_baseline": 0.0
     },
     {
@@ -761,10 +816,10 @@
       "baseline_brier": 0.2118353396654129,
       "baseline_accuracy": 0.6666666666666666,
       "nars_gated_auc": 0.7294117647058824,
-      "nars_gated_brier": 0.21263664011061195,
+      "nars_gated_brier": 0.2124388256296932,
       "nars_gated_accuracy": 0.6666666666666666,
       "auc_delta_gated_minus_baseline": 0.004201680672268893,
-      "brier_delta_gated_minus_baseline": 0.0008013004451990491,
+      "brier_delta_gated_minus_baseline": 0.0006034859642803092,
       "accuracy_delta_gated_minus_baseline": 0.0
     }
   ],
@@ -873,7 +928,7 @@
       "random_forest_net_benefit": 0.03623188405797097,
       "baseline_net_benefit": 0.03623188405797097,
       "flat_confidence_net_benefit": 0.050724637681159354,
-      "nars_gated_net_benefit": 0.043478260869565175,
+      "nars_gated_net_benefit": 0.021739130434782553,
       "treat_all_net_benefit": -0.26811594202898587,
       "treat_none_net_benefit": 0.0
     },
@@ -943,7 +998,7 @@
   ],
   "calibration_reliability": [
     {
-      "mean_predicted_probability": 0.16396885944063072,
+      "mean_predicted_probability": 0.1639688594406307,
       "fraction_positives": 0.0,
       "count": 7,
       "variant": "random_forest"
@@ -955,7 +1010,7 @@
       "variant": "random_forest"
     },
     {
-      "mean_predicted_probability": 0.4208009137411098,
+      "mean_predicted_probability": 0.42080091374110973,
       "fraction_positives": 0.42857142857142855,
       "count": 7,
       "variant": "random_forest"
@@ -979,13 +1034,13 @@
       "variant": "random_forest"
     },
     {
-      "mean_predicted_probability": 0.5457126924797843,
+      "mean_predicted_probability": 0.5457126924797842,
       "fraction_positives": 0.14285714285714285,
       "count": 7,
       "variant": "random_forest"
     },
     {
-      "mean_predicted_probability": 0.5799682278609953,
+      "mean_predicted_probability": 0.5799682278609956,
       "fraction_positives": 0.5714285714285714,
       "count": 7,
       "variant": "random_forest"
@@ -1123,61 +1178,61 @@
       "variant": "flat_confidence"
     },
     {
-      "mean_predicted_probability": 0.1727512348108307,
+      "mean_predicted_probability": 0.17292122974644197,
       "fraction_positives": 0.0,
       "count": 7,
       "variant": "nars_gated"
     },
     {
-      "mean_predicted_probability": 0.25712094735161356,
+      "mean_predicted_probability": 0.25730816512359084,
       "fraction_positives": 0.2857142857142857,
       "count": 7,
       "variant": "nars_gated"
     },
     {
-      "mean_predicted_probability": 0.36282283732715326,
+      "mean_predicted_probability": 0.362821970312515,
       "fraction_positives": 0.42857142857142855,
       "count": 7,
       "variant": "nars_gated"
     },
     {
-      "mean_predicted_probability": 0.40326593054171783,
+      "mean_predicted_probability": 0.4032643219658673,
       "fraction_positives": 0.5714285714285714,
       "count": 7,
       "variant": "nars_gated"
     },
     {
-      "mean_predicted_probability": 0.4355513175819686,
+      "mean_predicted_probability": 0.43555085643196934,
       "fraction_positives": 0.42857142857142855,
       "count": 7,
       "variant": "nars_gated"
     },
     {
-      "mean_predicted_probability": 0.45749300608342724,
+      "mean_predicted_probability": 0.4574905251678929,
       "fraction_positives": 0.3333333333333333,
       "count": 6,
       "variant": "nars_gated"
     },
     {
-      "mean_predicted_probability": 0.5193263205160269,
+      "mean_predicted_probability": 0.5202362561119528,
       "fraction_positives": 0.8571428571428571,
       "count": 7,
       "variant": "nars_gated"
     },
     {
-      "mean_predicted_probability": 0.57272397603527,
+      "mean_predicted_probability": 0.5751545023525091,
       "fraction_positives": 0.7142857142857143,
       "count": 7,
       "variant": "nars_gated"
     },
     {
-      "mean_predicted_probability": 0.625636006730938,
+      "mean_predicted_probability": 0.6271846778372944,
       "fraction_positives": 0.42857142857142855,
       "count": 7,
       "variant": "nars_gated"
     },
     {
-      "mean_predicted_probability": 0.6995727049126846,
+      "mean_predicted_probability": 0.700670299541686,
       "fraction_positives": 0.8571428571428571,
       "count": 7,
       "variant": "nars_gated"
