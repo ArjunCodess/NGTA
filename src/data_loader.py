@@ -13,6 +13,8 @@ from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from torch.utils.data import DataLoader, Dataset
 
+from .gdc_downloader import ensure_tcga_thca_maf
+
 pd.set_option("future.no_silent_downcasting", True)
 
 DEFAULT_TARGET_COLUMN = "diagnoses.ajcc_pathologic_n"
@@ -39,6 +41,7 @@ DEFAULT_CATEGORICAL_COLUMNS = (
     "diagnoses.residual_disease",
     "pathology_details.extrathyroid_extension",
 )
+DEFAULT_BINARY_COLUMNS: tuple[str, ...] = ()
 TARGET_MAP = {"N0": 0, "N1": 1, "N1a": 1, "N1b": 1}
 MISSING_PLACEHOLDERS = {
     "--": np.nan,
@@ -55,6 +58,18 @@ TABLE_FILES = (
     "follow_up.tsv",
     "pathology_detail.tsv",
 )
+GENOMIC_FEATURE_PREFIX = "genomic_mutation__"
+FUNCTIONAL_VARIANT_CLASSES = (
+    "Missense_Mutation",
+    "Nonsense_Mutation",
+    "Frame_Shift_Del",
+    "Frame_Shift_Ins",
+    "Splice_Site",
+    "In_Frame_Del",
+    "In_Frame_Ins",
+)
+MAX_GENOMIC_GENES = 50
+MAF_GLOB_PATTERNS = ("*.maf", "*tcga_mutations.tsv", "*mutations*.tsv")
 
 
 @dataclass
@@ -69,6 +84,7 @@ class PreprocessorMetadata:
     target_column: str
     id_column: str
     numeric_columns: list[str]
+    binary_columns: list[str]
     categorical_columns: list[str]
     dropped_missing_columns: list[str]
     dropped_constant_columns: list[str]
@@ -108,11 +124,13 @@ class TabularPreprocessor:
         target_column: str = DEFAULT_TARGET_COLUMN,
         id_column: str = DEFAULT_ID_COLUMN,
         numeric_columns: tuple[str, ...] = DEFAULT_NUMERIC_COLUMNS,
+        binary_columns: tuple[str, ...] = DEFAULT_BINARY_COLUMNS,
         categorical_columns: tuple[str, ...] = DEFAULT_CATEGORICAL_COLUMNS,
     ) -> None:
         self.target_column = target_column
         self.id_column = id_column
         self.numeric_columns = list(numeric_columns)
+        self.binary_columns = list(binary_columns)
         self.categorical_columns = list(categorical_columns)
         self.dropped_missing_columns: list[str] = []
         self.dropped_constant_columns: list[str] = []
@@ -133,17 +151,21 @@ class TabularPreprocessor:
     def fit(self, frame: pd.DataFrame) -> "TabularPreprocessor":
         required = {self.id_column, self.target_column}
         required.update(self.numeric_columns)
+        required.update(self.binary_columns)
         required.update(self.categorical_columns)
         missing_columns = sorted(required - set(frame.columns))
         if missing_columns:
             raise ValueError(f"Missing required columns: {missing_columns}")
 
-        feature_columns = self.numeric_columns + self.categorical_columns
+        feature_columns = self.numeric_columns + self.binary_columns + self.categorical_columns
         self.dropped_constant_columns = [
             column for column in feature_columns if frame[column].nunique(dropna=False) <= 1
         ]
         self.numeric_columns = [
             column for column in self.numeric_columns if column not in self.dropped_constant_columns
+        ]
+        self.binary_columns = [
+            column for column in self.binary_columns if column not in self.dropped_constant_columns
         ]
         self.categorical_columns = [
             column for column in self.categorical_columns if column not in self.dropped_constant_columns
@@ -169,7 +191,7 @@ class TabularPreprocessor:
         categorical_feature_names = list(
             self.encoder.get_feature_names_out(self.categorical_columns)
         )
-        self.output_feature_names_ = numeric_feature_names + categorical_feature_names
+        self.output_feature_names_ = numeric_feature_names + list(self.binary_columns) + categorical_feature_names
         return self
 
     def transform(self, frame: pd.DataFrame) -> EncodedFrame:
@@ -186,16 +208,22 @@ class TabularPreprocessor:
         target = metadata[self.target_column].astype(np.float32).to_numpy()
 
         numeric_frame = frame[self.numeric_columns].apply(pd.to_numeric, errors="coerce")
+        binary_frame = (
+            frame[self.binary_columns].apply(pd.to_numeric, errors="coerce").fillna(0.0)
+            if self.binary_columns
+            else pd.DataFrame(index=frame.index)
+        )
         categorical_frame = frame[self.categorical_columns].astype("object")
 
         numeric_transformed = self.scaler.transform(self.numeric_imputer.transform(numeric_frame))
         categorical_transformed = self.encoder.transform(
             self.categorical_imputer.transform(categorical_frame)
         )
-        features = np.concatenate(
-            [numeric_transformed.astype(np.float32), categorical_transformed.astype(np.float32)],
-            axis=1,
-        )
+        feature_blocks = [numeric_transformed.astype(np.float32)]
+        if self.binary_columns:
+            feature_blocks.append(binary_frame.to_numpy(dtype=np.float32, copy=True))
+        feature_blocks.append(categorical_transformed.astype(np.float32))
+        features = np.concatenate(feature_blocks, axis=1)
 
         return EncodedFrame(features=features, target=target, metadata=metadata)
 
@@ -204,6 +232,7 @@ class TabularPreprocessor:
             target_column=self.target_column,
             id_column=self.id_column,
             numeric_columns=self.numeric_columns,
+            binary_columns=self.binary_columns,
             categorical_columns=self.categorical_columns,
             dropped_missing_columns=self.dropped_missing_columns,
             dropped_constant_columns=self.dropped_constant_columns,
@@ -287,7 +316,62 @@ def _drop_sparse_columns(frame: pd.DataFrame, threshold: float = 0.70) -> tuple[
     return frame.drop(columns=dropped_columns), dropped_columns
 
 
-def load_merged_tcga_frame(data_dir: str | Path) -> tuple[pd.DataFrame, list[str]]:
+def _find_genomic_maf_files(data_dir: Path) -> list[Path]:
+    matches: list[Path] = []
+    for pattern in MAF_GLOB_PATTERNS:
+        matches.extend(sorted(data_dir.glob(pattern)))
+    deduplicated = sorted({path.resolve(): path for path in matches}.values(), key=lambda path: path.name)
+    if deduplicated:
+        return deduplicated
+
+    ensured_path = ensure_tcga_thca_maf(download_dir=data_dir)
+    matches = [ensured_path]
+    return matches
+
+
+def _load_genomic_binary_matrix(
+    data_dir: str | Path,
+    max_genes: int = MAX_GENOMIC_GENES,
+) -> tuple[pd.DataFrame, list[str], list[str]]:
+    maf_paths = _find_genomic_maf_files(Path(data_dir))
+    maf_frames = [pd.read_csv(path, sep="\t", comment="#", low_memory=False) for path in maf_paths]
+    maf_frame = pd.concat(maf_frames, ignore_index=True)
+    required_columns = {"Tumor_Sample_Barcode", "Variant_Classification", "Hugo_Symbol"}
+    missing_columns = sorted(required_columns - set(maf_frame.columns))
+    if missing_columns:
+        raise ValueError(f"Missing required MAF columns in genomic input: {missing_columns}")
+
+    maf_frame["case_submitter_id"] = (
+        maf_frame["Tumor_Sample_Barcode"].astype(str).str.slice(0, 12)
+    )
+    filtered = maf_frame.loc[
+        maf_frame["Variant_Classification"].isin(FUNCTIONAL_VARIANT_CLASSES)
+        & maf_frame["Hugo_Symbol"].notna()
+        & maf_frame["case_submitter_id"].notna()
+    ].copy()
+    top_genes = (
+        filtered["Hugo_Symbol"].value_counts().head(max_genes).index.astype(str).tolist()
+    )
+    filtered = filtered.loc[filtered["Hugo_Symbol"].isin(top_genes)].copy()
+    filtered["mutated"] = 1
+
+    genomic_matrix = (
+        filtered.groupby([DEFAULT_ID_COLUMN, "Hugo_Symbol"], dropna=False)["mutated"]
+        .max()
+        .unstack(fill_value=0)
+        .reindex(columns=top_genes, fill_value=0)
+        .astype(np.int8)
+        .reset_index()
+    )
+    renamed_columns = {
+        gene: f"{GENOMIC_FEATURE_PREFIX}{gene}" for gene in genomic_matrix.columns if gene != DEFAULT_ID_COLUMN
+    }
+    genomic_matrix = genomic_matrix.rename(columns=renamed_columns)
+    genomic_columns = [column for column in genomic_matrix.columns if column != DEFAULT_ID_COLUMN]
+    return genomic_matrix, genomic_columns, [path.name for path in maf_paths]
+
+
+def load_merged_tcga_frame(data_dir: str | Path) -> tuple[pd.DataFrame, list[str], list[str], list[str]]:
     base_dir = Path(data_dir)
     missing_files = [name for name in TABLE_FILES if not (base_dir / name).exists()]
     if missing_files:
@@ -300,7 +384,13 @@ def load_merged_tcga_frame(data_dir: str | Path) -> tuple[pd.DataFrame, list[str
         merged = merged.merge(collapsed, on=DEFAULT_ID_COLUMN, how="left", suffixes=("", f"__{table_name}"))
 
     merged, dropped_columns = _drop_sparse_columns(merged, threshold=0.70)
-    return merged, dropped_columns
+    genomic_matrix, genomic_columns, maf_names = _load_genomic_binary_matrix(base_dir)
+    merged = merged.merge(genomic_matrix, on=DEFAULT_ID_COLUMN, how="left")
+    if genomic_columns:
+        merged[genomic_columns] = (
+            merged[genomic_columns].fillna(0).astype(np.int8)
+        )
+    return merged, dropped_columns, genomic_columns, maf_names
 
 
 def _prepare_labeled_frame(merged: pd.DataFrame) -> pd.DataFrame:
@@ -340,7 +430,7 @@ def load_data_bundle(
     batch_size: int,
     seed: int = 0,
 ) -> DataBundle:
-    merged_frame, dropped_missing_columns = load_merged_tcga_frame(data_dir)
+    merged_frame, dropped_missing_columns, genomic_columns, maf_file_names = load_merged_tcga_frame(data_dir)
     labeled_frame = _prepare_labeled_frame(merged_frame)
     train_frame, val_frame, test_frame = _stratified_split(
         labeled_frame,
@@ -348,7 +438,7 @@ def load_data_bundle(
         seed=seed,
     )
 
-    preprocessor = TabularPreprocessor().fit(train_frame)
+    preprocessor = TabularPreprocessor(binary_columns=tuple(genomic_columns)).fit(train_frame)
     preprocessor.dropped_missing_columns = dropped_missing_columns
     encoded_train = preprocessor.transform(train_frame)
     encoded_val = preprocessor.transform(val_frame)
@@ -370,8 +460,12 @@ def load_data_bundle(
         "positive_label": "Lymph Node Metastasis",
         "target_column": DEFAULT_TARGET_COLUMN,
         "id_column": DEFAULT_ID_COLUMN,
+        "maf_files": maf_file_names,
         "numeric_columns": preprocessor.numeric_columns,
+        "binary_columns": preprocessor.binary_columns,
         "categorical_columns": preprocessor.categorical_columns,
+        "clinical_feature_count": int(len(preprocessor.numeric_columns) + len(preprocessor.categorical_columns)),
+        "genomic_feature_count": int(len(preprocessor.binary_columns)),
         "input_dim": preprocessor.input_dim,
         "output_feature_names": preprocessor.feature_names,
         "dropped_missing_columns": dropped_missing_columns,

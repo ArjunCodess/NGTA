@@ -596,6 +596,20 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         json.dumps(bundle.split_summary, indent=2),
         encoding="utf-8",
     )
+    print(
+        "Loaded multi-modal dataset: "
+        f"{bundle.split_summary['labeled_case_rows']} labeled cases, "
+        f"{bundle.split_summary['input_dim']} total input features "
+        f"({len(bundle.preprocessor.numeric_columns)} scaled clinical numeric + "
+        f"{len(bundle.preprocessor.binary_columns)} genomic binary + "
+        f"{len(bundle.preprocessor.feature_names) - len(bundle.preprocessor.numeric_columns) - len(bundle.preprocessor.binary_columns)} encoded categorical)."
+    )
+    print(
+        "Split sizes: "
+        f"train={bundle.split_summary['train_rows']}, "
+        f"val={bundle.split_summary['val_rows']}, "
+        f"test={bundle.split_summary['test_rows']}."
+    )
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = TabularTransformerClassifier(
