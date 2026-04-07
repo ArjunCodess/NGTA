@@ -4,9 +4,10 @@ import argparse
 import json
 
 import numpy as np
+import torch
 
 from src.attention_hook import apply_confidence_gate
-from src.nars_interface import nars_revision, neural_to_nars
+from src.nars_interface import neural_to_nars, revise_truth_values
 from src.pipeline import PipelineConfig, run_pipeline
 
 
@@ -17,11 +18,24 @@ def _run_self_checks() -> None:
     if not np.isclose(neural_confidence, 0.7619160992, atol=1e-6):
         raise RuntimeError("neural_to_nars confidence check failed.")
 
-    revised_frequency, revised_confidence = nars_revision(0.8, neural_confidence, 0.9, 0.7)
+    revised_frequency, revised_confidence = revise_truth_values(0.8, neural_confidence, 0.9, 0.7)
     if not np.isclose(revised_frequency, 0.8421671506, atol=1e-6):
-        raise RuntimeError("nars_revision frequency check failed.")
+        raise RuntimeError("revise_truth_values frequency check failed.")
     if not np.isclose(revised_confidence, 0.8469434609, atol=1e-6):
-        raise RuntimeError("nars_revision confidence check failed.")
+        raise RuntimeError("revise_truth_values confidence check failed.")
+
+    clamped_frequency, clamped_confidence = revise_truth_values(
+        torch.tensor([0.2], dtype=torch.float32),
+        torch.tensor([0.0], dtype=torch.float32),
+        torch.tensor([0.8], dtype=torch.float32),
+        torch.tensor([1.0], dtype=torch.float32),
+    )
+    if not torch.isfinite(clamped_frequency).all() or not torch.isfinite(clamped_confidence).all():
+        raise RuntimeError("revise_truth_values clamp check failed.")
+    if not ((clamped_frequency >= 0.0).all() and (clamped_frequency <= 1.0).all()):
+        raise RuntimeError("revise_truth_values clamped frequency bounds check failed.")
+    if not ((clamped_confidence >= 0.0).all() and (clamped_confidence <= 1.0).all()):
+        raise RuntimeError("revise_truth_values clamped confidence bounds check failed.")
 
     gated = apply_confidence_gate(
         np.array([[0.5, 0.3, 0.2]], dtype=np.float64),

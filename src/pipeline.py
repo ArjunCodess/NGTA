@@ -15,8 +15,9 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, brier_score_loss, roc_auc_score, roc_curve
 from torch import nn
 
-from .attention_hook import apply_confidence_gate, attention_to_nars
+from .attention_hook import apply_confidence_gate, revise_attention_truths
 from .data_loader import DEFAULT_ID_COLUMN, DEFAULT_TARGET_COLUMN, load_data_bundle
+from .knowledge_base import SYMBOLIC_RULES, build_symbolic_truth_matrices
 from .nars_interface import neural_to_nars
 from .neural_encoder import TabularTransformerClassifier
 
@@ -515,10 +516,13 @@ def _build_trace_frame(
     neural_confidence: np.ndarray,
     attention_mean: np.ndarray,
     attention_var: np.ndarray,
-    feature_confidence: np.ndarray,
+    neural_feature_confidence: np.ndarray,
+    revised_feature_confidence: np.ndarray,
     gated_attention: np.ndarray,
     token_score_mean: np.ndarray,
     gated_probabilities: np.ndarray,
+    symbolic_rule_counts: np.ndarray,
+    symbolic_any_rule_triggered: np.ndarray,
 ) -> pd.DataFrame:
     trace_frame = bundle.test_frame[[DEFAULT_ID_COLUMN, DEFAULT_TARGET_COLUMN]].reset_index(drop=True).copy()
     trace_frame = trace_frame.rename(columns={DEFAULT_TARGET_COLUMN: "target"})
@@ -529,7 +533,11 @@ def _build_trace_frame(
             "neural_frequency": neural_frequency,
             "neural_confidence": neural_confidence,
             "gated_probability": gated_probabilities,
-            "attention_reliability": (gated_attention * feature_confidence).sum(axis=1),
+            "symbolic_rule_count": symbolic_rule_counts,
+            "symbolic_any_rule_triggered": symbolic_any_rule_triggered.astype(int),
+            "neural_attention_reliability": (attention_mean * neural_feature_confidence).sum(axis=1),
+            "revised_attention_reliability": (gated_attention * revised_feature_confidence).sum(axis=1),
+            "attention_reliability": (gated_attention * revised_feature_confidence).sum(axis=1),
         }
     )
 
@@ -538,7 +546,8 @@ def _build_trace_frame(
         safe_feature_name = feature_name.replace(" ", "_")
         feature_columns[f"attention_mean__{safe_feature_name}"] = attention_mean[:, index]
         feature_columns[f"attention_var__{safe_feature_name}"] = attention_var[:, index]
-        feature_columns[f"attention_confidence__{safe_feature_name}"] = feature_confidence[:, index]
+        feature_columns[f"attention_confidence__{safe_feature_name}"] = neural_feature_confidence[:, index]
+        feature_columns[f"revised_attention_confidence__{safe_feature_name}"] = revised_feature_confidence[:, index]
         feature_columns[f"gated_attention__{safe_feature_name}"] = gated_attention[:, index]
         feature_columns[f"token_score__{safe_feature_name}"] = token_score_mean[:, index]
 
@@ -630,20 +639,27 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         device=device,
         mc_samples=config.mc_samples,
     )
+    symbolic_knowledge = build_symbolic_truth_matrices(
+        bundle.test_frame,
+        bundle.preprocessor.feature_names,
+    )
     neural_frequency, neural_confidence = neural_to_nars(
         summary.probabilities_mean,
         summary.probabilities_var,
     )
-    _, feature_confidence = attention_to_nars(
+    attention_truths = revise_attention_truths(
         summary.attention_mean,
         summary.attention_var,
+        symbolic_frequency=symbolic_knowledge.symbolic_frequency,
+        symbolic_confidence=symbolic_knowledge.symbolic_confidence,
+        symbolic_trigger_mask=symbolic_knowledge.symbolic_trigger_mask,
     )
     gated_attention = apply_confidence_gate(
         summary.attention_mean,
-        feature_confidence,
+        attention_truths.revised_confidence,
         gamma=config.gamma,
     )
-    flat_feature_confidence = np.full_like(feature_confidence, 0.5, dtype=np.float64)
+    flat_feature_confidence = np.full_like(attention_truths.revised_confidence, 0.5, dtype=np.float64)
     flat_attention = apply_confidence_gate(
         summary.attention_mean,
         flat_feature_confidence,
@@ -725,10 +741,13 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         neural_confidence=np.asarray(neural_confidence),
         attention_mean=summary.attention_mean,
         attention_var=summary.attention_var,
-        feature_confidence=np.asarray(feature_confidence),
+        neural_feature_confidence=attention_truths.neural_confidence,
+        revised_feature_confidence=attention_truths.revised_confidence,
         gated_attention=gated_attention,
         token_score_mean=summary.token_score_mean,
         gated_probabilities=gated_probabilities,
+        symbolic_rule_counts=symbolic_knowledge.patient_rule_counts,
+        symbolic_any_rule_triggered=symbolic_knowledge.patient_any_rule_triggered,
     )
     trace_frame.to_csv(output_dirs["traces"] / "test_predictions.csv", index=False)
 
@@ -736,7 +755,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         y_true=y_true,
         baseline_probabilities=summary.probabilities_mean,
         attention_mean=summary.attention_mean,
-        feature_confidence=np.asarray(feature_confidence),
+        feature_confidence=attention_truths.revised_confidence,
         cls_logit_mean=summary.cls_logit_mean,
         token_score_mean=summary.token_score_mean,
     )
@@ -780,6 +799,14 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         },
         "split_summary": bundle.split_summary,
         "metrics": metrics_frame.to_dict(orient="records"),
+        "symbolic_rules": {
+            "definitions": SYMBOLIC_RULES,
+            "total_trigger_count": symbolic_knowledge.total_trigger_count,
+            "mapped_feature_trigger_count": symbolic_knowledge.mapped_feature_trigger_count,
+            "cases_with_any_trigger": int(symbolic_knowledge.patient_any_rule_triggered.sum()),
+            "per_rule_trigger_counts": symbolic_knowledge.rule_trigger_counts,
+            "per_rule_mapped_trigger_counts": symbolic_knowledge.mapped_rule_trigger_counts,
+        },
         "classical_baseline": {
             "variant": TREE_BASELINE_LABEL,
             "selection_objective": "validation_brier",
