@@ -34,10 +34,14 @@ def _run_self_checks() -> None:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Run the NGTA TCGA-THCA lymph node metastasis pipeline.",
+        description="Run the NGTA TCGA-THCA multi-modal lymph node metastasis pipeline.",
     )
     parser.add_argument("--run-all", action="store_true", help="Run the full training and evaluation pipeline.")
-    parser.add_argument("--data-dir", default="data", help="Directory containing the TCGA TSV tables.")
+    parser.add_argument(
+        "--data-dir",
+        default="data",
+        help="Directory containing the TCGA clinical TSV tables and the somatic mutation MAF file.",
+    )
     parser.add_argument("--output-dir", default=".", help="Base directory for charts and results.")
     parser.add_argument("--epochs", type=int, default=60, help="Maximum number of training epochs.")
     parser.add_argument("--batch-size", type=int, default=32, help="Batch size for training and evaluation.")
