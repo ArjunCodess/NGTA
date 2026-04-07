@@ -5,6 +5,8 @@ Refactor the pipeline from a single `data.csv` MTC task to a case-level TCGA-THC
 
 Add a strong tree-based tabular baseline on the exact same split so the final paper can defend the Transformer choice, and strengthen the manuscript framing around calibration, reliability, and black-box mitigation rather than pure AUC.
 
+Upgrade the benchmark again to a multi-modal pipeline by fusing the TCGA-THCA clinical case-level table with a MAF-derived binary mutation matrix, while preserving the existing clinical imputation, scaling, and split logic.
+
 ## Implementation Changes
 - Replace root `data.csv` usage entirely.
   - Delete `data.csv`.
@@ -24,6 +26,26 @@ Add a strong tree-based tabular baseline on the exact same split so the final pa
     - For repeated yes/no treatment flags in clinical, derive `derived.any_treatment_or_therapy` as `yes` if any row says yes, else `no` if any row says no, else null.
   - Collapse the other tables to one row per `case_submitter_id` with deterministic first-non-null per column, then left-join them onto the clinical base in this order: exposure, family_history, follow_up, pathology_detail.
   - After merging, drop columns with more than 70% missingness.
+- Add a genomic mutation-processing branch without deleting the clinical preprocessing path.
+  - Inspect `src/data_loader.py` and `src/pipeline.py` before editing and insert the new genomic path around the existing code instead of replacing the clinical imputation/scaling logic.
+  - Detect the MAF file from `data/` using a pattern such as `*.maf` or `*tcga_mutations.tsv`.
+  - Read the mutation file with `pd.read_csv(..., sep="\t", comment="#", low_memory=False)` so comment-prefixed metadata rows are skipped safely.
+  - Derive `case_submitter_id` from `Tumor_Sample_Barcode` by extracting the first 12 characters.
+  - Keep only functionally relevant mutations by filtering `Variant_Classification` to:
+    - `Missense_Mutation`
+    - `Nonsense_Mutation`
+    - `Frame_Shift_Del`
+    - `Frame_Shift_Ins`
+    - `Splice_Site`
+    - `In_Frame_Del`
+    - `In_Frame_Ins`
+  - Exclude synonymous and non-coding noise such as `Silent` and `Intron`.
+  - Identify the top 50 most frequently mutated genes by `Hugo_Symbol`.
+  - Pivot the filtered mutation table to one row per `case_submitter_id`, one binary column per selected gene, and aggregate duplicate case/gene hits with `groupby().max()`.
+  - Prefix genomic columns so they remain distinguishable from clinical columns in the saved metadata and traces.
+- Merge the modalities at the case level.
+  - Left-join the genomic binary matrix onto the clinical case-level table with the clinical frame on the left.
+  - Fill missing gene values with `0` after the merge so cases without sequencing coverage or without selected mutations remain in the cohort.
 - Define the target before splitting.
   - Use `diagnoses.ajcc_pathologic_n`.
   - Map `N0 -> 0`, `N1/N1a/N1b -> 1`.
@@ -67,12 +89,18 @@ Add a strong tree-based tabular baseline on the exact same split so the final pa
     - `OneHotEncoder(handle_unknown="ignore")` for categorical columns
   - Convert the final processed matrices and labels to `torch.float32` tensors for loaders.
   - Update `DataBundle` / preprocessing metadata so downstream code can access final numeric feature dimension and transformed feature names.
+  - Preserve the existing clinical preprocessing behavior:
+    - scale only the continuous clinical numeric columns
+    - continue categorical imputation and one-hot encoding for clinical categorical variables
+    - pass genomic binary columns through without `StandardScaler`
+  - Concatenate scaled clinical numeric features, binary genomic features, and encoded categorical clinical features into a single multi-modal tensor.
 - Adjust `src/pipeline.py` to the new tabular shape and task wording.
   - Remove all study-based split assumptions and `study_id` logging.
   - Compute model input dimension from the transformed feature matrix; the neural encoder should receive the post-encoding feature width instead of assuming the old mixed categorical-token schema.
   - If the current transformer class is kept, adapt its input path to accept the new fully numeric matrix. If that is more invasive than warranted, replace the mixed categorical/numeric tokenization with a numeric-only tabular encoder wrapper and keep the NGTA uncertainty/attention logic unchanged.
   - Update artifact labels, print statements, summaries, and chart titles to use “Lymph Node Metastasis” as the positive class.
   - Regenerate split summary and preprocessing metadata to describe TCGA case counts and selected features instead of study IDs.
+  - Print the final multi-modal dataset shape before training begins, including the clinical/genomic feature breakdown.
 - Add at least one classical tabular baseline on the identical split and label definition.
   - Preferred baseline order: `XGBoost`, `LightGBM`, then `RandomForestClassifier` if gradient-boosting dependencies are unavailable.
   - Train the baseline on the exact same train/val/test partition and post-imputation numeric design matrix used by the Transformer.
@@ -92,6 +120,11 @@ Add a strong tree-based tabular baseline on the exact same split so the final pa
   - confirm the join key is normalized to `case_submitter_id`
   - confirm no row-0 drop occurs on the current files
   - confirm the merged frame is one row per case
+  - confirm the MAF loader skips `#` metadata lines correctly
+  - confirm `Tumor_Sample_Barcode -> case_submitter_id` extraction uses the first 12 characters
+  - confirm only the allowed functional mutation classes are retained
+  - confirm the genomic matrix is limited to the top 50 genes and is binary after case-level deduplication
+  - confirm genomic columns are left-joined and missing values are filled with `0`
 - Target validation:
   - confirm only `N0`, `N1`, `N1a`, `N1b` survive into the labeled cohort
   - confirm `NX` and null targets are removed before splitting
@@ -100,6 +133,7 @@ Add a strong tree-based tabular baseline on the exact same split so the final pa
   - confirm columns over 70% missing are removed
   - confirm imputers/scalers/encoders are fit on train only
   - confirm transformed train/val/test matrices contain no NaNs and are strictly numeric
+  - confirm genomic binary columns bypass the clinical `StandardScaler`
 - Split/model validation:
   - confirm stratified split sizes are 319/69/69 with seed 0 on the current data snapshot
   - confirm model input width matches the transformed feature matrix width at runtime
