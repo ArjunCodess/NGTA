@@ -34,10 +34,14 @@ def _run_self_checks() -> None:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Run the NGTA MTC diagnosis pipeline.",
+        description="Run the NGTA TCGA-THCA multi-modal lymph node metastasis pipeline.",
     )
     parser.add_argument("--run-all", action="store_true", help="Run the full training and evaluation pipeline.")
-    parser.add_argument("--data-path", default="data.csv", help="Path to the input CSV dataset.")
+    parser.add_argument(
+        "--data-dir",
+        default="data",
+        help="Directory containing the TCGA clinical TSV tables and the somatic mutation MAF file.",
+    )
     parser.add_argument("--output-dir", default=".", help="Base directory for charts and results.")
     parser.add_argument("--epochs", type=int, default=60, help="Maximum number of training epochs.")
     parser.add_argument("--batch-size", type=int, default=32, help="Batch size for training and evaluation.")
@@ -47,7 +51,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--learning-rate", type=float, default=1e-3, help="Optimizer learning rate.")
     parser.add_argument("--weight-decay", type=float, default=1e-4, help="AdamW weight decay.")
     parser.add_argument("--patience", type=int, default=12, help="Early-stopping patience.")
-    parser.add_argument("--validation-size", type=float, default=0.2, help="Validation fraction inside the training split.")
     parser.add_argument("--d-model", type=int, default=64, help="Transformer hidden dimension.")
     parser.add_argument("--num-heads", type=int, default=4, help="Number of attention heads.")
     parser.add_argument("--num-layers", type=int, default=2, help="Number of Transformer encoder layers.")
@@ -60,7 +63,7 @@ def main() -> None:
     _run_self_checks()
 
     config = PipelineConfig(
-        data_path=args.data_path,
+        data_dir=args.data_dir,
         output_dir=args.output_dir,
         epochs=args.epochs,
         batch_size=args.batch_size,
@@ -70,7 +73,6 @@ def main() -> None:
         gamma=args.gamma,
         seed=args.seed,
         patience=args.patience,
-        validation_size=args.validation_size,
         d_model=args.d_model,
         num_heads=args.num_heads,
         num_layers=args.num_layers,
