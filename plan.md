@@ -1,190 +1,136 @@
-# TCGA-THCA Migration for NGTA Lymph Node Metastasis
+# Add Parallel WiDS ICU Pipeline Without Disturbing TCGA
 
 ## Summary
-Refactor the pipeline from a single `data.csv` MTC task to a case-level TCGA-THCA lymph node metastasis task built from the five TSV files under `data/`. The implementation should produce one row per `cases.submitter_id`, derive the binary target from `diagnoses.ajcc_pathologic_n`, run a leakage-safe stratified 70/15/15 split, preprocess features into numeric tensors for the existing NGTA model, then rerun the pipeline and refresh README plus a focused subset of paper sections/results.
+- Preserve the existing TCGA path as-is and add a second dataset path selected by `--dataset`, defaulting to `tcga` and accepting `wids`.
+- Implement a WiDS-specific loader and symbolic rule base for ICU hospital mortality using the requested 15 features from `data/wids_icu.csv`.
+- Keep symbolic revision behavior aligned with the current TCGA design: WiDS rule masks are generated in preprocessing, then used in the same post-MC inference attention-revision stage already used by the TCGA pipeline.
+- Make `python main.py --run-all` the full-repo orchestration entrypoint: it must run TCGA and WiDS sequentially, calculate every artifact for both datasets, and write all results to disk.
+- Isolate outputs by dataset so TCGA and WiDS artifacts never overwrite each other.
+- For `seed=0`, the current WiDS file should split to `64199 / 13757 / 13757` rows for train/val/test after target filtering.
+- After the pipeline work is complete, update `paper/main.tex` and `README.md` so the documentation matches the dual-dataset implementation and the new `--run-all` behavior.
 
-Add a strong tree-based tabular baseline on the exact same split so the final paper can defend the Transformer choice, and strengthen the manuscript framing around calibration, reliability, and black-box mitigation rather than pure AUC.
+## Key Changes
+- `main.py`
+  - Add `--dataset {tcga,wids}` with default `tcga`.
+  - Pass `dataset` into `PipelineConfig`.
+  - Keep all existing TCGA flags unchanged.
+  - Make `--run-all` override single-dataset execution and run the full TCGA pipeline followed by the full WiDS pipeline.
+  - Ensure `--run-all` writes both dataset result bundles plus an aggregate top-level run summary.
 
-Upgrade the benchmark again to a multi-modal pipeline by fusing the TCGA-THCA clinical case-level table with a MAF-derived binary mutation matrix, while preserving the existing clinical imputation, scaling, and split logic.
+- `src/wids_loader.py`
+  - Add a dedicated WiDS loader entrypoint, e.g. `load_wids_data_bundle(data_dir, batch_size, seed)`.
+  - Read `data/wids_icu.csv` with `pd.read_csv(..., na_values=['NA'])`.
+  - Use `encounter_id` as the WiDS identifier and `hospital_death` as the binary target; drop rows with missing target, then cast target to integer.
+  - Use exactly these feature groups:
+    - Continuous numeric, scaled: `age`, `bmi`, `d1_heartrate_max`, `d1_sysbp_min`, `d1_temp_max`, `d1_lactate_max`, `d1_bun_max`, `d1_creatinine_max`, `d1_glucose_max`, `d1_wbc_max`, `d1_spo2_min`, `d1_platelets_min`, `apache_4a_hospital_death_prob`
+    - Binary pass-through, unscaled: `elective_surgery`
+    - Categorical, imputed + one-hot encoded: `gender`
+  - Perform a stratified `70/15/15` split with the provided seed.
+  - Fit preprocessing on train only:
+    - `KNNImputer(n_neighbors=5)` for the 13 continuous columns
+    - `SimpleImputer(strategy='most_frequent')` for `gender`
+    - `OneHotEncoder(handle_unknown='ignore')` for `gender`
+    - `StandardScaler` on the 13 continuous columns only, after numeric imputation
+  - Evaluate ICU rules immediately after numeric KNN imputation and before scaling, using the imputed-but-human-readable numeric values:
+    - `rule_lactate`: `d1_lactate_max >= 4.0`
+    - `rule_hypotension`: `d1_sysbp_min <= 90.0`
+    - `rule_age`: `age >= 75.0`
+    - `rule_creatinine`: `d1_creatinine_max >= 2.0`
+  - Return split bundles that expose, per sample:
+    - scaled continuous tensor `[13]`
+    - encoded auxiliary tensor containing `elective_surgery` plus one-hot gender columns
+    - combined model feature tensor used by the transformer
+    - rule trigger tensor `[4]` in fixed order: lactate, hypotension, age, creatinine
+    - target label tensor
+  - Store feature names and rule names in the bundle so downstream code can align attention positions with symbolic rules deterministically.
 
-## Implementation Changes
-- Replace root `data.csv` usage entirely.
-  - Delete `data.csv`.
-  - Remove all `data.csv`, `149`-sample, `10 studies`, `study-aware split`, `MTC`, and hereditary MEN2 dataset references from `README.md`, `main.py`, and `src/pipeline.py`.
-- Update the entrypoint/config interface.
-  - Change `PipelineConfig.data_path` to `data_dir` with default `data`.
-  - Change CLI flag from `--data-path` to `--data-dir`.
-  - Update CLI/help text and printed summaries to describe TCGA-THCA lymph node metastasis prediction.
-- Rebuild `src/data_loader.py` around TCGA tables.
-  - Read `clinical.tsv`, `exposure.tsv`, `family_history.tsv`, `follow_up.tsv`, and `pathology_detail.tsv` with `sep="\t"` and string dtype.
-  - Normalize the join key by renaming `cases.submitter_id` to `case_submitter_id` in each table.
-  - Add a metadata-row guard: inspect row 0 and drop it only if it matches a descriptor/CDE pattern rather than real data. For the current repo snapshot, row 0 appears to be real data, so the implemented heuristic should leave all rows intact.
-  - Normalize missing placeholders globally before further processing: `--`, `'--`, `Not Reported`, `not reported`, `Unknown`, `unknown` -> `np.nan`.
-  - Build a one-row-per-case clinical base table:
-    - Filter `clinical.tsv` to primary-diagnosis rows using `diagnoses.classification_of_tumor == "primary"` (this removes prior-primary / recurrence rows and resolves observed target conflicts).
-    - Collapse remaining duplicate case rows by case using first non-null per column for diagnosis-level fields.
-    - For repeated yes/no treatment flags in clinical, derive `derived.any_treatment_or_therapy` as `yes` if any row says yes, else `no` if any row says no, else null.
-  - Collapse the other tables to one row per `case_submitter_id` with deterministic first-non-null per column, then left-join them onto the clinical base in this order: exposure, family_history, follow_up, pathology_detail.
-  - After merging, drop columns with more than 70% missingness.
-- Add a genomic mutation-processing branch without deleting the clinical preprocessing path.
-  - Inspect `src/data_loader.py` and `src/pipeline.py` before editing and insert the new genomic path around the existing code instead of replacing the clinical imputation/scaling logic.
-  - Detect the MAF file from `data/` using a pattern such as `*.maf` or `*tcga_mutations.tsv`.
-  - Read the mutation file with `pd.read_csv(..., sep="\t", comment="#", low_memory=False)` so comment-prefixed metadata rows are skipped safely.
-  - Derive `case_submitter_id` from `Tumor_Sample_Barcode` by extracting the first 12 characters.
-  - Keep only functionally relevant mutations by filtering `Variant_Classification` to:
-    - `Missense_Mutation`
-    - `Nonsense_Mutation`
-    - `Frame_Shift_Del`
-    - `Frame_Shift_Ins`
-    - `Splice_Site`
-    - `In_Frame_Del`
-    - `In_Frame_Ins`
-  - Exclude synonymous and non-coding noise such as `Silent` and `Intron`.
-  - Identify the top 50 most frequently mutated genes by `Hugo_Symbol`.
-  - Pivot the filtered mutation table to one row per `case_submitter_id`, one binary column per selected gene, and aggregate duplicate case/gene hits with `groupby().max()`.
-  - Prefix genomic columns so they remain distinguishable from clinical columns in the saved metadata and traces.
-- Merge the modalities at the case level.
-  - Left-join the genomic binary matrix onto the clinical case-level table with the clinical frame on the left.
-  - Fill missing gene values with `0` after the merge so cases without sequencing coverage or without selected mutations remain in the cohort.
-- Define the target before splitting.
-  - Use `diagnoses.ajcc_pathologic_n`.
-  - Map `N0 -> 0`, `N1/N1a/N1b -> 1`.
-  - Drop any case with `NX`, null, or unmapped target before splitting.
-  - On the current data snapshot, this should leave 457 labeled cases.
-- Lock a leakage-safe feature set for v1.
-  - Numerical features:
-    - `diagnoses.age_at_diagnosis`
-    - `diagnoses.year_of_diagnosis`
-    - `pathology_details.tumor_length_measurement`
-    - `pathology_details.tumor_width_measurement`
-    - `pathology_details.tumor_depth_measurement`
-  - Categorical features:
-    - `demographic.gender`
-    - `demographic.race`
-    - `demographic.ethnicity`
-    - `diagnoses.ajcc_pathologic_t`
-    - `diagnoses.prior_malignancy`
-    - `diagnoses.synchronous_malignancy`
-    - `diagnoses.prior_treatment`
-    - `diagnoses.primary_diagnosis`
-    - `diagnoses.morphology`
-    - `diagnoses.laterality`
-    - `diagnoses.tumor_focality`
-    - `diagnoses.residual_disease`
-    - `pathology_details.extrathyroid_extension`
-  - Explicitly exclude leakage-prone variables from the model matrix:
-    - `diagnoses.ajcc_pathologic_n`
-    - `diagnoses.ajcc_pathologic_stage`
-    - any lymph-node count / involvement columns
-    - recurrence / disease-response / follow-up outcome fields
-- Replace the old split/preprocessing path.
-  - Use a two-stage `StratifiedShuffleSplit` with the configured seed:
-    - stage 1: 70% train / 30% holdout
-    - stage 2: split holdout 50/50 into val/test
-  - With the current filtered cohort this should yield 319 train, 69 val, 69 test.
-  - Fit imputers/encoders/scalers on train only, then transform val/test:
-    - `KNNImputer` for numeric columns
-    - `SimpleImputer(strategy="most_frequent")` for categorical columns
-    - `StandardScaler` for numeric columns
-    - `OneHotEncoder(handle_unknown="ignore")` for categorical columns
-  - Convert the final processed matrices and labels to `torch.float32` tensors for loaders.
-  - Update `DataBundle` / preprocessing metadata so downstream code can access final numeric feature dimension and transformed feature names.
-  - Preserve the existing clinical preprocessing behavior:
-    - scale only the continuous clinical numeric columns
-    - continue categorical imputation and one-hot encoding for clinical categorical variables
-    - pass genomic binary columns through without `StandardScaler`
-  - Concatenate scaled clinical numeric features, binary genomic features, and encoded categorical clinical features into a single multi-modal tensor.
-- Adjust `src/pipeline.py` to the new tabular shape and task wording.
-  - Remove all study-based split assumptions and `study_id` logging.
-  - Compute model input dimension from the transformed feature matrix; the neural encoder should receive the post-encoding feature width instead of assuming the old mixed categorical-token schema.
-  - If the current transformer class is kept, adapt its input path to accept the new fully numeric matrix. If that is more invasive than warranted, replace the mixed categorical/numeric tokenization with a numeric-only tabular encoder wrapper and keep the NGTA uncertainty/attention logic unchanged.
-  - Update artifact labels, print statements, summaries, and chart titles to use “Lymph Node Metastasis” as the positive class.
-  - Regenerate split summary and preprocessing metadata to describe TCGA case counts and selected features instead of study IDs.
-  - Print the final multi-modal dataset shape before training begins, including the clinical/genomic feature breakdown.
-- Add at least one classical tabular baseline on the identical split and label definition.
-  - Preferred baseline order: `XGBoost`, `LightGBM`, then `RandomForestClassifier` if gradient-boosting dependencies are unavailable.
-  - Train the baseline on the exact same train/val/test partition and post-imputation numeric design matrix used by the Transformer.
-  - Save baseline AUC, Brier score, ECE, and accuracy into the same metrics artifacts and include it in the manuscript results table.
-  - If the tree baseline wins on AUC, keep that result and use it to justify NGTA on uncertainty semantics, calibration behavior, and inspectability rather than ranking alone.
-- Update docs with a focused refresh.
-  - `README.md`: replace the old task/dataset/results narrative with TCGA-THCA lymph node metastasis wording, new cohort counts, new split description, new feature list, and rerun-derived metrics/artifact paths.
-  - `paper/main.tex`: update abstract, task framing, dataset/application description, empirical results text/tables/captions, and conclusion passages to describe TCGA-THCA lymph node metastasis instead of the old MTC cohort.
-  - Remove or rewrite the MTC-specific handcrafted rule examples/table so the paper does not claim a disease-specific symbolic rule base that the current THCA codepath does not implement; replace with a brief statement that the present benchmark evaluates the uncertainty-to-NARS attention interface on structured TCGA clinicopathologic variables.
-  - Explicitly frame Brier score and ECE as deployment-relevant metrics, and avoid an AUC-first narrative if the results do not support it.
-  - Strengthen the introduction, discussion, and conclusion so they state that NGTA addresses the black-box problem by quantifying and propagating uncertainty instead of only emitting a risk score.
-  - Do not describe the current v1 benchmark as “strictly non-invasive” or “baseline-only”; the retained predictors are clinicopathologic and include pathologic/post-surgical variables.
+- `src/wids_knowledge_base.py`
+  - Define the WiDS rule map:
+    - `rule_lactate -> (0.85, 0.80)`
+    - `rule_hypotension -> (0.75, 0.70)`
+    - `rule_age -> (0.65, 0.60)`
+    - `rule_creatinine -> (0.70, 0.65)`
+  - Add a helper parallel to the TCGA symbolic builder that converts WiDS rule-trigger tensors into `symbolic_frequency`, `symbolic_confidence`, and `symbolic_trigger_mask` arrays aligned to the transformer input dimension.
+  - Apply symbolic truth values only to the matching continuous-feature positions for `d1_lactate_max`, `d1_sysbp_min`, `age`, and `d1_creatinine_max`; all other feature positions remain zero / untriggered.
+
+- `src/pipeline.py`
+  - Extend `PipelineConfig` with `dataset`.
+  - Branch dataset loading:
+    - `tcga` keeps using the existing loader and knowledge base unchanged.
+    - `wids` uses the new WiDS loader and WiDS symbolic builder.
+  - Ensure each dataset run computes the full artifact set end to end:
+    - training history
+    - random forest baseline
+    - baseline / flat-confidence / NARS-gated metrics
+    - bootstrap AUC intervals
+    - calibration reliability
+    - decision curve
+    - gamma ablation
+    - trace CSV
+    - charts
+    - run summary JSON
+  - For WiDS, force effective batch size to `512` regardless of the CLI batch-size value.
+  - Build the transformer with `input_dim` from the selected bundle, not a hardcoded feature count.
+  - Keep training logic unchanged for TCGA.
+  - For WiDS batches, train and evaluate the transformer on the combined feature tensor while preserving the rule-trigger tensor for the symbolic gating stage.
+  - In the WiDS inference path, run the same NARS revision math already used now:
+    - derive neural attention truth values from MC attention mean/variance
+    - revise only the triggered feature truths with WiDS symbolic `(f_sym, c_sym)`
+    - gate attention with revised confidences
+  - Train the random-forest baseline on the exact same WiDS train/val/test splits and the exact same transformed design matrix used for the transformer.
+  - Parameterize dataset metadata in summaries and plots:
+    - WiDS positive class label: `Hospital Mortality`
+    - WiDS target column: `hospital_death`
+    - WiDS id column: `encounter_id`
+  - Write outputs into dataset-specific directories, e.g. under a `tcga/` or `wids/` subdirectory inside the chosen output root, so artifacts co-exist safely.
+  - Print WiDS test-set rule-trigger counts for all 4 ICU rules from the post-imputation, pre-scaling masks.
+
+## Public Interfaces / Contracts
+- CLI:
+  - `python main.py --dataset tcga`
+  - `python main.py --dataset wids`
+  - `python main.py --run-all`
+- Config:
+  - `PipelineConfig.dataset: str`
+- WiDS loader contract:
+  - deterministic split by `seed`
+  - train-only fitted imputers/scaler/encoder
+  - fixed rule order: `rule_lactate`, `rule_hypotension`, `rule_age`, `rule_creatinine`
+  - combined model feature order:
+    - 13 scaled continuous features first
+    - `elective_surgery` next
+    - one-hot gender columns last
 
 ## Test Plan
-- Loader validation:
-  - confirm all five TSVs load from `data/`
-  - confirm the join key is normalized to `case_submitter_id`
-  - confirm no row-0 drop occurs on the current files
-  - confirm the merged frame is one row per case
-  - confirm the MAF loader skips `#` metadata lines correctly
-  - confirm `Tumor_Sample_Barcode -> case_submitter_id` extraction uses the first 12 characters
-  - confirm only the allowed functional mutation classes are retained
-  - confirm the genomic matrix is limited to the top 50 genes and is binary after case-level deduplication
-  - confirm genomic columns are left-joined and missing values are filled with `0`
-- Target validation:
-  - confirm only `N0`, `N1`, `N1a`, `N1b` survive into the labeled cohort
-  - confirm `NX` and null targets are removed before splitting
-  - confirm current labeled count is 457 with near-balanced classes
-- Preprocessing validation:
-  - confirm columns over 70% missing are removed
-  - confirm imputers/scalers/encoders are fit on train only
-  - confirm transformed train/val/test matrices contain no NaNs and are strictly numeric
-  - confirm genomic binary columns bypass the clinical `StandardScaler`
-- Split/model validation:
-  - confirm stratified split sizes are 319/69/69 with seed 0 on the current data snapshot
-  - confirm model input width matches the transformed feature matrix width at runtime
-  - run the full pipeline end-to-end and regenerate metrics CSVs, trace CSV, ROC, calibration, decision-curve, and training-history artifacts
-- Baseline validation:
-  - confirm the tree baseline uses the exact same split and target filtering as NGTA
-  - confirm the baseline appears in the same saved metrics table with AUC, Brier, ECE, and accuracy
-  - confirm the manuscript text follows the actual metric winners instead of forcing a Transformer-wins-on-AUC story
-- Documentation validation:
-  - confirm README and focused paper sections no longer mention the 149-row MTC cohort, 10 studies, or study-aware splitting
-  - confirm reported metrics/counts in docs match the rerun outputs
+- CLI smoke checks:
+  - `python main.py --dataset tcga --epochs 1 --mc-samples 2`
+  - `python main.py --dataset wids --epochs 1 --mc-samples 2`
+  - `python main.py --run-all --epochs 1 --mc-samples 2`
+- Run-all orchestration checks:
+  - confirms `--run-all` executes both datasets even if `--dataset` is omitted
+  - confirms every expected metrics/traces/chart artifact is produced for both datasets
+  - confirms aggregate summary output is written after both runs finish
+- WiDS loader invariants:
+  - confirms `na_values=['NA']` parsing
+  - confirms target rows with missing `hospital_death` are removed before splitting
+  - confirms train/val/test sizes are `64199 / 13757 / 13757` for the current file with `seed=0`
+  - confirms continuous tensor width is `13`
+  - confirms rule tensor width is `4`
+  - confirms transformer input width is derived dynamically from the transformed feature count
+- Leakage checks:
+  - imputers, scaler, and encoder are fit only on train
+  - validation/test use only `.transform(...)`
+  - random forest and transformer consume the same transformed split matrices
+- Symbolic checks:
+  - rule masks are computed from imputed unscaled numeric values, not scaled values
+  - only the 4 intended feature positions receive symbolic truth injections
+  - WiDS test logging prints per-rule counts for lactate, hypotension, age, and creatinine triggers
+- Regression checks:
+  - TCGA path still runs without using any WiDS-only code or changing TCGA artifacts/layout except for dataset namespacing
+  - `paper/main.tex` and `README.md` are updated at the end to describe both datasets, the new result layout, and the `python main.py --run-all` workflow
 
-## Assumptions And Defaults
-- The current TCGA files use real data in row 0; the metadata-row logic should be heuristic and conservative, not unconditional.
-- The actual missing placeholder present in this repo includes `'--`; handle that in addition to the user-listed tokens.
-- `diagnoses.classification_of_tumor == "primary"` is the canonical way to resolve multi-diagnosis clinical rows before case-level collapsing.
-- The implementation should prioritize leakage-safe predictors, even if some user examples such as `ajcc_pathologic_stage` are excluded.
-- The current selected predictors are not a strictly non-invasive or prospective baseline feature set; they are clinicopathologic retrospective benchmark features.
-- Paper scope is a focused refresh, not a full theoretical rewrite; generic NARS theory sections can stay, but MTC-specific application/results content must be updated or removed.
-
-## Phase: Symbolic Knowledge Graph Injection
-
-### Summary
-- Append symbolic clinical-rule injection as an inference-time extension of the existing MC-dropout NARS pipeline.
-- Preserve the current variance-to-NARS mapping, preprocessing, split logic, flat-confidence control, and evaluation metrics.
-- Apply symbolic revision to per-feature attention confidence only; keep case-level neural probability truth values unchanged in this phase.
-
-### Tasks
-- Add `src/knowledge_base.py` with hardcoded thyroid oncology rules for:
-  - `genomic_mutation__BRAF == 1 -> (0.85, 0.75)`
-  - `diagnoses.age_at_diagnosis / 365.25 >= 55 -> (0.70, 0.60)`
-  - `diagnoses.ajcc_pathologic_t` beginning with `T3` or `T4` -> `(0.90, 0.85)`
-  - non-null `pathology_details.extrathyroid_extension` -> `(0.85, 0.80)`
-- Expose a helper that converts raw test-case rows plus transformed feature names into symbolic frequency/confidence matrices, a trigger mask, per-rule trigger counts, and per-patient trigger counts.
-- Extend `src/nars_interface.py` with tensor-safe `revise_truth_values(f1, c1, f2, c2)` using NARS revision with confidence clamped to `[0.001, 0.999]`.
-- Integrate symbolic revision into the attention path without deleting the existing neural attention-to-NARS logic:
-  - derive per-feature neural truths from MC-dropout attention summaries
-  - revise only triggered features
-  - fall back to neural truth values when no rule is triggered
-  - gate attention with revised confidence via `A_gated = A ⊙ diag(c_rev^gamma)`
-- Update evaluation outputs to log symbolic rule activity while preserving Brier, ECE, and AUC generation:
-  - add symbolic trigger summaries to `results/metrics/run_summary.json`
-  - add per-case symbolic counts and revised attention confidence reporting to `results/traces/test_predictions.csv`
-  - use revised feature confidence for the main NARS-gated path and gamma ablation
-
-### Validation
-- Verify `revise_truth_values()` matches the paper equations and remains finite for tensor confidences at `0.0` and `1.0`.
-- Confirm raw-rule hit counts on the current `seed=0` test split remain:
-  - `69` test cases
-  - `0` BRAF hits
-  - `25` age >= 55-year hits
-  - `29` `T3/T4*` hits
-  - `25` non-null extrathyroid-extension hits
-- Confirm full pipeline outputs still include metrics, calibration, gamma ablation, decision curve, run summary, and trace CSV artifacts.
+## Assumptions / Defaults
+- `elective_surgery` is treated as an unscaled binary pass-through feature and concatenated with the one-hot gender block.
+- WiDS symbolic revision stays aligned with the current TCGA inference-time gating design rather than moving into the model’s inner training forward pass.
+- WiDS uses a forced batch size of `512`.
+- Output isolation is mandatory, so dataset-specific artifact directories are part of the implementation.
