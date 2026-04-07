@@ -62,29 +62,18 @@ class AttentionEncoderLayer(nn.Module):
 class TabularTransformerClassifier(nn.Module):
     def __init__(
         self,
-        categorical_cardinalities: list[int],
-        num_numeric_features: int,
+        input_dim: int,
         d_model: int = 64,
         nhead: int = 4,
         num_layers: int = 2,
         dropout: float = 0.2,
     ) -> None:
         super().__init__()
-        self.num_numeric_features = num_numeric_features
-        self.num_categorical_features = len(categorical_cardinalities)
-        self.num_features = self.num_categorical_features + self.num_numeric_features
-
-        self.categorical_embeddings = nn.ModuleList(
-            [nn.Embedding(cardinality + 1, d_model) for cardinality in categorical_cardinalities]
-        )
-        self.numeric_weight = nn.Parameter(
-            torch.randn(num_numeric_features, d_model) * 0.02
-        )
-        self.numeric_bias = nn.Parameter(torch.zeros(num_numeric_features, d_model))
+        self.input_dim = input_dim
+        self.feature_weight = nn.Parameter(torch.randn(input_dim, d_model) * 0.02)
+        self.feature_bias = nn.Parameter(torch.zeros(input_dim, d_model))
         self.cls_token = nn.Parameter(torch.zeros(1, 1, d_model))
-        self.position_embedding = nn.Parameter(
-            torch.randn(1, self.num_features + 1, d_model) * 0.02
-        )
+        self.position_embedding = nn.Parameter(torch.randn(1, input_dim + 1, d_model) * 0.02)
         self.input_dropout = nn.Dropout(dropout)
         self.layers = nn.ModuleList(
             [AttentionEncoderLayer(d_model=d_model, nhead=nhead, dropout=dropout) for _ in range(num_layers)]
@@ -92,39 +81,13 @@ class TabularTransformerClassifier(nn.Module):
         self.cls_head = nn.Linear(d_model, 1)
         self.token_scorer = nn.Linear(d_model, 1)
 
-    def _embed_features(
-        self,
-        categorical_inputs: torch.Tensor,
-        numerical_inputs: torch.Tensor,
-    ) -> torch.Tensor:
-        tokens = []
+    def _embed_features(self, inputs: torch.Tensor) -> torch.Tensor:
+        if inputs.ndim != 2:
+            raise ValueError(f"Expected 2D feature tensor, got shape {tuple(inputs.shape)}")
+        return (inputs.unsqueeze(-1) * self.feature_weight.unsqueeze(0)) + self.feature_bias.unsqueeze(0)
 
-        for index, embedding in enumerate(self.categorical_embeddings):
-            tokens.append(embedding(categorical_inputs[:, index]))
-
-        if self.num_numeric_features:
-            numeric_tokens = (
-                numerical_inputs.unsqueeze(-1) * self.numeric_weight.unsqueeze(0)
-            ) + self.numeric_bias.unsqueeze(0)
-            tokens.append(numeric_tokens)
-
-        if not tokens:
-            raise ValueError("Model requires at least one feature token.")
-
-        stacked_tokens = []
-        for token in tokens:
-            if token.ndim == 2:
-                stacked_tokens.append(token.unsqueeze(1))
-            else:
-                stacked_tokens.append(token)
-        return torch.cat(stacked_tokens, dim=1)
-
-    def forward(
-        self,
-        categorical_inputs: torch.Tensor,
-        numerical_inputs: torch.Tensor,
-    ) -> ModelOutput:
-        feature_tokens = self._embed_features(categorical_inputs, numerical_inputs)
+    def forward(self, inputs: torch.Tensor) -> ModelOutput:
+        feature_tokens = self._embed_features(inputs)
         batch_size = feature_tokens.shape[0]
         cls_token = self.cls_token.expand(batch_size, -1, -1)
         hidden = torch.cat([cls_token, feature_tokens], dim=1)
@@ -174,10 +137,9 @@ class TabularTransformerClassifier(nn.Module):
                 pass_cls_logits = []
                 pass_labels = []
 
-                for categorical_inputs, numerical_inputs, target in loader:
-                    categorical_inputs = categorical_inputs.to(device)
-                    numerical_inputs = numerical_inputs.to(device)
-                    output = self(categorical_inputs, numerical_inputs)
+                for features, target in loader:
+                    features = features.to(device)
+                    output = self(features)
                     pass_probabilities.append(torch.sigmoid(output.logits).cpu().numpy())
                     pass_attention.append(output.attention.cpu().numpy())
                     pass_token_scores.append(output.token_scores.cpu().numpy())
