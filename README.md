@@ -7,7 +7,7 @@
 ![Labeled Cases](https://img.shields.io/badge/Labeled%20Cases-457-informational)
 ![Dataset](https://img.shields.io/badge/Dataset-TCGA--THCA-success)
 
-NGTA is a research implementation of a neurosymbolic multi-modal Transformer pipeline for **lymph node metastasis prediction in TCGA-THCA**. The current codebase loads five TCGA clinical TSV tables, fuses them with a somatic-mutation MAF-derived binary gene matrix at the case level, maps model uncertainty into NARS truth values, and feeds confidence back into feature attention during inference.
+NGTA is a research implementation of a neurosymbolic multi-modal Transformer pipeline for **lymph node metastasis prediction in TCGA-THCA**. The current codebase loads five TCGA clinical TSV tables, fuses them with a somatic-mutation MAF-derived binary gene matrix at the case level, maps model uncertainty into NARS truth values, injects a small hardcoded thyroid oncology rule base through NARS revision, and feeds revised confidence back into feature attention during inference.
 
 The executable manuscript companion lives in [paper/main.tex](paper/main.tex). The public repository is `https://github.com/ArjunCodess/NGTA`.
 
@@ -58,6 +58,13 @@ The current run consumed these two MAF files:
 - `1feaf21d-8259-4c70-bcb7-7e3fb0887ea4.wxs.aliquot_ensemble_masked.maf`
 - `c2e3ad0c-d449-449d-b3a3-793b90bdc793.wxs.aliquot_ensemble_masked.maf`
 
+The symbolic rule base currently revises feature-level attention truth values with four hardcoded clinical rules:
+
+- `genomic_mutation__BRAF == 1 -> (0.85, 0.75)`
+- `diagnoses.age_at_diagnosis / 365.25 >= 55 -> (0.70, 0.60)`
+- `diagnoses.ajcc_pathologic_t` beginning with `T3` or `T4` -> `(0.90, 0.85)`
+- non-null `pathology_details.extrathyroid_extension` -> `(0.85, 0.80)`
+
 The split is a stratified `70/15/15` train/validation/test split with `seed=0`:
 
 - Train: `319` cases (`158` positive)
@@ -79,16 +86,23 @@ Test-set metrics from [`results/metrics/metrics.csv`](results/metrics/metrics.cs
 | Random Forest | 0.6613 | 0.2200 | 0.1597 | 59.42% | 0.5101 to 0.7908 |
 | Baseline Transformer | 0.7252 | 0.2118 | 0.1390 | 66.67% | 0.5931 to 0.8454 |
 | Flat-Confidence Transformer | 0.7261 | 0.2118 | 0.1390 | 68.12% | 0.5934 to 0.8468 |
-| NARS-Gated Transformer | 0.7261 | 0.2122 | 0.1403 | 66.67% | 0.5957 to 0.8460 |
+| NARS-Gated Transformer | 0.7261 | 0.2121 | 0.1400 | 66.67% | 0.5957 to 0.8460 |
 
 Interpretation:
 
 - The TCGA-THCA benchmark is materially harder than the old hand-curated cohort and no longer produces near-perfect discrimination.
 - On this saved split, the random forest baseline underperforms the Transformer family on AUC, Brier score, accuracy, and ECE.
-- The flat-confidence and NARS-gated variants tie on AUC to four decimal places shown in the saved summary.
+- The flat-confidence and NARS-gated variants still tie on AUC to four decimal places shown in the saved summary, even after symbolic rule injection.
 - The flat-confidence control is now marginally best on both Brier score and ECE, and it also reaches the best test accuracy at `68.12%`.
-- The NARS-gated variant no longer wins the calibration metrics at `gamma=2.0`; its strongest metric in this saved run is tied AUC rather than Brier or ECE.
+- The NARS-gated variant no longer wins the calibration metrics at `gamma=2.0`; with symbolic revision enabled, its strongest metric in this saved run is tied AUC rather than Brier or ECE.
 - All four 95% bootstrap AUC intervals overlap, so the observed differences should be treated as uncertain on this test split.
+
+Symbolic rule activity from [`results/metrics/run_summary.json`](results/metrics/run_summary.json):
+
+- Symbolic rules fired on `42 / 69` held-out cases.
+- The trace file records `79` total feature-level symbolic injections.
+- Per-rule trigger counts were `0` for BRAF mutation, `25` for age `>= 55` years, `29` for pathologic `T3/T4*`, and `25` for non-null extrathyroid extension.
+- [`results/traces/test_predictions.csv`](results/traces/test_predictions.csv) now includes `symbolic_rule_count`, `symbolic_any_rule_triggered`, `neural_attention_reliability`, and `revised_attention_reliability`.
 
 Deployment framing:
 
@@ -107,7 +121,7 @@ Gamma ablation from [`results/metrics/gamma_ablation.csv`](results/metrics/gamma
 | 2.0 | 0.7252 | 0.7261 | 0.21184 | 0.21219 |
 | 4.0 | 0.7252 | 0.7294 | 0.21184 | 0.21264 |
 
-On this run, higher `gamma` values improve the NARS-gated AUC slightly, with `gamma=4.0` giving the best gated AUC. In contrast to the prior run, stronger gating worsens the NARS-gated Brier score here, so the gamma trade-off is now discrimination-versus-calibration rather than a consistent gain on both.
+On this rerun, higher `gamma` values still improve the NARS-gated AUC slightly, with `gamma=4.0` giving the best gated AUC. In contrast, stronger gating worsens the NARS-gated Brier score under symbolic revision, so the gamma trade-off remains discrimination-versus-calibration rather than a consistent gain on both.
 
 ## Outputs
 
@@ -166,7 +180,7 @@ python main.py --run-all --gamma 4.0 --mc-samples 25
 
 ## Notes
 
-- The current implementation focuses on the uncertainty-to-NARS and confidence-gated attention path on TCGA-THCA. It does not ship a handcrafted THCA symbolic rule base.
+- The current implementation now includes a small THCA-oriented symbolic rule base that revises feature-level attention truth values for BRAF mutation, age at diagnosis, pathologic T category, and extrathyroid extension.
 - The saved classical baseline is a validation-tuned `RandomForestClassifier`, selected by validation Brier score on the same encoded train/validation split used by the Transformer pipeline.
 - The downloader-integrated pipeline now automatically ensures TCGA-THCA MAF availability before preprocessing. With the current local files, that genomic branch expands to the intended top-50-gene binary panel automatically.
 - The auxiliary TCGA tables are still merged even though most retained model features come from the clinical and pathology-detail tables after missingness filtering.

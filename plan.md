@@ -153,3 +153,38 @@ Upgrade the benchmark again to a multi-modal pipeline by fusing the TCGA-THCA cl
 - The implementation should prioritize leakage-safe predictors, even if some user examples such as `ajcc_pathologic_stage` are excluded.
 - The current selected predictors are not a strictly non-invasive or prospective baseline feature set; they are clinicopathologic retrospective benchmark features.
 - Paper scope is a focused refresh, not a full theoretical rewrite; generic NARS theory sections can stay, but MTC-specific application/results content must be updated or removed.
+
+## Phase: Symbolic Knowledge Graph Injection
+
+### Summary
+- Append symbolic clinical-rule injection as an inference-time extension of the existing MC-dropout NARS pipeline.
+- Preserve the current variance-to-NARS mapping, preprocessing, split logic, flat-confidence control, and evaluation metrics.
+- Apply symbolic revision to per-feature attention confidence only; keep case-level neural probability truth values unchanged in this phase.
+
+### Tasks
+- Add `src/knowledge_base.py` with hardcoded thyroid oncology rules for:
+  - `genomic_mutation__BRAF == 1 -> (0.85, 0.75)`
+  - `diagnoses.age_at_diagnosis / 365.25 >= 55 -> (0.70, 0.60)`
+  - `diagnoses.ajcc_pathologic_t` beginning with `T3` or `T4` -> `(0.90, 0.85)`
+  - non-null `pathology_details.extrathyroid_extension` -> `(0.85, 0.80)`
+- Expose a helper that converts raw test-case rows plus transformed feature names into symbolic frequency/confidence matrices, a trigger mask, per-rule trigger counts, and per-patient trigger counts.
+- Extend `src/nars_interface.py` with tensor-safe `revise_truth_values(f1, c1, f2, c2)` using NARS revision with confidence clamped to `[0.001, 0.999]`.
+- Integrate symbolic revision into the attention path without deleting the existing neural attention-to-NARS logic:
+  - derive per-feature neural truths from MC-dropout attention summaries
+  - revise only triggered features
+  - fall back to neural truth values when no rule is triggered
+  - gate attention with revised confidence via `A_gated = A ⊙ diag(c_rev^gamma)`
+- Update evaluation outputs to log symbolic rule activity while preserving Brier, ECE, and AUC generation:
+  - add symbolic trigger summaries to `results/metrics/run_summary.json`
+  - add per-case symbolic counts and revised attention confidence reporting to `results/traces/test_predictions.csv`
+  - use revised feature confidence for the main NARS-gated path and gamma ablation
+
+### Validation
+- Verify `revise_truth_values()` matches the paper equations and remains finite for tensor confidences at `0.0` and `1.0`.
+- Confirm raw-rule hit counts on the current `seed=0` test split remain:
+  - `69` test cases
+  - `0` BRAF hits
+  - `25` age >= 55-year hits
+  - `29` `T3/T4*` hits
+  - `25` non-null extrathyroid-extension hits
+- Confirm full pipeline outputs still include metrics, calibration, gamma ablation, decision curve, run summary, and trace CSV artifacts.
