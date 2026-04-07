@@ -627,9 +627,9 @@
     {
       "variant": "random_forest",
       "auc": 0.6613445378151261,
-      "brier": 0.21997575273834527,
+      "brier": 0.21997575273834533,
       "accuracy": 0.5942028985507246,
-      "ece": 0.15966664988761547,
+      "ece": 0.15966664988761545,
       "auc_ci_95_lower": 0.5100720984441915,
       "auc_ci_95_upper": 0.7907666818849781
     },
@@ -670,7 +670,7 @@
       "min_samples_leaf": 1
     },
     "validation_auc": 0.7529411764705882,
-    "validation_brier": 0.20979110015441177
+    "validation_brier": 0.20979110015441182
   },
   "auc_bootstrap": {
     "random_forest": {
@@ -955,13 +955,13 @@
       "variant": "random_forest"
     },
     {
-      "mean_predicted_probability": 0.42080091374110973,
+      "mean_predicted_probability": 0.4208009137411098,
       "fraction_positives": 0.42857142857142855,
       "count": 7,
       "variant": "random_forest"
     },
     {
-      "mean_predicted_probability": 0.4626527066061575,
+      "mean_predicted_probability": 0.4626527066061574,
       "fraction_positives": 0.8571428571428571,
       "count": 7,
       "variant": "random_forest"
@@ -979,13 +979,13 @@
       "variant": "random_forest"
     },
     {
-      "mean_predicted_probability": 0.5457126924797842,
+      "mean_predicted_probability": 0.5457126924797843,
       "fraction_positives": 0.14285714285714285,
       "count": 7,
       "variant": "random_forest"
     },
     {
-      "mean_predicted_probability": 0.5799682278609956,
+      "mean_predicted_probability": 0.5799682278609953,
       "fraction_positives": 0.5714285714285714,
       "count": 7,
       "variant": "random_forest"

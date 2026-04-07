@@ -84,7 +84,7 @@ Test-set metrics from [`results/metrics/metrics.csv`](results/metrics/metrics.cs
 Interpretation:
 
 - The TCGA-THCA benchmark is materially harder than the old hand-curated cohort and no longer produces near-perfect discrimination.
-- On this saved split, the random forest baseline still underperforms the Transformer family on AUC, Brier score, and accuracy, though it remains competitive on ECE.
+- On this saved split, the random forest baseline underperforms the Transformer family on AUC, Brier score, accuracy, and ECE.
 - The flat-confidence and NARS-gated variants tie on AUC to four decimal places shown in the saved summary.
 - The flat-confidence control is now marginally best on both Brier score and ECE, and it also reaches the best test accuracy at `68.12%`.
 - The NARS-gated variant no longer wins the calibration metrics at `gamma=2.0`; its strongest metric in this saved run is tied AUC rather than Brier or ECE.
