@@ -2,185 +2,164 @@
 
 **NARS-Guided Transformer Attention**
 
-![AUC](https://img.shields.io/badge/AUC%20(NARS--Gated)-0.7261-blue)
-![Accuracy](https://img.shields.io/badge/Accuracy-68.12%25-informational)
-![Labeled Cases](https://img.shields.io/badge/Labeled%20Cases-457-informational)
-![Dataset](https://img.shields.io/badge/Dataset-TCGA--THCA-success)
+NGTA is a neurosymbolic tabular prediction pipeline that maps neural uncertainty into NARS truth values and feeds revised confidence back into Transformer attention during inference. The repository now supports two benchmarks in parallel:
 
-NGTA is a research implementation of a neurosymbolic multi-modal Transformer pipeline for **lymph node metastasis prediction in TCGA-THCA**. The current codebase loads five TCGA clinical TSV tables, fuses them with a somatic-mutation MAF-derived binary gene matrix at the case level, maps model uncertainty into NARS truth values, injects a small hardcoded thyroid oncology rule base through NARS revision, and feeds revised confidence back into feature attention during inference.
+- `tcga`: TCGA-THCA lymph node metastasis prediction from merged clinical tables plus a mutation-derived binary gene panel
+- `wids`: WiDS Datathon 2020 ICU hospital mortality prediction from a high-missingness ICU tabular cohort
 
-The executable manuscript companion lives in [paper/main.tex](paper/main.tex). The public repository is `https://github.com/ArjunCodess/NGTA`.
+The executable manuscript companion lives in [`paper/main.tex`](paper/main.tex).
 
-## Overview
+## Running
 
-The current benchmark uses the TCGA-THCA tables in [`data/`](data):
+Create an environment and install dependencies:
+
+```bash
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+```
+
+Run one dataset:
+
+```bash
+python main.py --dataset tcga
+python main.py --dataset wids
+```
+
+Run the whole repository pipeline:
+
+```bash
+python main.py --run-all
+```
+
+`--run-all` is the full orchestration entrypoint. It runs the complete TCGA pipeline and the complete WiDS pipeline sequentially, computes every metric/chart/trace artifact for both datasets, and writes an aggregate `run_all_summary.json` at the chosen output root.
+
+Useful flags:
+
+- `--data-dir`: directory containing the TCGA tables / MAF files and `wids_icu.csv`
+- `--output-dir`: base directory for per-dataset outputs
+- `--epochs`, `--batch-size`, `--learning-rate`, `--weight-decay`
+- `--mc-samples`, `--gamma`, `--seed`
+- `--d-model`, `--num-heads`, `--num-layers`, `--dropout`, `--patience`
+
+Notes:
+
+- WiDS uses a dataset-specific batch-size override of `512`
+- `--dataset` is used for single-dataset execution; `--run-all` runs both datasets regardless
+- outputs are namespaced by dataset so TCGA and WiDS artifacts do not overwrite each other
+
+## Data
+
+TCGA expects the following in [`data/`](data):
 
 - `clinical.tsv`
 - `exposure.tsv`
 - `family_history.tsv`
 - `follow_up.tsv`
 - `pathology_detail.tsv`
-- `*.maf` somatic mutation file(s)
+- one or more `*.maf` files
 
-The loader:
+WiDS expects:
 
-- normalizes TCGA missing-value placeholders such as `--`, `'--`, `Not Reported`, and `Unknown`
-- collapses each table to one row per `case_submitter_id`
-- left-joins the auxiliary tables onto the clinical base table
-- drops columns with more than 70% missingness
-- derives the binary target from `diagnoses.ajcc_pathologic_n`
-- reads MAF files with `comment='#'`, extracts `case_submitter_id` from `Tumor_Sample_Barcode`, filters to functional mutations, selects the top mutated genes, and left-joins a binary mutation matrix onto the clinical frame
+- `wids_icu.csv`
 
-Target mapping:
+## WiDS Configuration
 
-- `N0 -> 0`
-- `N1`, `N1a`, `N1b -> 1`
-- `NX`, missing, and unmapped values are removed before splitting
+The WiDS branch uses exactly these 15 core features:
 
-On the saved run in this repository, the merged dataset contains `507` raw TCGA cases and `457` labeled cases after target filtering.
+- Continuous numeric: `age`, `bmi`, `d1_heartrate_max`, `d1_sysbp_min`, `d1_temp_max`, `d1_lactate_max`, `d1_bun_max`, `d1_creatinine_max`, `d1_glucose_max`, `d1_wbc_max`, `d1_spo2_min`, `d1_platelets_min`, `apache_4a_hospital_death_prob`
+- Binary pass-through: `elective_surgery`
+- Categorical: `gender`
 
-## Current Experiment
+Preprocessing rules:
 
-The current saved run uses a leakage-aware multi-modal feature set with `18` clinical variables plus `50` genomic mutation indicators derived from the currently available MAF files:
+- `pd.read_csv(..., na_values=['NA'])`
+- drop rows where `hospital_death` is missing
+- stratified `70/15/15` split with the run seed
+- `KNNImputer(n_neighbors=5)` on the 13 continuous features, fit on train only
+- `SimpleImputer(strategy='most_frequent')` + one-hot encoding for `gender`
+- `StandardScaler` on the 13 continuous features only, fit on train only
 
-- Numerical: `diagnoses.age_at_diagnosis`, `diagnoses.year_of_diagnosis`, `pathology_details.tumor_length_measurement`, `pathology_details.tumor_width_measurement`, `pathology_details.tumor_depth_measurement`
-- Categorical: `demographic.gender`, `demographic.race`, `demographic.ethnicity`, `diagnoses.ajcc_pathologic_t`, `diagnoses.prior_malignancy`, `diagnoses.synchronous_malignancy`, `diagnoses.prior_treatment`, `diagnoses.primary_diagnosis`, `diagnoses.morphology`, `diagnoses.laterality`, `diagnoses.tumor_focality`, `diagnoses.residual_disease`, `pathology_details.extrathyroid_extension`
-- Genomic binary features: top-50 filtered mutation indicators including `genomic_mutation__BRAF`, `genomic_mutation__ZNF804A`, `genomic_mutation__ST18`, `genomic_mutation__CYP2C9`, `genomic_mutation__OR4D5`, `genomic_mutation__TP73`, `genomic_mutation__RCC1`, `genomic_mutation__PI4KB`, `genomic_mutation__RFX5`, `genomic_mutation__SPDYA`, and 40 additional binary gene columns saved in [`results/traces/preprocessing_metadata.json`](results/traces/preprocessing_metadata.json)
+WiDS symbolic ICU rules are evaluated after KNN imputation and before scaling:
 
-After preprocessing, the model sees `105` numeric input features:
-
-- `5` scaled clinical numeric features
-- `50` pass-through genomic binary features
-- `50` one-hot encoded clinical categorical features
-
-The current run consumed these two MAF files:
-
-- `1feaf21d-8259-4c70-bcb7-7e3fb0887ea4.wxs.aliquot_ensemble_masked.maf`
-- `c2e3ad0c-d449-449d-b3a3-793b90bdc793.wxs.aliquot_ensemble_masked.maf`
-
-The symbolic rule base currently revises feature-level attention truth values with four hardcoded clinical rules:
-
-- `genomic_mutation__BRAF == 1 -> (0.85, 0.75)`
-- `diagnoses.age_at_diagnosis / 365.25 >= 55 -> (0.70, 0.60)`
-- `diagnoses.ajcc_pathologic_t` beginning with `T3` or `T4` -> `(0.90, 0.85)`
-- non-null `pathology_details.extrathyroid_extension` -> `(0.85, 0.80)`
-
-The split is a stratified `70/15/15` train/validation/test split with `seed=0`:
-
-- Train: `319` cases (`158` positive)
-- Validation: `69` cases (`34` positive)
-- Test: `69` cases (`34` positive)
-
-## Latest Results
-
-Run command:
-
-```bash
-python main.py --run-all
-```
-
-Test-set metrics from [`results/metrics/metrics.csv`](results/metrics/metrics.csv):
-
-| Variant | AUC | Brier | ECE | Accuracy | 95% AUC CI |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| Random Forest | 0.6613 | 0.2200 | 0.1597 | 59.42% | 0.5101 to 0.7908 |
-| Baseline Transformer | 0.7252 | 0.2118 | 0.1390 | 66.67% | 0.5931 to 0.8454 |
-| Flat-Confidence Transformer | 0.7261 | 0.2118 | 0.1390 | 68.12% | 0.5934 to 0.8468 |
-| NARS-Gated Transformer | 0.7261 | 0.2121 | 0.1400 | 66.67% | 0.5957 to 0.8460 |
-
-Interpretation:
-
-- The TCGA-THCA benchmark is materially harder than the old hand-curated cohort and no longer produces near-perfect discrimination.
-- On this saved split, the random forest baseline underperforms the Transformer family on AUC, Brier score, accuracy, and ECE.
-- The flat-confidence and NARS-gated variants still tie on AUC to four decimal places shown in the saved summary, even after symbolic rule injection.
-- The flat-confidence control is now marginally best on both Brier score and ECE, and it also reaches the best test accuracy at `68.12%`.
-- The NARS-gated variant no longer wins the calibration metrics at `gamma=2.0`; with symbolic revision enabled, its strongest metric in this saved run is tied AUC rather than Brier or ECE.
-- All four 95% bootstrap AUC intervals overlap, so the observed differences should be treated as uncertain on this test split.
-
-Symbolic rule activity from [`results/metrics/run_summary.json`](results/metrics/run_summary.json):
-
-- Symbolic rules fired on `42 / 69` held-out cases.
-- The trace file records `79` total feature-level symbolic injections.
-- Per-rule trigger counts were `0` for BRAF mutation, `25` for age `>= 55` years, `29` for pathologic `T3/T4*`, and `25` for non-null extrathyroid extension.
-- [`results/traces/test_predictions.csv`](results/traces/test_predictions.csv) now includes `symbolic_rule_count`, `symbolic_any_rule_triggered`, `neural_attention_reliability`, and `revised_attention_reliability`.
-
-Deployment framing:
-
-- In this repository, NGTA should be read as a reliability-oriented interface, not an AUC-maximization claim.
-- The NARS layer makes evidential confidence explicit and exportable, which is the main answer to the clinical black-box problem: the model emits both a risk score and a confidence-like control signal that can be inspected and reused in attention.
-- The retained feature set is clinicopathologic, not strictly non-invasive or baseline-only.
-- The current documentation reflects a broader multi-modal run with the genomic branch expanded to the top-50 gene panel from the available MAF files in `data/`.
-
-Gamma ablation from [`results/metrics/gamma_ablation.csv`](results/metrics/gamma_ablation.csv):
-
-| Gamma | Baseline AUC | NARS-Gated AUC | Baseline Brier | NARS-Gated Brier |
-| ---: | ---: | ---: | ---: | ---: |
-| 0.25 | 0.7252 | 0.7261 | 0.21184 | 0.21187 |
-| 0.5 | 0.7252 | 0.7261 | 0.21184 | 0.21192 |
-| 1.0 | 0.7252 | 0.7261 | 0.21184 | 0.21200 |
-| 2.0 | 0.7252 | 0.7261 | 0.21184 | 0.21219 |
-| 4.0 | 0.7252 | 0.7294 | 0.21184 | 0.21264 |
-
-On this rerun, higher `gamma` values still improve the NARS-gated AUC slightly, with `gamma=4.0` giving the best gated AUC. In contrast, stronger gating worsens the NARS-gated Brier score under symbolic revision, so the gamma trade-off remains discrimination-versus-calibration rather than a consistent gain on both.
+- `d1_lactate_max >= 4.0`
+- `d1_sysbp_min <= 90.0`
+- `age >= 75.0`
+- `d1_creatinine_max >= 2.0`
 
 ## Outputs
 
-Charts:
+Each dataset writes a full artifact bundle under the chosen output root:
 
-- [charts/roc_curve.png](charts/roc_curve.png)
-- [charts/calibration_curve.png](charts/calibration_curve.png)
-- [charts/training_history.png](charts/training_history.png)
-- [charts/gamma_ablation_auc.png](charts/gamma_ablation_auc.png)
-- [charts/decision_curve.png](charts/decision_curve.png)
+- `<output-dir>/tcga/charts`
+- `<output-dir>/tcga/metrics`
+- `<output-dir>/tcga/traces`
+- `<output-dir>/wids/charts`
+- `<output-dir>/wids/metrics`
+- `<output-dir>/wids/traces`
 
-Metrics and traces:
+Top-level orchestration output:
 
-- [results/metrics/run_summary.json](results/metrics/run_summary.json)
-- [results/metrics/metrics.csv](results/metrics/metrics.csv)
-- [results/metrics/training_history.csv](results/metrics/training_history.csv)
-- [results/metrics/gamma_ablation.csv](results/metrics/gamma_ablation.csv)
-- [results/metrics/decision_curve.csv](results/metrics/decision_curve.csv)
-- [results/metrics/calibration_reliability.csv](results/metrics/calibration_reliability.csv)
-- [results/traces/split_summary.json](results/traces/split_summary.json)
-- [results/traces/preprocessing_metadata.json](results/traces/preprocessing_metadata.json)
-- [results/traces/test_predictions.csv](results/traces/test_predictions.csv)
+- `<output-dir>/run_all_summary.json`
 
-## Quick Start
+Per-dataset metrics/traces include:
+
+- `metrics.csv`
+- `training_history.csv`
+- `gamma_ablation.csv`
+- `decision_curve.csv`
+- `calibration_reliability.csv`
+- `run_summary.json`
+- `test_predictions.csv`
+- ROC, calibration, training-history, gamma-ablation, and decision-curve plots
+
+## Latest Full Run
+
+The current default full run was produced with:
 
 ```bash
-python -m venv venv
-.\venv\Scripts\Activate.ps1
-pip install -r requirements.txt
 python main.py --run-all
 ```
 
-Useful flags:
+Result bundles written by that run:
 
-- `--data-dir`: directory containing the TCGA TSV tables
-- `--output-dir`: alternate root for charts and results
-- `--epochs`, `--batch-size`, `--learning-rate`, `--weight-decay`
-- `--mc-samples`, `--gamma`, `--seed`
-- `--d-model`, `--num-heads`, `--num-layers`, `--dropout`, `--patience`
+- [`results/run_all_summary.json`](results/run_all_summary.json)
+- [`results/tcga/metrics/run_summary.json`](results/tcga/metrics/run_summary.json)
+- [`results/wids/metrics/run_summary.json`](results/wids/metrics/run_summary.json)
 
-Example:
+TCGA-THCA full-run summary:
 
-```bash
-python main.py --run-all --gamma 4.0 --mc-samples 25
-```
+- Split: `319 / 69 / 69` train/validation/test from `457` labeled cases
+- Best AUC: `0.7328` for `flat_confidence`
+- Best Brier: `0.2109` for `flat_confidence`
+- Best ECE: `0.1178` for `flat_confidence`
+- Best accuracy: `0.6812`, tied across `baseline`, `flat_confidence`, and `nars_gated`
+- Symbolic activity: `42 / 69` held-out cases with any trigger, `79` total feature-level revisions
+
+WiDS ICU full-run summary:
+
+- Split: `64199 / 13757 / 13757` train/validation/test from `91713` labeled rows
+- Input width: `16` model features after preprocessing
+- Best AUC: `0.8803` for `baseline`
+- Best Brier: `0.05647` for `nars_gated`
+- Best ECE: `0.00583` for `nars_gated`
+- Best accuracy: `0.92862`, tied across `flat_confidence` and `nars_gated`
+- Symbolic activity: `8551 / 13757` held-out cases with any trigger, `13031` total feature-level revisions
+- Per-rule test triggers:
+  - `rule_lactate: 1936`
+  - `rule_hypotension: 5338`
+  - `rule_age: 3443`
+  - `rule_creatinine: 2314`
 
 ## Repository Layout
 
-- [main.py](main.py): CLI entry point
-- [src/data_loader.py](src/data_loader.py): TCGA ingestion, case-level merging, preprocessing, and stratified splitting
-- [src/neural_encoder.py](src/neural_encoder.py): tabular Transformer with MC-dropout inference
-- [src/nars_interface.py](src/nars_interface.py): NARS truth-value mapping and revision operators
-- [src/attention_hook.py](src/attention_hook.py): confidence-based attention gating
-- [src/pipeline.py](src/pipeline.py): training, evaluation, and artifact generation
-- [paper/main.tex](paper/main.tex): manuscript source
-
-## Notes
-
-- The current implementation now includes a small THCA-oriented symbolic rule base that revises feature-level attention truth values for BRAF mutation, age at diagnosis, pathologic T category, and extrathyroid extension.
-- The saved classical baseline is a validation-tuned `RandomForestClassifier`, selected by validation Brier score on the same encoded train/validation split used by the Transformer pipeline.
-- The downloader-integrated pipeline now automatically ensures TCGA-THCA MAF availability before preprocessing. With the current local files, that genomic branch expands to the intended top-50-gene binary panel automatically.
-- The auxiliary TCGA tables are still merged even though most retained model features come from the clinical and pathology-detail tables after missingness filtering.
+- [`main.py`](main.py): CLI entry point and `--run-all` orchestration
+- [`src/data_loader.py`](src/data_loader.py): TCGA ingestion and preprocessing
+- [`src/wids_loader.py`](src/wids_loader.py): WiDS ingestion, preprocessing, and ICU rule-mask generation
+- [`src/knowledge_base.py`](src/knowledge_base.py): TCGA symbolic rule base
+- [`src/wids_knowledge_base.py`](src/wids_knowledge_base.py): WiDS symbolic ICU rule base
+- [`src/neural_encoder.py`](src/neural_encoder.py): tabular Transformer with MC-dropout inference
+- [`src/nars_interface.py`](src/nars_interface.py): NARS truth-value mapping and revision operators
+- [`src/attention_hook.py`](src/attention_hook.py): confidence-based attention gating
+- [`src/pipeline.py`](src/pipeline.py): training, baselines, evaluation, plotting, and summary generation
+- [`paper/main.tex`](paper/main.tex): manuscript source
