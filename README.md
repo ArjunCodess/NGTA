@@ -11,7 +11,7 @@ NGTA is a neurosymbolic clinical prediction architecture that maps neural uncert
 - `tcga`: TCGA-THCA lymph node metastasis prediction from merged clinical tables plus a mutation-derived binary gene panel
 - `wids`: WiDS Datathon 2020 ICU hospital mortality prediction from a high-missingness ICU tabular cohort
 
-The executable manuscript companion lives in [`paper/main.tex`](paper/main.tex).
+The research paper lives in [`paper/main.pdf`](paper/main.pdf), with source in [`paper/main.tex`](paper/main.tex).
 
 ## Key Achievements
 
