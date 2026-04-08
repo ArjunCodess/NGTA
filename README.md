@@ -9,6 +9,46 @@ NGTA is a neurosymbolic tabular prediction pipeline that maps neural uncertainty
 
 The executable manuscript companion lives in [`paper/main.tex`](paper/main.tex).
 
+## Overview
+
+### What it does
+
+NGTA is a medical prediction system for messy hospital-style tables where many values are missing. It uses a Transformer to make predictions, but it does not stop at producing a single risk score. It also estimates how confident the model is, checks a small set of human-written medical rules, and then uses both pieces of information to adjust how the model pays attention to the input features.
+
+### Why it matters
+
+Many clinical AI systems can give a strong prediction even when the data are incomplete or unreliable. That is dangerous in real settings. NGTA is designed to be more careful. Instead of acting like a pure black box, it tries to separate "high score" from "high confidence." That makes the system more useful in high-missingness environments like ICU data, where safer calibration matters as much as raw accuracy.
+
+### What is novel here
+
+The main novelty is not just "Transformer + rules." The key idea is that NGTA turns neural uncertainty into explicit symbolic truth values from NARS, revises those values with domain rules, and then feeds the revised confidence back into Transformer attention. In simple terms: the model can use both learned patterns and symbolic evidence to decide how much trust to place in each feature at inference time.
+
+### How it works
+
+1. The Transformer reads the patient features and predicts risk.
+2. Monte Carlo dropout is used to measure how stable that prediction is across repeated passes.
+3. That uncertainty is converted into NARS-style truth values: frequency and confidence.
+4. If a symbolic rule fires, its truth value is combined with the neural truth value using NARS revision.
+5. The revised confidence is used to reweight attention, so uncertain or weakly supported features matter less.
+6. The pipeline then evaluates discrimination, Calibration, decision curves, symbolic trigger activity, and baseline comparisons.
+
+### Why there are two datasets
+
+The two benchmarks test different strengths of the architecture:
+
+- `tcga` shows that NGTA can fuse multi-modal clinical and genomic information in a small oncology setting.
+- `wids` shows that the same architecture scales to a much larger ICU dataset with heavy missingness and still produces stable end-to-end results.
+
+### What we found
+
+The main result is that NGTA works as intended on both a small multi-modal cancer dataset and a much larger high-missingness ICU dataset.
+
+- On `tcga`, the Transformer-based models clearly beat the random-forest baseline. The best AUC was `0.7328`, compared with `0.6613` for random forest. This shows that the architecture can learn useful signal from combined clinical and genomic inputs.
+- On `wids`, all Transformer variants were very close on AUC, with the best AUC at `0.8803`. The important result there was Calibration: the NARS-gated version achieved the best ECE at `0.00583` and the best Brier score at `0.05647`.
+- In simple terms, the WiDS result suggests that the symbolic confidence mechanism did not dramatically change ranking performance, but it did make the probabilities better behaved. That matters in hospital settings, where a well-calibrated risk score is often safer than a slightly sharper but less trustworthy one.
+- The symbolic rules were not just decorative. On the held-out WiDS test set, ICU rules fired in `8551` of `13757` cases for `13031` total feature-level revisions, which means the neurosymbolic revision path was active at scale rather than sitting unused.
+- Taken together, the results support a narrower and more defensible claim than "always better accuracy": NGTA is competitive on discrimination and especially interesting for Calibration and uncertainty-aware behavior under heavy missingness.
+
 ## Running
 
 Create an environment and install dependencies:
