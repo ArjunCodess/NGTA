@@ -30,9 +30,13 @@ NGTA is a medical prediction system for messy hospital-style tables where many v
 
 Many clinical AI systems can give a strong prediction even when the data are incomplete or unreliable. That is dangerous in real settings because missing hospital data can produce overconfident probabilities that look trustworthy when they are not. NGTA is designed to separate "high score" from "high confidence" and to expose a human-readable revision path when symbolic rules intervene. That makes the system more useful in high-missingness environments like ICU data, where safer calibration matters as much as raw accuracy.
 
+In standard clinical prediction, models optimize for point-estimate accuracy but lack native mechanisms to express epistemic doubt, leading to overconfident extrapolation when faced with missing features. NGTA is built around the opposite design goal: instead of a black-box predictor that guesses blindly across data gaps, it calculates feature-level uncertainty and can route attention toward explicit medical heuristics when uncertainty is high. That is the practical meaning of the glass-box framing used throughout this project.
+
 ### What is novel here
 
 The main novelty is not just "Transformer + rules." The key idea is that NGTA turns neural uncertainty into explicit symbolic truth values from NARS, revises those values with domain rules, and then feeds the revised confidence back into Transformer attention. In simple terms: the model can use both learned patterns and symbolic evidence to decide how much trust to place in each feature at inference time, while also leaving behind an auditable evidential trace.
+
+The end result is not just another tabular model with a rules layer attached to the side. It is an auditable, human-in-the-loop reasoning engine: instead of emitting an overconfident scalar score on missing data, the system exposes what it does not confidently know and provides a direct insertion point for clinicians to inject overriding physiological rules into the inference path itself.
 
 ### How it works
 
@@ -59,6 +63,8 @@ The main result is that NGTA works as intended on both a small multi-modal cance
 - The WiDS result shows the calibration-versus-discrimination story clearly. NGTA did not need to win AUC by a wide margin to matter; it made the predicted probabilities better behaved while remaining competitive on ranking performance.
 - The symbolic rules were not just decorative. On the held-out WiDS test set, ICU rules fired in `8551` of `13757` cases for `13031` total feature-level revisions, which means the neurosymbolic revision path was active at scale rather than sitting unused.
 - Taken together, the results support a narrower and more defensible claim than "always better accuracy": NGTA is competitive on discrimination, strongest on calibration, and valuable as a human-auditable instrumentation layer under heavy missingness.
+
+Put differently: the main architectural achievement here is safety-oriented behavior, not just ranking performance. NGTA turns the transformer's attention update from an opaque mapping into a transparent glass box, where uncertainty is explicit, rule interventions are traceable, and the final probability is better calibrated for clinical use.
 
 ## Running
 
