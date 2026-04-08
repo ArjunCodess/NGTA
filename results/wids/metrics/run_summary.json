@@ -1,0 +1,702 @@
+{
+  "config": {
+    "data_dir": "data",
+    "output_dir": "results",
+    "dataset": "wids",
+    "epochs": 60,
+    "batch_size": 512,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "mc_samples": 50,
+    "gamma": 2.0,
+    "seed": 0,
+    "patience": 12,
+    "d_model": 64,
+    "num_heads": 4,
+    "num_layers": 2,
+    "dropout": 0.2
+  },
+  "task": {
+    "dataset": "WiDS ICU 2020",
+    "dataset_key": "wids",
+    "positive_class": "Hospital Mortality",
+    "id_column": "encounter_id",
+    "target_column": "hospital_death",
+    "source_description": "WiDS ICU CSV file."
+  },
+  "split_summary": {
+    "raw_case_rows": 91713,
+    "labeled_case_rows": 91713,
+    "train_rows": 64199,
+    "val_rows": 13757,
+    "test_rows": 13757,
+    "train_positive": 5540,
+    "val_positive": 1188,
+    "test_positive": 1187,
+    "positive_label": "Hospital Mortality",
+    "target_column": "hospital_death",
+    "id_column": "encounter_id",
+    "numeric_columns": [
+      "age",
+      "bmi",
+      "d1_heartrate_max",
+      "d1_sysbp_min",
+      "d1_temp_max",
+      "d1_lactate_max",
+      "d1_bun_max",
+      "d1_creatinine_max",
+      "d1_glucose_max",
+      "d1_wbc_max",
+      "d1_spo2_min",
+      "d1_platelets_min",
+      "apache_4a_hospital_death_prob"
+    ],
+    "binary_columns": [
+      "elective_surgery"
+    ],
+    "categorical_columns": [
+      "gender"
+    ],
+    "rule_names": [
+      "rule_lactate",
+      "rule_hypotension",
+      "rule_age",
+      "rule_creatinine"
+    ],
+    "clinical_feature_count": 15,
+    "genomic_feature_count": 0,
+    "input_dim": 16,
+    "output_feature_names": [
+      "age",
+      "bmi",
+      "d1_heartrate_max",
+      "d1_sysbp_min",
+      "d1_temp_max",
+      "d1_lactate_max",
+      "d1_bun_max",
+      "d1_creatinine_max",
+      "d1_glucose_max",
+      "d1_wbc_max",
+      "d1_spo2_min",
+      "d1_platelets_min",
+      "apache_4a_hospital_death_prob",
+      "elective_surgery",
+      "gender_F",
+      "gender_M"
+    ],
+    "continuous_feature_count": 13,
+    "auxiliary_feature_count": 3,
+    "rule_feature_count": 4
+  },
+  "metrics": [
+    {
+      "variant": "random_forest",
+      "auc": 0.8768362712198378,
+      "brier": 0.05816876926300937,
+      "accuracy": 0.9257832376244821,
+      "ece": 0.007372339899687431,
+      "auc_ci_95_lower": 0.8669175671816576,
+      "auc_ci_95_upper": 0.8867520461147212
+    },
+    {
+      "variant": "baseline",
+      "auc": 0.8803399865554915,
+      "brier": 0.056527189910411835,
+      "accuracy": 0.9285454677618666,
+      "ece": 0.007496397690061542,
+      "auc_ci_95_lower": 0.8700149115209564,
+      "auc_ci_95_upper": 0.8902125095917065
+    },
+    {
+      "variant": "flat_confidence",
+      "auc": 0.8802329532545297,
+      "brier": 0.0564804631786328,
+      "accuracy": 0.92861815802864,
+      "ece": 0.006181551976017444,
+      "auc_ci_95_lower": 0.8698110721699586,
+      "auc_ci_95_upper": 0.8901487833176899
+    },
+    {
+      "variant": "nars_gated",
+      "auc": 0.8802429394548069,
+      "brier": 0.05646863238466607,
+      "accuracy": 0.92861815802864,
+      "ece": 0.005833076672807212,
+      "auc_ci_95_lower": 0.8698052485145314,
+      "auc_ci_95_upper": 0.8901395464331447
+    }
+  ],
+  "symbolic_rules": {
+    "definitions": {
+      "rule_lactate": [
+        0.85,
+        0.8
+      ],
+      "rule_hypotension": [
+        0.75,
+        0.7
+      ],
+      "rule_age": [
+        0.65,
+        0.6
+      ],
+      "rule_creatinine": [
+        0.7,
+        0.65
+      ]
+    },
+    "total_trigger_count": 13031,
+    "mapped_feature_trigger_count": 13031,
+    "cases_with_any_trigger": 8551,
+    "per_rule_trigger_counts": {
+      "rule_lactate": 1936,
+      "rule_hypotension": 5338,
+      "rule_age": 3443,
+      "rule_creatinine": 2314
+    },
+    "per_rule_mapped_trigger_counts": {
+      "rule_lactate": 1936,
+      "rule_hypotension": 5338,
+      "rule_age": 3443,
+      "rule_creatinine": 2314
+    }
+  },
+  "classical_baseline": {
+    "variant": "random_forest",
+    "selection_objective": "validation_brier",
+    "best_config": {
+      "n_estimators": 400,
+      "max_depth": null,
+      "min_samples_leaf": 1
+    },
+    "validation_auc": 0.8749365455547331,
+    "validation_brier": 0.05848512560886924
+  },
+  "auc_bootstrap": {
+    "random_forest": {
+      "iterations": 1000,
+      "auc_samples_mean": 0.8768632532082704,
+      "auc_ci_95_lower": 0.8669175671816576,
+      "auc_ci_95_upper": 0.8867520461147212
+    },
+    "baseline": {
+      "iterations": 1000,
+      "auc_samples_mean": 0.8803468246889194,
+      "auc_ci_95_lower": 0.8700149115209564,
+      "auc_ci_95_upper": 0.8902125095917065
+    },
+    "flat_confidence": {
+      "iterations": 1000,
+      "auc_samples_mean": 0.8802434052200427,
+      "auc_ci_95_lower": 0.8698110721699586,
+      "auc_ci_95_upper": 0.8901487833176899
+    },
+    "nars_gated": {
+      "iterations": 1000,
+      "auc_samples_mean": 0.8802547715479859,
+      "auc_ci_95_lower": 0.8698052485145314,
+      "auc_ci_95_upper": 0.8901395464331447
+    },
+    "comparison": {
+      "baseline_vs_nars_gated_ci_overlap": true,
+      "baseline_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain.",
+      "flat_confidence_vs_nars_gated_ci_overlap": true,
+      "flat_confidence_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain.",
+      "random_forest_vs_nars_gated_ci_overlap": true,
+      "random_forest_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain."
+    }
+  },
+  "gamma_ablation": [
+    {
+      "gamma": 0.25,
+      "baseline_auc": 0.8803399865554915,
+      "baseline_brier": 0.056527189910411835,
+      "baseline_accuracy": 0.9285454677618666,
+      "nars_gated_auc": 0.8802354330492291,
+      "nars_gated_brier": 0.05647888873638778,
+      "nars_gated_accuracy": 0.9286908482954133,
+      "auc_delta_gated_minus_baseline": -0.00010455350626237259,
+      "brier_delta_gated_minus_baseline": -4.8301174024052707e-05,
+      "accuracy_delta_gated_minus_baseline": 0.00014538053354662406
+    },
+    {
+      "gamma": 0.5,
+      "baseline_auc": 0.8803399865554915,
+      "baseline_brier": 0.056527189910411835,
+      "baseline_accuracy": 0.9285454677618666,
+      "nars_gated_auc": 0.8802409288104558,
+      "nars_gated_brier": 0.056477340888191126,
+      "nars_gated_accuracy": 0.92861815802864,
+      "auc_delta_gated_minus_baseline": -9.90577450357133e-05,
+      "brier_delta_gated_minus_baseline": -4.984902222070903e-05,
+      "accuracy_delta_gated_minus_baseline": 7.269026677336754e-05
+    },
+    {
+      "gamma": 1.0,
+      "baseline_auc": 0.8803399865554915,
+      "baseline_brier": 0.056527189910411835,
+      "baseline_accuracy": 0.9285454677618666,
+      "nars_gated_auc": 0.8802433415836773,
+      "nars_gated_brier": 0.05647432643307405,
+      "nars_gated_accuracy": 0.9286908482954133,
+      "auc_delta_gated_minus_baseline": -9.664497181416376e-05,
+      "brier_delta_gated_minus_baseline": -5.286347733778757e-05,
+      "accuracy_delta_gated_minus_baseline": 0.00014538053354662406
+    },
+    {
+      "gamma": 2.0,
+      "baseline_auc": 0.8803399865554915,
+      "baseline_brier": 0.056527189910411835,
+      "baseline_accuracy": 0.9285454677618666,
+      "nars_gated_auc": 0.8802429394548069,
+      "nars_gated_brier": 0.05646863238466607,
+      "nars_gated_accuracy": 0.92861815802864,
+      "auc_delta_gated_minus_baseline": -9.704710068458855e-05,
+      "brier_delta_gated_minus_baseline": -5.8557525745767114e-05,
+      "accuracy_delta_gated_minus_baseline": 7.269026677336754e-05
+    },
+    {
+      "gamma": 4.0,
+      "baseline_auc": 0.8803399865554915,
+      "baseline_brier": 0.056527189910411835,
+      "baseline_accuracy": 0.9285454677618666,
+      "nars_gated_auc": 0.8802393873164533,
+      "nars_gated_brier": 0.056458657740458856,
+      "nars_gated_accuracy": 0.9284727774950934,
+      "auc_delta_gated_minus_baseline": -0.00010059923903815715,
+      "brier_delta_gated_minus_baseline": -6.85321699529784e-05,
+      "accuracy_delta_gated_minus_baseline": -7.269026677325652e-05
+    }
+  ],
+  "decision_curve": [
+    {
+      "threshold": 0.05,
+      "random_forest_net_benefit": 0.0606313340959435,
+      "baseline_net_benefit": 0.060822624271662656,
+      "flat_confidence_net_benefit": 0.0609488757876373,
+      "nars_gated_net_benefit": 0.06099095962629551,
+      "treat_all_net_benefit": 0.03819299648408657,
+      "treat_none_net_benefit": 0.0
+    },
+    {
+      "threshold": 0.1,
+      "random_forest_net_benefit": 0.047612124736497785,
+      "baseline_net_benefit": 0.048193646870684004,
+      "flat_confidence_net_benefit": 0.04823403035222472,
+      "nars_gated_net_benefit": 0.048137109996527025,
+      "treat_all_net_benefit": -0.015240725933464178,
+      "treat_none_net_benefit": 0.0
+    },
+    {
+      "threshold": 0.15000000000000002,
+      "random_forest_net_benefit": 0.03815811415792602,
+      "baseline_net_benefit": 0.03927839944584361,
+      "flat_confidence_net_benefit": 0.038825154253021986,
+      "nars_gated_net_benefit": 0.03874391219015773,
+      "treat_all_net_benefit": -0.07496076863543269,
+      "treat_none_net_benefit": 0.0
+    },
+    {
+      "threshold": 0.2,
+      "random_forest_net_benefit": 0.031874681980082864,
+      "baseline_net_benefit": 0.03300138111506869,
+      "flat_confidence_net_benefit": 0.032765137748055534,
+      "nars_gated_net_benefit": 0.03298320854837537,
+      "treat_all_net_benefit": -0.1421458166751472,
+      "treat_none_net_benefit": 0.0
+    },
+    {
+      "threshold": 0.25,
+      "random_forest_net_benefit": 0.026483487194398008,
+      "baseline_net_benefit": 0.028131133241258998,
+      "flat_confidence_net_benefit": 0.028034212885561294,
+      "nars_gated_net_benefit": 0.02798575270771244,
+      "treat_all_net_benefit": -0.218288871120157,
+      "treat_none_net_benefit": 0.0
+    },
+    {
+      "threshold": 0.3,
+      "random_forest_net_benefit": 0.02316742645302651,
+      "baseline_net_benefit": 0.024050093978130613,
+      "flat_confidence_net_benefit": 0.024070862625780117,
+      "nars_gated_net_benefit": 0.02401894100665635,
+      "treat_all_net_benefit": -0.30530950477159685,
+      "treat_none_net_benefit": 0.0
+    },
+    {
+      "threshold": 0.35000000000000003,
+      "random_forest_net_benefit": 0.01818374981128488,
+      "baseline_net_benefit": 0.019945090890791255,
+      "flat_confidence_net_benefit": 0.020112837660268057,
+      "nars_gated_net_benefit": 0.020235851957884375,
+      "treat_all_net_benefit": -0.40571792821556585,
+      "treat_none_net_benefit": 0.0
+    },
+    {
+      "threshold": 0.4,
+      "random_forest_net_benefit": 0.01591916842334811,
+      "baseline_net_benefit": 0.01761527464805795,
+      "flat_confidence_net_benefit": 0.017712195003755662,
+      "nars_gated_net_benefit": 0.017809115359453363,
+      "treat_all_net_benefit": -0.5228610889001963,
+      "treat_none_net_benefit": 0.0
+    },
+    {
+      "threshold": 0.45,
+      "random_forest_net_benefit": 0.013844191717274513,
+      "baseline_net_benefit": 0.016692328533572994,
+      "flat_confidence_net_benefit": 0.017168119370634456,
+      "nars_gated_net_benefit": 0.017055779867439388,
+      "treat_all_net_benefit": -0.6613030060729413,
+      "treat_none_net_benefit": 0.0
+    },
+    {
+      "threshold": 0.5,
+      "random_forest_net_benefit": 0.012066584284364322,
+      "baseline_net_benefit": 0.014828814421748927,
+      "flat_confidence_net_benefit": 0.014901504688522207,
+      "nars_gated_net_benefit": 0.014901504688522207,
+      "treat_all_net_benefit": -0.8274333066802355,
+      "treat_none_net_benefit": 0.0
+    },
+    {
+      "threshold": 0.55,
+      "random_forest_net_benefit": 0.009885876281165952,
+      "baseline_net_benefit": 0.01362538667183575,
+      "flat_confidence_net_benefit": 0.01355269640506247,
+      "nars_gated_net_benefit": 0.013512312923521761,
+      "treat_all_net_benefit": -1.0304814518669287,
+      "treat_none_net_benefit": 0.0
+    },
+    {
+      "threshold": 0.6000000000000001,
+      "random_forest_net_benefit": 0.007923239078287417,
+      "baseline_net_benefit": 0.012720796685323834,
+      "flat_confidence_net_benefit": 0.01297521261903031,
+      "nars_gated_net_benefit": 0.01275714181871047,
+      "treat_all_net_benefit": -1.284291633350295,
+      "treat_none_net_benefit": 0.0
+    },
+    {
+      "threshold": 0.6500000000000001,
+      "random_forest_net_benefit": 0.006479818066646588,
+      "baseline_net_benefit": 0.010550473005950214,
+      "flat_confidence_net_benefit": 0.010477782739176933,
+      "nars_gated_net_benefit": 0.010259711938857097,
+      "treat_all_net_benefit": -1.6106190095431947,
+      "treat_none_net_benefit": 0.0
+    },
+    {
+      "threshold": 0.7000000000000001,
+      "random_forest_net_benefit": 0.004652177073489859,
+      "baseline_net_benefit": 0.008068619611833975,
+      "flat_confidence_net_benefit": 0.008141309878607254,
+      "nars_gated_net_benefit": 0.007850548811514138,
+      "treat_all_net_benefit": -2.0457221778003927,
+      "treat_none_net_benefit": 0.0
+    },
+    {
+      "threshold": 0.7500000000000001,
+      "random_forest_net_benefit": 0.0023260885367449285,
+      "baseline_net_benefit": 0.005742531075089043,
+      "flat_confidence_net_benefit": 0.005815221341862322,
+      "nars_gated_net_benefit": 0.005669840808315764,
+      "treat_all_net_benefit": -2.654866613360473,
+      "treat_none_net_benefit": 0.0
+    },
+    {
+      "threshold": 0.8,
+      "random_forest_net_benefit": 0.0013811150686923019,
+      "baseline_net_benefit": 0.004942938140582976,
+      "flat_confidence_net_benefit": 0.005306389474449371,
+      "nars_gated_net_benefit": 0.005088318674129534,
+      "treat_all_net_benefit": -3.56858326670059,
+      "treat_none_net_benefit": 0.0
+    },
+    {
+      "threshold": 0.8500000000000001,
+      "random_forest_net_benefit": 0.001308424801919023,
+      "baseline_net_benefit": 0.002229168181047224,
+      "flat_confidence_net_benefit": 0.002883380582006736,
+      "nars_gated_net_benefit": 0.0025926195149136196,
+      "treat_all_net_benefit": -5.091444355600789,
+      "treat_none_net_benefit": 0.0
+    },
+    {
+      "threshold": 0.9000000000000001,
+      "random_forest_net_benefit": 0.0002907610670931162,
+      "baseline_net_benefit": 7.269026677327906e-05,
+      "flat_confidence_net_benefit": 0.0001453805335465581,
+      "nars_gated_net_benefit": 7.269026677327906e-05,
+      "treat_all_net_benefit": -8.13716653340119,
+      "treat_none_net_benefit": 0.0
+    },
+    {
+      "threshold": 0.9500000000000001,
+      "random_forest_net_benefit": 0.0,
+      "baseline_net_benefit": 0.0,
+      "flat_confidence_net_benefit": 0.0,
+      "nars_gated_net_benefit": 0.0,
+      "treat_all_net_benefit": -17.27433306680238,
+      "treat_none_net_benefit": 0.0
+    }
+  ],
+  "calibration_reliability": [
+    {
+      "mean_predicted_probability": 0.00028343023255813956,
+      "fraction_positives": 0.003633720930232558,
+      "count": 1376,
+      "variant": "random_forest"
+    },
+    {
+      "mean_predicted_probability": 0.003553779069767442,
+      "fraction_positives": 0.002180232558139535,
+      "count": 1376,
+      "variant": "random_forest"
+    },
+    {
+      "mean_predicted_probability": 0.00818,
+      "fraction_positives": 0.008,
+      "count": 1375,
+      "variant": "random_forest"
+    },
+    {
+      "mean_predicted_probability": 0.015421511627906979,
+      "fraction_positives": 0.014534883720930232,
+      "count": 1376,
+      "variant": "random_forest"
+    },
+    {
+      "mean_predicted_probability": 0.024999999999999998,
+      "fraction_positives": 0.018168604651162792,
+      "count": 1376,
+      "variant": "random_forest"
+    },
+    {
+      "mean_predicted_probability": 0.039165454545454545,
+      "fraction_positives": 0.04072727272727273,
+      "count": 1375,
+      "variant": "random_forest"
+    },
+    {
+      "mean_predicted_probability": 0.05950399709302325,
+      "fraction_positives": 0.056686046511627904,
+      "count": 1376,
+      "variant": "random_forest"
+    },
+    {
+      "mean_predicted_probability": 0.09297636363636363,
+      "fraction_positives": 0.0989090909090909,
+      "count": 1375,
+      "variant": "random_forest"
+    },
+    {
+      "mean_predicted_probability": 0.15994731104651164,
+      "fraction_positives": 0.16497093023255813,
+      "count": 1376,
+      "variant": "random_forest"
+    },
+    {
+      "mean_predicted_probability": 0.4091860465116279,
+      "fraction_positives": 0.45494186046511625,
+      "count": 1376,
+      "variant": "random_forest"
+    },
+    {
+      "mean_predicted_probability": 0.004130384537559219,
+      "fraction_positives": 0.002180232558139535,
+      "count": 1376,
+      "variant": "baseline"
+    },
+    {
+      "mean_predicted_probability": 0.006532067114211142,
+      "fraction_positives": 0.002180232558139535,
+      "count": 1376,
+      "variant": "baseline"
+    },
+    {
+      "mean_predicted_probability": 0.010199129268527032,
+      "fraction_positives": 0.007272727272727273,
+      "count": 1375,
+      "variant": "baseline"
+    },
+    {
+      "mean_predicted_probability": 0.01623125915919149,
+      "fraction_positives": 0.014534883720930232,
+      "count": 1376,
+      "variant": "baseline"
+    },
+    {
+      "mean_predicted_probability": 0.025669660401628026,
+      "fraction_positives": 0.02252906976744186,
+      "count": 1376,
+      "variant": "baseline"
+    },
+    {
+      "mean_predicted_probability": 0.04011747369170189,
+      "fraction_positives": 0.03490909090909091,
+      "count": 1375,
+      "variant": "baseline"
+    },
+    {
+      "mean_predicted_probability": 0.06200001625409133,
+      "fraction_positives": 0.061046511627906974,
+      "count": 1376,
+      "variant": "baseline"
+    },
+    {
+      "mean_predicted_probability": 0.10155784034729004,
+      "fraction_positives": 0.08872727272727272,
+      "count": 1375,
+      "variant": "baseline"
+    },
+    {
+      "mean_predicted_probability": 0.18639599419263905,
+      "fraction_positives": 0.16569767441860464,
+      "count": 1376,
+      "variant": "baseline"
+    },
+    {
+      "mean_predicted_probability": 0.4848695307493556,
+      "fraction_positives": 0.4636627906976744,
+      "count": 1376,
+      "variant": "baseline"
+    },
+    {
+      "mean_predicted_probability": 0.0039625210224419035,
+      "fraction_positives": 0.002180232558139535,
+      "count": 1376,
+      "variant": "flat_confidence"
+    },
+    {
+      "mean_predicted_probability": 0.006135210332438906,
+      "fraction_positives": 0.002180232558139535,
+      "count": 1376,
+      "variant": "flat_confidence"
+    },
+    {
+      "mean_predicted_probability": 0.009515292651192343,
+      "fraction_positives": 0.008,
+      "count": 1375,
+      "variant": "flat_confidence"
+    },
+    {
+      "mean_predicted_probability": 0.015243267528023154,
+      "fraction_positives": 0.013808139534883721,
+      "count": 1376,
+      "variant": "flat_confidence"
+    },
+    {
+      "mean_predicted_probability": 0.024440405049751167,
+      "fraction_positives": 0.023255813953488372,
+      "count": 1376,
+      "variant": "flat_confidence"
+    },
+    {
+      "mean_predicted_probability": 0.03870682464071196,
+      "fraction_positives": 0.03563636363636364,
+      "count": 1375,
+      "variant": "flat_confidence"
+    },
+    {
+      "mean_predicted_probability": 0.060322949798062166,
+      "fraction_positives": 0.059593023255813955,
+      "count": 1376,
+      "variant": "flat_confidence"
+    },
+    {
+      "mean_predicted_probability": 0.0993259855029359,
+      "fraction_positives": 0.088,
+      "count": 1375,
+      "variant": "flat_confidence"
+    },
+    {
+      "mean_predicted_probability": 0.18348342526148143,
+      "fraction_positives": 0.16787790697674418,
+      "count": 1376,
+      "variant": "flat_confidence"
+    },
+    {
+      "mean_predicted_probability": 0.4834187393153352,
+      "fraction_positives": 0.4622093023255814,
+      "count": 1376,
+      "variant": "flat_confidence"
+    },
+    {
+      "mean_predicted_probability": 0.0040426919506978045,
+      "fraction_positives": 0.002180232558139535,
+      "count": 1376,
+      "variant": "nars_gated"
+    },
+    {
+      "mean_predicted_probability": 0.006246268559562921,
+      "fraction_positives": 0.002180232558139535,
+      "count": 1376,
+      "variant": "nars_gated"
+    },
+    {
+      "mean_predicted_probability": 0.009634233012685284,
+      "fraction_positives": 0.008,
+      "count": 1375,
+      "variant": "nars_gated"
+    },
+    {
+      "mean_predicted_probability": 0.015325289354568068,
+      "fraction_positives": 0.013808139534883721,
+      "count": 1376,
+      "variant": "nars_gated"
+    },
+    {
+      "mean_predicted_probability": 0.024432716512909267,
+      "fraction_positives": 0.02252906976744186,
+      "count": 1376,
+      "variant": "nars_gated"
+    },
+    {
+      "mean_predicted_probability": 0.03858095400500199,
+      "fraction_positives": 0.03709090909090909,
+      "count": 1375,
+      "variant": "nars_gated"
+    },
+    {
+      "mean_predicted_probability": 0.06007589032486134,
+      "fraction_positives": 0.059593023255813955,
+      "count": 1376,
+      "variant": "nars_gated"
+    },
+    {
+      "mean_predicted_probability": 0.09888315066375836,
+      "fraction_positives": 0.08872727272727272,
+      "count": 1375,
+      "variant": "nars_gated"
+    },
+    {
+      "mean_predicted_probability": 0.18262194428486567,
+      "fraction_positives": 0.16569767441860464,
+      "count": 1376,
+      "variant": "nars_gated"
+    },
+    {
+      "mean_predicted_probability": 0.4812271622943816,
+      "fraction_positives": 0.4629360465116279,
+      "count": 1376,
+      "variant": "nars_gated"
+    }
+  ],
+  "artifacts": {
+    "root": "results\\wids",
+    "metrics_csv": "results\\wids\\metrics\\metrics.csv",
+    "training_history_csv": "results\\wids\\metrics\\training_history.csv",
+    "gamma_ablation_csv": "results\\wids\\metrics\\gamma_ablation.csv",
+    "decision_curve_csv": "results\\wids\\metrics\\decision_curve.csv",
+    "calibration_reliability_csv": "results\\wids\\metrics\\calibration_reliability.csv",
+    "trace_csv": "results\\wids\\traces\\test_predictions.csv",
+    "roc_curve": "results\\wids\\charts\\roc_curve.png",
+    "calibration_curve": "results\\wids\\charts\\calibration_curve.png",
+    "training_history_plot": "results\\wids\\charts\\training_history.png",
+    "gamma_ablation_plot": "results\\wids\\charts\\gamma_ablation_auc.png",
+    "decision_curve_plot": "results\\wids\\charts\\decision_curve.png",
+    "preprocessing_metadata_json": "results\\wids\\traces\\preprocessing_metadata.json",
+    "split_summary_json": "results\\wids\\traces\\split_summary.json"
+  }
+}

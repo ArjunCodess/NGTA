@@ -1,0 +1,49 @@
+{
+  "target_column": "hospital_death",
+  "id_column": "encounter_id",
+  "numeric_columns": [
+    "age",
+    "bmi",
+    "d1_heartrate_max",
+    "d1_sysbp_min",
+    "d1_temp_max",
+    "d1_lactate_max",
+    "d1_bun_max",
+    "d1_creatinine_max",
+    "d1_glucose_max",
+    "d1_wbc_max",
+    "d1_spo2_min",
+    "d1_platelets_min",
+    "apache_4a_hospital_death_prob"
+  ],
+  "binary_columns": [
+    "elective_surgery"
+  ],
+  "categorical_columns": [
+    "gender"
+  ],
+  "rule_names": [
+    "rule_lactate",
+    "rule_hypotension",
+    "rule_age",
+    "rule_creatinine"
+  ],
+  "output_feature_names": [
+    "age",
+    "bmi",
+    "d1_heartrate_max",
+    "d1_sysbp_min",
+    "d1_temp_max",
+    "d1_lactate_max",
+    "d1_bun_max",
+    "d1_creatinine_max",
+    "d1_glucose_max",
+    "d1_wbc_max",
+    "d1_spo2_min",
+    "d1_platelets_min",
+    "apache_4a_hospital_death_prob",
+    "elective_surgery",
+    "gender_F",
+    "gender_M"
+  ]
+}
