@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import argparse
 import json
+from dataclasses import replace
+from pathlib import Path
 
 import numpy as np
 import torch
@@ -48,15 +50,21 @@ def _run_self_checks() -> None:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Run the NGTA TCGA-THCA multi-modal lymph node metastasis pipeline.",
+        description="Run the NGTA dual-dataset neurosymbolic tabular pipeline.",
     )
-    parser.add_argument("--run-all", action="store_true", help="Run the full training and evaluation pipeline.")
+    parser.add_argument("--run-all", action="store_true", help="Run the full TCGA and WiDS pipelines sequentially.")
+    parser.add_argument(
+        "--dataset",
+        default="tcga",
+        choices=("tcga", "wids"),
+        help="Dataset to run when --run-all is not specified.",
+    )
     parser.add_argument(
         "--data-dir",
         default="data",
-        help="Directory containing the TCGA clinical TSV tables and the somatic mutation MAF file.",
+        help="Directory containing the TCGA source tables/MAF files and the WiDS CSV file.",
     )
-    parser.add_argument("--output-dir", default=".", help="Base directory for charts and results.")
+    parser.add_argument("--output-dir", default="results", help="Base directory for all generated result artifacts.")
     parser.add_argument("--epochs", type=int, default=60, help="Maximum number of training epochs.")
     parser.add_argument("--batch-size", type=int, default=32, help="Batch size for training and evaluation.")
     parser.add_argument("--mc-samples", type=int, default=50, help="Number of MC dropout inference passes.")
@@ -79,6 +87,7 @@ def main() -> None:
     config = PipelineConfig(
         data_dir=args.data_dir,
         output_dir=args.output_dir,
+        dataset=args.dataset,
         epochs=args.epochs,
         batch_size=args.batch_size,
         learning_rate=args.learning_rate,
@@ -92,7 +101,19 @@ def main() -> None:
         num_layers=args.num_layers,
         dropout=args.dropout,
     )
-    summary = run_pipeline(config)
+    if args.run_all:
+        summaries: dict[str, dict] = {}
+        for dataset in ("tcga", "wids"):
+            print(f"Running dataset pipeline: {dataset}")
+            summaries[dataset] = run_pipeline(replace(config, dataset=dataset))
+        summary = {
+            "mode": "run_all",
+            "datasets": summaries,
+        }
+        summary_path = Path(args.output_dir) / "run_all_summary.json"
+        summary_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    else:
+        summary = run_pipeline(config)
     print(json.dumps(summary, indent=2))
 
 
