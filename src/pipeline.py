@@ -20,16 +20,42 @@ from .data_loader import DEFAULT_ID_COLUMN, DEFAULT_TARGET_COLUMN, load_data_bun
 from .knowledge_base import SYMBOLIC_RULES, build_symbolic_truth_matrices
 from .nars_interface import neural_to_nars
 from .neural_encoder import TabularTransformerClassifier
+from .wids_knowledge_base import WIDS_SYMBOLIC_RULES, build_wids_symbolic_truth_matrices
+from .wids_loader import WIDS_ID_COLUMN, WIDS_TARGET_COLUMN, load_wids_data_bundle
 
 GAMMA_ABLATION_VALUES = (0.25, 0.5, 1.0, 2.0, 4.0)
-POSITIVE_CLASS_LABEL = "Lymph Node Metastasis"
 TREE_BASELINE_LABEL = "random_forest"
+DATASET_METADATA: dict[str, dict[str, Any]] = {
+    "tcga": {
+        "display_name": "TCGA-THCA",
+        "positive_class": "Lymph Node Metastasis",
+        "id_column": DEFAULT_ID_COLUMN,
+        "target_column": DEFAULT_TARGET_COLUMN,
+        "loader": load_data_bundle,
+        "symbolic_rules": SYMBOLIC_RULES,
+        "symbolic_builder": "tcga",
+        "batch_size": None,
+        "source_description": "TCGA clinical TSV tables and somatic mutation MAF file(s).",
+    },
+    "wids": {
+        "display_name": "WiDS ICU 2020",
+        "positive_class": "Hospital Mortality",
+        "id_column": WIDS_ID_COLUMN,
+        "target_column": WIDS_TARGET_COLUMN,
+        "loader": load_wids_data_bundle,
+        "symbolic_rules": WIDS_SYMBOLIC_RULES,
+        "symbolic_builder": "wids",
+        "batch_size": 512,
+        "source_description": "WiDS ICU CSV file.",
+    },
+}
 
 
 @dataclass
 class PipelineConfig:
     data_dir: str = "data"
-    output_dir: str = "."
+    output_dir: str = "results"
+    dataset: str = "tcga"
     epochs: int = 60
     batch_size: int = 32
     learning_rate: float = 1e-3
@@ -52,20 +78,29 @@ def set_seed(seed: int) -> None:
         torch.cuda.manual_seed_all(seed)
 
 
-def _ensure_output_directories(base_dir: str | Path) -> dict[str, Path]:
-    root = Path(base_dir)
+def _get_dataset_metadata(dataset: str) -> dict[str, Any]:
+    try:
+        return DATASET_METADATA[dataset]
+    except KeyError as exc:
+        raise ValueError(f"Unsupported dataset: {dataset}") from exc
+
+
+def _ensure_output_directories(base_dir: str | Path, dataset: str) -> dict[str, Path]:
+    root = Path(base_dir) / dataset
     charts_dir = root / "charts"
-    metrics_dir = root / "results" / "metrics"
-    traces_dir = root / "results" / "traces"
+    metrics_dir = root / "metrics"
+    traces_dir = root / "traces"
     charts_dir.mkdir(parents=True, exist_ok=True)
     metrics_dir.mkdir(parents=True, exist_ok=True)
     traces_dir.mkdir(parents=True, exist_ok=True)
-    return {
-        "root": root,
-        "charts": charts_dir,
-        "metrics": metrics_dir,
-        "traces": traces_dir,
-    }
+    return {"root": root, "charts": charts_dir, "metrics": metrics_dir, "traces": traces_dir}
+
+
+def _get_encoded_split(bundle, split_name: str):
+    encoded = getattr(bundle, f"encoded_{split_name}", None)
+    if encoded is not None:
+        return encoded
+    return bundle.preprocessor.transform(getattr(bundle, f"{split_name}_frame"))
 
 
 def _evaluate_loss(
@@ -78,7 +113,6 @@ def _evaluate_loss(
     losses = []
     probabilities = []
     labels = []
-
     with torch.no_grad():
         for features, target in loader:
             features = features.to(device)
@@ -88,21 +122,11 @@ def _evaluate_loss(
             losses.append(float(loss.item()))
             probabilities.append(torch.sigmoid(output.logits).cpu().numpy())
             labels.append(target.cpu().numpy())
-
     return float(np.mean(losses)), np.concatenate(probabilities), np.concatenate(labels)
 
 
-def _train_model(
-    model: TabularTransformerClassifier,
-    bundle,
-    config: PipelineConfig,
-    device: torch.device,
-) -> pd.DataFrame:
-    optimizer = torch.optim.AdamW(
-        model.parameters(),
-        lr=config.learning_rate,
-        weight_decay=config.weight_decay,
-    )
+def _train_model(model: TabularTransformerClassifier, bundle, config: PipelineConfig, device: torch.device) -> pd.DataFrame:
+    optimizer = torch.optim.AdamW(model.parameters(), lr=config.learning_rate, weight_decay=config.weight_decay)
     criterion = nn.BCEWithLogitsLoss()
     best_state = copy.deepcopy(model.state_dict())
     best_val_loss = float("inf")
@@ -115,7 +139,6 @@ def _train_model(
         for features, target in bundle.train_loader:
             features = features.to(device)
             target = target.to(device)
-
             optimizer.zero_grad(set_to_none=True)
             output = model(features)
             loss = criterion(output.logits, target)
@@ -123,17 +146,11 @@ def _train_model(
             optimizer.step()
             train_losses.append(float(loss.item()))
 
-        val_loss, val_probabilities, val_labels = _evaluate_loss(
-            model,
-            bundle.val_loader,
-            device,
-            criterion,
-        )
+        val_loss, val_probabilities, val_labels = _evaluate_loss(model, bundle.val_loader, device, criterion)
         try:
             val_auc = float(roc_auc_score(val_labels, val_probabilities))
         except ValueError:
             val_auc = float("nan")
-
         history.append(
             {
                 "epoch": epoch,
@@ -142,7 +159,6 @@ def _train_model(
                 "val_auc": val_auc,
             }
         )
-
         if val_loss < best_val_loss - 1e-4:
             best_val_loss = val_loss
             best_state = copy.deepcopy(model.state_dict())
@@ -161,6 +177,31 @@ def _sigmoid(values: np.ndarray) -> np.ndarray:
     return 1.0 / (1.0 + np.exp(-values))
 
 
+def _build_reliability_frame(y_true: np.ndarray, probabilities: np.ndarray, n_bins: int = 10) -> pd.DataFrame:
+    frame = pd.DataFrame(
+        {"probability": np.asarray(probabilities, dtype=np.float64), "label": np.asarray(y_true, dtype=np.float64)}
+    ).sort_values("probability", kind="mergesort").reset_index(drop=True)
+    frame["bin"] = pd.qcut(frame.index, q=n_bins, labels=False, duplicates="drop")
+    return (
+        frame.groupby("bin", observed=True)
+        .agg(
+            mean_predicted_probability=("probability", "mean"),
+            fraction_positives=("label", "mean"),
+            count=("label", "size"),
+        )
+        .reset_index(drop=True)
+    )
+
+
+def _compute_ece(reliability_frame: pd.DataFrame) -> float:
+    total = float(reliability_frame["count"].sum())
+    weighted_error = (
+        (reliability_frame["count"] / total)
+        * np.abs(reliability_frame["fraction_positives"] - reliability_frame["mean_predicted_probability"])
+    ).sum()
+    return float(weighted_error)
+
+
 def _compute_metrics(y_true: np.ndarray, probabilities: np.ndarray) -> dict[str, float]:
     clipped_probabilities = np.clip(probabilities, 1e-6, 1.0 - 1e-6)
     predictions = (clipped_probabilities >= 0.5).astype(int)
@@ -171,39 +212,6 @@ def _compute_metrics(y_true: np.ndarray, probabilities: np.ndarray) -> dict[str,
         "accuracy": float(accuracy_score(y_true, predictions)),
         "ece": _compute_ece(reliability),
     }
-
-
-def _build_reliability_frame(
-    y_true: np.ndarray,
-    probabilities: np.ndarray,
-    n_bins: int = 10,
-) -> pd.DataFrame:
-    frame = pd.DataFrame(
-        {
-            "probability": np.asarray(probabilities, dtype=np.float64),
-            "label": np.asarray(y_true, dtype=np.float64),
-        }
-    ).sort_values("probability", kind="mergesort").reset_index(drop=True)
-    frame["bin"] = pd.qcut(frame.index, q=n_bins, labels=False, duplicates="drop")
-    reliability = (
-        frame.groupby("bin", observed=True)
-        .agg(
-            mean_predicted_probability=("probability", "mean"),
-            fraction_positives=("label", "mean"),
-            count=("label", "size"),
-        )
-        .reset_index(drop=True)
-    )
-    return reliability
-
-
-def _compute_ece(reliability_frame: pd.DataFrame) -> float:
-    total = float(reliability_frame["count"].sum())
-    weighted_error = (
-        (reliability_frame["count"] / total)
-        * np.abs(reliability_frame["fraction_positives"] - reliability_frame["mean_predicted_probability"])
-    ).sum()
-    return float(weighted_error)
 
 
 def _bootstrap_auc_intervals(
@@ -278,9 +286,9 @@ def _bootstrap_auc_intervals(
 
 
 def _train_tree_baseline(bundle, config: PipelineConfig) -> dict[str, Any]:
-    encoded_train = bundle.preprocessor.transform(bundle.train_frame)
-    encoded_val = bundle.preprocessor.transform(bundle.val_frame)
-    encoded_test = bundle.preprocessor.transform(bundle.test_frame)
+    encoded_train = _get_encoded_split(bundle, "train")
+    encoded_val = _get_encoded_split(bundle, "val")
+    encoded_test = _get_encoded_split(bundle, "test")
 
     x_train = encoded_train.features
     y_train = encoded_train.target.astype(int)
@@ -343,6 +351,7 @@ def _save_roc_plot(
     flat_probabilities: np.ndarray,
     gated_probabilities: np.ndarray,
     output_path: Path,
+    positive_class_label: str,
 ) -> None:
     tree_fpr, tree_tpr, _ = roc_curve(y_true, tree_probabilities)
     baseline_fpr, baseline_tpr, _ = roc_curve(y_true, baseline_probabilities)
@@ -355,9 +364,9 @@ def _save_roc_plot(
     plt.plot(flat_fpr, flat_tpr, label="Flat-confidence")
     plt.plot(gated_fpr, gated_tpr, label="NARS-gated")
     plt.plot([0, 1], [0, 1], linestyle="--", color="gray", linewidth=1)
-    plt.xlabel(f"False Positive Rate ({POSITIVE_CLASS_LABEL})")
-    plt.ylabel(f"True Positive Rate ({POSITIVE_CLASS_LABEL})")
-    plt.title(f"ROC Curve: {POSITIVE_CLASS_LABEL}")
+    plt.xlabel(f"False Positive Rate ({positive_class_label})")
+    plt.ylabel(f"True Positive Rate ({positive_class_label})")
+    plt.title(f"ROC Curve: {positive_class_label}")
     plt.legend()
     plt.tight_layout()
     plt.savefig(output_path, dpi=200)
@@ -371,6 +380,7 @@ def _save_calibration_plot(
     flat_probabilities: np.ndarray,
     gated_probabilities: np.ndarray,
     output_path: Path,
+    positive_class_label: str,
 ) -> None:
     plt.figure(figsize=(7, 5))
     for label, probabilities in (
@@ -387,29 +397,29 @@ def _save_calibration_plot(
             label=label,
         )
     plt.plot([0, 1], [0, 1], linestyle="--", color="gray", linewidth=1)
-    plt.xlabel(f"Mean Predicted Probability ({POSITIVE_CLASS_LABEL})")
-    plt.ylabel(f"Observed Frequency ({POSITIVE_CLASS_LABEL})")
-    plt.title(f"Calibration Reliability Diagram: {POSITIVE_CLASS_LABEL}")
+    plt.xlabel(f"Mean Predicted Probability ({positive_class_label})")
+    plt.ylabel(f"Observed Frequency ({positive_class_label})")
+    plt.title(f"Calibration Reliability Diagram: {positive_class_label}")
     plt.legend()
     plt.tight_layout()
     plt.savefig(output_path, dpi=200)
     plt.close()
 
 
-def _save_training_plot(history: pd.DataFrame, output_path: Path) -> None:
+def _save_training_plot(history: pd.DataFrame, output_path: Path, dataset_name: str) -> None:
     plt.figure(figsize=(7, 5))
     plt.plot(history["epoch"], history["train_loss"], label="Train Loss")
     plt.plot(history["epoch"], history["val_loss"], label="Validation Loss")
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
-    plt.title("Training History")
+    plt.title(f"Training History: {dataset_name}")
     plt.legend()
     plt.tight_layout()
     plt.savefig(output_path, dpi=200)
     plt.close()
 
 
-def _save_gamma_ablation_plot(ablation_frame: pd.DataFrame, output_path: Path) -> None:
+def _save_gamma_ablation_plot(ablation_frame: pd.DataFrame, output_path: Path, positive_class_label: str) -> None:
     plt.figure(figsize=(7, 5))
     plt.plot(ablation_frame["gamma"], ablation_frame["baseline_auc"], marker="o", label="Baseline AUC")
     plt.plot(ablation_frame["gamma"], ablation_frame["nars_gated_auc"], marker="o", label="NARS-gated AUC")
@@ -417,7 +427,7 @@ def _save_gamma_ablation_plot(ablation_frame: pd.DataFrame, output_path: Path) -
     plt.xticks(ablation_frame["gamma"], [str(gamma) for gamma in ablation_frame["gamma"]])
     plt.xlabel("Gamma")
     plt.ylabel("AUC")
-    plt.title(f"Gamma Ablation: {POSITIVE_CLASS_LABEL}")
+    plt.title(f"Gamma Ablation: {positive_class_label}")
     plt.legend()
     plt.tight_layout()
     plt.savefig(output_path, dpi=200)
@@ -443,7 +453,6 @@ def _build_decision_curve_frame(
     thresholds = np.arange(0.05, 1.0, 0.05, dtype=np.float64)
     prevalence = float(np.mean(y_true))
     rows: list[dict[str, float]] = []
-
     for threshold in thresholds:
         treat_all_net_benefit = prevalence - (1.0 - prevalence) * (threshold / (1.0 - threshold))
         rows.append(
@@ -457,51 +466,20 @@ def _build_decision_curve_frame(
                 "treat_none_net_benefit": 0.0,
             }
         )
-
     return pd.DataFrame(rows)
 
 
-def _save_decision_curve_plot(decision_curve_frame: pd.DataFrame, output_path: Path) -> None:
+def _save_decision_curve_plot(decision_curve_frame: pd.DataFrame, output_path: Path, positive_class_label: str) -> None:
     plt.figure(figsize=(7, 5))
-    plt.plot(
-        decision_curve_frame["threshold"],
-        decision_curve_frame["random_forest_net_benefit"],
-        marker="o",
-        label="Random forest",
-    )
-    plt.plot(
-        decision_curve_frame["threshold"],
-        decision_curve_frame["baseline_net_benefit"],
-        marker="o",
-        label="Baseline transformer",
-    )
-    plt.plot(
-        decision_curve_frame["threshold"],
-        decision_curve_frame["flat_confidence_net_benefit"],
-        marker="o",
-        label="Flat-confidence transformer",
-    )
-    plt.plot(
-        decision_curve_frame["threshold"],
-        decision_curve_frame["nars_gated_net_benefit"],
-        marker="o",
-        label="NARS-gated transformer",
-    )
-    plt.plot(
-        decision_curve_frame["threshold"],
-        decision_curve_frame["treat_all_net_benefit"],
-        linestyle="--",
-        label="Treat all",
-    )
-    plt.plot(
-        decision_curve_frame["threshold"],
-        decision_curve_frame["treat_none_net_benefit"],
-        linestyle=":",
-        label="Treat none",
-    )
-    plt.xlabel(f"Threshold Probability ({POSITIVE_CLASS_LABEL})")
+    plt.plot(decision_curve_frame["threshold"], decision_curve_frame["random_forest_net_benefit"], marker="o", label="Random forest")
+    plt.plot(decision_curve_frame["threshold"], decision_curve_frame["baseline_net_benefit"], marker="o", label="Baseline transformer")
+    plt.plot(decision_curve_frame["threshold"], decision_curve_frame["flat_confidence_net_benefit"], marker="o", label="Flat-confidence transformer")
+    plt.plot(decision_curve_frame["threshold"], decision_curve_frame["nars_gated_net_benefit"], marker="o", label="NARS-gated transformer")
+    plt.plot(decision_curve_frame["threshold"], decision_curve_frame["treat_all_net_benefit"], linestyle="--", label="Treat all")
+    plt.plot(decision_curve_frame["threshold"], decision_curve_frame["treat_none_net_benefit"], linestyle=":", label="Treat none")
+    plt.xlabel(f"Threshold Probability ({positive_class_label})")
     plt.ylabel("Net Benefit")
-    plt.title(f"Decision Curve Analysis: {POSITIVE_CLASS_LABEL}")
+    plt.title(f"Decision Curve Analysis: {positive_class_label}")
     plt.legend()
     plt.tight_layout()
     plt.savefig(output_path, dpi=200)
@@ -523,9 +501,11 @@ def _build_trace_frame(
     gated_probabilities: np.ndarray,
     symbolic_rule_counts: np.ndarray,
     symbolic_any_rule_triggered: np.ndarray,
+    id_column: str,
+    target_column: str,
 ) -> pd.DataFrame:
-    trace_frame = bundle.test_frame[[DEFAULT_ID_COLUMN, DEFAULT_TARGET_COLUMN]].reset_index(drop=True).copy()
-    trace_frame = trace_frame.rename(columns={DEFAULT_TARGET_COLUMN: "target"})
+    trace_frame = bundle.test_frame[[id_column, target_column]].reset_index(drop=True).copy()
+    trace_frame = trace_frame.rename(columns={target_column: "target"})
     base_columns = pd.DataFrame(
         {
             "baseline_probability": probabilities_mean,
@@ -540,7 +520,6 @@ def _build_trace_frame(
             "attention_reliability": (gated_attention * revised_feature_confidence).sum(axis=1),
         }
     )
-
     feature_columns: dict[str, np.ndarray] = {}
     for index, feature_name in enumerate(bundle.preprocessor.feature_names):
         safe_feature_name = feature_name.replace(" ", "_")
@@ -550,7 +529,6 @@ def _build_trace_frame(
         feature_columns[f"revised_attention_confidence__{safe_feature_name}"] = revised_feature_confidence[:, index]
         feature_columns[f"gated_attention__{safe_feature_name}"] = gated_attention[:, index]
         feature_columns[f"token_score__{safe_feature_name}"] = token_score_mean[:, index]
-
     return pd.concat([trace_frame, base_columns, pd.DataFrame(feature_columns)], axis=1)
 
 
@@ -564,13 +542,8 @@ def _build_gamma_ablation_frame(
 ) -> pd.DataFrame:
     baseline_metrics = _compute_metrics(y_true, baseline_probabilities)
     rows: list[dict[str, float]] = []
-
     for gamma in GAMMA_ABLATION_VALUES:
-        gated_attention = apply_confidence_gate(
-            attention_mean,
-            feature_confidence,
-            gamma=gamma,
-        )
+        gated_attention = apply_confidence_gate(attention_mean, feature_confidence, gamma=gamma)
         gated_logits = cls_logit_mean + np.sum(gated_attention * token_score_mean, axis=1)
         gated_probabilities = _sigmoid(gated_logits)
         gated_metrics = _compute_metrics(y_true, gated_probabilities)
@@ -588,30 +561,39 @@ def _build_gamma_ablation_frame(
                 "accuracy_delta_gated_minus_baseline": gated_metrics["accuracy"] - baseline_metrics["accuracy"],
             }
         )
-
     return pd.DataFrame(rows)
 
 
+def _resolve_symbolic_knowledge(bundle, config: PipelineConfig):
+    dataset_metadata = _get_dataset_metadata(config.dataset)
+    if dataset_metadata["symbolic_builder"] == "tcga":
+        return build_symbolic_truth_matrices(bundle.test_frame, bundle.preprocessor.feature_names)
+    encoded_test = _get_encoded_split(bundle, "test")
+    print("WiDS ICU rule trigger counts on the test set:")
+    for rule_name, count in zip(bundle.preprocessor.rule_names, encoded_test.rule_triggers.sum(axis=0).astype(int)):
+        print(f"  {rule_name}: {int(count)}")
+    return build_wids_symbolic_truth_matrices(
+        encoded_test.rule_triggers,
+        bundle.preprocessor.feature_names,
+        rule_names=bundle.preprocessor.rule_names,
+    )
+
+
 def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
-    set_seed(config.seed)
-    output_dirs = _ensure_output_directories(config.output_dir)
-    bundle = load_data_bundle(
-        data_dir=config.data_dir,
-        batch_size=config.batch_size,
-        seed=config.seed,
-    )
+    dataset_metadata = _get_dataset_metadata(config.dataset)
+    effective_batch_size = int(dataset_metadata["batch_size"] or config.batch_size)
+    effective_config = PipelineConfig(**{**asdict(config), "batch_size": effective_batch_size})
+
+    set_seed(effective_config.seed)
+    output_dirs = _ensure_output_directories(effective_config.output_dir, effective_config.dataset)
+    bundle = dataset_metadata["loader"](data_dir=effective_config.data_dir, batch_size=effective_config.batch_size, seed=effective_config.seed)
     bundle.preprocessor.save(output_dirs["traces"] / "preprocessing_metadata.json")
-    (output_dirs["traces"] / "split_summary.json").write_text(
-        json.dumps(bundle.split_summary, indent=2),
-        encoding="utf-8",
-    )
+    (output_dirs["traces"] / "split_summary.json").write_text(json.dumps(bundle.split_summary, indent=2), encoding="utf-8")
+
     print(
-        "Loaded multi-modal dataset: "
+        f"Loaded {dataset_metadata['display_name']} dataset: "
         f"{bundle.split_summary['labeled_case_rows']} labeled cases, "
-        f"{bundle.split_summary['input_dim']} total input features "
-        f"({len(bundle.preprocessor.numeric_columns)} scaled clinical numeric + "
-        f"{len(bundle.preprocessor.binary_columns)} genomic binary + "
-        f"{len(bundle.preprocessor.feature_names) - len(bundle.preprocessor.numeric_columns) - len(bundle.preprocessor.binary_columns)} encoded categorical)."
+        f"{bundle.split_summary['input_dim']} total input features."
     )
     print(
         "Split sizes: "
@@ -619,34 +601,26 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         f"val={bundle.split_summary['val_rows']}, "
         f"test={bundle.split_summary['test_rows']}."
     )
+    if effective_config.batch_size != config.batch_size:
+        print(f"Using dataset-specific batch size override: {effective_config.batch_size}")
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = TabularTransformerClassifier(
         input_dim=bundle.preprocessor.input_dim,
-        d_model=config.d_model,
-        nhead=config.num_heads,
-        num_layers=config.num_layers,
-        dropout=config.dropout,
+        d_model=effective_config.d_model,
+        nhead=effective_config.num_heads,
+        num_layers=effective_config.num_layers,
+        dropout=effective_config.dropout,
     ).to(device)
 
-    history = _train_model(model=model, bundle=bundle, config=config, device=device)
+    history = _train_model(model=model, bundle=bundle, config=effective_config, device=device)
     history.to_csv(output_dirs["metrics"] / "training_history.csv", index=False)
-    _save_training_plot(history, output_dirs["charts"] / "training_history.png")
-    tree_baseline = _train_tree_baseline(bundle=bundle, config=config)
+    _save_training_plot(history, output_dirs["charts"] / "training_history.png", dataset_metadata["display_name"])
+    tree_baseline = _train_tree_baseline(bundle=bundle, config=effective_config)
 
-    summary = model.predict_with_mc_dropout(
-        loader=bundle.test_loader,
-        device=device,
-        mc_samples=config.mc_samples,
-    )
-    symbolic_knowledge = build_symbolic_truth_matrices(
-        bundle.test_frame,
-        bundle.preprocessor.feature_names,
-    )
-    neural_frequency, neural_confidence = neural_to_nars(
-        summary.probabilities_mean,
-        summary.probabilities_var,
-    )
+    summary = model.predict_with_mc_dropout(loader=bundle.test_loader, device=device, mc_samples=effective_config.mc_samples)
+    symbolic_knowledge = _resolve_symbolic_knowledge(bundle, effective_config)
+    neural_frequency, neural_confidence = neural_to_nars(summary.probabilities_mean, summary.probabilities_var)
     attention_truths = revise_attention_truths(
         summary.attention_mean,
         summary.attention_var,
@@ -654,40 +628,25 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         symbolic_confidence=symbolic_knowledge.symbolic_confidence,
         symbolic_trigger_mask=symbolic_knowledge.symbolic_trigger_mask,
     )
-    gated_attention = apply_confidence_gate(
-        summary.attention_mean,
-        attention_truths.revised_confidence,
-        gamma=config.gamma,
-    )
-    flat_feature_confidence = np.full_like(attention_truths.revised_confidence, 0.5, dtype=np.float64)
+    gated_attention = apply_confidence_gate(summary.attention_mean, attention_truths.revised_confidence, gamma=effective_config.gamma)
     flat_attention = apply_confidence_gate(
         summary.attention_mean,
-        flat_feature_confidence,
-        gamma=config.gamma,
+        np.full_like(attention_truths.revised_confidence, 0.5, dtype=np.float64),
+        gamma=effective_config.gamma,
     )
-    flat_logits = summary.cls_logit_mean + np.sum(
-        flat_attention * summary.token_score_mean,
-        axis=1,
-    )
+    flat_logits = summary.cls_logit_mean + np.sum(flat_attention * summary.token_score_mean, axis=1)
     flat_probabilities = _sigmoid(flat_logits)
-    gated_logits = summary.cls_logit_mean + np.sum(
-        gated_attention * summary.token_score_mean,
-        axis=1,
-    )
+    gated_logits = summary.cls_logit_mean + np.sum(gated_attention * summary.token_score_mean, axis=1)
     gated_probabilities = _sigmoid(gated_logits)
 
     y_true = summary.labels.astype(int)
     tree_probabilities = tree_baseline["test_probabilities"]
-    tree_reliability = _build_reliability_frame(y_true, tree_probabilities, n_bins=10)
-    baseline_reliability = _build_reliability_frame(y_true, summary.probabilities_mean, n_bins=10)
-    flat_reliability = _build_reliability_frame(y_true, flat_probabilities, n_bins=10)
-    gated_reliability = _build_reliability_frame(y_true, gated_probabilities, n_bins=10)
     reliability_frame = pd.concat(
         [
-            tree_reliability.assign(variant=TREE_BASELINE_LABEL),
-            baseline_reliability.assign(variant="baseline"),
-            flat_reliability.assign(variant="flat_confidence"),
-            gated_reliability.assign(variant="nars_gated"),
+            _build_reliability_frame(y_true, tree_probabilities, n_bins=10).assign(variant=TREE_BASELINE_LABEL),
+            _build_reliability_frame(y_true, summary.probabilities_mean, n_bins=10).assign(variant="baseline"),
+            _build_reliability_frame(y_true, flat_probabilities, n_bins=10).assign(variant="flat_confidence"),
+            _build_reliability_frame(y_true, gated_probabilities, n_bins=10).assign(variant="nars_gated"),
         ],
         ignore_index=True,
     )
@@ -700,7 +659,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
             "nars_gated": gated_probabilities,
         },
         iterations=1000,
-        seed=config.seed,
+        seed=effective_config.seed,
     )
     metrics_frame = pd.DataFrame(
         [
@@ -748,6 +707,8 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         gated_probabilities=gated_probabilities,
         symbolic_rule_counts=symbolic_knowledge.patient_rule_counts,
         symbolic_any_rule_triggered=symbolic_knowledge.patient_any_rule_triggered,
+        id_column=dataset_metadata["id_column"],
+        target_column=dataset_metadata["target_column"],
     )
     trace_frame.to_csv(output_dirs["traces"] / "test_predictions.csv", index=False)
 
@@ -760,7 +721,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         token_score_mean=summary.token_score_mean,
     )
     gamma_ablation_frame.to_csv(output_dirs["metrics"] / "gamma_ablation.csv", index=False)
-    _save_gamma_ablation_plot(gamma_ablation_frame, output_dirs["charts"] / "gamma_ablation_auc.png")
+    _save_gamma_ablation_plot(gamma_ablation_frame, output_dirs["charts"] / "gamma_ablation_auc.png", dataset_metadata["positive_class"])
 
     decision_curve_frame = _build_decision_curve_frame(
         y_true=y_true,
@@ -770,7 +731,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         gated_probabilities=gated_probabilities,
     )
     decision_curve_frame.to_csv(output_dirs["metrics"] / "decision_curve.csv", index=False)
-    _save_decision_curve_plot(decision_curve_frame, output_dirs["charts"] / "decision_curve.png")
+    _save_decision_curve_plot(decision_curve_frame, output_dirs["charts"] / "decision_curve.png", dataset_metadata["positive_class"])
 
     _save_roc_plot(
         y_true,
@@ -779,6 +740,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         flat_probabilities,
         gated_probabilities,
         output_dirs["charts"] / "roc_curve.png",
+        dataset_metadata["positive_class"],
     )
     _save_calibration_plot(
         y_true,
@@ -787,20 +749,23 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         flat_probabilities,
         gated_probabilities,
         output_dirs["charts"] / "calibration_curve.png",
+        dataset_metadata["positive_class"],
     )
 
     summary_frame = {
-        "config": asdict(config),
+        "config": asdict(effective_config),
         "task": {
-            "dataset": "TCGA-THCA",
-            "positive_class": POSITIVE_CLASS_LABEL,
-            "id_column": DEFAULT_ID_COLUMN,
-            "target_column": DEFAULT_TARGET_COLUMN,
+            "dataset": dataset_metadata["display_name"],
+            "dataset_key": effective_config.dataset,
+            "positive_class": dataset_metadata["positive_class"],
+            "id_column": dataset_metadata["id_column"],
+            "target_column": dataset_metadata["target_column"],
+            "source_description": dataset_metadata["source_description"],
         },
         "split_summary": bundle.split_summary,
         "metrics": metrics_frame.to_dict(orient="records"),
         "symbolic_rules": {
-            "definitions": SYMBOLIC_RULES,
+            "definitions": dataset_metadata["symbolic_rules"],
             "total_trigger_count": symbolic_knowledge.total_trigger_count,
             "mapped_feature_trigger_count": symbolic_knowledge.mapped_feature_trigger_count,
             "cases_with_any_trigger": int(symbolic_knowledge.patient_any_rule_triggered.sum()),
@@ -819,6 +784,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         "decision_curve": decision_curve_frame.to_dict(orient="records"),
         "calibration_reliability": reliability_frame.to_dict(orient="records"),
         "artifacts": {
+            "root": str(output_dirs["root"]),
             "metrics_csv": str(output_dirs["metrics"] / "metrics.csv"),
             "training_history_csv": str(output_dirs["metrics"] / "training_history.csv"),
             "gamma_ablation_csv": str(output_dirs["metrics"] / "gamma_ablation.csv"),
@@ -830,10 +796,9 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
             "training_history_plot": str(output_dirs["charts"] / "training_history.png"),
             "gamma_ablation_plot": str(output_dirs["charts"] / "gamma_ablation_auc.png"),
             "decision_curve_plot": str(output_dirs["charts"] / "decision_curve.png"),
+            "preprocessing_metadata_json": str(output_dirs["traces"] / "preprocessing_metadata.json"),
+            "split_summary_json": str(output_dirs["traces"] / "split_summary.json"),
         },
     }
-    (output_dirs["metrics"] / "run_summary.json").write_text(
-        json.dumps(summary_frame, indent=2),
-        encoding="utf-8",
-    )
+    (output_dirs["metrics"] / "run_summary.json").write_text(json.dumps(summary_frame, indent=2), encoding="utf-8")
     return summary_frame
