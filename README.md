@@ -1,8 +1,6 @@
 # NGTA
 
-**NARS-Guided Transformer Attention**
-
-**Dynamic Evidential Routing for clinical transformers under extreme missingness**
+**NARS-Guided Transformer Attention for clinical transformers under extreme missingness**
 
 **TL;DR:** NGTA is a clinical transformer that does not just rank patients; it tries to tell the truth about its own uncertainty. It estimates epistemic uncertainty with MC Dropout, converts that uncertainty into NARS truth values, injects explicit human-written medical rules at inference time, and feeds the revised confidence back into attention so brittle evidence is downweighted before the final prediction is made.
 
@@ -36,7 +34,7 @@ In standard clinical prediction, models optimize for point-estimate accuracy but
 
 The main novelty is not just "Transformer + rules." The key idea is that NGTA turns neural uncertainty into explicit symbolic truth values from NARS, revises those values with domain rules, and then feeds the revised confidence back into Transformer attention. In simple terms: the model can use both learned patterns and symbolic evidence to decide how much trust to place in each feature at inference time, while also leaving behind an auditable evidential trace.
 
-The end result is not just another tabular model with a rules layer attached to the side. It is an auditable, human-in-the-loop reasoning engine: instead of emitting an overconfident scalar score on missing data, the system exposes what it does not confidently know and provides a direct insertion point for clinicians to inject overriding physiological rules into the inference path itself. The novel outcome of this project is that calibration, clinician steerability, and auditability all appear in the same deployed inference loop.
+The end result is not just another tabular model with a rules layer attached to the side. It is an auditable, human-in-the-loop reasoning engine: instead of emitting an overconfident scalar score on missing data, the system exposes what it does not confidently know and provides a direct insertion point for clinicians to inject overriding physiological rules into the inference path itself. We refer to this uncertainty-conditioned attention update as Dynamic Evidential Routing. The novel outcome of this project is that calibration, clinician steerability, and auditability all appear in the same deployed inference loop.
 
 ### How it works
 
@@ -45,7 +43,7 @@ The end result is not just another tabular model with a rules layer attached to 
 3. That uncertainty is converted into NARS-style truth values: frequency and confidence.
 4. If a symbolic rule fires, its truth value is combined with the neural truth value using NARS revision.
 5. The revised confidence is used to reweight attention, so uncertain or weakly supported features matter less.
-6. The pipeline then evaluates discrimination, Calibration, decision curves, symbolic trigger activity, and baseline comparisons.
+6. The pipeline then evaluates discrimination, calibration, decision curves, symbolic trigger activity, and baseline comparisons.
 
 ### Why there are two datasets
 
@@ -228,4 +226,5 @@ Role in the paper: primary empirical validation for scale, missingness, and cali
 - [`src/nars_interface.py`](src/nars_interface.py): NARS truth-value mapping and revision operators
 - [`src/attention_hook.py`](src/attention_hook.py): confidence-based attention gating
 - [`src/pipeline.py`](src/pipeline.py): training, baselines, evaluation, plotting, and summary generation
+- [`paper/main.pdf`](paper/main.pdf): compiled research paper
 - [`paper/main.tex`](paper/main.tex): manuscript source
