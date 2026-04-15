@@ -16,7 +16,7 @@ The research paper lives in [`paper/main.pdf`](paper/main.pdf), with source in [
 - **Inference-Time Logic Injection:** Fuses MC-Dropout epistemic uncertainty with NARS symbolic logic and pushes the revised confidence signal directly into Transformer attention during inference.
 - **Scale & Safety:** Benchmarked on `91,713` ICU stays and achieved the best reported Expected Calibration Error in this repository evaluation at `0.00583`, versus `0.00750` for the baseline transformer, with a best Brier score of `0.05647`.
 - **Glass-Box Activity:** On held-out WiDS ICU data, explicit symbolic rules fired in `8551` of `13757` stays for `13031` total feature-level revisions, showing that the logic layer is active rather than decorative.
-- **Multi-Modal Ready:** Proven to handle fused clinical tabular features and genomic mutation matrices on TCGA-THCA, where the same interface remains operational as a clinical-plus-genomic proof of concept.
+- **Multi-Modal Ready:** Demonstrated on fused clinical tabular features and genomic mutation matrices on TCGA-THCA, where the same interface remains operational as a clinical-plus-genomic proof of concept. The TCGA transformer variants are not statistically separated from one another on the 69-case held-out split.
 
 ## Overview
 
@@ -56,11 +56,12 @@ The two benchmarks test different strengths of the architecture:
 
 The main result is that NGTA works as intended on both a small multi-modal cancer dataset and a much larger high-missingness ICU dataset, but the two datasets support different claims.
 
-- On `tcga`, the Transformer-based models clearly beat the random-forest baseline. The best AUC was `0.7328`, compared with `0.6613` for random forest. This supports the claim that the architecture can learn useful signal from combined clinical and genomic inputs.
+- On `tcga`, the Transformer-based models beat the random-forest baseline numerically. The best AUC was `0.7328`, compared with `0.6613` for random forest. This supports the claim that the architecture can learn useful signal from combined clinical and genomic inputs, but it does not support a claim that the NARS-gated transformer is statistically better than the baseline or flat-confidence transformer variants.
+- The flat-confidence control is the best TCGA transformer variant on AUC, Brier score, and ECE in the current run. That matters for interpretation: TCGA should be treated as a multi-modal interface proof of concept, not as evidence that dynamic NARS gating dominates a simpler confidence gate on very small cohorts.
 - On `wids`, all Transformer variants were very close on AUC, with the best AUC at `0.8803`. The key result there was calibration: the NARS-gated version achieved the best ECE at `0.00583` versus `0.00750` for the baseline transformer, and the best Brier score at `0.05647`.
 - The WiDS result shows the calibration-versus-discrimination story clearly. NGTA did not need to win AUC by a wide margin to matter; it made the predicted probabilities better behaved while remaining competitive on ranking performance. For clinical deployment, that is arguably the more important result, because calibration determines whether a reported risk can actually be trusted as a probability.
 - The symbolic rules were not just decorative. On the held-out WiDS test set, ICU rules fired in `8551` of `13757` cases for `13031` total feature-level revisions, which means the neurosymbolic revision path was active at scale rather than sitting unused.
-- Taken together, the results support a narrower and more defensible claim than "always better accuracy": NGTA is competitive on discrimination, strongest on calibration, and valuable as a human-auditable instrumentation layer under heavy missingness.
+- Taken together, the results support a narrower and more defensible claim than "always better accuracy": NGTA is competitive on discrimination, strongest on calibration in WiDS, and valuable as a human-auditable instrumentation layer under heavy missingness.
 
 Put differently: the main architectural achievement here is safety-oriented behavior, not just ranking performance. NGTA turns the transformer's attention update from an opaque mapping into a transparent and auditable inference path, where uncertainty is explicit, rule interventions are traceable, and the final probability is better calibrated for clinical use.
 
@@ -142,6 +143,15 @@ WiDS symbolic ICU rules are evaluated after KNN imputation and before scaling:
 - `age >= 75.0`
 - `d1_creatinine_max >= 2.0`
 
+## Interpretation Caveats
+
+This repository is a first methods implementation, not a clinical validation package.
+
+- The TCGA held-out split has only `69` cases. The transformer variants are close and should not be described as statistically separated from one another.
+- The symbolic rule bases are deliberately thin: four thyroid rules and four ICU rules. They demonstrate that the NARS revision path is active, but they are not independently curated clinical ontologies.
+- The current results do not establish that these exact hand-selected rules are sufficient or optimal. A stronger study would lock a broader expert-curated rule base before evaluation and report sensitivity to rule inclusion and truth-value assignments.
+- There is no external validation cohort in this snapshot. Clinical claims would require temporally or institutionally independent test cohorts with locked preprocessing, model settings, and rule definitions.
+
 ## Outputs
 
 Each dataset writes a full artifact bundle under the chosen output root:
@@ -192,6 +202,7 @@ Role in the paper: multi-modal proof of concept for clinical-plus-genomic fusion
 - Best ECE: `0.1178` for `flat_confidence`
 - Best accuracy: `0.6812`, tied across `baseline`, `flat_confidence`, and `nars_gated`
 - Symbolic activity: `42 / 69` held-out cases with any trigger, `79` total feature-level revisions
+- Interpretation: the flat-confidence control is marginally best among transformer variants, and the transformer variants are not statistically separated on this small split.
 
 WiDS ICU full-run summary:
 
