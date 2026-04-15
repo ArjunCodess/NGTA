@@ -214,7 +214,7 @@ def _compute_metrics(y_true: np.ndarray, probabilities: np.ndarray) -> dict[str,
     }
 
 
-def _bootstrap_auc_intervals(
+def _bootstrap_metric_intervals(
     y_true: np.ndarray,
     probability_map: dict[str, np.ndarray],
     iterations: int = 1000,
@@ -228,7 +228,7 @@ def _bootstrap_auc_intervals(
 
     while len(bootstrap_indices) < iterations:
         if attempts >= max_attempts:
-            raise RuntimeError("Unable to generate enough valid bootstrap samples for AUC estimation.")
+            raise RuntimeError("Unable to generate enough valid bootstrap samples for metric estimation.")
         sampled_indices = rng.integers(0, n_samples, size=n_samples)
         sampled_labels = y_true[sampled_indices]
         attempts += 1
@@ -238,8 +238,20 @@ def _bootstrap_auc_intervals(
 
     intervals: dict[str, Any] = {}
     for variant, probabilities in probability_map.items():
+        clipped_probabilities = np.clip(probabilities, 1e-6, 1.0 - 1e-6)
         auc_samples = np.asarray(
-            [roc_auc_score(y_true[index_set], probabilities[index_set]) for index_set in bootstrap_indices],
+            [roc_auc_score(y_true[index_set], clipped_probabilities[index_set]) for index_set in bootstrap_indices],
+            dtype=np.float64,
+        )
+        brier_samples = np.asarray(
+            [brier_score_loss(y_true[index_set], clipped_probabilities[index_set]) for index_set in bootstrap_indices],
+            dtype=np.float64,
+        )
+        ece_samples = np.asarray(
+            [
+                _compute_ece(_build_reliability_frame(y_true[index_set], clipped_probabilities[index_set], n_bins=10))
+                for index_set in bootstrap_indices
+            ],
             dtype=np.float64,
         )
         intervals[variant] = {
@@ -247,6 +259,12 @@ def _bootstrap_auc_intervals(
             "auc_samples_mean": float(np.mean(auc_samples)),
             "auc_ci_95_lower": float(np.percentile(auc_samples, 2.5)),
             "auc_ci_95_upper": float(np.percentile(auc_samples, 97.5)),
+            "brier_samples_mean": float(np.mean(brier_samples)),
+            "brier_ci_95_lower": float(np.percentile(brier_samples, 2.5)),
+            "brier_ci_95_upper": float(np.percentile(brier_samples, 97.5)),
+            "ece_samples_mean": float(np.mean(ece_samples)),
+            "ece_ci_95_lower": float(np.percentile(ece_samples, 2.5)),
+            "ece_ci_95_upper": float(np.percentile(ece_samples, 97.5)),
         }
 
     def _interval_overlap(left: dict[str, float], right: dict[str, float]) -> bool:
@@ -254,6 +272,41 @@ def _bootstrap_auc_intervals(
             left["auc_ci_95_upper"] < right["auc_ci_95_lower"]
             or right["auc_ci_95_upper"] < left["auc_ci_95_lower"]
         )
+
+    def _metric_samples(metric_name: str, variant: str) -> np.ndarray:
+        probabilities = np.clip(probability_map[variant], 1e-6, 1.0 - 1e-6)
+        if metric_name == "brier":
+            return np.asarray(
+                [brier_score_loss(y_true[index_set], probabilities[index_set]) for index_set in bootstrap_indices],
+                dtype=np.float64,
+            )
+        if metric_name == "ece":
+            return np.asarray(
+                [
+                    _compute_ece(_build_reliability_frame(y_true[index_set], probabilities[index_set], n_bins=10))
+                    for index_set in bootstrap_indices
+                ],
+                dtype=np.float64,
+            )
+        raise ValueError(f"Unsupported bootstrap metric: {metric_name}")
+
+    def _add_delta_intervals(comparisons: dict[str, Any], left_variant: str, right_variant: str) -> None:
+        comparison_key = f"{left_variant}_vs_{right_variant}"
+        for metric_name in ("brier", "ece"):
+            left_samples = _metric_samples(metric_name, left_variant)
+            right_samples = _metric_samples(metric_name, right_variant)
+            delta_samples = left_samples - right_samples
+            comparisons[f"{comparison_key}_{metric_name}_delta_left_minus_right"] = float(np.mean(delta_samples))
+            comparisons[f"{comparison_key}_{metric_name}_delta_ci_95_lower"] = float(np.percentile(delta_samples, 2.5))
+            comparisons[f"{comparison_key}_{metric_name}_delta_ci_95_upper"] = float(np.percentile(delta_samples, 97.5))
+            comparisons[f"{comparison_key}_{metric_name}_interpretation"] = (
+                f"The 95% paired bootstrap interval for the {metric_name} difference excludes zero."
+                if (
+                    comparisons[f"{comparison_key}_{metric_name}_delta_ci_95_lower"] > 0.0
+                    or comparisons[f"{comparison_key}_{metric_name}_delta_ci_95_upper"] < 0.0
+                )
+                else f"The 95% paired bootstrap interval for the {metric_name} difference includes zero."
+            )
 
     comparisons: dict[str, Any] = {}
     if "baseline" in intervals and "nars_gated" in intervals:
@@ -264,6 +317,7 @@ def _bootstrap_auc_intervals(
             if overlap
             else "The 95% bootstrap AUC confidence intervals do not overlap, so the observed difference is likely real on this test split."
         )
+        _add_delta_intervals(comparisons, "baseline", "nars_gated")
     if "flat_confidence" in intervals and "nars_gated" in intervals:
         overlap = _interval_overlap(intervals["flat_confidence"], intervals["nars_gated"])
         comparisons["flat_confidence_vs_nars_gated_ci_overlap"] = overlap
@@ -272,6 +326,7 @@ def _bootstrap_auc_intervals(
             if overlap
             else "The 95% bootstrap AUC confidence intervals do not overlap, so the observed difference is likely real on this test split."
         )
+        _add_delta_intervals(comparisons, "flat_confidence", "nars_gated")
     if "random_forest" in intervals and "nars_gated" in intervals:
         overlap = _interval_overlap(intervals["random_forest"], intervals["nars_gated"])
         comparisons["random_forest_vs_nars_gated_ci_overlap"] = overlap
@@ -280,6 +335,7 @@ def _bootstrap_auc_intervals(
             if overlap
             else "The 95% bootstrap AUC confidence intervals do not overlap, so the observed difference is likely real on this test split."
         )
+        _add_delta_intervals(comparisons, "random_forest", "nars_gated")
     if comparisons:
         intervals["comparison"] = comparisons
     return intervals
@@ -650,7 +706,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         ],
         ignore_index=True,
     )
-    auc_bootstrap = _bootstrap_auc_intervals(
+    metric_bootstrap = _bootstrap_metric_intervals(
         y_true=y_true,
         probability_map={
             TREE_BASELINE_LABEL: tree_probabilities,
@@ -666,26 +722,42 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
             {
                 "variant": TREE_BASELINE_LABEL,
                 **_compute_metrics(y_true, tree_probabilities),
-                "auc_ci_95_lower": auc_bootstrap[TREE_BASELINE_LABEL]["auc_ci_95_lower"],
-                "auc_ci_95_upper": auc_bootstrap[TREE_BASELINE_LABEL]["auc_ci_95_upper"],
+                "auc_ci_95_lower": metric_bootstrap[TREE_BASELINE_LABEL]["auc_ci_95_lower"],
+                "auc_ci_95_upper": metric_bootstrap[TREE_BASELINE_LABEL]["auc_ci_95_upper"],
+                "brier_ci_95_lower": metric_bootstrap[TREE_BASELINE_LABEL]["brier_ci_95_lower"],
+                "brier_ci_95_upper": metric_bootstrap[TREE_BASELINE_LABEL]["brier_ci_95_upper"],
+                "ece_ci_95_lower": metric_bootstrap[TREE_BASELINE_LABEL]["ece_ci_95_lower"],
+                "ece_ci_95_upper": metric_bootstrap[TREE_BASELINE_LABEL]["ece_ci_95_upper"],
             },
             {
                 "variant": "baseline",
                 **_compute_metrics(y_true, summary.probabilities_mean),
-                "auc_ci_95_lower": auc_bootstrap["baseline"]["auc_ci_95_lower"],
-                "auc_ci_95_upper": auc_bootstrap["baseline"]["auc_ci_95_upper"],
+                "auc_ci_95_lower": metric_bootstrap["baseline"]["auc_ci_95_lower"],
+                "auc_ci_95_upper": metric_bootstrap["baseline"]["auc_ci_95_upper"],
+                "brier_ci_95_lower": metric_bootstrap["baseline"]["brier_ci_95_lower"],
+                "brier_ci_95_upper": metric_bootstrap["baseline"]["brier_ci_95_upper"],
+                "ece_ci_95_lower": metric_bootstrap["baseline"]["ece_ci_95_lower"],
+                "ece_ci_95_upper": metric_bootstrap["baseline"]["ece_ci_95_upper"],
             },
             {
                 "variant": "flat_confidence",
                 **_compute_metrics(y_true, flat_probabilities),
-                "auc_ci_95_lower": auc_bootstrap["flat_confidence"]["auc_ci_95_lower"],
-                "auc_ci_95_upper": auc_bootstrap["flat_confidence"]["auc_ci_95_upper"],
+                "auc_ci_95_lower": metric_bootstrap["flat_confidence"]["auc_ci_95_lower"],
+                "auc_ci_95_upper": metric_bootstrap["flat_confidence"]["auc_ci_95_upper"],
+                "brier_ci_95_lower": metric_bootstrap["flat_confidence"]["brier_ci_95_lower"],
+                "brier_ci_95_upper": metric_bootstrap["flat_confidence"]["brier_ci_95_upper"],
+                "ece_ci_95_lower": metric_bootstrap["flat_confidence"]["ece_ci_95_lower"],
+                "ece_ci_95_upper": metric_bootstrap["flat_confidence"]["ece_ci_95_upper"],
             },
             {
                 "variant": "nars_gated",
                 **_compute_metrics(y_true, gated_probabilities),
-                "auc_ci_95_lower": auc_bootstrap["nars_gated"]["auc_ci_95_lower"],
-                "auc_ci_95_upper": auc_bootstrap["nars_gated"]["auc_ci_95_upper"],
+                "auc_ci_95_lower": metric_bootstrap["nars_gated"]["auc_ci_95_lower"],
+                "auc_ci_95_upper": metric_bootstrap["nars_gated"]["auc_ci_95_upper"],
+                "brier_ci_95_lower": metric_bootstrap["nars_gated"]["brier_ci_95_lower"],
+                "brier_ci_95_upper": metric_bootstrap["nars_gated"]["brier_ci_95_upper"],
+                "ece_ci_95_lower": metric_bootstrap["nars_gated"]["ece_ci_95_lower"],
+                "ece_ci_95_upper": metric_bootstrap["nars_gated"]["ece_ci_95_upper"],
             },
         ]
     )
@@ -779,7 +851,8 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
             "validation_auc": tree_baseline["val_auc"],
             "validation_brier": tree_baseline["val_brier"],
         },
-        "auc_bootstrap": auc_bootstrap,
+        "auc_bootstrap": metric_bootstrap,
+        "metric_bootstrap": metric_bootstrap,
         "gamma_ablation": gamma_ablation_frame.to_dict(orient="records"),
         "decision_curve": decision_curve_frame.to_dict(orient="records"),
         "calibration_reliability": reliability_frame.to_dict(orient="records"),

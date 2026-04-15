@@ -14,7 +14,7 @@ The research paper lives in [`paper/main.pdf`](paper/main.pdf), with source in [
 ## Key Achievements
 
 - **Inference-Time Logic Injection:** Fuses MC-Dropout epistemic uncertainty with NARS symbolic logic and pushes the revised confidence signal directly into Transformer attention during inference.
-- **Scale & Safety:** Benchmarked on `91,713` ICU stays and achieved the best reported Expected Calibration Error in this repository evaluation at `0.00583`, versus `0.00750` for the baseline transformer, with a best Brier score of `0.05647`.
+- **Scale & Safety:** Benchmarked on `91,713` ICU stays and achieved the best reported Expected Calibration Error in this repository evaluation at `0.00583` with 95% CI `[0.00411, 0.01064]`, versus `0.00750` for the baseline transformer. The best Brier score was `0.05647` with 95% CI `[0.05365, 0.05962]`.
 - **Glass-Box Activity:** On held-out WiDS ICU data, explicit symbolic rules fired in `8551` of `13757` stays for `13031` total feature-level revisions, showing that the logic layer is active rather than decorative.
 - **Multi-Modal Ready:** Demonstrated on fused clinical tabular features and genomic mutation matrices on TCGA-THCA, where the same interface remains operational as a clinical-plus-genomic proof of concept. The TCGA transformer variants are not statistically separated from one another on the 69-case held-out split.
 
@@ -58,7 +58,8 @@ The main result is that NGTA works as intended on both a small multi-modal cance
 
 - On `tcga`, the Transformer-based models beat the random-forest baseline numerically. The best AUC was `0.7328`, compared with `0.6613` for random forest. This supports the claim that the architecture can learn useful signal from combined clinical and genomic inputs, but it does not support a claim that the NARS-gated transformer is statistically better than the baseline or flat-confidence transformer variants.
 - The flat-confidence control is the best TCGA transformer variant on AUC, Brier score, and ECE in the current run. That matters for interpretation: TCGA should be treated as a multi-modal interface proof of concept, not as evidence that dynamic NARS gating dominates a simpler confidence gate on very small cohorts.
-- On `wids`, all Transformer variants were very close on AUC, with the best AUC at `0.8803`. The key result there was calibration: the NARS-gated version achieved the best ECE at `0.00583` versus `0.00750` for the baseline transformer, and the best Brier score at `0.05647`.
+- On `wids`, all Transformer variants were very close on AUC, with the best AUC at `0.8803`. The key result there was calibration: the NARS-gated version achieved the best ECE at `0.00583` with 95% CI `[0.00411, 0.01064]`, versus `0.00750` for the baseline transformer, and the best Brier score at `0.05647` with 95% CI `[0.05365, 0.05962]`.
+- The WiDS baseline-vs-NARS paired bootstrap intervals exclude zero for Brier improvement (`0.000025` to `0.000091`) and ECE improvement (`0.000028` to `0.002024`). The AUC intervals still overlap, so the WiDS claim is a calibration claim rather than a ranking-superiority claim.
 - The WiDS result shows the calibration-versus-discrimination story clearly. NGTA did not need to win AUC by a wide margin to matter; it made the predicted probabilities better behaved while remaining competitive on ranking performance. For clinical deployment, that is arguably the more important result, because calibration determines whether a reported risk can actually be trusted as a probability.
 - The symbolic rules were not just decorative. On the held-out WiDS test set, ICU rules fired in `8551` of `13757` cases for `13031` total feature-level revisions, which means the neurosymbolic revision path was active at scale rather than sitting unused.
 - Taken together, the results support a narrower and more defensible claim than "always better accuracy": NGTA is competitive on discrimination, strongest on calibration in WiDS, and valuable as a human-auditable instrumentation layer under heavy missingness.
@@ -178,6 +179,8 @@ Per-dataset metrics/traces include:
 - `test_predictions.csv`
 - ROC, calibration, training-history, gamma-ablation, and decision-curve plots
 
+`metrics.csv` now reports 95% bootstrap confidence intervals for AUC, Brier score, and ECE. `run_summary.json` also includes paired bootstrap Brier/ECE deltas for the main comparisons.
+
 ## Latest Full Run
 
 The current default full run was produced with:
@@ -198,8 +201,8 @@ Role in the paper: multi-modal proof of concept for clinical-plus-genomic fusion
 
 - Split: `319 / 69 / 69` train/validation/test from `457` labeled cases
 - Best AUC: `0.7328` for `flat_confidence`
-- Best Brier: `0.2109` for `flat_confidence`
-- Best ECE: `0.1178` for `flat_confidence`
+- Best Brier: `0.21091` for `flat_confidence` with 95% CI `[0.18160, 0.24265]`
+- Best ECE: `0.11779` for `flat_confidence` with 95% CI `[0.11300, 0.26405]`
 - Best accuracy: `0.6812`, tied across `baseline`, `flat_confidence`, and `nars_gated`
 - Symbolic activity: `42 / 69` held-out cases with any trigger, `79` total feature-level revisions
 - Interpretation: the flat-confidence control is marginally best among transformer variants, and the transformer variants are not statistically separated on this small split.
@@ -211,15 +214,18 @@ Role in the paper: primary empirical validation for scale, missingness, and cali
 - Split: `64199 / 13757 / 13757` train/validation/test from `91713` labeled rows
 - Input width: `16` model features after preprocessing
 - Best AUC: `0.8803` for `baseline`
-- Best Brier: `0.05647` for `nars_gated`
-- Best ECE: `0.00583` for `nars_gated`
+- Best Brier: `0.05647` for `nars_gated` with 95% CI `[0.05365, 0.05962]`
+- Best ECE: `0.00583` for `nars_gated` with 95% CI `[0.00411, 0.01064]`
 - Best accuracy: `0.92862`, tied across `flat_confidence` and `nars_gated`
 - Symbolic activity: `8551 / 13757` held-out cases with any trigger, `13031` total feature-level revisions
 - Calibration comparison:
-  - vs random forest Brier `0.05817 -> 0.05647`
-  - vs random forest ECE `0.00737 -> 0.00583`
-  - vs baseline transformer Brier `0.05653 -> 0.05647`
-  - vs baseline transformer ECE `0.00750 -> 0.00583`
+  - vs random forest Brier `0.05817 -> 0.05647`; paired delta CI `[0.000963, 0.002399]`
+  - vs random forest ECE `0.00737 -> 0.00583`; paired delta CI `[-0.003868, 0.007944]`
+  - vs baseline transformer Brier `0.05653 -> 0.05647`; paired delta CI `[0.000025, 0.000091]`
+  - vs baseline transformer ECE `0.00750 -> 0.00583`; paired delta CI `[0.000028, 0.002024]`
+  - vs flat-confidence Brier `0.05648 -> 0.05647`; paired delta CI `[-0.000005, 0.000029]`
+  - vs flat-confidence ECE `0.00618 -> 0.00583`; paired delta CI `[-0.000386, 0.000846]`
+  - AUC confidence intervals overlap across all WiDS variants.
 - Per-rule test triggers:
   - `rule_lactate: 1936`
   - `rule_hypotension: 5338`

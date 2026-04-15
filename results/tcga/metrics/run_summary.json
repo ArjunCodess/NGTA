@@ -630,11 +630,15 @@
     {
       "variant": "random_forest",
       "auc": 0.6613445378151261,
-      "brier": 0.21997575273834527,
+      "brier": 0.2199757527383453,
       "accuracy": 0.5942028985507246,
-      "ece": 0.15966664988761547,
+      "ece": 0.15966664988761545,
       "auc_ci_95_lower": 0.5100720984441915,
-      "auc_ci_95_upper": 0.7907666818849781
+      "auc_ci_95_upper": 0.7907666818849781,
+      "brier_ci_95_lower": 0.18953733342289616,
+      "brier_ci_95_upper": 0.24980725468298617,
+      "ece_ci_95_lower": 0.13173260446334506,
+      "ece_ci_95_upper": 0.2824154266581759
     },
     {
       "variant": "baseline",
@@ -643,7 +647,11 @@
       "accuracy": 0.6811594202898551,
       "ece": 0.1184147227069606,
       "auc_ci_95_lower": 0.5974753869216433,
-      "auc_ci_95_upper": 0.8461637931034482
+      "auc_ci_95_upper": 0.8461637931034482,
+      "brier_ci_95_lower": 0.18247724510729313,
+      "brier_ci_95_upper": 0.24257818944752216,
+      "ece_ci_95_lower": 0.10735998972710492,
+      "ece_ci_95_upper": 0.25169606376709286
     },
     {
       "variant": "flat_confidence",
@@ -652,7 +660,11 @@
       "accuracy": 0.6811594202898551,
       "ece": 0.11779116849243783,
       "auc_ci_95_lower": 0.6028159501996712,
-      "auc_ci_95_upper": 0.8479409969115851
+      "auc_ci_95_upper": 0.8479409969115851,
+      "brier_ci_95_lower": 0.18159944440132217,
+      "brier_ci_95_upper": 0.2426503573051238,
+      "ece_ci_95_lower": 0.11300419198069299,
+      "ece_ci_95_upper": 0.26405413712371323
     },
     {
       "variant": "nars_gated",
@@ -661,7 +673,11 @@
       "accuracy": 0.6811594202898551,
       "ece": 0.11837148991650208,
       "auc_ci_95_lower": 0.6007795416316232,
-      "auc_ci_95_upper": 0.8453026463963964
+      "auc_ci_95_upper": 0.8453026463963964,
+      "brier_ci_95_lower": 0.1819761870066667,
+      "brier_ci_95_upper": 0.2417248642825134,
+      "ece_ci_95_lower": 0.10417135091289556,
+      "ece_ci_95_upper": 0.2480979034655626
     }
   ],
   "symbolic_rules": {
@@ -728,40 +744,170 @@
       "min_samples_leaf": 1
     },
     "validation_auc": 0.7529411764705882,
-    "validation_brier": 0.20979110015441182
+    "validation_brier": 0.20979110015441177
   },
   "auc_bootstrap": {
     "random_forest": {
       "iterations": 1000,
       "auc_samples_mean": 0.6621587811244568,
       "auc_ci_95_lower": 0.5100720984441915,
-      "auc_ci_95_upper": 0.7907666818849781
+      "auc_ci_95_upper": 0.7907666818849781,
+      "brier_samples_mean": 0.21969943709437945,
+      "brier_ci_95_lower": 0.18953733342289616,
+      "brier_ci_95_upper": 0.24980725468298617,
+      "ece_samples_mean": 0.20844884693908314,
+      "ece_ci_95_lower": 0.13173260446334506,
+      "ece_ci_95_upper": 0.2824154266581759
     },
     "baseline": {
       "iterations": 1000,
       "auc_samples_mean": 0.7314579835062327,
       "auc_ci_95_lower": 0.5974753869216433,
-      "auc_ci_95_upper": 0.8461637931034482
+      "auc_ci_95_upper": 0.8461637931034482,
+      "brier_samples_mean": 0.21107627055048941,
+      "brier_ci_95_lower": 0.18247724510729313,
+      "brier_ci_95_upper": 0.24257818944752216,
+      "ece_samples_mean": 0.1755486473914074,
+      "ece_ci_95_lower": 0.10735998972710492,
+      "ece_ci_95_upper": 0.25169606376709286
     },
     "flat_confidence": {
       "iterations": 1000,
       "auc_samples_mean": 0.733244507798272,
       "auc_ci_95_lower": 0.6028159501996712,
-      "auc_ci_95_upper": 0.8479409969115851
+      "auc_ci_95_upper": 0.8479409969115851,
+      "brier_samples_mean": 0.21066240952867804,
+      "brier_ci_95_lower": 0.18159944440132217,
+      "brier_ci_95_upper": 0.2426503573051238,
+      "ece_samples_mean": 0.18307524748610732,
+      "ece_ci_95_lower": 0.11300419198069299,
+      "ece_ci_95_upper": 0.26405413712371323
     },
     "nars_gated": {
       "iterations": 1000,
       "auc_samples_mean": 0.7313714963588568,
       "auc_ci_95_lower": 0.6007795416316232,
-      "auc_ci_95_upper": 0.8453026463963964
+      "auc_ci_95_upper": 0.8453026463963964,
+      "brier_samples_mean": 0.21069791290847717,
+      "brier_ci_95_lower": 0.1819761870066667,
+      "brier_ci_95_upper": 0.2417248642825134,
+      "ece_samples_mean": 0.17153785728802887,
+      "ece_ci_95_lower": 0.10417135091289556,
+      "ece_ci_95_upper": 0.2480979034655626
     },
     "comparison": {
       "baseline_vs_nars_gated_ci_overlap": true,
       "baseline_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain.",
+      "baseline_vs_nars_gated_brier_delta_left_minus_right": 0.0003783576420122638,
+      "baseline_vs_nars_gated_brier_delta_ci_95_lower": -0.00018000941491782413,
+      "baseline_vs_nars_gated_brier_delta_ci_95_upper": 0.0009192052733395077,
+      "baseline_vs_nars_gated_brier_interpretation": "The 95% paired bootstrap interval for brier improvement includes zero.",
+      "baseline_vs_nars_gated_ece_delta_left_minus_right": 0.004010790103378515,
+      "baseline_vs_nars_gated_ece_delta_ci_95_lower": -0.029281731114167542,
+      "baseline_vs_nars_gated_ece_delta_ci_95_upper": 0.05171238111207011,
+      "baseline_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for ece improvement includes zero.",
       "flat_confidence_vs_nars_gated_ci_overlap": true,
       "flat_confidence_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain.",
+      "flat_confidence_vs_nars_gated_brier_delta_left_minus_right": -3.550337979913759e-05,
+      "flat_confidence_vs_nars_gated_brier_delta_ci_95_lower": -0.0008857656720551006,
+      "flat_confidence_vs_nars_gated_brier_delta_ci_95_upper": 0.0008699675331154104,
+      "flat_confidence_vs_nars_gated_brier_interpretation": "The 95% paired bootstrap interval for brier improvement includes zero.",
+      "flat_confidence_vs_nars_gated_ece_delta_left_minus_right": 0.011537390198078444,
+      "flat_confidence_vs_nars_gated_ece_delta_ci_95_lower": -0.030814755699316288,
+      "flat_confidence_vs_nars_gated_ece_delta_ci_95_upper": 0.06623342875090847,
+      "flat_confidence_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for ece improvement includes zero.",
       "random_forest_vs_nars_gated_ci_overlap": true,
-      "random_forest_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain."
+      "random_forest_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain.",
+      "random_forest_vs_nars_gated_brier_delta_left_minus_right": 0.009001524185902311,
+      "random_forest_vs_nars_gated_brier_delta_ci_95_lower": -0.008562648578939444,
+      "random_forest_vs_nars_gated_brier_delta_ci_95_upper": 0.02864665793953099,
+      "random_forest_vs_nars_gated_brier_interpretation": "The 95% paired bootstrap interval for brier improvement includes zero.",
+      "random_forest_vs_nars_gated_ece_delta_left_minus_right": 0.036910989651054237,
+      "random_forest_vs_nars_gated_ece_delta_ci_95_lower": -0.06692256155041403,
+      "random_forest_vs_nars_gated_ece_delta_ci_95_upper": 0.1334341975107847,
+      "random_forest_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for ece improvement includes zero."
+    }
+  },
+  "metric_bootstrap": {
+    "random_forest": {
+      "iterations": 1000,
+      "auc_samples_mean": 0.6621587811244568,
+      "auc_ci_95_lower": 0.5100720984441915,
+      "auc_ci_95_upper": 0.7907666818849781,
+      "brier_samples_mean": 0.21969943709437945,
+      "brier_ci_95_lower": 0.18953733342289616,
+      "brier_ci_95_upper": 0.24980725468298617,
+      "ece_samples_mean": 0.20844884693908314,
+      "ece_ci_95_lower": 0.13173260446334506,
+      "ece_ci_95_upper": 0.2824154266581759
+    },
+    "baseline": {
+      "iterations": 1000,
+      "auc_samples_mean": 0.7314579835062327,
+      "auc_ci_95_lower": 0.5974753869216433,
+      "auc_ci_95_upper": 0.8461637931034482,
+      "brier_samples_mean": 0.21107627055048941,
+      "brier_ci_95_lower": 0.18247724510729313,
+      "brier_ci_95_upper": 0.24257818944752216,
+      "ece_samples_mean": 0.1755486473914074,
+      "ece_ci_95_lower": 0.10735998972710492,
+      "ece_ci_95_upper": 0.25169606376709286
+    },
+    "flat_confidence": {
+      "iterations": 1000,
+      "auc_samples_mean": 0.733244507798272,
+      "auc_ci_95_lower": 0.6028159501996712,
+      "auc_ci_95_upper": 0.8479409969115851,
+      "brier_samples_mean": 0.21066240952867804,
+      "brier_ci_95_lower": 0.18159944440132217,
+      "brier_ci_95_upper": 0.2426503573051238,
+      "ece_samples_mean": 0.18307524748610732,
+      "ece_ci_95_lower": 0.11300419198069299,
+      "ece_ci_95_upper": 0.26405413712371323
+    },
+    "nars_gated": {
+      "iterations": 1000,
+      "auc_samples_mean": 0.7313714963588568,
+      "auc_ci_95_lower": 0.6007795416316232,
+      "auc_ci_95_upper": 0.8453026463963964,
+      "brier_samples_mean": 0.21069791290847717,
+      "brier_ci_95_lower": 0.1819761870066667,
+      "brier_ci_95_upper": 0.2417248642825134,
+      "ece_samples_mean": 0.17153785728802887,
+      "ece_ci_95_lower": 0.10417135091289556,
+      "ece_ci_95_upper": 0.2480979034655626
+    },
+    "comparison": {
+      "baseline_vs_nars_gated_ci_overlap": true,
+      "baseline_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain.",
+      "baseline_vs_nars_gated_brier_delta_left_minus_right": 0.0003783576420122638,
+      "baseline_vs_nars_gated_brier_delta_ci_95_lower": -0.00018000941491782413,
+      "baseline_vs_nars_gated_brier_delta_ci_95_upper": 0.0009192052733395077,
+      "baseline_vs_nars_gated_brier_interpretation": "The 95% paired bootstrap interval for brier improvement includes zero.",
+      "baseline_vs_nars_gated_ece_delta_left_minus_right": 0.004010790103378515,
+      "baseline_vs_nars_gated_ece_delta_ci_95_lower": -0.029281731114167542,
+      "baseline_vs_nars_gated_ece_delta_ci_95_upper": 0.05171238111207011,
+      "baseline_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for ece improvement includes zero.",
+      "flat_confidence_vs_nars_gated_ci_overlap": true,
+      "flat_confidence_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain.",
+      "flat_confidence_vs_nars_gated_brier_delta_left_minus_right": -3.550337979913759e-05,
+      "flat_confidence_vs_nars_gated_brier_delta_ci_95_lower": -0.0008857656720551006,
+      "flat_confidence_vs_nars_gated_brier_delta_ci_95_upper": 0.0008699675331154104,
+      "flat_confidence_vs_nars_gated_brier_interpretation": "The 95% paired bootstrap interval for brier improvement includes zero.",
+      "flat_confidence_vs_nars_gated_ece_delta_left_minus_right": 0.011537390198078444,
+      "flat_confidence_vs_nars_gated_ece_delta_ci_95_lower": -0.030814755699316288,
+      "flat_confidence_vs_nars_gated_ece_delta_ci_95_upper": 0.06623342875090847,
+      "flat_confidence_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for ece improvement includes zero.",
+      "random_forest_vs_nars_gated_ci_overlap": true,
+      "random_forest_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain.",
+      "random_forest_vs_nars_gated_brier_delta_left_minus_right": 0.009001524185902311,
+      "random_forest_vs_nars_gated_brier_delta_ci_95_lower": -0.008562648578939444,
+      "random_forest_vs_nars_gated_brier_delta_ci_95_upper": 0.02864665793953099,
+      "random_forest_vs_nars_gated_brier_interpretation": "The 95% paired bootstrap interval for brier improvement includes zero.",
+      "random_forest_vs_nars_gated_ece_delta_left_minus_right": 0.036910989651054237,
+      "random_forest_vs_nars_gated_ece_delta_ci_95_lower": -0.06692256155041403,
+      "random_forest_vs_nars_gated_ece_delta_ci_95_upper": 0.1334341975107847,
+      "random_forest_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for ece improvement includes zero."
     }
   },
   "gamma_ablation": [
@@ -1001,7 +1147,7 @@
   ],
   "calibration_reliability": [
     {
-      "mean_predicted_probability": 0.1639688594406307,
+      "mean_predicted_probability": 0.16396885944063072,
       "fraction_positives": 0.0,
       "count": 7,
       "variant": "random_forest"
@@ -1013,7 +1159,7 @@
       "variant": "random_forest"
     },
     {
-      "mean_predicted_probability": 0.42080091374110973,
+      "mean_predicted_probability": 0.4208009137411098,
       "fraction_positives": 0.42857142857142855,
       "count": 7,
       "variant": "random_forest"
@@ -1025,7 +1171,7 @@
       "variant": "random_forest"
     },
     {
-      "mean_predicted_probability": 0.49994853525048893,
+      "mean_predicted_probability": 0.499948535250489,
       "fraction_positives": 0.5714285714285714,
       "count": 7,
       "variant": "random_forest"
@@ -1043,19 +1189,19 @@
       "variant": "random_forest"
     },
     {
-      "mean_predicted_probability": 0.5799682278609953,
+      "mean_predicted_probability": 0.5799682278609956,
       "fraction_positives": 0.5714285714285714,
       "count": 7,
       "variant": "random_forest"
     },
     {
-      "mean_predicted_probability": 0.6487417237192943,
+      "mean_predicted_probability": 0.6487417237192945,
       "fraction_positives": 0.8571428571428571,
       "count": 7,
       "variant": "random_forest"
     },
     {
-      "mean_predicted_probability": 0.7282909847479112,
+      "mean_predicted_probability": 0.7282909847479111,
       "fraction_positives": 0.5714285714285714,
       "count": 7,
       "variant": "random_forest"
