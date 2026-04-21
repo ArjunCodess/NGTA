@@ -838,6 +838,11 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         "metrics": metrics_frame.to_dict(orient="records"),
         "symbolic_rules": {
             "definitions": dataset_metadata["symbolic_rules"],
+            "interface_notes": {
+                "neural_truth_mapping": "variance-derived heuristic initializer for NARS-style confidence",
+                "symbolic_rule_grounding": "explicit NAL deduction from direct observation before revision",
+                "revision_assumption": "neural and symbolic truths are treated as distinct evidential sources",
+            },
             "total_trigger_count": symbolic_knowledge.total_trigger_count,
             "mapped_feature_trigger_count": symbolic_knowledge.mapped_feature_trigger_count,
             "cases_with_any_trigger": int(symbolic_knowledge.patient_any_rule_triggered.sum()),

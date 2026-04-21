@@ -6,6 +6,10 @@ from typing import Any, Sequence
 import numpy as np
 import pandas as pd
 
+from .nars_interface import deduce_truth_values
+
+EMPIRICAL_OBSERVATION_CONFIDENCE = 0.95
+
 SYMBOLIC_RULES: dict[str, dict[str, Any]] = {
     "braf_mutation": {
         "description": "BRAF mutation strongly predicts lymph node metastasis.",
@@ -65,6 +69,30 @@ def _assign_truth_value(
     trigger_mask[patient_index, feature_index] = True
 
 
+def _deduced_ground_truth(rule_truth_value: dict[str, float]) -> tuple[float, float]:
+    """Explicitly ground a triggered rule by NAL deduction from empirical observation."""
+    grounded_frequency = float(rule_truth_value["frequency"])
+    grounded_confidence = float(rule_truth_value["confidence"])
+    if grounded_frequency <= 0.0:
+        raise ValueError("Rule truth frequency must be positive to recover the implication confidence.")
+
+    implication_confidence = grounded_confidence / (
+        grounded_frequency * EMPIRICAL_OBSERVATION_CONFIDENCE
+    )
+    if implication_confidence > 1.0 + 1e-9:
+        raise ValueError(
+            "Grounded rule confidence exceeds what can be produced by an empirical-observation deduction step."
+        )
+
+    deduced_frequency, deduced_confidence = deduce_truth_values(
+        grounded_frequency,
+        min(implication_confidence, 1.0),
+        1.0,
+        EMPIRICAL_OBSERVATION_CONFIDENCE,
+    )
+    return float(deduced_frequency), float(deduced_confidence)
+
+
 def build_symbolic_truth_matrices(
     case_frame: pd.DataFrame,
     feature_names: Sequence[str],
@@ -95,8 +123,7 @@ def build_symbolic_truth_matrices(
         )
 
     for rule_id, rule in SYMBOLIC_RULES.items():
-        frequency_value = float(rule["truth_value"]["frequency"])
-        confidence_value = float(rule["truth_value"]["confidence"])
+        frequency_value, confidence_value = _deduced_ground_truth(rule["truth_value"])
         source_column = str(rule["source_column"])
         triggered_patients = np.zeros(n_cases, dtype=bool)
         mapped_patients = np.zeros(n_cases, dtype=bool)

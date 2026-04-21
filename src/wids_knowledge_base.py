@@ -5,6 +5,7 @@ from typing import Sequence
 import numpy as np
 
 from .knowledge_base import SymbolicKnowledgeResult
+from .nars_interface import deduce_truth_values
 
 WIDS_SYMBOLIC_RULES: dict[str, tuple[float, float]] = {
     "rule_lactate": (0.85, 0.80),
@@ -21,6 +22,29 @@ RULE_TO_FEATURE_NAME: dict[str, str] = {
 }
 
 RULE_ORDER: tuple[str, ...] = tuple(WIDS_SYMBOLIC_RULES.keys())
+EMPIRICAL_OBSERVATION_CONFIDENCE = 0.95
+
+
+def _deduced_ground_truth(frequency_value: float, confidence_value: float) -> tuple[float, float]:
+    """Explicitly ground a triggered ICU rule by NAL deduction from empirical observation."""
+    if frequency_value <= 0.0:
+        raise ValueError("Rule truth frequency must be positive to recover the implication confidence.")
+
+    implication_confidence = confidence_value / (
+        frequency_value * EMPIRICAL_OBSERVATION_CONFIDENCE
+    )
+    if implication_confidence > 1.0 + 1e-9:
+        raise ValueError(
+            "Grounded rule confidence exceeds what can be produced by an empirical-observation deduction step."
+        )
+
+    deduced_frequency, deduced_confidence = deduce_truth_values(
+        frequency_value,
+        min(implication_confidence, 1.0),
+        1.0,
+        EMPIRICAL_OBSERVATION_CONFIDENCE,
+    )
+    return float(deduced_frequency), float(deduced_confidence)
 
 
 def build_wids_symbolic_truth_matrices(
@@ -58,6 +82,7 @@ def build_wids_symbolic_truth_matrices(
             continue
 
         frequency_value, confidence_value = WIDS_SYMBOLIC_RULES[rule_name]
+        frequency_value, confidence_value = _deduced_ground_truth(frequency_value, confidence_value)
         patient_indices = np.flatnonzero(triggered_patients)
         symbolic_frequency[patient_indices, feature_position] = frequency_value
         symbolic_confidence[patient_indices, feature_position] = confidence_value
