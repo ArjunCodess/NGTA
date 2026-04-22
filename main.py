@@ -9,7 +9,14 @@ import numpy as np
 import torch
 
 from src.attention_hook import apply_confidence_gate
-from src.nars_interface import neural_to_nars, revise_truth_values
+from src.nars_interface import (
+    confidence_to_evidence,
+    deduce_truth_values,
+    evidence_to_confidence,
+    neural_to_nars,
+    revise_truth_values,
+    truth_to_expectation,
+)
 from src.pipeline import PipelineConfig, run_pipeline
 
 
@@ -38,6 +45,22 @@ def _run_self_checks() -> None:
         raise RuntimeError("revise_truth_values clamped frequency bounds check failed.")
     if not ((clamped_confidence >= 0.0).all() and (clamped_confidence <= 1.0).all()):
         raise RuntimeError("revise_truth_values clamped confidence bounds check failed.")
+
+    deduced_frequency, deduced_confidence = deduce_truth_values(0.85, 0.8823529411764706, 1.0, 1.0)
+    if not np.isclose(deduced_frequency, 0.85, atol=1e-6):
+        raise RuntimeError("deduce_truth_values frequency check failed.")
+    if not np.isclose(deduced_confidence, 0.75, atol=1e-6):
+        raise RuntimeError("deduce_truth_values confidence check failed.")
+
+    confidence = evidence_to_confidence(9.0)
+    if not np.isclose(confidence, 0.9, atol=1e-6):
+        raise RuntimeError("evidence_to_confidence check failed.")
+    evidence = confidence_to_evidence(confidence)
+    if not np.isclose(evidence, 9.0, atol=1e-5):
+        raise RuntimeError("confidence_to_evidence check failed.")
+    expectation = truth_to_expectation(1.0, 0.8)
+    if not np.isclose(expectation, 0.9, atol=1e-6):
+        raise RuntimeError("truth_to_expectation check failed.")
 
     gated = apply_confidence_gate(
         np.array([[0.5, 0.3, 0.2]], dtype=np.float64),

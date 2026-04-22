@@ -307,7 +307,9 @@ def _collapse_case_table(frame: pd.DataFrame, prefer_primary: bool = False) -> p
             how="left",
         )
 
-    return collapsed.reset_index()
+    # Defragment after the wide groupby aggregation so downstream resets/joins do not
+    # emit the pandas fragmentation warning during the TCGA pipeline.
+    return collapsed.copy().reset_index()
 
 
 def _drop_sparse_columns(frame: pd.DataFrame, threshold: float = 0.70) -> tuple[pd.DataFrame, list[str]]:
