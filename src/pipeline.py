@@ -2,7 +2,10 @@ from __future__ import annotations
 
 import copy
 import json
+import platform
 import random
+import subprocess
+import sys
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
@@ -10,8 +13,11 @@ from typing import Any
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import sklearn
 import torch
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.calibration import CalibratedClassifierCV
+from sklearn.ensemble import ExtraTreesClassifier, HistGradientBoostingClassifier, RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, brier_score_loss, roc_auc_score, roc_curve
 from torch import nn
 
@@ -25,6 +31,7 @@ from .wids_loader import WIDS_ID_COLUMN, WIDS_TARGET_COLUMN, load_wids_data_bund
 
 GAMMA_ABLATION_VALUES = (0.25, 0.5, 1.0, 2.0, 4.0)
 TREE_BASELINE_LABEL = "random_forest"
+TRANSFORMER_VARIANTS = ("baseline", "flat_confidence", "mc_confidence_only", "nars_gated")
 DATASET_METADATA: dict[str, dict[str, Any]] = {
     "tcga": {
         "display_name": "TCGA-THCA",
@@ -51,6 +58,43 @@ DATASET_METADATA: dict[str, dict[str, Any]] = {
 }
 
 
+def _get_git_commit() -> str | None:
+    try:
+        completed = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+    except (subprocess.SubprocessError, OSError):
+        return None
+    return completed.stdout.strip() or None
+
+
+def _get_environment_info() -> dict[str, Any]:
+    return {
+        "python": sys.version.split()[0],
+        "platform": platform.platform(),
+        "numpy": np.__version__,
+        "pandas": pd.__version__,
+        "scikit_learn": sklearn.__version__,
+        "torch": torch.__version__,
+        "cuda_available": bool(torch.cuda.is_available()),
+        "git_commit": _get_git_commit(),
+    }
+
+
+def _json_default(value: Any) -> Any:
+    if isinstance(value, np.integer):
+        return int(value)
+    if isinstance(value, np.floating):
+        return float(value)
+    if isinstance(value, np.ndarray):
+        return value.tolist()
+    return str(value)
+
+
 @dataclass
 class PipelineConfig:
     data_dir: str = "data"
@@ -68,6 +112,9 @@ class PipelineConfig:
     num_heads: int = 4
     num_layers: int = 2
     dropout: float = 0.2
+    baseline_set: str = "minimal"
+    ablation_set: str = "quick"
+    export_case_traces: bool = False
 
 
 def set_seed(seed: int) -> None:
@@ -341,36 +388,21 @@ def _bootstrap_metric_intervals(
     return intervals
 
 
-def _train_tree_baseline(bundle, config: PipelineConfig) -> dict[str, Any]:
-    encoded_train = _get_encoded_split(bundle, "train")
-    encoded_val = _get_encoded_split(bundle, "val")
-    encoded_test = _get_encoded_split(bundle, "test")
-
-    x_train = encoded_train.features
-    y_train = encoded_train.target.astype(int)
-    x_val = encoded_val.features
-    y_val = encoded_val.target.astype(int)
-    x_test = encoded_test.features
-    y_test = encoded_test.target.astype(int)
-
-    candidate_configs = [
-        {"n_estimators": 200, "max_depth": None, "min_samples_leaf": 1},
-        {"n_estimators": 400, "max_depth": None, "min_samples_leaf": 1},
-        {"n_estimators": 400, "max_depth": 8, "min_samples_leaf": 1},
-        {"n_estimators": 400, "max_depth": 8, "min_samples_leaf": 3},
-    ]
-    best_model: RandomForestClassifier | None = None
+def _fit_best_baseline(
+    label: str,
+    candidates: list[tuple[Any, dict[str, Any]]],
+    x_train: np.ndarray,
+    y_train: np.ndarray,
+    x_val: np.ndarray,
+    y_val: np.ndarray,
+    x_test: np.ndarray,
+) -> dict[str, Any]:
+    best_model = None
     best_config: dict[str, Any] | None = None
     best_val_brier = float("inf")
     best_val_auc = float("-inf")
 
-    for candidate in candidate_configs:
-        model = RandomForestClassifier(
-            **candidate,
-            random_state=config.seed,
-            n_jobs=-1,
-            class_weight="balanced",
-        )
+    for model, candidate_config in candidates:
         model.fit(x_train, y_train)
         val_probabilities = model.predict_proba(x_val)[:, 1]
         val_metrics = _compute_metrics(y_val, val_probabilities)
@@ -382,22 +414,125 @@ def _train_tree_baseline(bundle, config: PipelineConfig) -> dict[str, Any]:
             )
         ):
             best_model = model
-            best_config = candidate
+            best_config = candidate_config
             best_val_brier = val_metrics["brier"]
             best_val_auc = val_metrics["auc"]
 
     if best_model is None or best_config is None:
-        raise RuntimeError("Failed to train a Random Forest baseline.")
+        raise RuntimeError(f"Failed to train baseline: {label}")
 
-    test_probabilities = best_model.predict_proba(x_test)[:, 1]
     return {
-        "label": TREE_BASELINE_LABEL,
+        "label": label,
         "best_config": best_config,
         "val_brier": best_val_brier,
         "val_auc": best_val_auc,
-        "test_labels": y_test,
-        "test_probabilities": test_probabilities,
+        "test_probabilities": best_model.predict_proba(x_test)[:, 1],
     }
+
+
+def _train_classical_baselines(bundle, config: PipelineConfig) -> dict[str, dict[str, Any]]:
+    encoded_train = _get_encoded_split(bundle, "train")
+    encoded_val = _get_encoded_split(bundle, "val")
+    encoded_test = _get_encoded_split(bundle, "test")
+
+    x_train = encoded_train.features
+    y_train = encoded_train.target.astype(int)
+    x_val = encoded_val.features
+    y_val = encoded_val.target.astype(int)
+    x_test = encoded_test.features
+    y_test = encoded_test.target.astype(int)
+
+    random_forest_configs = [
+        {"n_estimators": 200, "max_depth": None, "min_samples_leaf": 1},
+        {"n_estimators": 400, "max_depth": None, "min_samples_leaf": 1},
+        {"n_estimators": 400, "max_depth": 8, "min_samples_leaf": 1},
+        {"n_estimators": 400, "max_depth": 8, "min_samples_leaf": 3},
+    ]
+    baseline_candidates: dict[str, list[tuple[Any, dict[str, Any]]]] = {
+        TREE_BASELINE_LABEL: [
+            (
+                RandomForestClassifier(
+                    **candidate,
+                    random_state=config.seed,
+                    n_jobs=-1,
+                    class_weight="balanced",
+                ),
+                candidate,
+            )
+            for candidate in random_forest_configs
+        ]
+    }
+
+    if config.baseline_set == "standard":
+        extra_trees_configs = [
+            {"n_estimators": 400, "max_depth": None, "min_samples_leaf": 1},
+            {"n_estimators": 400, "max_depth": 10, "min_samples_leaf": 2},
+        ]
+        baseline_candidates["extra_trees"] = [
+            (
+                ExtraTreesClassifier(
+                    **candidate,
+                    random_state=config.seed,
+                    n_jobs=-1,
+                    class_weight="balanced",
+                ),
+                candidate,
+            )
+            for candidate in extra_trees_configs
+        ]
+        hist_gradient_configs = [
+            {"max_iter": 150, "learning_rate": 0.05, "max_leaf_nodes": 31},
+            {"max_iter": 200, "learning_rate": 0.03, "max_leaf_nodes": 15},
+        ]
+        baseline_candidates["hist_gradient_boosting"] = [
+            (
+                HistGradientBoostingClassifier(
+                    **candidate,
+                    random_state=config.seed,
+                    l2_regularization=1e-4,
+                ),
+                candidate,
+            )
+            for candidate in hist_gradient_configs
+        ]
+        logistic_configs = [
+            {"C": 0.5},
+            {"C": 1.0},
+        ]
+        baseline_candidates["calibrated_logistic_regression"] = [
+            (
+                CalibratedClassifierCV(
+                    estimator=LogisticRegression(
+                        **candidate,
+                        max_iter=2000,
+                        class_weight="balanced",
+                        solver="lbfgs",
+                    ),
+                    method="sigmoid",
+                    cv=3,
+                ),
+                candidate,
+            )
+            for candidate in logistic_configs
+        ]
+
+    baselines: dict[str, dict[str, Any]] = {}
+    for label, candidates in baseline_candidates.items():
+        baselines[label] = _fit_best_baseline(
+            label=label,
+            candidates=candidates,
+            x_train=x_train,
+            y_train=y_train,
+            x_val=x_val,
+            y_val=y_val,
+            x_test=x_test,
+        )
+        baselines[label]["test_labels"] = y_test
+    return baselines
+
+
+def _train_tree_baseline(bundle, config: PipelineConfig) -> dict[str, Any]:
+    return _train_classical_baselines(bundle, config)[TREE_BASELINE_LABEL]
 
 
 def _save_roc_plot(
@@ -620,6 +755,189 @@ def _build_gamma_ablation_frame(
     return pd.DataFrame(rows)
 
 
+def _build_submission_ablation_frame(
+    y_true: np.ndarray,
+    baseline_probabilities: np.ndarray,
+    attention_mean: np.ndarray,
+    neural_confidence: np.ndarray,
+    revised_confidence: np.ndarray,
+    symbolic_confidence: np.ndarray,
+    symbolic_trigger_mask: np.ndarray,
+    cls_logit_mean: np.ndarray,
+    token_score_mean: np.ndarray,
+) -> pd.DataFrame:
+    rows: list[dict[str, float | str]] = []
+
+    def _add_row(ablation: str, gamma: float, confidence: np.ndarray) -> None:
+        ablated_attention = apply_confidence_gate(attention_mean, confidence, gamma=gamma)
+        ablated_logits = cls_logit_mean + np.sum(ablated_attention * token_score_mean, axis=1)
+        ablated_probabilities = _sigmoid(ablated_logits)
+        metrics = _compute_metrics(y_true, ablated_probabilities)
+        rows.append(
+            {
+                "ablation": ablation,
+                "gamma": float(gamma),
+                "symbolic_confidence_scale": 1.0,
+                "baseline_auc": _compute_metrics(y_true, baseline_probabilities)["auc"],
+                "baseline_brier": _compute_metrics(y_true, baseline_probabilities)["brier"],
+                "auc": metrics["auc"],
+                "brier": metrics["brier"],
+                "accuracy": metrics["accuracy"],
+                "ece": metrics["ece"],
+            }
+        )
+
+    for gamma in GAMMA_ABLATION_VALUES:
+        _add_row("nars_gated_gamma", float(gamma), revised_confidence)
+        _add_row("symbolic_disabled_mc_confidence_only", float(gamma), neural_confidence)
+
+    for scale in (0.5, 0.75, 1.25, 1.5):
+        scaled_symbolic_confidence = np.where(
+            symbolic_trigger_mask,
+            np.clip(symbolic_confidence * scale, 0.0, 1.0),
+            neural_confidence,
+        )
+        revised_scaled_confidence = np.where(symbolic_trigger_mask, scaled_symbolic_confidence, neural_confidence)
+        gated_attention = apply_confidence_gate(attention_mean, revised_scaled_confidence, gamma=2.0)
+        probabilities = _sigmoid(cls_logit_mean + np.sum(gated_attention * token_score_mean, axis=1))
+        metrics = _compute_metrics(y_true, probabilities)
+        rows.append(
+            {
+                "ablation": "rule_truth_confidence_scale",
+                "gamma": 2.0,
+                "symbolic_confidence_scale": float(scale),
+                "baseline_auc": _compute_metrics(y_true, baseline_probabilities)["auc"],
+                "baseline_brier": _compute_metrics(y_true, baseline_probabilities)["brier"],
+                "auc": metrics["auc"],
+                "brier": metrics["brier"],
+                "accuracy": metrics["accuracy"],
+                "ece": metrics["ece"],
+            }
+        )
+
+    return pd.DataFrame(rows)
+
+
+def _missingness_fraction(frame: pd.DataFrame) -> np.ndarray:
+    feature_frame = frame.drop(columns=[column for column in frame.columns if column.endswith("_id")], errors="ignore")
+    return feature_frame.isna().mean(axis=1).to_numpy(dtype=np.float64)
+
+
+def _json_feature_trace(
+    feature_names: list[str],
+    patient_index: int,
+    neural_frequency: np.ndarray,
+    neural_confidence: np.ndarray,
+    symbolic_frequency: np.ndarray,
+    symbolic_confidence: np.ndarray,
+    revised_frequency: np.ndarray,
+    revised_confidence: np.ndarray,
+    attention_mean: np.ndarray,
+    gated_attention: np.ndarray,
+    symbolic_trigger_mask: np.ndarray,
+) -> str:
+    triggered_indices = np.flatnonzero(symbolic_trigger_mask[patient_index])
+    if triggered_indices.size == 0:
+        changed = np.abs(gated_attention[patient_index] - attention_mean[patient_index])
+        triggered_indices = np.argsort(changed)[-3:][::-1]
+    records = []
+    for feature_index in triggered_indices[:6]:
+        records.append(
+            {
+                "feature": feature_names[int(feature_index)],
+                "neural_f": float(neural_frequency[patient_index, feature_index]),
+                "neural_c": float(neural_confidence[patient_index, feature_index]),
+                "symbolic_f": float(symbolic_frequency[patient_index, feature_index]),
+                "symbolic_c": float(symbolic_confidence[patient_index, feature_index]),
+                "revised_f": float(revised_frequency[patient_index, feature_index]),
+                "revised_c": float(revised_confidence[patient_index, feature_index]),
+                "attention_before": float(attention_mean[patient_index, feature_index]),
+                "attention_after": float(gated_attention[patient_index, feature_index]),
+                "attention_delta": float(gated_attention[patient_index, feature_index] - attention_mean[patient_index, feature_index]),
+            }
+        )
+    return json.dumps(records, sort_keys=True)
+
+
+def _build_case_trace_frame(
+    bundle,
+    y_true: np.ndarray,
+    baseline_probabilities: np.ndarray,
+    gated_probabilities: np.ndarray,
+    neural_frequency: np.ndarray,
+    neural_confidence: np.ndarray,
+    attention_truths,
+    symbolic_knowledge,
+    attention_mean: np.ndarray,
+    gated_attention: np.ndarray,
+    id_column: str,
+) -> pd.DataFrame:
+    predictions = (gated_probabilities >= 0.5).astype(int)
+    missingness = _missingness_fraction(bundle.test_frame)
+    categories = {
+        "true_positive": np.flatnonzero((predictions == 1) & (y_true == 1)),
+        "true_negative": np.flatnonzero((predictions == 0) & (y_true == 0)),
+        "false_positive": np.flatnonzero((predictions == 1) & (y_true == 0)),
+        "false_negative": np.flatnonzero((predictions == 0) & (y_true == 1)),
+        "high_missingness": np.argsort(missingness)[-5:][::-1],
+        "symbolic_active": np.flatnonzero(symbolic_knowledge.patient_any_rule_triggered),
+    }
+
+    selected: list[tuple[str, int]] = []
+    seen: set[int] = set()
+    for category, indices in categories.items():
+        for index in indices[:5]:
+            patient_index = int(index)
+            if patient_index in seen:
+                continue
+            selected.append((category, patient_index))
+            seen.add(patient_index)
+            break
+    if len(selected) < 20:
+        uncertainty_order = np.argsort(np.abs(gated_probabilities - 0.5))
+        for index in uncertainty_order:
+            patient_index = int(index)
+            if patient_index in seen:
+                continue
+            selected.append(("near_threshold", patient_index))
+            seen.add(patient_index)
+            if len(selected) >= 20:
+                break
+
+    rows: list[dict[str, Any]] = []
+    feature_names = bundle.preprocessor.feature_names
+    for category, patient_index in selected[:20]:
+        row = {
+            "case_category": category,
+            "case_index": patient_index,
+            "case_id": bundle.test_frame.iloc[patient_index][id_column],
+            "target": int(y_true[patient_index]),
+            "baseline_probability": float(baseline_probabilities[patient_index]),
+            "nars_gated_probability": float(gated_probabilities[patient_index]),
+            "prediction": int(predictions[patient_index]),
+            "missingness_fraction": float(missingness[patient_index]),
+            "symbolic_rule_count": int(symbolic_knowledge.patient_rule_counts[patient_index]),
+            "symbolic_any_rule_triggered": int(symbolic_knowledge.patient_any_rule_triggered[patient_index]),
+            "neural_prediction_f": float(neural_frequency[patient_index]),
+            "neural_prediction_c": float(neural_confidence[patient_index]),
+            "feature_trace_json": _json_feature_trace(
+                feature_names=feature_names,
+                patient_index=patient_index,
+                neural_frequency=attention_truths.neural_frequency,
+                neural_confidence=attention_truths.neural_confidence,
+                symbolic_frequency=symbolic_knowledge.symbolic_frequency,
+                symbolic_confidence=symbolic_knowledge.symbolic_confidence,
+                revised_frequency=attention_truths.revised_frequency,
+                revised_confidence=attention_truths.revised_confidence,
+                attention_mean=attention_mean,
+                gated_attention=gated_attention,
+                symbolic_trigger_mask=symbolic_knowledge.symbolic_trigger_mask,
+            ),
+        }
+        rows.append(row)
+    return pd.DataFrame(rows)
+
+
 def _resolve_symbolic_knowledge(bundle, config: PipelineConfig):
     dataset_metadata = _get_dataset_metadata(config.dataset)
     if dataset_metadata["symbolic_builder"] == "tcga":
@@ -672,7 +990,8 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
     history = _train_model(model=model, bundle=bundle, config=effective_config, device=device)
     history.to_csv(output_dirs["metrics"] / "training_history.csv", index=False)
     _save_training_plot(history, output_dirs["charts"] / "training_history.png", dataset_metadata["display_name"])
-    tree_baseline = _train_tree_baseline(bundle=bundle, config=effective_config)
+    classical_baselines = _train_classical_baselines(bundle=bundle, config=effective_config)
+    tree_baseline = classical_baselines[TREE_BASELINE_LABEL]
 
     summary = model.predict_with_mc_dropout(loader=bundle.test_loader, device=device, mc_samples=effective_config.mc_samples)
     symbolic_knowledge = _resolve_symbolic_knowledge(bundle, effective_config)
@@ -685,6 +1004,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         symbolic_trigger_mask=symbolic_knowledge.symbolic_trigger_mask,
     )
     gated_attention = apply_confidence_gate(summary.attention_mean, attention_truths.revised_confidence, gamma=effective_config.gamma)
+    mc_attention = apply_confidence_gate(summary.attention_mean, attention_truths.neural_confidence, gamma=effective_config.gamma)
     flat_attention = apply_confidence_gate(
         summary.attention_mean,
         np.full_like(attention_truths.revised_confidence, 0.5, dtype=np.float64),
@@ -692,75 +1012,48 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
     )
     flat_logits = summary.cls_logit_mean + np.sum(flat_attention * summary.token_score_mean, axis=1)
     flat_probabilities = _sigmoid(flat_logits)
+    mc_logits = summary.cls_logit_mean + np.sum(mc_attention * summary.token_score_mean, axis=1)
+    mc_probabilities = _sigmoid(mc_logits)
     gated_logits = summary.cls_logit_mean + np.sum(gated_attention * summary.token_score_mean, axis=1)
     gated_probabilities = _sigmoid(gated_logits)
 
     y_true = summary.labels.astype(int)
     tree_probabilities = tree_baseline["test_probabilities"]
+    probability_map = {
+        **{label: baseline["test_probabilities"] for label, baseline in classical_baselines.items()},
+        "baseline": summary.probabilities_mean,
+        "flat_confidence": flat_probabilities,
+        "mc_confidence_only": mc_probabilities,
+        "nars_gated": gated_probabilities,
+    }
     reliability_frame = pd.concat(
         [
-            _build_reliability_frame(y_true, tree_probabilities, n_bins=10).assign(variant=TREE_BASELINE_LABEL),
-            _build_reliability_frame(y_true, summary.probabilities_mean, n_bins=10).assign(variant="baseline"),
-            _build_reliability_frame(y_true, flat_probabilities, n_bins=10).assign(variant="flat_confidence"),
-            _build_reliability_frame(y_true, gated_probabilities, n_bins=10).assign(variant="nars_gated"),
+            _build_reliability_frame(y_true, probabilities, n_bins=10).assign(variant=variant)
+            for variant, probabilities in probability_map.items()
         ],
         ignore_index=True,
     )
     metric_bootstrap = _bootstrap_metric_intervals(
         y_true=y_true,
-        probability_map={
-            TREE_BASELINE_LABEL: tree_probabilities,
-            "baseline": summary.probabilities_mean,
-            "flat_confidence": flat_probabilities,
-            "nars_gated": gated_probabilities,
-        },
+        probability_map=probability_map,
         iterations=1000,
         seed=effective_config.seed,
     )
-    metrics_frame = pd.DataFrame(
-        [
+    metric_rows: list[dict[str, Any]] = []
+    for variant, probabilities in probability_map.items():
+        metric_rows.append(
             {
-                "variant": TREE_BASELINE_LABEL,
-                **_compute_metrics(y_true, tree_probabilities),
-                "auc_ci_95_lower": metric_bootstrap[TREE_BASELINE_LABEL]["auc_ci_95_lower"],
-                "auc_ci_95_upper": metric_bootstrap[TREE_BASELINE_LABEL]["auc_ci_95_upper"],
-                "brier_ci_95_lower": metric_bootstrap[TREE_BASELINE_LABEL]["brier_ci_95_lower"],
-                "brier_ci_95_upper": metric_bootstrap[TREE_BASELINE_LABEL]["brier_ci_95_upper"],
-                "ece_ci_95_lower": metric_bootstrap[TREE_BASELINE_LABEL]["ece_ci_95_lower"],
-                "ece_ci_95_upper": metric_bootstrap[TREE_BASELINE_LABEL]["ece_ci_95_upper"],
-            },
-            {
-                "variant": "baseline",
-                **_compute_metrics(y_true, summary.probabilities_mean),
-                "auc_ci_95_lower": metric_bootstrap["baseline"]["auc_ci_95_lower"],
-                "auc_ci_95_upper": metric_bootstrap["baseline"]["auc_ci_95_upper"],
-                "brier_ci_95_lower": metric_bootstrap["baseline"]["brier_ci_95_lower"],
-                "brier_ci_95_upper": metric_bootstrap["baseline"]["brier_ci_95_upper"],
-                "ece_ci_95_lower": metric_bootstrap["baseline"]["ece_ci_95_lower"],
-                "ece_ci_95_upper": metric_bootstrap["baseline"]["ece_ci_95_upper"],
-            },
-            {
-                "variant": "flat_confidence",
-                **_compute_metrics(y_true, flat_probabilities),
-                "auc_ci_95_lower": metric_bootstrap["flat_confidence"]["auc_ci_95_lower"],
-                "auc_ci_95_upper": metric_bootstrap["flat_confidence"]["auc_ci_95_upper"],
-                "brier_ci_95_lower": metric_bootstrap["flat_confidence"]["brier_ci_95_lower"],
-                "brier_ci_95_upper": metric_bootstrap["flat_confidence"]["brier_ci_95_upper"],
-                "ece_ci_95_lower": metric_bootstrap["flat_confidence"]["ece_ci_95_lower"],
-                "ece_ci_95_upper": metric_bootstrap["flat_confidence"]["ece_ci_95_upper"],
-            },
-            {
-                "variant": "nars_gated",
-                **_compute_metrics(y_true, gated_probabilities),
-                "auc_ci_95_lower": metric_bootstrap["nars_gated"]["auc_ci_95_lower"],
-                "auc_ci_95_upper": metric_bootstrap["nars_gated"]["auc_ci_95_upper"],
-                "brier_ci_95_lower": metric_bootstrap["nars_gated"]["brier_ci_95_lower"],
-                "brier_ci_95_upper": metric_bootstrap["nars_gated"]["brier_ci_95_upper"],
-                "ece_ci_95_lower": metric_bootstrap["nars_gated"]["ece_ci_95_lower"],
-                "ece_ci_95_upper": metric_bootstrap["nars_gated"]["ece_ci_95_upper"],
-            },
-        ]
-    )
+                "variant": variant,
+                **_compute_metrics(y_true, probabilities),
+                "auc_ci_95_lower": metric_bootstrap[variant]["auc_ci_95_lower"],
+                "auc_ci_95_upper": metric_bootstrap[variant]["auc_ci_95_upper"],
+                "brier_ci_95_lower": metric_bootstrap[variant]["brier_ci_95_lower"],
+                "brier_ci_95_upper": metric_bootstrap[variant]["brier_ci_95_upper"],
+                "ece_ci_95_lower": metric_bootstrap[variant]["ece_ci_95_lower"],
+                "ece_ci_95_upper": metric_bootstrap[variant]["ece_ci_95_upper"],
+            }
+        )
+    metrics_frame = pd.DataFrame(metric_rows)
     metrics_frame.to_csv(output_dirs["metrics"] / "metrics.csv", index=False)
     reliability_frame.to_csv(output_dirs["metrics"] / "calibration_reliability.csv", index=False)
 
@@ -783,6 +1076,22 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         target_column=dataset_metadata["target_column"],
     )
     trace_frame.to_csv(output_dirs["traces"] / "test_predictions.csv", index=False)
+    case_trace_frame = pd.DataFrame()
+    if effective_config.export_case_traces:
+        case_trace_frame = _build_case_trace_frame(
+            bundle=bundle,
+            y_true=y_true,
+            baseline_probabilities=summary.probabilities_mean,
+            gated_probabilities=gated_probabilities,
+            neural_frequency=np.asarray(neural_frequency),
+            neural_confidence=np.asarray(neural_confidence),
+            attention_truths=attention_truths,
+            symbolic_knowledge=symbolic_knowledge,
+            attention_mean=summary.attention_mean,
+            gated_attention=gated_attention,
+            id_column=dataset_metadata["id_column"],
+        )
+        case_trace_frame.to_csv(output_dirs["traces"] / "case_traces.csv", index=False)
 
     gamma_ablation_frame = _build_gamma_ablation_frame(
         y_true=y_true,
@@ -794,6 +1103,20 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
     )
     gamma_ablation_frame.to_csv(output_dirs["metrics"] / "gamma_ablation.csv", index=False)
     _save_gamma_ablation_plot(gamma_ablation_frame, output_dirs["charts"] / "gamma_ablation_auc.png", dataset_metadata["positive_class"])
+    submission_ablation_frame = pd.DataFrame()
+    if effective_config.ablation_set == "submission":
+        submission_ablation_frame = _build_submission_ablation_frame(
+            y_true=y_true,
+            baseline_probabilities=summary.probabilities_mean,
+            attention_mean=summary.attention_mean,
+            neural_confidence=attention_truths.neural_confidence,
+            revised_confidence=attention_truths.revised_confidence,
+            symbolic_confidence=symbolic_knowledge.symbolic_confidence,
+            symbolic_trigger_mask=symbolic_knowledge.symbolic_trigger_mask,
+            cls_logit_mean=summary.cls_logit_mean,
+            token_score_mean=summary.token_score_mean,
+        )
+        submission_ablation_frame.to_csv(output_dirs["metrics"] / "submission_ablation.csv", index=False)
 
     decision_curve_frame = _build_decision_curve_frame(
         y_true=y_true,
@@ -826,6 +1149,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
 
     summary_frame = {
         "config": asdict(effective_config),
+        "environment": _get_environment_info(),
         "task": {
             "dataset": dataset_metadata["display_name"],
             "dataset_key": effective_config.dataset,
@@ -856,9 +1180,21 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
             "validation_auc": tree_baseline["val_auc"],
             "validation_brier": tree_baseline["val_brier"],
         },
+        "classical_baselines": {
+            label: {
+                "variant": label,
+                "selection_objective": "validation_brier",
+                "best_config": baseline["best_config"],
+                "validation_auc": baseline["val_auc"],
+                "validation_brier": baseline["val_brier"],
+            }
+            for label, baseline in classical_baselines.items()
+        },
         "auc_bootstrap": metric_bootstrap,
         "metric_bootstrap": metric_bootstrap,
         "gamma_ablation": gamma_ablation_frame.to_dict(orient="records"),
+        "submission_ablation": submission_ablation_frame.to_dict(orient="records"),
+        "case_traces": case_trace_frame.to_dict(orient="records"),
         "decision_curve": decision_curve_frame.to_dict(orient="records"),
         "calibration_reliability": reliability_frame.to_dict(orient="records"),
         "artifacts": {
@@ -866,9 +1202,11 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
             "metrics_csv": str(output_dirs["metrics"] / "metrics.csv"),
             "training_history_csv": str(output_dirs["metrics"] / "training_history.csv"),
             "gamma_ablation_csv": str(output_dirs["metrics"] / "gamma_ablation.csv"),
+            "submission_ablation_csv": str(output_dirs["metrics"] / "submission_ablation.csv") if effective_config.ablation_set == "submission" else None,
             "decision_curve_csv": str(output_dirs["metrics"] / "decision_curve.csv"),
             "calibration_reliability_csv": str(output_dirs["metrics"] / "calibration_reliability.csv"),
             "trace_csv": str(output_dirs["traces"] / "test_predictions.csv"),
+            "case_traces_csv": str(output_dirs["traces"] / "case_traces.csv") if effective_config.export_case_traces else None,
             "roc_curve": str(output_dirs["charts"] / "roc_curve.png"),
             "calibration_curve": str(output_dirs["charts"] / "calibration_curve.png"),
             "training_history_plot": str(output_dirs["charts"] / "training_history.png"),
@@ -878,5 +1216,8 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
             "split_summary_json": str(output_dirs["traces"] / "split_summary.json"),
         },
     }
-    (output_dirs["metrics"] / "run_summary.json").write_text(json.dumps(summary_frame, indent=2), encoding="utf-8")
+    (output_dirs["metrics"] / "run_summary.json").write_text(
+        json.dumps(summary_frame, indent=2, default=_json_default),
+        encoding="utf-8",
+    )
     return summary_frame
