@@ -1,5 +1,8 @@
 {
   "mode": "run_all",
+  "seeds": [
+    0
+  ],
   "datasets": {
     "tcga": {
       "config": {
@@ -17,7 +20,20 @@
         "d_model": 64,
         "num_heads": 4,
         "num_layers": 2,
-        "dropout": 0.2
+        "dropout": 0.2,
+        "baseline_set": "minimal",
+        "ablation_set": "quick",
+        "export_case_traces": false
+      },
+      "environment": {
+        "python": "3.14.4",
+        "platform": "Windows-11-10.0.26100-SP0",
+        "numpy": "2.4.4",
+        "pandas": "3.0.2",
+        "scikit_learn": "1.8.0",
+        "torch": "2.11.0+cpu",
+        "cuda_available": false,
+        "git_commit": "38c856a5204114067718c29361c110f0b974dcd3"
       },
       "task": {
         "dataset": "TCGA-THCA",
@@ -633,12 +649,12 @@
         {
           "variant": "random_forest",
           "auc": 0.6613445378151261,
-          "brier": 0.21997575273834527,
+          "brier": 0.2199757527383453,
           "accuracy": 0.5942028985507246,
           "ece": 0.15966664988761547,
           "auc_ci_95_lower": 0.5100720984441915,
           "auc_ci_95_upper": 0.7907666818849781,
-          "brier_ci_95_lower": 0.18953733342289616,
+          "brier_ci_95_lower": 0.18953733342289614,
           "brier_ci_95_upper": 0.24980725468298623,
           "ece_ci_95_lower": 0.13173260446334506,
           "ece_ci_95_upper": 0.2824154266581759
@@ -668,6 +684,19 @@
           "brier_ci_95_upper": 0.24551392772871664,
           "ece_ci_95_lower": 0.11629387033672048,
           "ece_ci_95_upper": 0.2596672449059608
+        },
+        {
+          "variant": "mc_confidence_only",
+          "auc": 0.7260504201680673,
+          "brier": 0.2121918105689808,
+          "accuracy": 0.6666666666666666,
+          "ece": 0.14027097963106075,
+          "auc_ci_95_lower": 0.5956742424242424,
+          "auc_ci_95_upper": 0.8459660682454799,
+          "brier_ci_95_lower": 0.18075487949743851,
+          "brier_ci_95_upper": 0.24512478039534769,
+          "ece_ci_95_lower": 0.11766520017870366,
+          "ece_ci_95_upper": 0.26213069786795506
         },
         {
           "variant": "nars_gated",
@@ -754,6 +783,19 @@
         "validation_auc": 0.7529411764705882,
         "validation_brier": 0.20979110015441177
       },
+      "classical_baselines": {
+        "random_forest": {
+          "variant": "random_forest",
+          "selection_objective": "validation_brier",
+          "best_config": {
+            "n_estimators": 400,
+            "max_depth": 8,
+            "min_samples_leaf": 1
+          },
+          "validation_auc": 0.7529411764705882,
+          "validation_brier": 0.20979110015441177
+        }
+      },
       "auc_bootstrap": {
         "random_forest": {
           "iterations": 1000,
@@ -761,7 +803,7 @@
           "auc_ci_95_lower": 0.5100720984441915,
           "auc_ci_95_upper": 0.7907666818849781,
           "brier_samples_mean": 0.21969943709437945,
-          "brier_ci_95_lower": 0.18953733342289616,
+          "brier_ci_95_lower": 0.18953733342289614,
           "brier_ci_95_upper": 0.24980725468298623,
           "ece_samples_mean": 0.20844884693908314,
           "ece_ci_95_lower": 0.13173260446334506,
@@ -790,6 +832,18 @@
           "ece_samples_mean": 0.1848452143218193,
           "ece_ci_95_lower": 0.11629387033672048,
           "ece_ci_95_upper": 0.2596672449059608
+        },
+        "mc_confidence_only": {
+          "iterations": 1000,
+          "auc_samples_mean": 0.7265985058093779,
+          "auc_ci_95_lower": 0.5956742424242424,
+          "auc_ci_95_upper": 0.8459660682454799,
+          "brier_samples_mean": 0.21180730758844896,
+          "brier_ci_95_lower": 0.18075487949743851,
+          "brier_ci_95_upper": 0.24512478039534769,
+          "ece_samples_mean": 0.18623690241564914,
+          "ece_ci_95_lower": 0.11766520017870366,
+          "ece_ci_95_upper": 0.26213069786795506
         },
         "nars_gated": {
           "iterations": 1000,
@@ -826,12 +880,12 @@
           "flat_confidence_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for the ece difference includes zero.",
           "random_forest_vs_nars_gated_ci_overlap": true,
           "random_forest_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain.",
-          "random_forest_vs_nars_gated_brier_delta_left_minus_right": 0.007982659823407479,
-          "random_forest_vs_nars_gated_brier_delta_ci_95_lower": -0.011301369963078992,
+          "random_forest_vs_nars_gated_brier_delta_left_minus_right": 0.00798265982340748,
+          "random_forest_vs_nars_gated_brier_delta_ci_95_lower": -0.011301369963078966,
           "random_forest_vs_nars_gated_brier_delta_ci_95_upper": 0.02773086751512264,
           "random_forest_vs_nars_gated_brier_interpretation": "The 95% paired bootstrap interval for the brier difference includes zero.",
-          "random_forest_vs_nars_gated_ece_delta_left_minus_right": 0.022365492387442912,
-          "random_forest_vs_nars_gated_ece_delta_ci_95_lower": -0.07642998582535623,
+          "random_forest_vs_nars_gated_ece_delta_left_minus_right": 0.022365492387442915,
+          "random_forest_vs_nars_gated_ece_delta_ci_95_lower": -0.0764299858253562,
           "random_forest_vs_nars_gated_ece_delta_ci_95_upper": 0.11806720270373779,
           "random_forest_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for the ece difference includes zero."
         }
@@ -843,7 +897,7 @@
           "auc_ci_95_lower": 0.5100720984441915,
           "auc_ci_95_upper": 0.7907666818849781,
           "brier_samples_mean": 0.21969943709437945,
-          "brier_ci_95_lower": 0.18953733342289616,
+          "brier_ci_95_lower": 0.18953733342289614,
           "brier_ci_95_upper": 0.24980725468298623,
           "ece_samples_mean": 0.20844884693908314,
           "ece_ci_95_lower": 0.13173260446334506,
@@ -872,6 +926,18 @@
           "ece_samples_mean": 0.1848452143218193,
           "ece_ci_95_lower": 0.11629387033672048,
           "ece_ci_95_upper": 0.2596672449059608
+        },
+        "mc_confidence_only": {
+          "iterations": 1000,
+          "auc_samples_mean": 0.7265985058093779,
+          "auc_ci_95_lower": 0.5956742424242424,
+          "auc_ci_95_upper": 0.8459660682454799,
+          "brier_samples_mean": 0.21180730758844896,
+          "brier_ci_95_lower": 0.18075487949743851,
+          "brier_ci_95_upper": 0.24512478039534769,
+          "ece_samples_mean": 0.18623690241564914,
+          "ece_ci_95_lower": 0.11766520017870366,
+          "ece_ci_95_upper": 0.26213069786795506
         },
         "nars_gated": {
           "iterations": 1000,
@@ -908,12 +974,12 @@
           "flat_confidence_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for the ece difference includes zero.",
           "random_forest_vs_nars_gated_ci_overlap": true,
           "random_forest_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain.",
-          "random_forest_vs_nars_gated_brier_delta_left_minus_right": 0.007982659823407479,
-          "random_forest_vs_nars_gated_brier_delta_ci_95_lower": -0.011301369963078992,
+          "random_forest_vs_nars_gated_brier_delta_left_minus_right": 0.00798265982340748,
+          "random_forest_vs_nars_gated_brier_delta_ci_95_lower": -0.011301369963078966,
           "random_forest_vs_nars_gated_brier_delta_ci_95_upper": 0.02773086751512264,
           "random_forest_vs_nars_gated_brier_interpretation": "The 95% paired bootstrap interval for the brier difference includes zero.",
-          "random_forest_vs_nars_gated_ece_delta_left_minus_right": 0.022365492387442912,
-          "random_forest_vs_nars_gated_ece_delta_ci_95_lower": -0.07642998582535623,
+          "random_forest_vs_nars_gated_ece_delta_left_minus_right": 0.022365492387442915,
+          "random_forest_vs_nars_gated_ece_delta_ci_95_lower": -0.0764299858253562,
           "random_forest_vs_nars_gated_ece_delta_ci_95_upper": 0.11806720270373779,
           "random_forest_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for the ece difference includes zero."
         }
@@ -980,6 +1046,8 @@
           "accuracy_delta_gated_minus_baseline": 0.0
         }
       ],
+      "submission_ablation": [],
+      "case_traces": [],
       "decision_curve": [
         {
           "threshold": 0.05,
@@ -1191,7 +1259,7 @@
           "variant": "random_forest"
         },
         {
-          "mean_predicted_probability": 0.5457126924797843,
+          "mean_predicted_probability": 0.5457126924797842,
           "fraction_positives": 0.14285714285714285,
           "count": 7,
           "variant": "random_forest"
@@ -1209,7 +1277,7 @@
           "variant": "random_forest"
         },
         {
-          "mean_predicted_probability": 0.7282909847479111,
+          "mean_predicted_probability": 0.7282909847479112,
           "fraction_positives": 0.5714285714285714,
           "count": 7,
           "variant": "random_forest"
@@ -1335,6 +1403,66 @@
           "variant": "flat_confidence"
         },
         {
+          "mean_predicted_probability": 0.1727513082332202,
+          "fraction_positives": 0.0,
+          "count": 7,
+          "variant": "mc_confidence_only"
+        },
+        {
+          "mean_predicted_probability": 0.2571210321844151,
+          "fraction_positives": 0.2857142857142857,
+          "count": 7,
+          "variant": "mc_confidence_only"
+        },
+        {
+          "mean_predicted_probability": 0.3628228577923665,
+          "fraction_positives": 0.42857142857142855,
+          "count": 7,
+          "variant": "mc_confidence_only"
+        },
+        {
+          "mean_predicted_probability": 0.4032659107981614,
+          "fraction_positives": 0.5714285714285714,
+          "count": 7,
+          "variant": "mc_confidence_only"
+        },
+        {
+          "mean_predicted_probability": 0.43555129895449596,
+          "fraction_positives": 0.42857142857142855,
+          "count": 7,
+          "variant": "mc_confidence_only"
+        },
+        {
+          "mean_predicted_probability": 0.45749295854120114,
+          "fraction_positives": 0.3333333333333333,
+          "count": 6,
+          "variant": "mc_confidence_only"
+        },
+        {
+          "mean_predicted_probability": 0.5193263528824279,
+          "fraction_positives": 0.8571428571428571,
+          "count": 7,
+          "variant": "mc_confidence_only"
+        },
+        {
+          "mean_predicted_probability": 0.5727240743242851,
+          "fraction_positives": 0.7142857142857143,
+          "count": 7,
+          "variant": "mc_confidence_only"
+        },
+        {
+          "mean_predicted_probability": 0.625636072972073,
+          "fraction_positives": 0.42857142857142855,
+          "count": 7,
+          "variant": "mc_confidence_only"
+        },
+        {
+          "mean_predicted_probability": 0.6995727602787066,
+          "fraction_positives": 0.8571428571428571,
+          "count": 7,
+          "variant": "mc_confidence_only"
+        },
+        {
           "mean_predicted_probability": 0.17292130481744647,
           "fraction_positives": 0.0,
           "count": 7,
@@ -1400,9 +1528,11 @@
         "metrics_csv": "results\\tcga\\metrics\\metrics.csv",
         "training_history_csv": "results\\tcga\\metrics\\training_history.csv",
         "gamma_ablation_csv": "results\\tcga\\metrics\\gamma_ablation.csv",
+        "submission_ablation_csv": null,
         "decision_curve_csv": "results\\tcga\\metrics\\decision_curve.csv",
         "calibration_reliability_csv": "results\\tcga\\metrics\\calibration_reliability.csv",
         "trace_csv": "results\\tcga\\traces\\test_predictions.csv",
+        "case_traces_csv": null,
         "roc_curve": "results\\tcga\\charts\\roc_curve.png",
         "calibration_curve": "results\\tcga\\charts\\calibration_curve.png",
         "training_history_plot": "results\\tcga\\charts\\training_history.png",
@@ -1428,7 +1558,20 @@
         "d_model": 64,
         "num_heads": 4,
         "num_layers": 2,
-        "dropout": 0.2
+        "dropout": 0.2,
+        "baseline_set": "minimal",
+        "ablation_set": "quick",
+        "export_case_traces": false
+      },
+      "environment": {
+        "python": "3.14.4",
+        "platform": "Windows-11-10.0.26100-SP0",
+        "numpy": "2.4.4",
+        "pandas": "3.0.2",
+        "scikit_learn": "1.8.0",
+        "torch": "2.11.0+cpu",
+        "cuda_available": false,
+        "git_commit": "38c856a5204114067718c29361c110f0b974dcd3"
       },
       "task": {
         "dataset": "WiDS ICU 2020",
@@ -1543,6 +1686,19 @@
           "ece_ci_95_upper": 0.009685358164897939
         },
         {
+          "variant": "mc_confidence_only",
+          "auc": 0.8828774197267,
+          "brier": 0.05618068546430419,
+          "accuracy": 0.9290542996292797,
+          "ece": 0.004948316315293253,
+          "auc_ci_95_lower": 0.8730540809860217,
+          "auc_ci_95_upper": 0.8924703921381556,
+          "brier_ci_95_lower": 0.05326830758849572,
+          "brier_ci_95_upper": 0.05945310214392899,
+          "ece_ci_95_lower": 0.003862145115463386,
+          "ece_ci_95_upper": 0.009547634878479096
+        },
+        {
           "variant": "nars_gated",
           "auc": 0.8828853952826262,
           "brier": 0.05617974174439984,
@@ -1607,6 +1763,19 @@
         "validation_auc": 0.8762096526835169,
         "validation_brier": 0.05835939552600211
       },
+      "classical_baselines": {
+        "random_forest": {
+          "variant": "random_forest",
+          "selection_objective": "validation_brier",
+          "best_config": {
+            "n_estimators": 400,
+            "max_depth": null,
+            "min_samples_leaf": 1
+          },
+          "validation_auc": 0.8762096526835169,
+          "validation_brier": 0.05835939552600211
+        }
+      },
       "auc_bootstrap": {
         "random_forest": {
           "iterations": 1000,
@@ -1643,6 +1812,18 @@
           "ece_samples_mean": 0.006667173812003438,
           "ece_ci_95_lower": 0.004105570352410677,
           "ece_ci_95_upper": 0.009685358164897939
+        },
+        "mc_confidence_only": {
+          "iterations": 1000,
+          "auc_samples_mean": 0.8828564877528888,
+          "auc_ci_95_lower": 0.8730540809860217,
+          "auc_ci_95_upper": 0.8924703921381556,
+          "brier_samples_mean": 0.05624322194215141,
+          "brier_ci_95_lower": 0.05326830758849572,
+          "brier_ci_95_upper": 0.05945310214392899,
+          "ece_samples_mean": 0.0065148124889950485,
+          "ece_ci_95_lower": 0.003862145115463386,
+          "ece_ci_95_upper": 0.009547634878479096
         },
         "nars_gated": {
           "iterations": 1000,
@@ -1725,6 +1906,18 @@
           "ece_samples_mean": 0.006667173812003438,
           "ece_ci_95_lower": 0.004105570352410677,
           "ece_ci_95_upper": 0.009685358164897939
+        },
+        "mc_confidence_only": {
+          "iterations": 1000,
+          "auc_samples_mean": 0.8828564877528888,
+          "auc_ci_95_lower": 0.8730540809860217,
+          "auc_ci_95_upper": 0.8924703921381556,
+          "brier_samples_mean": 0.05624322194215141,
+          "brier_ci_95_lower": 0.05326830758849572,
+          "brier_ci_95_upper": 0.05945310214392899,
+          "ece_samples_mean": 0.0065148124889950485,
+          "ece_ci_95_lower": 0.003862145115463386,
+          "ece_ci_95_upper": 0.009547634878479096
         },
         "nars_gated": {
           "iterations": 1000,
@@ -1833,6 +2026,8 @@
           "accuracy_delta_gated_minus_baseline": 0.0002907610670931371
         }
       ],
+      "submission_ablation": [],
+      "case_traces": [],
       "decision_curve": [
         {
           "threshold": 0.05,
@@ -2188,6 +2383,66 @@
           "variant": "flat_confidence"
         },
         {
+          "mean_predicted_probability": 0.004249200556562649,
+          "fraction_positives": 0.0029069767441860465,
+          "count": 1376,
+          "variant": "mc_confidence_only"
+        },
+        {
+          "mean_predicted_probability": 0.006980020318785798,
+          "fraction_positives": 0.002180232558139535,
+          "count": 1376,
+          "variant": "mc_confidence_only"
+        },
+        {
+          "mean_predicted_probability": 0.011309922788163956,
+          "fraction_positives": 0.004363636363636364,
+          "count": 1375,
+          "variant": "mc_confidence_only"
+        },
+        {
+          "mean_predicted_probability": 0.018295990220354975,
+          "fraction_positives": 0.014534883720930232,
+          "count": 1376,
+          "variant": "mc_confidence_only"
+        },
+        {
+          "mean_predicted_probability": 0.028612005791635066,
+          "fraction_positives": 0.02252906976744186,
+          "count": 1376,
+          "variant": "mc_confidence_only"
+        },
+        {
+          "mean_predicted_probability": 0.04268080148296397,
+          "fraction_positives": 0.03563636363636364,
+          "count": 1375,
+          "variant": "mc_confidence_only"
+        },
+        {
+          "mean_predicted_probability": 0.06242637983081503,
+          "fraction_positives": 0.057412790697674417,
+          "count": 1376,
+          "variant": "mc_confidence_only"
+        },
+        {
+          "mean_predicted_probability": 0.09571282170805505,
+          "fraction_positives": 0.09309090909090909,
+          "count": 1375,
+          "variant": "mc_confidence_only"
+        },
+        {
+          "mean_predicted_probability": 0.16771061431306586,
+          "fraction_positives": 0.16569767441860464,
+          "count": 1376,
+          "variant": "mc_confidence_only"
+        },
+        {
+          "mean_predicted_probability": 0.45453030708637004,
+          "fraction_positives": 0.4643895348837209,
+          "count": 1376,
+          "variant": "mc_confidence_only"
+        },
+        {
           "mean_predicted_probability": 0.004249227834000903,
           "fraction_positives": 0.0029069767441860465,
           "count": 1376,
@@ -2253,9 +2508,11 @@
         "metrics_csv": "results\\wids\\metrics\\metrics.csv",
         "training_history_csv": "results\\wids\\metrics\\training_history.csv",
         "gamma_ablation_csv": "results\\wids\\metrics\\gamma_ablation.csv",
+        "submission_ablation_csv": null,
         "decision_curve_csv": "results\\wids\\metrics\\decision_curve.csv",
         "calibration_reliability_csv": "results\\wids\\metrics\\calibration_reliability.csv",
         "trace_csv": "results\\wids\\traces\\test_predictions.csv",
+        "case_traces_csv": null,
         "roc_curve": "results\\wids\\charts\\roc_curve.png",
         "calibration_curve": "results\\wids\\charts\\calibration_curve.png",
         "training_history_plot": "results\\wids\\charts\\training_history.png",
