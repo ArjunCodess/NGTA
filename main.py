@@ -4,8 +4,10 @@ import argparse
 import json
 from dataclasses import replace
 from pathlib import Path
+from typing import Any
 
 import numpy as np
+import pandas as pd
 import torch
 
 from src.attention_hook import apply_confidence_gate
@@ -18,6 +20,8 @@ from src.nars_interface import (
     truth_to_expectation,
 )
 from src.pipeline import PipelineConfig, run_pipeline
+
+TRANSFORMER_VARIANTS = {"baseline", "flat_confidence", "mc_confidence_only", "nars_gated"}
 
 
 def _run_self_checks() -> None:
@@ -100,7 +104,106 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--num-heads", type=int, default=4, help="Number of attention heads.")
     parser.add_argument("--num-layers", type=int, default=2, help="Number of Transformer encoder layers.")
     parser.add_argument("--dropout", type=float, default=0.2, help="Dropout probability.")
+    parser.add_argument(
+        "--seeds",
+        type=int,
+        nargs="+",
+        default=None,
+        help="Run one or more seeds and aggregate submission-ready outputs.",
+    )
+    parser.add_argument(
+        "--baseline-set",
+        choices=("minimal", "standard"),
+        default="minimal",
+        help="Classical baseline suite. 'standard' adds calibrated logistic regression, ExtraTrees, and histogram gradient boosting.",
+    )
+    parser.add_argument(
+        "--ablation-set",
+        choices=("quick", "submission"),
+        default="quick",
+        help="Ablation suite. 'submission' adds symbolic-disabled and rule-truth sensitivity summaries.",
+    )
+    parser.add_argument(
+        "--export-case-traces",
+        action="store_true",
+        help="Export curated glass-box case traces for representative held-out cases.",
+    )
+    parser.add_argument(
+        "--paper-tables",
+        action="store_true",
+        help="Write submission-ready aggregate CSV and LaTeX table artifacts under <output-dir>/submission.",
+    )
     return parser.parse_args()
+
+
+def _json_default(value: Any) -> Any:
+    if isinstance(value, np.integer):
+        return int(value)
+    if isinstance(value, np.floating):
+        return float(value)
+    if isinstance(value, np.ndarray):
+        return value.tolist()
+    return str(value)
+
+
+def _metrics_to_latex(metrics_frame: pd.DataFrame) -> str:
+    columns = ["dataset", "variant", "auc_mean", "auc_std", "brier_mean", "brier_std", "ece_mean", "ece_std"]
+    available_columns = [column for column in columns if column in metrics_frame.columns]
+    if metrics_frame.empty:
+        return "% No metrics available.\n"
+    return metrics_frame[available_columns].to_latex(index=False, float_format="%.5f")
+
+
+def _write_submission_outputs(summaries: list[dict[str, Any]], output_dir: str | Path, write_paper_tables: bool) -> None:
+    submission_dir = Path(output_dir) / "submission"
+    submission_dir.mkdir(parents=True, exist_ok=True)
+
+    metric_rows: list[dict[str, Any]] = []
+    baseline_rows: list[dict[str, Any]] = []
+    ablation_rows: list[dict[str, Any]] = []
+    case_trace_rows: list[dict[str, Any]] = []
+
+    for summary in summaries:
+        dataset = summary["task"]["dataset_key"]
+        seed = summary["config"]["seed"]
+        for metric in summary["metrics"]:
+            row = {"dataset": dataset, "seed": seed, **metric}
+            metric_rows.append(row)
+            if metric["variant"] not in TRANSFORMER_VARIANTS:
+                baseline_rows.append(row)
+        for ablation in summary.get("submission_ablation", []):
+            ablation_rows.append({"dataset": dataset, "seed": seed, **ablation})
+        for case_trace in summary.get("case_traces", []):
+            case_trace_rows.append({"dataset": dataset, "seed": seed, **case_trace})
+
+    metrics_frame = pd.DataFrame(metric_rows)
+    if not metrics_frame.empty:
+        aggregate = (
+            metrics_frame.groupby(["dataset", "variant"], as_index=False)
+            .agg(
+                auc_mean=("auc", "mean"),
+                auc_std=("auc", "std"),
+                brier_mean=("brier", "mean"),
+                brier_std=("brier", "std"),
+                accuracy_mean=("accuracy", "mean"),
+                accuracy_std=("accuracy", "std"),
+                ece_mean=("ece", "mean"),
+                ece_std=("ece", "std"),
+                runs=("seed", "nunique"),
+            )
+            .fillna(0.0)
+        )
+        aggregate.to_csv(submission_dir / "multiseed_metrics.csv", index=False)
+    else:
+        aggregate = pd.DataFrame()
+        aggregate.to_csv(submission_dir / "multiseed_metrics.csv", index=False)
+
+    pd.DataFrame(baseline_rows).to_csv(submission_dir / "baseline_comparison.csv", index=False)
+    pd.DataFrame(ablation_rows).to_csv(submission_dir / "ablation_summary.csv", index=False)
+    pd.DataFrame(case_trace_rows).to_csv(submission_dir / "case_traces.csv", index=False)
+
+    if write_paper_tables:
+        (submission_dir / "paper_tables.tex").write_text(_metrics_to_latex(aggregate), encoding="utf-8")
 
 
 def main() -> None:
@@ -123,21 +226,42 @@ def main() -> None:
         num_heads=args.num_heads,
         num_layers=args.num_layers,
         dropout=args.dropout,
+        baseline_set=args.baseline_set,
+        ablation_set=args.ablation_set,
+        export_case_traces=args.export_case_traces,
     )
-    if args.run_all:
+
+    requested_seeds = args.seeds or [args.seed]
+    requested_datasets = ("tcga", "wids") if args.run_all else (args.dataset,)
+    all_summaries: list[dict[str, Any]] = []
+
+    if args.run_all or args.seeds:
         summaries: dict[str, dict] = {}
-        for dataset in ("tcga", "wids"):
-            print(f"Running dataset pipeline: {dataset}")
-            summaries[dataset] = run_pipeline(replace(config, dataset=dataset))
+        for seed in requested_seeds:
+            for dataset in requested_datasets:
+                print(f"Running dataset pipeline: {dataset} (seed={seed})")
+                seed_output_dir = Path(args.output_dir)
+                if args.seeds:
+                    seed_output_dir = seed_output_dir / f"seed_{seed}"
+                run_summary = run_pipeline(replace(config, dataset=dataset, seed=seed, output_dir=str(seed_output_dir)))
+                all_summaries.append(run_summary)
+                summary_key = f"{dataset}_seed_{seed}" if args.seeds else dataset
+                summaries[summary_key] = run_summary
         summary = {
-            "mode": "run_all",
+            "mode": "run_all" if args.run_all else "multi_seed",
+            "seeds": requested_seeds,
             "datasets": summaries,
         }
         summary_path = Path(args.output_dir) / "run_all_summary.json"
-        summary_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
+        summary_path.write_text(json.dumps(summary, indent=2, default=_json_default), encoding="utf-8")
     else:
         summary = run_pipeline(config)
-    print(json.dumps(summary, indent=2))
+        all_summaries.append(summary)
+
+    if args.paper_tables or args.seeds or args.export_case_traces or args.ablation_set == "submission" or args.baseline_set == "standard":
+        _write_submission_outputs(all_summaries, args.output_dir, write_paper_tables=args.paper_tables)
+
+    print(json.dumps(summary, indent=2, default=_json_default))
 
 
 if __name__ == "__main__":
