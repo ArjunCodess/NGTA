@@ -71,11 +71,10 @@ The two benchmarks test different strengths of the architecture:
 
 The main result is that NGTA works as intended on both a small multi-modal cancer dataset and a much larger high-missingness ICU dataset, but the two datasets support different claims.
 
-- On `tcga`, the Transformer-based models still beat the random-forest baseline numerically. The best default AUC is `0.72605`, tied across `flat_confidence`, `mc_confidence_only`, and `nars_gated`, versus `0.66134` for random forest. This supports the claim that the interface can learn useful signal from combined clinical and genomic inputs, but it does not support a claim that NARS gating is statistically better than the other Transformer variants.
-- The flat-confidence control is the strongest TCGA Transformer variant overall in the current default run because it pairs that tied-best AUC with the best Brier score (`0.21184`), the best ECE (`0.13897`), and the best accuracy (`0.68116`). TCGA should therefore still be treated as a multi-modal interface proof of concept rather than evidence that dynamic NARS gating dominates simpler confidence gates on very small cohorts.
-- On `wids`, all Transformer variants are extremely close on AUC around `0.8829`. At full precision, the baseline transformer is best on AUC, the flat-confidence control is best on ECE at `0.00490`, the MC-confidence-only ablation is best on accuracy at `0.92905`, and the NARS-gated version is best on Brier score at `0.05618`.
-- The WiDS baseline-vs-NARS paired bootstrap intervals now include zero for both Brier difference (`-0.000004` to `0.000061`) and ECE difference (`-0.000355` to `0.001796`). That means the current run does not statistically establish a calibration gain for NARS gating over the baseline transformer.
-- The WiDS NARS-gated variant is also not statistically separated from the flat-confidence control on Brier or ECE. The new MC-confidence-only ablation sits almost exactly between the generic confidence gate and the symbolic gate, which makes the interpretation sharper: symbolic rules are active at scale, but the current default run still does not isolate their marginal calibration effect over neural uncertainty gating alone.
+- On `tcga`, the Transformer-based models still beat the random-forest baseline numerically. The current best default AUC is `0.73277` for `flat_confidence`, versus `0.66134` for random forest. `nars_gated` reports AUC `0.73109` and Brier score `0.21094`. This supports the claim that the interface can learn useful signal from combined clinical and genomic inputs, but it does not support a claim that NARS gating is statistically better than the other Transformer variants.
+- The flat-confidence control is the strongest TCGA Transformer variant by point estimate in the current default run because it has the highest AUC (`0.73277`), the lowest Brier score (`0.21091`), and the lowest ECE (`0.11779`). TCGA should therefore still be treated as a multi-modal interface proof of concept rather than evidence that dynamic NARS gating dominates simpler confidence gates on very small cohorts.
+- On `wids`, all Transformer variants are extremely close on AUC around `0.8829`. At full precision, the baseline transformer is best on AUC, the MC-confidence-only ablation is best on accuracy at `0.92884`, and the NARS-gated version is best on Brier score (`0.05618`) and ECE (`0.00475`).
+- The WiDS NARS-gated variant is not clearly separated from the flat-confidence or MC-confidence-only controls on the reported confidence intervals. This makes the interpretation sharper: symbolic rules are active at scale, but the current default run still does not isolate their marginal calibration effect over neural uncertainty gating alone.
 - The WiDS result still matters because the transformer family remains stronger than the random forest on the main summaries, and the symbolic path is physically active during inference. But the right interpretation is now narrower: this run supports operational neurosymbolic routing and competitive calibration, not a confirmed within-family superiority claim for NARS gating.
 - The symbolic rules were not just decorative. On the held-out WiDS test set, ICU rules fired in `8551` of `13757` cases for `13031` total feature-level revisions, which means the neurosymbolic revision path was active at scale rather than sitting unused.
 - Taken together, the results support a narrower and more defensible claim than "always better accuracy": NGTA is competitive on discrimination, operational as a human-auditable instrumentation layer under heavy missingness, and strongest as a framework for explicit uncertainty routing rather than as a proved winner over every control.
@@ -119,6 +118,7 @@ Useful flags:
 - `--ablation-set submission`: add symbolic-disabled and rule-truth sensitivity summaries
 - `--export-case-traces`: write curated glass-box case traces for representative held-out patients
 - `--paper-tables`: export aggregate CSV and LaTeX tables under `results/submission`
+- `--skip-paper-figures`: skip automatic regeneration of the paper figures under `paper/figures`
 
 Notes:
 
@@ -140,6 +140,13 @@ This writes:
 - `results/submission/ablation_summary.csv`
 - `results/submission/case_traces.csv`
 - `results/submission/paper_tables.tex`
+- refreshed paper figures under `paper/figures`
+
+Paper figures are regenerated automatically at the end of a complete run when both TCGA and WiDS result directories are available under the selected `--output-dir`. The LaTeX paper references stable figure paths, so recompiling `paper/nesy2026.tex` picks up the updated PDFs. The same step can be run directly:
+
+```bash
+python -c "from src.paper_figures import generate_paper_figures; generate_paper_figures('results')"
+```
 
 The submission artifacts are intended to support a theory-forward framing: NGTA is a glass-box evidential routing interface for clinical transformers, with performance treated as feasibility evidence rather than as a claim of universal superiority.
 
@@ -218,7 +225,7 @@ Per-dataset metrics/traces include:
 - `test_predictions.csv`
 - ROC, calibration, training-history, gamma-ablation, and decision-curve plots
 
-`metrics.csv` now reports 95% bootstrap confidence intervals for AUC, Brier score, and ECE across the random forest, baseline transformer, flat-confidence transformer, MC-confidence-only ablation, and NARS-gated transformer. `run_summary.json` also includes paired bootstrap Brier/ECE deltas for the main comparisons.
+`metrics.csv` now reports 95% bootstrap confidence intervals for AUC, Brier score, and ECE across the random forest, baseline transformer, flat-confidence transformer, MC-confidence-only ablation, and NARS-gated transformer.
 
 ## Latest Full Run
 
