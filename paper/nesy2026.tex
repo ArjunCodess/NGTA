@@ -54,6 +54,13 @@ We propose dynamic evidential routing as that interface. A neural predictive dis
 
 We evaluate the interface on two clinical benchmarks with different roles. TCGA-THCA tests whether the same mechanism runs under clinical-genomic feature fusion, while WiDS ICU mortality prediction tests scale and extreme missingness. The claim is deliberately narrow: dynamic evidential routing is an operational and auditable neurosymbolic mechanism for uncertainty-aware prediction under missingness. The present experiments support feasibility, traceability, and competitive predictive behavior; they do not prove that symbolic revision alone improves calibration over simpler confidence-gating controls.
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/figure-1.png}
+\caption{Inference-time dynamic evidential routing. A trained transformer produces a prediction and feature attention; MC dropout estimates uncertainty; the uncertainty signal initializes NAL truth values; triggered clinical rules revise those values; revised confidence gates attention; and the system exports a case-level trace showing where symbolic evidence changed the computation.}
+\label{fig:pipeline}
+\end{figure}
+
 \section{Related Work}
 \label{sec:related}
 
