@@ -249,6 +249,27 @@ NARS-gated & 0.8829 [0.8731, 0.8925] & 0.05618 [0.05327, 0.05945] & 0.00494 [0.0
 
 The symbolic pathway operated at scale: ICU rules fired on 8,551 of 13,757 held-out stays, with 13,031 total feature-level revisions. The per-rule counts were 1,936 for lactate, 5,338 for hypotension, 3,443 for age, and 2,314 for creatinine. This supports the neurosymbolic systems claim that a human-auditable rule path can be embedded directly into transformer inference.
 
+\subsection{Case-Level Rule Trace}
+
+Table~\ref{tab:case_trace} shows one exported WiDS held-out trace. The case was selected from the near-threshold trace category because it makes the inference-time mechanism visible: three ICU rules fired, the revised feature confidences changed attention, and the final probability moved from 0.5084 to 0.5000. The target was positive, so this is not presented as a clinical success. Its value is auditability. A reviewer can inspect which rules fired, how their symbolic truth values revised the neural truth values, and how the attention distribution changed.
+
+\begin{table}[t]
+\caption{Concrete WiDS rule trace for held-out encounter 26030. Probability changed from 0.5084 before routing to 0.5000 after NARS-gated routing; the thresholded prediction was 0 while the target was 1.}
+\label{tab:case_trace}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Feature & Neural $(f,c)$ & Rule $(f,c)$ & Revised $(f,c)$ & Attention before $\rightarrow$ after \\
+\midrule
+Systolic BP min & $(0.1690,0.9591)$ & $(0.7500,0.7000)$ & $(0.2216,0.9627)$ & $0.1690 \rightarrow 0.1679$ \\
+Lactate max & $(0.0628,0.9687)$ & $(0.8500,0.8000)$ & $(0.1528,0.9722)$ & $0.0628 \rightarrow 0.0636$ \\
+Creatinine max & $(0.0186,0.9840)$ & $(0.7000,0.6500)$ & $(0.0386,0.9844)$ & $0.0186 \rightarrow 0.0193$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Calibration Interpretation}
 
 The WiDS calibration results should be read as a close comparison rather than a win table. NARS-gated attention has the best Brier score at the reported precision, but flat-confidence has the best ECE, and the paired intervals for key within-transformer comparisons include zero. This means the observed differences are too small to claim that symbolic revision is the causal source of improved calibration.
