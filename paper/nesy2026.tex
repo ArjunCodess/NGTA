@@ -21,6 +21,9 @@
 \newcommand{\GeneratedCaseTraceBaselineProbability}{}
 \newcommand{\GeneratedCaseTraceNarsProbability}{}
 \newcommand{\GeneratedCaseTraceRuleCount}{}
+\newcommand{\GeneratedCaseTraceBaselinePrediction}{}
+\newcommand{\GeneratedCaseTraceNarsPrediction}{}
+\newcommand{\GeneratedCaseTraceTarget}{}
 }
 
  % Use \Name{Author Name} to specify the name.
@@ -36,7 +39,7 @@
 
  % *** Make sure there's no spurious space before \nametag ***
 
-\title[Dynamic Evidential Routing]{Dynamic Evidential Routing: A Neurosymbolic Transformer Interface for Calibrated Clinical Prediction Under Extreme Missingness}
+\title[Dynamic Evidential Routing]{Dynamic Evidential Routing: A Neurosymbolic Transformer Interface for Auditable Clinical Prediction Under Extreme Missingness}
 
  % Two authors with the same address
 \clearauthor{\Name{Arjun Vijay Prakash} \Email{arjunv.prakash12345@gmail.com}\\
@@ -47,7 +50,7 @@
 \maketitle
 
 \begin{abstract}
-Clinical predictors can assign confident probabilities to sparse or shifted hospital records even when the available evidence is weak. The technical challenge is not only calibration, but auditability: a reviewer should be able to see when uncertainty was high, when a symbolic clinical rule was invoked, and how that rule changed the computation. We present dynamic evidential routing, an inference-time neurosymbolic interface that maps Monte Carlo dropout uncertainty into Non-Axiomatic Logic (NAL) truth values, revises those truth values with explicit clinical rules, and feeds the revised confidence signal back into transformer attention. The implementation is a NAL truth-value interface, not a full Non-Axiomatic Reasoning System (NARS) cognitive architecture. We evaluate TCGA-THCA lymph node metastasis prediction as a clinical-genomic feasibility check and WiDS ICU mortality prediction as the primary high-missingness scale test. The results do not show that symbolic revision is statistically separable from simpler confidence gating: paired bootstrap intervals for the main within-transformer calibration comparisons include zero. The supported contribution is narrower and more defensible: the symbolic path is operational, auditable, and active at scale, firing 13,031 times across 8,551 of 13,757 held-out ICU stays while preserving competitive discrimination and calibration.
+Clinical predictors can assign confident probabilities to sparse or shifted hospital records even when the available evidence is weak. The technical challenge is not only calibration, but auditability: a reviewer should be able to see when uncertainty was high, when a symbolic clinical rule was invoked, and how that rule changed the computation. We present dynamic evidential routing, an inference-time neurosymbolic interface that maps Monte Carlo dropout uncertainty into Non-Axiomatic Logic (NAL) truth values, revises those truth values with explicit clinical rules, and feeds the revised confidence signal back into transformer attention. The implementation is a NAL truth-value interface, not a full Non-Axiomatic Reasoning System (NARS) cognitive architecture. We evaluate TCGA-THCA lymph node metastasis prediction as a clinical-genomic feasibility check and WiDS ICU mortality prediction as the primary high-missingness scale test. The current results show active symbolic routing and competitive predictive behavior, but they do not isolate symbolic revision as the source of calibration changes beyond simpler confidence-gating controls. The supported contribution is narrower and more defensible: the symbolic path is operational, auditable, and active at scale, firing 13,031 times across 8,551 of 13,757 held-out ICU stays while preserving usable discrimination and calibration.
 \end{abstract}
 
 \section{Introduction}
@@ -59,7 +62,7 @@ The challenge is that current model components expose different pieces of the pr
 
 We propose dynamic evidential routing as that interface. A neural predictive distribution is first mapped into a two-dimensional truth value $(f,c)$, where frequency $f$ describes the balance of evidence and confidence $c$ describes evidential support \citep{wang1995,wang2006,wang2013}. Explicit clinical rules then revise feature-level truths in the same NAL truth-value space, and the revised confidence values control a normalized attention gate. This design separates what the model predicts from how strongly the available evidence supports that prediction.
 
-We evaluate the interface on two clinical benchmarks with different roles. TCGA-THCA tests whether the same mechanism runs under clinical-genomic feature fusion, while WiDS ICU mortality prediction tests scale and extreme missingness. The claim is deliberately narrow: dynamic evidential routing is an operational and auditable neurosymbolic mechanism for uncertainty-aware prediction under missingness. The present experiments support feasibility, traceability, and competitive predictive behavior; they do not prove that symbolic revision alone improves calibration over simpler confidence-gating controls.
+We evaluate the interface on two clinical benchmarks with different roles. TCGA-THCA tests whether the same mechanism runs under clinical-genomic feature fusion, while WiDS ICU mortality prediction tests scale and extreme missingness. The claim is deliberately narrow: dynamic evidential routing is an operational and auditable neurosymbolic mechanism for uncertainty-aware prediction under missingness. The present experiments support feasibility, traceability, and competitive predictive behavior. They do not prove that symbolic revision alone improves calibration over simpler confidence-gating controls.
 
 Figure~\ref{fig:pipeline} summarizes the inference-time data flow from sparse clinical inputs through uncertainty estimation, NAL-style truth initialization, rule-triggered revision, confidence-gated attention, and trace export.
 
@@ -195,11 +198,11 @@ The random forest baseline addresses the common tabular-learning concern that tr
 
 The TCGA rule base contains four thyroid-cancer rules chosen to exercise distinct input channels: BRAF mutation for genomic evidence, age at least 55 years for demographic evidence, pathologic T3/T4 stage for staging evidence, and extrathyroid extension for pathology-derived evidence. The WiDS rule base contains four ICU rules chosen to exercise common tabular critical-care signals: lactate for metabolic stress, hypotension for hemodynamic instability, age for demographic risk, and creatinine for renal dysfunction. All rules are applied only at inference time.
 
-The small rule bases are prototype probes, not complete clinical ontologies. Their thresholds and $(f,c)$ values were fixed before held-out evaluation to test whether rule-triggered truth revision can be audited in the prediction path. Clinical use would require expert-curated propositions, documented threshold rationales for the intended population, and sensitivity analysis over both thresholds and truth values. This choice creates a useful stress test. If the rule pathway does not fire, the method is only an uncertainty gate. If it fires but does not change aggregate metrics, the interface is still functioning as an auditable symbolic intervention layer, but the evidence does not support a performance claim. Symbolic revision would be empirically isolated only if the NARS-gated variant separated from the baseline, flat-confidence, and MC-confidence-only controls with paired intervals excluding zero. The current results do not meet that standard.
+The small rule bases are prototype probes, not complete clinical ontologies. Their thresholds and $(f,c)$ values were fixed before held-out evaluation to test whether rule-triggered truth revision can be audited in the prediction path. Clinical use would require expert-curated propositions, documented threshold rationales for the intended population, and sensitivity analysis over both thresholds and truth values. This choice creates a useful stress test. If the rule pathway does not fire, the method is only an uncertainty gate. If it fires but does not change aggregate metrics, the interface is still functioning as an auditable symbolic intervention layer, but the evidence does not support a performance claim. Symbolic revision would be empirically isolated only if the NARS-gated variant separated from the baseline, flat-confidence, and MC-confidence-only controls with confidence intervals or paired tests that exclude zero. The current results do not meet that standard.
 
 \subsection{Statistical Reporting}
 
-The metric tables report point estimates followed by 95\% bootstrap confidence intervals over held-out examples for AUC, Brier score, and ECE. Accuracy is reported as a point estimate. These intervals are confidence intervals, not standard deviations. Paired bootstrap comparisons are used for the most important within-transformer calibration contrasts. This matters because the transformer variants are extremely close numerically. A table entry that is best at the fourth or fifth decimal place should not be interpreted as a confirmed improvement unless the paired interval excludes zero.
+The metric tables report point estimates followed by 95\% bootstrap confidence intervals over held-out examples for AUC, Brier score, and ECE. Accuracy is reported as a point estimate. These intervals are confidence intervals, not standard deviations. This matters because the transformer variants are extremely close numerically. A table entry that is best at the fourth or fifth decimal place should not be interpreted as a confirmed improvement unless a corresponding interval or paired comparison excludes zero.
 
 The paper therefore separates three evidential claims. First, whether the architecture compiles and runs on the benchmark. Second, whether the symbolic pathway fires and changes feature-level truth values. Third, whether the symbolic pathway changes predictive metrics beyond simpler controls. The present results support the first two claims. They do not isolate the third claim. This separation is central to the paper's framing.
 
@@ -212,7 +215,7 @@ The most important reproducibility constraint is that preprocessing must be fitt
 \section{Results}
 \label{sec:results}
 
-On TCGA-THCA, the flat-confidence, MC-confidence-only, and NARS-gated variants all report AUC 0.7261, while flat-confidence has the lowest Brier score and ECE and the highest accuracy. The small 69-case test split does not statistically separate transformer variants, so TCGA is best read as a multimodal feasibility test rather than as evidence of symbolic-gating superiority.
+On TCGA-THCA, the transformer variants remain tightly clustered. Flat-confidence has the highest AUC at 0.7328 and the lowest Brier score at 0.2109, while NARS-gated routing has AUC 0.7311 and Brier score 0.2109 at the reported precision. The small 69-case test split does not statistically separate transformer variants, so TCGA is best read as a multimodal feasibility test rather than as evidence of symbolic-gating superiority.
 
 \begin{table}[t]
 \caption{Held-out TCGA-THCA performance for lymph node metastasis prediction. Point estimates are followed by 95\% bootstrap confidence intervals where shown.}
@@ -225,17 +228,17 @@ On TCGA-THCA, the flat-confidence, MC-confidence-only, and NARS-gated variants a
 Variant & AUC & Brier & ECE & Acc. \\
 \midrule
 Random forest & 0.6613 [0.5101, 0.7908] & 0.2200 [0.1895, 0.2498] & 0.1597 [0.1317, 0.2824] & 0.5942 \\
-Baseline transformer & 0.7252 [0.5931, 0.8454] & 0.2118 [0.1800, 0.2449] & 0.1390 [0.1183, 0.2610] & 0.6667 \\
-Flat-confidence & 0.7261 [0.5934, 0.8468] & 0.2118 [0.1793, 0.2455] & 0.1390 [0.1163, 0.2597] & 0.6812 \\
-MC-confidence-only & 0.7261 [0.5957, 0.8460] & 0.2122 [0.1808, 0.2451] & 0.1403 [0.1177, 0.2621] & 0.6667 \\
-NARS-gated & 0.7261 [0.5957, 0.8460] & 0.2121 [0.1805, 0.2452] & 0.1400 [0.1176, 0.2618] & 0.6667 \\
+Baseline transformer & 0.7311 [0.5975, 0.8462] & 0.2113 [0.1825, 0.2426] & 0.1184 [0.1074, 0.2517] & 0.6812 \\
+Flat-confidence & 0.7328 [0.6028, 0.8479] & 0.2109 [0.1816, 0.2427] & 0.1178 [0.1130, 0.2641] & 0.6812 \\
+MC-confidence-only & 0.7311 [0.6008, 0.8453] & 0.2110 [0.1820, 0.2418] & 0.1184 [0.1041, 0.2481] & 0.6812 \\
+NARS-gated & 0.7311 [0.6008, 0.8453] & 0.2109 [0.1820, 0.2417] & 0.1184 [0.1042, 0.2481] & 0.6812 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 The TCGA symbolic rules fired 79 times across 42 of 69 held-out cases. Per-rule counts were 0 for BRAF mutation, 25 for age at least 55 years, 29 for pathologic T3/T4 stage, and 25 for non-null extrathyroid extension. This shows that the rule path was active under clinical-genomic fusion, but the small split does not provide enough power to distinguish the transformer variants.
 
-WiDS provides the clearer scale test. All transformer variants have higher AUC than the random forest in this run. Within the transformer family, the baseline has the highest AUC, flat-confidence has the lowest ECE, MC-confidence-only has the highest accuracy, and NARS-gated has the lowest Brier score at the reported precision. The NARS-vs-baseline paired bootstrap intervals include zero for Brier and ECE, and the same is true for NARS-vs-flat-confidence. Thus symbolic revision is active but not statistically isolated from generic confidence gating in this run.
+WiDS provides the clearer scale test. All transformer variants have higher AUC than the random forest in this run. Within the transformer family, the baseline has the highest AUC, NARS-gated has the lowest Brier score and ECE at the reported precision, and MC-confidence-only has the highest accuracy. The differences among transformer variants are very small, so symbolic revision is active but not statistically isolated from generic confidence gating in this run.
 
 Figure~\ref{fig:performance_ci} visualizes the Brier-score intervals for both benchmarks. The overlap among transformer variants is large, especially on TCGA, reinforcing the interpretation that the current evidence supports operational compatibility rather than a separated performance claim.
 
@@ -249,19 +252,19 @@ Figure~\ref{fig:performance_ci} visualizes the Brier-score intervals for both be
 \toprule
 Variant & AUC & Brier & ECE & Acc. \\
 \midrule
-Random forest & 0.8754 [0.8655, 0.8858] & 0.05821 [0.05524, 0.06149] & 0.00764 [0.00547, 0.01242] & 0.9259 \\
-Baseline transformer & 0.8829 [0.8732, 0.8926] & 0.05621 [0.05334, 0.05946] & 0.00601 [0.00466, 0.01050] & 0.9288 \\
-Flat-confidence & 0.8829 [0.8731, 0.8925] & 0.05618 [0.05328, 0.05946] & 0.00490 [0.00411, 0.00969] & 0.9288 \\
-MC-confidence-only & 0.8829 [0.8731, 0.8925] & 0.05618 [0.05327, 0.05945] & 0.00495 [0.00386, 0.00955] & 0.9291 \\
-NARS-gated & 0.8829 [0.8731, 0.8925] & 0.05618 [0.05327, 0.05945] & 0.00494 [0.00387, 0.00956] & 0.9288 \\
+Random forest & 0.8768 [0.8669, 0.8868] & 0.05817 [0.05520, 0.06142] & 0.00737 [0.00596, 0.01254] & 0.9258 \\
+Baseline transformer & 0.8830 [0.8732, 0.8926] & 0.05621 [0.05334, 0.05946] & 0.00596 [0.00464, 0.01054] & 0.9288 \\
+Flat-confidence & 0.8829 [0.8731, 0.8925] & 0.05618 [0.05328, 0.05946] & 0.00500 [0.00401, 0.00968] & 0.9288 \\
+MC-confidence-only & 0.8829 [0.8731, 0.8925] & 0.05618 [0.05327, 0.05945] & 0.00476 [0.00385, 0.00956] & 0.9288 \\
+NARS-gated & 0.8829 [0.8731, 0.8925] & 0.05618 [0.05327, 0.05945] & 0.00475 [0.00384, 0.00955] & 0.9288 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\linewidth]{figures/figure-2-performance-ci.pdf}
-\caption{Held-out Brier scores with 95\% bootstrap confidence intervals. Lower values are better. The transformer variants are close, so small point-estimate differences should be interpreted together with paired-bootstrap comparisons.}
+\includegraphics[width=\linewidth]{figures/figure-2-performance-ci.png}
+\caption{Held-out Brier scores with 95\% bootstrap confidence intervals. Lower values are better. The transformer variants are close, so small point-estimate differences should be interpreted as descriptive unless corroborated by additional comparisons.}
 \label{fig:performance_ci}
 \end{figure}
 
@@ -271,42 +274,27 @@ Figure~\ref{fig:rule_firing} shows the rule-firing distribution. TCGA exercises 
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\linewidth]{figures/figure-3-rule-firing.pdf}
+\includegraphics[width=\linewidth]{figures/figure-3-rule-firing.png}
 \caption{Rule-trigger counts on held-out cases. TCGA-THCA uses a small clinical-genomic rule base; WiDS ICU shows frequent rule activation across four critical-care signals.}
 \label{fig:rule_firing}
 \end{figure}
 
 \subsection{Case-Level Rule Trace}
 
-Table~\ref{tab:case_trace} shows one exported WiDS held-out trace. The case was selected from the near-threshold trace category because it makes the inference-time mechanism visible: three ICU rules fired, the revised feature confidences changed attention, and the final probability moved from 0.5084 to 0.5000. The target was positive, so this is not presented as a clinical success. Its value is auditability. A reviewer can inspect which rules fired, how their symbolic truth values revised the neural truth values, and how the attention distribution changed.
+Table~\ref{tab:case_trace} and Figure~\ref{fig:case_trace} show a generated WiDS held-out trace selected from the current trace export. The case is chosen because it is near the decision threshold, symbolic rules fired, and routing changed the thresholded prediction. It is not presented as clinical validation. Its value is auditability. A reviewer can inspect which rules fired, how their symbolic truth values revised the neural truth values, and how the attention distribution changed.
 
-\begin{table}[t]
-\caption{Concrete WiDS rule trace for held-out encounter 26030. Probability changed from 0.5084 before routing to 0.5000 after NARS-gated routing; the thresholded prediction was 0 while the target was 1.}
-\label{tab:case_trace}
-\centering
-\scriptsize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{@{}lcccc@{}}
-\toprule
-Feature & Neural $(f,c)$ & Rule $(f,c)$ & Revised $(f,c)$ & Attention before $\rightarrow$ after \\
-\midrule
-Systolic BP min & $(0.1690,0.9591)$ & $(0.7500,0.7000)$ & $(0.2216,0.9627)$ & $0.1690 \rightarrow 0.1679$ \\
-Lactate max & $(0.0628,0.9687)$ & $(0.8500,0.8000)$ & $(0.1528,0.9722)$ & $0.0628 \rightarrow 0.0636$ \\
-Creatinine max & $(0.0186,0.9840)$ & $(0.7000,0.6500)$ & $(0.0386,0.9844)$ & $0.0186 \rightarrow 0.0193$ \\
-\bottomrule
-\end{tabular}
-\end{table}
+\input{figures/generated_case_trace_table.tex}
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\linewidth]{figures/figure-4-case-trace.pdf}
+\includegraphics[width=\linewidth]{figures/figure-4-case-trace.png}
 \caption{Generated case-trace visualization for selected WiDS held-out encounter \GeneratedCaseTraceId. The left panel shows the near-threshold probability before and after routing; the right panel shows attention changes for \GeneratedCaseTraceRuleCount{} fired rules.}
 \label{fig:case_trace}
 \end{figure}
 
 \subsection{Calibration Interpretation}
 
-The WiDS calibration results should be read as a close comparison rather than a win table. NARS-gated attention has the lowest Brier score at the reported precision, but flat-confidence has the lowest ECE, and the paired intervals for key within-transformer comparisons include zero. This means the observed differences are too small to claim that symbolic revision is the causal source of calibration change.
+The WiDS calibration results should be read as a close comparison rather than a win table. NARS-gated attention has the lowest Brier score and ECE at the reported precision, but the differences from flat-confidence and MC-confidence-only are tiny. This means the observed differences are too small to claim that symbolic revision is the causal source of calibration change.
 
 That restraint keeps the contribution aligned with what the experiment actually supports. Dynamic evidential routing should not be described as a universal calibration booster. The supported claim is that a symbolic evidential channel can be made active, traceable, and compatible with competitive calibrated prediction on a large high-missingness ICU benchmark.
 
@@ -319,9 +307,9 @@ This division also explains why TCGA is not used as the main performance claim. 
 \section{Ablation and Interpretation}
 \label{sec:analysis}
 
-The flat-confidence and MC-confidence-only controls are essential for interpreting the result. If NARS-gated attention were compared only with the baseline transformer, a small Brier difference on WiDS might be over-interpreted as a symbolic reasoning effect. The controls show a more precise picture: much of the behavior can be reproduced by confidence gating even before symbolic revision is added. The NARS rule path is therefore best interpreted as an instrumentation layer whose value is auditability, modifiability, and compatibility with symbolic intervention, not yet a statistically isolated source of within-family calibration change.
+The flat-confidence and MC-confidence-only controls are essential for interpreting the result. If NARS-gated attention were compared only with the baseline transformer, a small Brier difference might be over-interpreted as a symbolic reasoning effect. The controls show a more precise picture: much of the behavior can be reproduced by confidence gating before symbolic revision is added. The NARS rule path is therefore best interpreted as an instrumentation layer whose value is auditability, modifiability, and compatibility with symbolic intervention, not yet a statistically isolated source of within-family calibration change.
 
-On TCGA, a gamma sweep over $\gamma\in\{0.25,0.5,1,2,4\}$ showed a mild ranking-versus-calibration trade-off. NARS-gated AUC was slightly higher at stronger gating values, peaking at 0.7294 for $\gamma=4$, while Brier score worsened monotonically from 0.21186 to 0.21244. No gamma setting yields a clear statistical separation on this small split, so the sweep is a sensitivity result rather than an optimizable superiority regime.
+On TCGA, a gamma sweep over $\gamma\in\{0.25,0.5,1,2,4\}$ showed small sensitivity to gating strength. NARS-gated AUC was 0.7336 for $\gamma\in\{0.25,0.5,1\}$, matched the baseline at $\gamma=2$, and dipped to 0.7303 at $\gamma=4$. Brier scores stayed within a narrow range from 0.21091 to 0.21104, all close to the baseline value of 0.21132. No gamma setting yields a clear statistical separation on this small split, so the sweep is a sensitivity result rather than an optimizable superiority regime.
 
 Decision-curve analysis further supports a cautious reading. The transformer variants remain broadly similar, but modest threshold-dependent differences appear at intermediate operating points. In clinical triage, this means the interface may be more important for calibrated decision behavior and traceability than for raw rank ordering.
 
