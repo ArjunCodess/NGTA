@@ -16,6 +16,13 @@
 \usepackage[utf8]{inputenc}
 \usepackage{array}
 
+\IfFileExists{figures/generated_figure_metadata.tex}{\input{figures/generated_figure_metadata.tex}}{
+\newcommand{\GeneratedCaseTraceId}{selected}
+\newcommand{\GeneratedCaseTraceBaselineProbability}{}
+\newcommand{\GeneratedCaseTraceNarsProbability}{}
+\newcommand{\GeneratedCaseTraceRuleCount}{}
+}
+
  % Use \Name{Author Name} to specify the name.
 
  % Spaces are used to separate forenames from the surname so that
@@ -53,6 +60,8 @@ The challenge is that current model components expose different pieces of the pr
 We propose dynamic evidential routing as that interface. A neural predictive distribution is first mapped into a two-dimensional truth value $(f,c)$, where frequency $f$ describes the balance of evidence and confidence $c$ describes evidential support \citep{wang1995,wang2006,wang2013}. Explicit clinical rules then revise feature-level truths in the same NAL truth-value space, and the revised confidence values control a normalized attention gate. This design separates what the model predicts from how strongly the available evidence supports that prediction.
 
 We evaluate the interface on two clinical benchmarks with different roles. TCGA-THCA tests whether the same mechanism runs under clinical-genomic feature fusion, while WiDS ICU mortality prediction tests scale and extreme missingness. The claim is deliberately narrow: dynamic evidential routing is an operational and auditable neurosymbolic mechanism for uncertainty-aware prediction under missingness. The present experiments support feasibility, traceability, and competitive predictive behavior; they do not prove that symbolic revision alone improves calibration over simpler confidence-gating controls.
+
+Figure~\ref{fig:pipeline} summarizes the inference-time data flow from sparse clinical inputs through uncertainty estimation, NAL-style truth initialization, rule-triggered revision, confidence-gated attention, and trace export.
 
 \begin{figure}[t]
 \centering
@@ -228,6 +237,8 @@ The TCGA symbolic rules fired 79 times across 42 of 69 held-out cases. Per-rule 
 
 WiDS provides the clearer scale test. All transformer variants have higher AUC than the random forest in this run. Within the transformer family, the baseline has the highest AUC, flat-confidence has the lowest ECE, MC-confidence-only has the highest accuracy, and NARS-gated has the lowest Brier score at the reported precision. The NARS-vs-baseline paired bootstrap intervals include zero for Brier and ECE, and the same is true for NARS-vs-flat-confidence. Thus symbolic revision is active but not statistically isolated from generic confidence gating in this run.
 
+Figure~\ref{fig:performance_ci} visualizes the Brier-score intervals for both benchmarks. The overlap among transformer variants is large, especially on TCGA, reinforcing the interpretation that the current evidence supports operational compatibility rather than a separated performance claim.
+
 \begin{table}[t]
 \caption{Held-out WiDS ICU performance for hospital mortality prediction. Point estimates are followed by 95\% bootstrap confidence intervals where shown.}
 \label{tab:wids_results}
@@ -247,7 +258,23 @@ NARS-gated & 0.8829 [0.8731, 0.8925] & 0.05618 [0.05327, 0.05945] & 0.00494 [0.0
 \end{tabular}
 \end{table}
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/figure-2-performance-ci.pdf}
+\caption{Held-out Brier scores with 95\% bootstrap confidence intervals. Lower values are better. The transformer variants are close, so small point-estimate differences should be interpreted together with paired-bootstrap comparisons.}
+\label{fig:performance_ci}
+\end{figure}
+
 The symbolic pathway operated at scale: ICU rules fired on 8,551 of 13,757 held-out stays, with 13,031 total feature-level revisions. The per-rule counts were 1,936 for lactate, 5,338 for hypotension, 3,443 for age, and 2,314 for creatinine. This supports the neurosymbolic systems claim that a human-auditable rule path can be embedded directly into transformer inference, while leaving performance attribution unresolved.
+
+Figure~\ref{fig:rule_firing} shows the rule-firing distribution. TCGA exercises the clinical-genomic rule path on a small held-out split, while WiDS shows frequent rule activation in a larger high-missingness cohort.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/figure-3-rule-firing.pdf}
+\caption{Rule-trigger counts on held-out cases. TCGA-THCA uses a small clinical-genomic rule base; WiDS ICU shows frequent rule activation across four critical-care signals.}
+\label{fig:rule_firing}
+\end{figure}
 
 \subsection{Case-Level Rule Trace}
 
@@ -269,6 +296,13 @@ Creatinine max & $(0.0186,0.9840)$ & $(0.7000,0.6500)$ & $(0.0386,0.9844)$ & $0.
 \bottomrule
 \end{tabular}
 \end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/figure-4-case-trace.pdf}
+\caption{Generated case-trace visualization for selected WiDS held-out encounter \GeneratedCaseTraceId. The left panel shows the near-threshold probability before and after routing; the right panel shows attention changes for \GeneratedCaseTraceRuleCount{} fired rules.}
+\label{fig:case_trace}
+\end{figure}
 
 \subsection{Calibration Interpretation}
 
@@ -318,7 +352,7 @@ The deployment boundary also shapes how the metrics should be read. Competitive 
 \section{Limitations}
 \label{sec:limitations}
 
-The current evidence is a first methods evaluation, not a clinical validation study. TCGA has only 69 held-out cases, so tiny AUC and calibration differences are not reliable. WiDS is much larger, but all experiments use an internal split rather than an external temporal or institutional cohort. The rule bases are prototype probes; deployment would require independently curated rules, sensitivity analysis, and clinician review.
+The current evidence is a methods evaluation, not a clinical validation study. TCGA has only 69 held-out cases, so tiny AUC and calibration differences are not reliable. WiDS is much larger, but all experiments use an internal split rather than an external temporal or institutional cohort. The rule bases are prototype probes; deployment would require independently curated rules, sensitivity analysis, and clinician review.
 
 The neural-to-NAL initializer depends on MC-dropout variance, which can be miscalibrated under shift. The method would over-trust a weak prediction if the uncertainty estimator underestimates epistemic uncertainty. Future runs should compare MC dropout with ensembles and should test shifted cohorts.
 
@@ -327,13 +361,18 @@ Finally, the repository implements NAL truth-value functions and feature-level r
 \section{Conclusion}
 \label{sec:conclusion}
 
-Dynamic evidential routing converts neural uncertainty into an explicit NAL-style confidence variable, revises that variable with symbolic rules, and feeds it back into transformer attention. Across TCGA-THCA and WiDS ICU, the interface is operational across modalities and active at scale. The strongest current claim is not that symbolic gating universally improves AUC, but that it provides a transparent instrumentation layer for uncertainty-aware clinical prediction under missingness. Future work should test stronger uncertainty estimators, broader rule bases, external cohorts, and ablations that more sharply separate neural uncertainty gating from symbolic revision.
+Dynamic evidential routing converts neural uncertainty into an explicit NAL-style confidence variable, revises that variable with symbolic rules, and feeds it back into transformer attention. Across TCGA-THCA and WiDS ICU, the interface is operational across modalities and active at scale. The strongest current claim is that it provides an auditable inference-time interface for uncertainty-aware clinical prediction under missingness, not that symbolic gating is a standalone source of higher AUC or better calibration. Future work should test stronger uncertainty estimators, broader rule bases, external cohorts, and ablations that more sharply separate neural uncertainty gating from symbolic revision.
 
 \section*{Ethics, Data, and Code Availability}
 
 This work uses public, de-identified benchmark data and did not collect new patient data. The anonymous repository for review is available at \url{https://anonymous.4open.science/r/NGTA/}. Large language models were used to assist with drafting, mathematical formulation, and code generation; the author(s) independently checked the derivations, implementation, and reported results and take full responsibility for the work. At least one author will attend in person if the paper is accepted.
 
 \acks{Acknowledgments and author-identifying details are withheld for anonymous review. The final version will acknowledge relevant feedback, data providers, funding status, and conflicts of interest.}
+
+\iffalse
+Final-version acknowledgement placeholder:
+The authors thank Prof. Leilani H. Gilpin for detailed feedback on the paper's framing, NAL/NARS boundary, audit-trace presentation, rule-base discussion, and claims about evidence and calibration.
+\fi
 
 \bibliography{references}
 
