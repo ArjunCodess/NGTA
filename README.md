@@ -119,6 +119,7 @@ Useful flags:
 - `--ablation-set submission`: add symbolic-disabled and rule-truth sensitivity summaries
 - `--export-case-traces`: write curated glass-box case traces for representative held-out patients
 - `--paper-tables`: export aggregate CSV and LaTeX tables under `results/submission`
+- `--skip-paper-figures`: skip automatic regeneration of the paper figures under `paper/figures`
 
 Notes:
 
@@ -140,6 +141,13 @@ This writes:
 - `results/submission/ablation_summary.csv`
 - `results/submission/case_traces.csv`
 - `results/submission/paper_tables.tex`
+- refreshed paper figures under `paper/figures`
+
+Paper figures are regenerated automatically at the end of a complete run when both TCGA and WiDS result directories are available under the selected `--output-dir`. The LaTeX paper references stable figure paths, so recompiling `paper/nesy2026.tex` picks up the updated PDFs. The same step can be run directly:
+
+```bash
+python -c "from src.paper_figures import generate_paper_figures; generate_paper_figures('results')"
+```
 
 The submission artifacts are intended to support a theory-forward framing: NGTA is a glass-box evidential routing interface for clinical transformers, with performance treated as feasibility evidence rather than as a claim of universal superiority.
 

@@ -19,6 +19,7 @@ from src.nars_interface import (
     revise_truth_values,
     truth_to_expectation,
 )
+from src.paper_figures import generate_paper_figures
 from src.pipeline import PipelineConfig, run_pipeline
 
 TRANSFORMER_VARIANTS = {"baseline", "flat_confidence", "mc_confidence_only", "nars_gated"}
@@ -132,6 +133,11 @@ def parse_args() -> argparse.Namespace:
         "--paper-tables",
         action="store_true",
         help="Write submission-ready aggregate CSV and LaTeX table artifacts under <output-dir>/submission.",
+    )
+    parser.add_argument(
+        "--skip-paper-figures",
+        action="store_true",
+        help="Skip regenerating paper figures under paper/figures after the pipeline finishes.",
     )
     return parser.parse_args()
 
@@ -260,6 +266,15 @@ def main() -> None:
 
     if args.paper_tables or args.seeds or args.export_case_traces or args.ablation_set == "submission" or args.baseline_set == "standard":
         _write_submission_outputs(all_summaries, args.output_dir, write_paper_tables=args.paper_tables)
+
+    if not args.skip_paper_figures:
+        try:
+            generated_figures = generate_paper_figures(args.output_dir, seeds=requested_seeds)
+            print("Regenerated paper figures:")
+            for figure_path in generated_figures:
+                print(f"- {figure_path}")
+        except FileNotFoundError as exc:
+            print(f"Skipping paper figure generation: {exc}")
 
     print(json.dumps(summary, indent=2, default=_json_default))
 
