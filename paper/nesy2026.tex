@@ -65,20 +65,26 @@ We evaluate the interface on two clinical benchmarks with different roles. TCGA-
 \label{sec:related}
 
 \paragraph{Neurosymbolic integration.}
-Neurosymbolic AI combines neural pattern recognition with symbolic reasoning, knowledge injection, or interpretable rule systems \citep{garcez2020,marra2021,bhuyan2024,colelough2025}. Prior surveys distinguish loose coupling, tight coupling, and unified architectures \citep{hilario2013,nawaz2025}. Our method is a tight inference-time interface: the neural model produces probabilistic and attention signals, while the symbolic layer exposes and revises evidential confidence before the final attention update.
+Neurosymbolic AI combines neural pattern recognition with symbolic reasoning, knowledge injection, or interpretable rule systems \citep{garcez2020,marra2021,bhuyan2024,colelough2025}. Prior surveys distinguish loose coupling, tight coupling, and unified architectures \citep{hilario2013,nawaz2025}. Dynamic evidential routing is a tight inference-time interface: the neural model supplies probabilities, uncertainty estimates, and attention weights, while the symbolic layer revises evidential confidence before attention is updated. Its contribution is the interface contract between these components. Neural uncertainty is converted into an explicit truth-value representation, symbolic rules revise that representation, and the revised confidence is fed back into attention with a trace of the intervention.
 
 \paragraph{Clinical transformers and uncertainty.}
-Clinical transformers have been used for structured EHRs, clinical text, and medical prediction tasks \citep{rasmy2021,li2019,dai2025}. Attention can help interpretability, but medical attention mechanisms rarely represent uncertainty as a first-class control signal \citep{goncalves2022}. In parallel, uncertainty quantification methods such as Bayesian neural networks, MC dropout, and ensembles provide useful but imperfect epistemic uncertainty estimates \citep{blundell2015,gal2016,lakshminarayanan2017,abad2025}. MC dropout is attractive because it is cheap, but it can be miscalibrated under dataset shift \citep{ovadia2019}.
+Clinical transformers have been used for structured EHRs, clinical text, and medical prediction tasks \citep{rasmy2021,li2019,dai2025}. Attention can help interpretability, but medical attention mechanisms rarely represent uncertainty as a first-class control signal \citep{goncalves2022}. In parallel, uncertainty quantification methods such as Bayesian neural networks, MC dropout, and ensembles provide useful but imperfect epistemic uncertainty estimates \citep{blundell2015,gal2016,lakshminarayanan2017,abad2025}. MC dropout is attractive because it is cheap, but it can be miscalibrated under dataset shift \citep{ovadia2019}. Our use of uncertainty is therefore not a standalone calibration method. The uncertainty estimate initializes evidential confidence, which becomes available for symbolic revision and case-level audit.
 
 \paragraph{NARS and biomedical reasoning.}
-NARS and Non-Axiomatic Logic model reasoning under insufficient knowledge and resources \citep{wang1995,wang2006,wang2022}. NAL truth values have been studied for uncertain medical diagnosis \citep{wang2013}. Biomedical knowledge graphs and symbolic reasoning can improve clinical interpretability \citep{wu2023,abusalih2023,rajabi2022,jiang2024,chudasama2025}, but many such systems enrich representations rather than exposing an evidential confidence variable that directly controls neural inference. Our repository uses NAL truth-value functions and rule-triggered revision, but it does not implement full NARS memory or control.
+NARS and Non-Axiomatic Logic model reasoning under insufficient knowledge and resources \citep{wang1995,wang2006,wang2022}. NAL truth values have been studied for uncertain medical diagnosis \citep{wang2013}. Biomedical knowledge graphs and symbolic reasoning can improve clinical interpretability \citep{wu2023,abusalih2023,rajabi2022,jiang2024,chudasama2025}, but many such systems enrich representations rather than exposing an evidential confidence variable that directly controls neural inference. This paper uses NAL truth-value functions and rule-triggered revision only. It does not implement full NARS concept memory, task scheduling, resource allocation, or evidential-base management.
+
+The resulting distinction is operational. Compared with ordinary attention gating, the gate is driven by an evidential confidence value that can be revised by symbolic rules. Compared with uncertainty calibration, the method exposes an intermediate revision trace rather than only changing the final probability. Compared with rule-based post-hoc explanation, the rule path participates in the computation. Compared with knowledge-injected models, the symbolic source remains separately inspectable and editable at inference time.
 
 \section{Method}
 \label{sec:method}
 
+\subsection{Interface Boundary}
+
+The implementation should be read as a NAL truth-value interface inspired by NARS, not as a full NARS system. It uses the $(f,c)$ truth-value representation, deduction-style grounding of triggered rules, and revision of neural and symbolic judgments. It does not maintain concept memory, task queues, priority dynamics, resource-bounded control, or explicit evidential-base objects. The claims in this paper are therefore interface-level claims about truth-value-guided fusion and attention control.
+
 \subsection{Truth Values}
 
-For a statement $S$ with positive evidence $w^+$ and negative evidence $w^-$, NARS represents truth as $(f,c)$:
+For a statement $S$ with positive evidence $w^+$ and negative evidence $w^-$, NAL represents truth as $(f,c)$:
 \begin{equation}
 f=\frac{w^+}{w^+ + w^-},
 \label{eq:frequency}
@@ -108,7 +114,7 @@ f_{\text{neural}}=p,\qquad
 c_{\text{neural}}=\frac{p(1-p)}{p(1-p)+\sigma^2+\varepsilon}.
 \label{eq:neural_to_nars}
 \end{equation}
-This is an application-specific initializer, not a canonical NARS measurement of evidential support. It parallels a variance-controlled evidence mass, then lets symbolic rules revise the confidence in NAL space. If the variance estimator underestimates uncertainty, $c$ can be inflated; this is a limitation inherited from the neural UQ method.
+This is an application-specific initializer, not a canonical NARS measurement of evidential support. It parallels a variance-controlled evidence mass, then lets symbolic rules revise the confidence in NAL space. If the variance estimator underestimates uncertainty, $c$ can be inflated. This limitation is inherited from the neural uncertainty method.
 
 \subsection{Symbolic Rule Revision}
 
@@ -293,14 +299,14 @@ The deployment boundary also shapes how the metrics should be read. Competitive 
 
 The current evidence is a first methods evaluation, not a clinical validation study. TCGA has only 69 held-out cases, so tiny AUC and calibration differences are not reliable. WiDS is much larger, but all experiments use an internal split rather than an external temporal or institutional cohort. The rule bases are deliberately small and hand-written; deployment would require independently curated rules, sensitivity analysis over rule truth values, and clinician review.
 
-The neural-to-NARS initializer depends on MC-dropout variance, which can be miscalibrated under shift. The method would over-trust a weak prediction if the uncertainty estimator underestimates epistemic uncertainty. Future runs should compare MC dropout with ensembles and should test shifted cohorts.
+The neural-to-NAL initializer depends on MC-dropout variance, which can be miscalibrated under shift. The method would over-trust a weak prediction if the uncertainty estimator underestimates epistemic uncertainty. Future runs should compare MC dropout with ensembles and should test shifted cohorts.
 
 Finally, the repository implements NAL truth-value functions and feature-level rule revision, but not the complete NARS architecture. It does not maintain concept priority dynamics, task scheduling, or explicit evidential-base records. The claims should therefore be read as interface-level claims about truth-value-guided fusion and attention control.
 
 \section{Conclusion}
 \label{sec:conclusion}
 
-Dynamic evidential routing converts neural uncertainty into an explicit NARS-style confidence variable, revises that variable with symbolic rules, and feeds it back into transformer attention. Across TCGA-THCA and WiDS ICU, the interface is operational across modalities and active at scale. The strongest current claim is not that symbolic gating universally improves AUC, but that it provides a transparent instrumentation layer for uncertainty-aware clinical prediction under missingness. Future work should test stronger uncertainty estimators, broader rule bases, external cohorts, and ablations that more sharply separate neural uncertainty gating from symbolic revision.
+Dynamic evidential routing converts neural uncertainty into an explicit NAL-style confidence variable, revises that variable with symbolic rules, and feeds it back into transformer attention. Across TCGA-THCA and WiDS ICU, the interface is operational across modalities and active at scale. The strongest current claim is not that symbolic gating universally improves AUC, but that it provides a transparent instrumentation layer for uncertainty-aware clinical prediction under missingness. Future work should test stronger uncertainty estimators, broader rule bases, external cohorts, and ablations that more sharply separate neural uncertainty gating from symbolic revision.
 
 \section*{Ethics, Data, and Code Availability}
 
