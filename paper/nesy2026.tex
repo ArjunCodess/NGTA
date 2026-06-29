@@ -178,21 +178,21 @@ All transformer variants use the same trained base architecture: $d_{\text{model
 
 \subsection{Baselines and Controls}
 
-The baseline transformer tests whether the underlying neural architecture is competitive before confidence gating is introduced. The flat-confidence control assigns the same confidence to every feature and therefore isolates the architectural effect of adding a gate without using uncertainty. The MC-confidence-only ablation uses the neural variance-derived confidence but does not apply symbolic revision. The NARS-gated model adds the symbolic rule path on top of the MC-confidence initializer. This ordering is important: a gain over the baseline alone is not enough to show that symbolic reasoning helped, because confidence gating or regularization may explain the change.
+The baseline transformer tests whether the underlying neural architecture is competitive before confidence gating is introduced. The flat-confidence control assigns the same confidence to every feature and therefore isolates the architectural effect of adding a gate without using uncertainty. The MC-confidence-only ablation uses the neural variance-derived confidence but does not apply symbolic revision. The NARS-gated model adds the symbolic rule path on top of the MC-confidence initializer. This ordering is important: a difference from the baseline alone is not enough to show that symbolic reasoning helped, because confidence gating or regularization may explain the change.
 
-The random forest baseline addresses the common tabular-learning concern that tree ensembles can outperform neural models on structured clinical features. It is trained on the same split and post-preprocessing design matrix, so differences cannot be attributed to a different data representation.
+The random forest baseline addresses the common tabular-learning concern that tree ensembles can be strong competitors on structured clinical features. It is trained on the same split and post-preprocessing design matrix, so differences cannot be attributed to a different data representation.
 
 \subsection{Rule Bases}
 
 The TCGA rule base contains four thyroid-cancer rules chosen to exercise the clinical and genomic feature channels: BRAF mutation, age at least 55 years, pathologic T3/T4 stage, and extrathyroid extension. The WiDS rule base contains four ICU rules for lactate, hypotension, age, and creatinine. These rules are deliberately small. They are not proposed as complete clinical ontologies; they are probes for whether the interface supports rule-triggered truth revision at inference time.
 
-This choice creates a useful stress test. If the rule pathway does not fire, the method is only an uncertainty gate. If it fires but does not change aggregate metrics, the interface is still functioning as an auditable symbolic intervention layer, but the evidence does not support a performance claim. If it fires and improves metrics beyond the controls, then symbolic revision would be empirically isolated. The current results fall in the second category.
+This choice creates a useful stress test. If the rule pathway does not fire, the method is only an uncertainty gate. If it fires but does not change aggregate metrics, the interface is still functioning as an auditable symbolic intervention layer, but the evidence does not support a performance claim. Symbolic revision would be empirically isolated only if the NARS-gated variant separated from the baseline, flat-confidence, and MC-confidence-only controls with paired intervals excluding zero. The current results do not meet that standard.
 
 \subsection{Statistical Reporting}
 
 The reported confidence intervals are bootstrap intervals over held-out examples for AUC, Brier score, and ECE. Paired bootstrap comparisons are used for the most important within-transformer calibration contrasts. This matters because the transformer variants are extremely close numerically. A table entry that is best at the fourth or fifth decimal place should not be interpreted as a confirmed improvement unless the paired interval excludes zero.
 
-The paper therefore separates three evidential claims. First, whether the architecture compiles and runs on the benchmark. Second, whether the symbolic pathway fires and changes feature-level truth values. Third, whether the symbolic pathway improves predictive metrics beyond simpler controls. The present results support the first two claims strongly and the third claim only weakly. This separation is central to the paper's framing.
+The paper therefore separates three evidential claims. First, whether the architecture compiles and runs on the benchmark. Second, whether the symbolic pathway fires and changes feature-level truth values. Third, whether the symbolic pathway changes predictive metrics beyond simpler controls. The present results support the first two claims. They do not isolate the third claim. This separation is central to the paper's framing.
 
 \subsection{Reproducibility Interface}
 
@@ -203,7 +203,7 @@ The most important reproducibility constraint is that preprocessing must be fitt
 \section{Results}
 \label{sec:results}
 
-On TCGA-THCA, the flat-confidence, MC-confidence-only, and NARS-gated variants tie for best default AUC at 0.7261, while flat-confidence has the best Brier score, ECE, and accuracy. The small 69-case test split does not statistically separate transformer variants, so TCGA is best read as a multimodal feasibility test rather than as evidence of symbolic-gating superiority.
+On TCGA-THCA, the flat-confidence, MC-confidence-only, and NARS-gated variants all report AUC 0.7261, while flat-confidence has the lowest Brier score and ECE and the highest accuracy. The small 69-case test split does not statistically separate transformer variants, so TCGA is best read as a multimodal feasibility test rather than as evidence of symbolic-gating superiority.
 
 \begin{table}[t]
 \caption{Held-out TCGA-THCA performance for lymph node metastasis prediction.}
@@ -226,7 +226,7 @@ NARS-gated & 0.7261 [0.5957, 0.8460] & 0.2121 [0.1805, 0.2452] & 0.1400 [0.1176,
 
 The TCGA symbolic rules fired 79 times across 42 of 69 held-out cases. Per-rule counts were 0 for BRAF mutation, 25 for age at least 55 years, 29 for pathologic T3/T4 stage, and 25 for non-null extrathyroid extension. This shows that the rule path was active under clinical-genomic fusion, but the small split does not provide enough power to distinguish the transformer variants.
 
-WiDS provides the clearer scale test. All transformer variants outperform the random forest on AUC. The baseline transformer is marginally best on AUC, flat-confidence is best on ECE, MC-confidence-only is best on accuracy, and NARS-gated is best on Brier score. The NARS-vs-baseline paired bootstrap intervals include zero for Brier and ECE, and the same is true for NARS-vs-flat-confidence. Thus symbolic revision is active but not statistically isolated from generic confidence gating in this run.
+WiDS provides the clearer scale test. All transformer variants have higher AUC than the random forest in this run. Within the transformer family, the baseline has the highest AUC, flat-confidence has the lowest ECE, MC-confidence-only has the highest accuracy, and NARS-gated has the lowest Brier score at the reported precision. The NARS-vs-baseline paired bootstrap intervals include zero for Brier and ECE, and the same is true for NARS-vs-flat-confidence. Thus symbolic revision is active but not statistically isolated from generic confidence gating in this run.
 
 \begin{table}[t]
 \caption{Held-out WiDS ICU performance for hospital mortality prediction.}
@@ -247,7 +247,7 @@ NARS-gated & 0.8829 [0.8731, 0.8925] & 0.05618 [0.05327, 0.05945] & 0.00494 [0.0
 \end{tabular}
 \end{table}
 
-The symbolic pathway operated at scale: ICU rules fired on 8,551 of 13,757 held-out stays, with 13,031 total feature-level revisions. The per-rule counts were 1,936 for lactate, 5,338 for hypotension, 3,443 for age, and 2,314 for creatinine. This supports the neurosymbolic systems claim that a human-auditable rule path can be embedded directly into transformer inference.
+The symbolic pathway operated at scale: ICU rules fired on 8,551 of 13,757 held-out stays, with 13,031 total feature-level revisions. The per-rule counts were 1,936 for lactate, 5,338 for hypotension, 3,443 for age, and 2,314 for creatinine. This supports the neurosymbolic systems claim that a human-auditable rule path can be embedded directly into transformer inference, while leaving performance attribution unresolved.
 
 \subsection{Case-Level Rule Trace}
 
@@ -272,9 +272,9 @@ Creatinine max & $(0.0186,0.9840)$ & $(0.7000,0.6500)$ & $(0.0386,0.9844)$ & $0.
 
 \subsection{Calibration Interpretation}
 
-The WiDS calibration results should be read as a close comparison rather than a win table. NARS-gated attention has the best Brier score at the reported precision, but flat-confidence has the best ECE, and the paired intervals for key within-transformer comparisons include zero. This means the observed differences are too small to claim that symbolic revision is the causal source of improved calibration.
+The WiDS calibration results should be read as a close comparison rather than a win table. NARS-gated attention has the lowest Brier score at the reported precision, but flat-confidence has the lowest ECE, and the paired intervals for key within-transformer comparisons include zero. This means the observed differences are too small to claim that symbolic revision is the causal source of calibration change.
 
-That negative restraint is important. It keeps the contribution aligned with what the experiment actually supports. Dynamic evidential routing should not be described as a universal calibration booster. The stronger supported claim is that a symbolic evidential channel can be made active, traceable, and compatible with competitive calibrated prediction on a large high-missingness ICU benchmark.
+That restraint keeps the contribution aligned with what the experiment actually supports. Dynamic evidential routing should not be described as a universal calibration booster. The supported claim is that a symbolic evidential channel can be made active, traceable, and compatible with competitive calibrated prediction on a large high-missingness ICU benchmark.
 
 \subsection{Why TCGA and WiDS Play Different Roles}
 
@@ -285,9 +285,9 @@ This division also explains why TCGA is not used as the main performance claim. 
 \section{Ablation and Interpretation}
 \label{sec:analysis}
 
-The flat-confidence and MC-confidence-only controls are essential for interpreting the result. If NARS-gated attention were compared only with the baseline transformer, a small Brier improvement on WiDS might be over-interpreted as a symbolic reasoning gain. The controls show a more precise picture: much of the behavior can be reproduced by confidence gating even before symbolic revision is added. The NARS rule path is therefore best interpreted as an instrumentation layer whose value is auditability, modifiability, and compatibility with symbolic intervention, not yet a statistically isolated source of within-family calibration improvement.
+The flat-confidence and MC-confidence-only controls are essential for interpreting the result. If NARS-gated attention were compared only with the baseline transformer, a small Brier difference on WiDS might be over-interpreted as a symbolic reasoning effect. The controls show a more precise picture: much of the behavior can be reproduced by confidence gating even before symbolic revision is added. The NARS rule path is therefore best interpreted as an instrumentation layer whose value is auditability, modifiability, and compatibility with symbolic intervention, not yet a statistically isolated source of within-family calibration change.
 
-On TCGA, a gamma sweep over $\gamma\in\{0.25,0.5,1,2,4\}$ showed a mild ranking-versus-calibration trade-off. Stronger gating increased NARS-gated AUC slightly, peaking at 0.7294 for $\gamma=4$, while Brier score worsened monotonically from 0.21186 to 0.21244. No gamma setting yields a clear statistical separation on this small split, so the sweep is a sensitivity result rather than an optimizable superiority regime.
+On TCGA, a gamma sweep over $\gamma\in\{0.25,0.5,1,2,4\}$ showed a mild ranking-versus-calibration trade-off. NARS-gated AUC was slightly higher at stronger gating values, peaking at 0.7294 for $\gamma=4$, while Brier score worsened monotonically from 0.21186 to 0.21244. No gamma setting yields a clear statistical separation on this small split, so the sweep is a sensitivity result rather than an optimizable superiority regime.
 
 Decision-curve analysis further supports a cautious reading. The transformer variants remain broadly similar, but modest threshold-dependent differences appear at intermediate operating points. In clinical triage, this means the interface may be more important for calibrated decision behavior and traceability than for raw rank ordering.
 
@@ -295,13 +295,13 @@ Decision-curve analysis further supports a cautious reading. The transformer var
 
 The interface can fail in three main ways. First, the neural uncertainty estimate can be wrong. If MC dropout underestimates epistemic uncertainty under shift, the initializer in Eq.~\eqref{eq:neural_to_nars} will assign confidence that is too high. Second, proposition extraction can misalign encoded features with clinical concepts. A one-hot category, imputed value, or missingness indicator may not correspond cleanly to the symbolic condition. Third, the rule truth values can be weak, conflicting, or clinically disputed.
 
-These failures are not unique to this implementation, but dynamic evidential routing makes them more inspectable than a purely neural predictor. A bad rule leaves a trace. A misfired proposition can be counted. A confidence gate can be ablated. The resulting system is not automatically safer, but it gives researchers concrete handles for safety analysis.
+These failures are not unique to this implementation, but dynamic evidential routing makes them more inspectable than a purely neural predictor. A bad rule leaves a trace. A misfired proposition can be counted. A confidence gate can be ablated. The resulting system is not a clinical safety mechanism by itself, but it gives researchers concrete handles for safety analysis.
 
 \subsection{What Would Count as Stronger Evidence?}
 
 Stronger evidence would require at least three additions. First, the rule base should be curated independently of the evaluation split, preferably with multiple clinicians or domain experts assigning truth values and resolving disagreement. Second, external validation should be performed without retuning the preprocessing, thresholds, or rule definitions. Third, uncertainty estimators should be compared directly, including MC dropout, deep ensembles, and possibly conformal or distribution-shift-aware variants.
 
-The most informative future ablation would freeze the trained transformer and evaluate four inference modes on multiple external cohorts: baseline attention, flat-confidence attention, MC-confidence attention, and NARS-revised attention. Symbolic revision would be isolated only if NARS-revised attention improves calibration or decision utility beyond the first three modes with intervals that exclude zero.
+The most informative future ablation would freeze the trained transformer and evaluate four inference modes on multiple external cohorts: baseline attention, flat-confidence attention, MC-confidence attention, and NARS-revised attention. Symbolic revision would be isolated only if NARS-revised attention separates from the first three modes on calibration or decision utility with intervals that exclude zero.
 
 \subsection{Clinical Audit Scenario}
 
