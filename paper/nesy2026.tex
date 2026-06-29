@@ -118,9 +118,9 @@ This is an application-specific initializer, not a canonical NARS measurement of
 
 \subsection{Symbolic Rule Revision}
 
-Each rule is represented as a clinical proposition with a pre-specified symbolic truth value. During inference, feature-level neural truths are initialized from predictive and attention variance, the rule extractor tests whether the corresponding clinical condition is present, and triggered rules revise the matching feature truth by Eq.~\eqref{eq:revision}. The current implementation uses small rule bases rather than comprehensive clinical ontologies. This design is deliberate: it tests whether a transparent symbolic channel can be integrated with transformer inference before claiming broad clinical knowledge coverage.
+Each rule is represented as a clinical proposition with a pre-specified symbolic truth value. During inference, feature-level neural truths are initialized from predictive and attention variance, the rule extractor tests whether the corresponding clinical condition is present, and triggered rules revise the matching feature truth by Eq.~\eqref{eq:revision}. The rules use fixed thresholds over variables already present in the processed inputs. These thresholds are deterministic triggers for symbolic propositions, not learned decision thresholds or validated clinical cut points.
 
-The rule pathway is clinically important even when aggregate metrics are close. A fired rule produces an inspectable event: the source feature, the rule condition, the symbolic truth value, the neural truth value, and the revised truth value can be exported. This makes the mechanism different from ordinary attention regularization. A clinician or domain expert can see where symbolic priors entered the model and can modify the rule base without retraining the transformer.
+The symbolic truth values should be read as prototype prior strengths for testing the interface. They are not presented as an authoritative clinical knowledge base. This design is deliberate: it tests whether a transparent symbolic channel can be integrated with transformer inference before claiming broad clinical knowledge coverage. A fired rule produces an inspectable event: the source feature, the rule condition, the symbolic truth value, the neural truth value, and the revised truth value can be exported. This makes the mechanism different from ordinary attention regularization. A clinician or domain expert can see where symbolic priors entered the model and can modify the rule base without retraining the transformer.
 
 \subsection{Attention Gating}
 
@@ -184,13 +184,13 @@ The random forest baseline addresses the common tabular-learning concern that tr
 
 \subsection{Rule Bases}
 
-The TCGA rule base contains four thyroid-cancer rules chosen to exercise the clinical and genomic feature channels: BRAF mutation, age at least 55 years, pathologic T3/T4 stage, and extrathyroid extension. The WiDS rule base contains four ICU rules for lactate, hypotension, age, and creatinine. These rules are deliberately small. They are not proposed as complete clinical ontologies; they are probes for whether the interface supports rule-triggered truth revision at inference time.
+The TCGA rule base contains four thyroid-cancer rules chosen to exercise distinct input channels: BRAF mutation for genomic evidence, age at least 55 years for demographic evidence, pathologic T3/T4 stage for staging evidence, and extrathyroid extension for pathology-derived evidence. The WiDS rule base contains four ICU rules chosen to exercise common tabular critical-care signals: lactate for metabolic stress, hypotension for hemodynamic instability, age for demographic risk, and creatinine for renal dysfunction. All rules are applied only at inference time.
 
-This choice creates a useful stress test. If the rule pathway does not fire, the method is only an uncertainty gate. If it fires but does not change aggregate metrics, the interface is still functioning as an auditable symbolic intervention layer, but the evidence does not support a performance claim. Symbolic revision would be empirically isolated only if the NARS-gated variant separated from the baseline, flat-confidence, and MC-confidence-only controls with paired intervals excluding zero. The current results do not meet that standard.
+The small rule bases are prototype probes, not complete clinical ontologies. Their thresholds and $(f,c)$ values were fixed before held-out evaluation to test whether rule-triggered truth revision can be audited in the prediction path. Clinical use would require expert-curated propositions, documented threshold rationales for the intended population, and sensitivity analysis over both thresholds and truth values. This choice creates a useful stress test. If the rule pathway does not fire, the method is only an uncertainty gate. If it fires but does not change aggregate metrics, the interface is still functioning as an auditable symbolic intervention layer, but the evidence does not support a performance claim. Symbolic revision would be empirically isolated only if the NARS-gated variant separated from the baseline, flat-confidence, and MC-confidence-only controls with paired intervals excluding zero. The current results do not meet that standard.
 
 \subsection{Statistical Reporting}
 
-The reported confidence intervals are bootstrap intervals over held-out examples for AUC, Brier score, and ECE. Paired bootstrap comparisons are used for the most important within-transformer calibration contrasts. This matters because the transformer variants are extremely close numerically. A table entry that is best at the fourth or fifth decimal place should not be interpreted as a confirmed improvement unless the paired interval excludes zero.
+The metric tables report point estimates followed by 95\% bootstrap confidence intervals over held-out examples for AUC, Brier score, and ECE. Accuracy is reported as a point estimate. These intervals are confidence intervals, not standard deviations. Paired bootstrap comparisons are used for the most important within-transformer calibration contrasts. This matters because the transformer variants are extremely close numerically. A table entry that is best at the fourth or fifth decimal place should not be interpreted as a confirmed improvement unless the paired interval excludes zero.
 
 The paper therefore separates three evidential claims. First, whether the architecture compiles and runs on the benchmark. Second, whether the symbolic pathway fires and changes feature-level truth values. Third, whether the symbolic pathway changes predictive metrics beyond simpler controls. The present results support the first two claims. They do not isolate the third claim. This separation is central to the paper's framing.
 
@@ -206,7 +206,7 @@ The most important reproducibility constraint is that preprocessing must be fitt
 On TCGA-THCA, the flat-confidence, MC-confidence-only, and NARS-gated variants all report AUC 0.7261, while flat-confidence has the lowest Brier score and ECE and the highest accuracy. The small 69-case test split does not statistically separate transformer variants, so TCGA is best read as a multimodal feasibility test rather than as evidence of symbolic-gating superiority.
 
 \begin{table}[t]
-\caption{Held-out TCGA-THCA performance for lymph node metastasis prediction.}
+\caption{Held-out TCGA-THCA performance for lymph node metastasis prediction. Point estimates are followed by 95\% bootstrap confidence intervals where shown.}
 \label{tab:tcga_results}
 \centering
 \scriptsize
@@ -229,7 +229,7 @@ The TCGA symbolic rules fired 79 times across 42 of 69 held-out cases. Per-rule 
 WiDS provides the clearer scale test. All transformer variants have higher AUC than the random forest in this run. Within the transformer family, the baseline has the highest AUC, flat-confidence has the lowest ECE, MC-confidence-only has the highest accuracy, and NARS-gated has the lowest Brier score at the reported precision. The NARS-vs-baseline paired bootstrap intervals include zero for Brier and ECE, and the same is true for NARS-vs-flat-confidence. Thus symbolic revision is active but not statistically isolated from generic confidence gating in this run.
 
 \begin{table}[t]
-\caption{Held-out WiDS ICU performance for hospital mortality prediction.}
+\caption{Held-out WiDS ICU performance for hospital mortality prediction. Point estimates are followed by 95\% bootstrap confidence intervals where shown.}
 \label{tab:wids_results}
 \centering
 \scriptsize
@@ -318,7 +318,7 @@ The deployment boundary also shapes how the metrics should be read. Competitive 
 \section{Limitations}
 \label{sec:limitations}
 
-The current evidence is a first methods evaluation, not a clinical validation study. TCGA has only 69 held-out cases, so tiny AUC and calibration differences are not reliable. WiDS is much larger, but all experiments use an internal split rather than an external temporal or institutional cohort. The rule bases are deliberately small and hand-written; deployment would require independently curated rules, sensitivity analysis over rule truth values, and clinician review.
+The current evidence is a first methods evaluation, not a clinical validation study. TCGA has only 69 held-out cases, so tiny AUC and calibration differences are not reliable. WiDS is much larger, but all experiments use an internal split rather than an external temporal or institutional cohort. The rule bases are prototype probes; deployment would require independently curated rules, sensitivity analysis, and clinician review.
 
 The neural-to-NAL initializer depends on MC-dropout variance, which can be miscalibrated under shift. The method would over-trust a weak prediction if the uncertainty estimator underestimates epistemic uncertainty. Future runs should compare MC dropout with ensembles and should test shifted cohorts.
 
