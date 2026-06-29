@@ -27,7 +27,7 @@
     "scikit_learn": "1.8.0",
     "torch": "2.11.0+cu126",
     "cuda_available": true,
-    "git_commit": "698c3403d48c049435630e13b9c3e16c7a045596"
+    "git_commit": "4c6133a53a5a4152d000d22a0ad53562e0e4c2e2"
   },
   "task": {
     "dataset": "TCGA-THCA",
@@ -649,9 +649,9 @@
       "auc_ci_95_lower": 0.5100720984441915,
       "auc_ci_95_upper": 0.7907666818849781,
       "brier_ci_95_lower": 0.18953733342289616,
-      "brier_ci_95_upper": 0.24980725468298623,
-      "ece_ci_95_lower": 0.13173260446334506,
-      "ece_ci_95_upper": 0.282415426658176
+      "brier_ci_95_upper": 0.24980725468298617,
+      "ece_ci_95_lower": 0.1317326044633451,
+      "ece_ci_95_upper": 0.28241542665817587
     },
     {
       "variant": "baseline",
@@ -796,12 +796,12 @@
       "auc_samples_mean": 0.6621587811244568,
       "auc_ci_95_lower": 0.5100720984441915,
       "auc_ci_95_upper": 0.7907666818849781,
-      "brier_samples_mean": 0.2196994370943795,
+      "brier_samples_mean": 0.21969943709437945,
       "brier_ci_95_lower": 0.18953733342289616,
-      "brier_ci_95_upper": 0.24980725468298623,
+      "brier_ci_95_upper": 0.24980725468298617,
       "ece_samples_mean": 0.20844884693908314,
-      "ece_ci_95_lower": 0.13173260446334506,
-      "ece_ci_95_upper": 0.282415426658176
+      "ece_ci_95_lower": 0.1317326044633451,
+      "ece_ci_95_upper": 0.28241542665817587
     },
     "baseline": {
       "iterations": 1000,
@@ -874,13 +874,13 @@
       "flat_confidence_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for the ece difference includes zero.",
       "random_forest_vs_nars_gated_ci_overlap": true,
       "random_forest_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain.",
-      "random_forest_vs_nars_gated_brier_delta_left_minus_right": 0.009001502427654903,
+      "random_forest_vs_nars_gated_brier_delta_left_minus_right": 0.00900150242765489,
       "random_forest_vs_nars_gated_brier_delta_ci_95_lower": -0.008562656652591219,
-      "random_forest_vs_nars_gated_brier_delta_ci_95_upper": 0.02864663860385705,
+      "random_forest_vs_nars_gated_brier_delta_ci_95_upper": 0.028646638603857074,
       "random_forest_vs_nars_gated_brier_interpretation": "The 95% paired bootstrap interval for the brier difference includes zero.",
-      "random_forest_vs_nars_gated_ece_delta_left_minus_right": 0.03691096800317764,
-      "random_forest_vs_nars_gated_ece_delta_ci_95_lower": -0.0669225806156801,
-      "random_forest_vs_nars_gated_ece_delta_ci_95_upper": 0.13343417770820823,
+      "random_forest_vs_nars_gated_ece_delta_left_minus_right": 0.03691096800317763,
+      "random_forest_vs_nars_gated_ece_delta_ci_95_lower": -0.06692258061568011,
+      "random_forest_vs_nars_gated_ece_delta_ci_95_upper": 0.13343417770820812,
       "random_forest_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for the ece difference includes zero."
     }
   },
@@ -890,12 +890,12 @@
       "auc_samples_mean": 0.6621587811244568,
       "auc_ci_95_lower": 0.5100720984441915,
       "auc_ci_95_upper": 0.7907666818849781,
-      "brier_samples_mean": 0.2196994370943795,
+      "brier_samples_mean": 0.21969943709437945,
       "brier_ci_95_lower": 0.18953733342289616,
-      "brier_ci_95_upper": 0.24980725468298623,
+      "brier_ci_95_upper": 0.24980725468298617,
       "ece_samples_mean": 0.20844884693908314,
-      "ece_ci_95_lower": 0.13173260446334506,
-      "ece_ci_95_upper": 0.282415426658176
+      "ece_ci_95_lower": 0.1317326044633451,
+      "ece_ci_95_upper": 0.28241542665817587
     },
     "baseline": {
       "iterations": 1000,
@@ -968,13 +968,13 @@
       "flat_confidence_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for the ece difference includes zero.",
       "random_forest_vs_nars_gated_ci_overlap": true,
       "random_forest_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain.",
-      "random_forest_vs_nars_gated_brier_delta_left_minus_right": 0.009001502427654903,
+      "random_forest_vs_nars_gated_brier_delta_left_minus_right": 0.00900150242765489,
       "random_forest_vs_nars_gated_brier_delta_ci_95_lower": -0.008562656652591219,
-      "random_forest_vs_nars_gated_brier_delta_ci_95_upper": 0.02864663860385705,
+      "random_forest_vs_nars_gated_brier_delta_ci_95_upper": 0.028646638603857074,
       "random_forest_vs_nars_gated_brier_interpretation": "The 95% paired bootstrap interval for the brier difference includes zero.",
-      "random_forest_vs_nars_gated_ece_delta_left_minus_right": 0.03691096800317764,
-      "random_forest_vs_nars_gated_ece_delta_ci_95_lower": -0.0669225806156801,
-      "random_forest_vs_nars_gated_ece_delta_ci_95_upper": 0.13343417770820823,
+      "random_forest_vs_nars_gated_ece_delta_left_minus_right": 0.03691096800317763,
+      "random_forest_vs_nars_gated_ece_delta_ci_95_lower": -0.06692258061568011,
+      "random_forest_vs_nars_gated_ece_delta_ci_95_upper": 0.13343417770820812,
       "random_forest_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for the ece difference includes zero."
     }
   },
@@ -1229,7 +1229,7 @@
       "variant": "random_forest"
     },
     {
-      "mean_predicted_probability": 0.4208009137411097,
+      "mean_predicted_probability": 0.4208009137411098,
       "fraction_positives": 0.42857142857142855,
       "count": 7,
       "variant": "random_forest"
@@ -1241,7 +1241,7 @@
       "variant": "random_forest"
     },
     {
-      "mean_predicted_probability": 0.499948535250489,
+      "mean_predicted_probability": 0.49994853525048905,
       "fraction_positives": 0.5714285714285714,
       "count": 7,
       "variant": "random_forest"
@@ -1253,7 +1253,7 @@
       "variant": "random_forest"
     },
     {
-      "mean_predicted_probability": 0.545712692479784,
+      "mean_predicted_probability": 0.5457126924797843,
       "fraction_positives": 0.14285714285714285,
       "count": 7,
       "variant": "random_forest"
@@ -1265,13 +1265,13 @@
       "variant": "random_forest"
     },
     {
-      "mean_predicted_probability": 0.6487417237192944,
+      "mean_predicted_probability": 0.6487417237192945,
       "fraction_positives": 0.8571428571428571,
       "count": 7,
       "variant": "random_forest"
     },
     {
-      "mean_predicted_probability": 0.7282909847479111,
+      "mean_predicted_probability": 0.728290984747911,
       "fraction_positives": 0.5714285714285714,
       "count": 7,
       "variant": "random_forest"
