@@ -303,4 +303,8 @@ Role in the paper: primary empirical validation for scale, missingness, and cali
 
 ## Acknowledgments
 
-The repository updates in this snapshot were shaped directly by Pei Wang's email feedback on April 21, 2026. In particular, he pointed out that statistical variance is not the same thing as NARS evidence amount and that the manuscript's deduction confidence formula needed to match standard NAL. The current code and paper now reflect those corrections. The project also relies on public TCGA-THCA data from the NCI Genomic Data Commons.
+The repository updates in this snapshot were shaped directly by Pei Wang's email feedback on April 21, 2026. In particular, he pointed out that statistical variance is not the same thing as NARS evidence amount and that the manuscript's deduction confidence formula needed to match standard NAL. The current code and paper now reflect those corrections.
+
+The author also thanks Prof. Leilani H. Gilpin for reviewing the manuscript and for guidance on its central contribution: an auditable inference-time neurosymbolic interface rather than a claim of clinically validated prediction improvement. Her feedback informed the paper's framing, NAL/NARS boundary, pipeline figure, case-trace presentation, rule-base discussion, and cautious interpretation of the experimental results.
+
+The project also relies on public TCGA-THCA data from the NCI Genomic Data Commons.
