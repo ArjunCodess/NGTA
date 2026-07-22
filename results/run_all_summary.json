@@ -26,14 +26,14 @@
         "export_case_traces": false
       },
       "environment": {
-        "python": "3.14.4",
-        "platform": "Windows-11-10.0.26100-SP0",
-        "numpy": "2.4.4",
-        "pandas": "3.0.2",
+        "python": "3.14.0",
+        "platform": "Windows-10-10.0.19045-SP0",
+        "numpy": "2.4.3",
+        "pandas": "3.0.1",
         "scikit_learn": "1.8.0",
-        "torch": "2.11.0+cpu",
-        "cuda_available": false,
-        "git_commit": "38c856a5204114067718c29361c110f0b974dcd3"
+        "torch": "2.11.0+cu126",
+        "cuda_available": true,
+        "git_commit": "581774203721bd4a497bb2cf3ea335679425ff4c"
       },
       "task": {
         "dataset": "TCGA-THCA",
@@ -649,74 +649,77 @@
         {
           "variant": "random_forest",
           "auc": 0.6613445378151261,
-          "brier": 0.2199757527383453,
+          "brier": 0.21997575273834533,
           "accuracy": 0.5942028985507246,
           "ece": 0.15966664988761547,
           "auc_ci_95_lower": 0.5100720984441915,
           "auc_ci_95_upper": 0.7907666818849781,
-          "brier_ci_95_lower": 0.18953733342289614,
+          "brier_ci_95_lower": 0.18953733342289616,
           "brier_ci_95_upper": 0.24980725468298623,
           "ece_ci_95_lower": 0.13173260446334506,
           "ece_ci_95_upper": 0.2824154266581759
         },
         {
           "variant": "baseline",
-          "auc": 0.7252100840336135,
-          "brier": 0.2118353396654129,
-          "accuracy": 0.6666666666666666,
-          "ece": 0.13902454164581024,
-          "auc_ci_95_lower": 0.5931287878787879,
-          "auc_ci_95_upper": 0.8453926873779815,
-          "brier_ci_95_lower": 0.17995227947831155,
-          "brier_ci_95_upper": 0.24489708580076694,
-          "ece_ci_95_lower": 0.11829200520355633,
-          "ece_ci_95_upper": 0.26102216540147427
+          "auc": 0.73109243697479,
+          "brier": 0.21131697297096252,
+          "accuracy": 0.6811594202898551,
+          "ece": 0.1184147227069606,
+          "auc_ci_95_lower": 0.5974753869216433,
+          "auc_ci_95_upper": 0.8461637931034482,
+          "brier_ci_95_lower": 0.18247724510729313,
+          "brier_ci_95_upper": 0.24257818944752216,
+          "ece_ci_95_lower": 0.10735998972710492,
+          "ece_ci_95_upper": 0.25169606376709286
         },
         {
           "variant": "flat_confidence",
-          "auc": 0.7260504201680673,
-          "brier": 0.21183523285801545,
+          "auc": 0.7327731092436974,
+          "brier": 0.21090691822520885,
           "accuracy": 0.6811594202898551,
-          "ece": 0.13897058145545926,
-          "auc_ci_95_lower": 0.5934275446775447,
-          "auc_ci_95_upper": 0.8468077837195485,
-          "brier_ci_95_lower": 0.17929926754197834,
-          "brier_ci_95_upper": 0.24551392772871664,
-          "ece_ci_95_lower": 0.11629387033672048,
-          "ece_ci_95_upper": 0.2596672449059608
+          "ece": 0.11779116849243783,
+          "auc_ci_95_lower": 0.6028159501996712,
+          "auc_ci_95_upper": 0.8479409969115851,
+          "brier_ci_95_lower": 0.18159944440132217,
+          "brier_ci_95_upper": 0.2426503573051238,
+          "ece_ci_95_lower": 0.11300419198069299,
+          "ece_ci_95_upper": 0.26405413712371323
         },
         {
           "variant": "mc_confidence_only",
-          "auc": 0.7260504201680673,
-          "brier": 0.2121918105689808,
-          "accuracy": 0.6666666666666666,
-          "ece": 0.14027097963106075,
-          "auc_ci_95_lower": 0.5956742424242424,
-          "auc_ci_95_upper": 0.8459660682454799,
-          "brier_ci_95_lower": 0.18075487949743851,
-          "brier_ci_95_upper": 0.24512478039534769,
-          "ece_ci_95_lower": 0.11766520017870366,
-          "ece_ci_95_upper": 0.26213069786795506
+          "auc": 0.73109243697479,
+          "brier": 0.2109503031817101,
+          "accuracy": 0.6811594202898551,
+          "ece": 0.11842502253891472,
+          "auc_ci_95_lower": 0.6007795416316232,
+          "auc_ci_95_upper": 0.8453026463963964,
+          "brier_ci_95_lower": 0.1819828027429445,
+          "brier_ci_95_upper": 0.2418053373429521,
+          "ece_ci_95_lower": 0.10413311026053661,
+          "ece_ci_95_upper": 0.24812524541198114
         },
         {
           "variant": "nars_gated",
-          "auc": 0.7260504201680673,
-          "brier": 0.21210240428539698,
-          "accuracy": 0.6666666666666666,
-          "ece": 0.13997613189221422,
-          "auc_ci_95_lower": 0.5956742424242424,
-          "auc_ci_95_upper": 0.8459660682454799,
-          "brier_ci_95_lower": 0.18045659080522958,
-          "brier_ci_95_upper": 0.24522664091008686,
-          "ece_ci_95_lower": 0.11760323614785666,
-          "ece_ci_95_upper": 0.2618185939672086
+          "auc": 0.73109243697479,
+          "brier": 0.21094128690864986,
+          "accuracy": 0.6811594202898551,
+          "ece": 0.11837152315381069,
+          "auc_ci_95_lower": 0.6007795416316232,
+          "auc_ci_95_upper": 0.8453026463963964,
+          "brier_ci_95_lower": 0.18197620270611292,
+          "brier_ci_95_upper": 0.2417248622037831,
+          "ece_ci_95_lower": 0.10417136747209355,
+          "ece_ci_95_upper": 0.2480979029540966
         }
       ],
       "symbolic_rules": {
         "definitions": {
           "braf_mutation": {
-            "description": "BRAF mutation strongly predicts lymph node metastasis.",
+            "condition": "BRAF mutation indicator = 1",
+            "description": "A recorded BRAF mutation supplies prototype evidence toward lymph node metastasis.",
+            "clinical_interpretation": "The rule increases support for the BRAF feature when the mutation is recorded; it is not a validated risk probability.",
             "source_column": "genomic_mutation__BRAF",
+            "target_key": "genomic_mutation__BRAF",
             "target_mode": "direct",
             "truth_value": {
               "frequency": 0.85,
@@ -724,8 +727,11 @@
             }
           },
           "age_ge_55_years": {
-            "description": "Age at diagnosis >= 55 years increases metastasis risk.",
+            "condition": "age at diagnosis >= 55 years",
+            "description": "Age at diagnosis of at least 55 years supplies prototype demographic evidence.",
+            "clinical_interpretation": "The rule raises evidential support for the age feature without asserting that age alone determines metastasis.",
             "source_column": "diagnoses.age_at_diagnosis",
+            "target_key": "diagnoses.age_at_diagnosis",
             "target_mode": "direct",
             "truth_value": {
               "frequency": 0.7,
@@ -733,8 +739,11 @@
             }
           },
           "pathologic_t_t3_t4": {
-            "description": "Pathologic T3/T4 disease strongly predicts nodal spread.",
+            "condition": "pathologic T category starts with T3 or T4",
+            "description": "A recorded pathologic T3/T4 category supplies prototype staging evidence.",
+            "clinical_interpretation": "The rule increases support for the observed staging feature; it does not establish nodal spread by itself.",
             "source_column": "diagnoses.ajcc_pathologic_t",
+            "target_key": "diagnoses.ajcc_pathologic_t",
             "target_mode": "categorical_active",
             "truth_value": {
               "frequency": 0.9,
@@ -742,8 +751,11 @@
             }
           },
           "extrathyroid_extension_present": {
-            "description": "Any recorded extrathyroid extension increases metastasis risk.",
+            "condition": "extrathyroid extension is Minimal (T3), Moderate/Advanced (T4a), or Very Advanced (T4b)",
+            "description": "A recognized extrathyroid-extension category supplies prototype pathology evidence.",
+            "clinical_interpretation": "The rule raises support only for an explicitly recorded extension category; missing, placeholder, and unknown values do not fire.",
             "source_column": "pathology_details.extrathyroid_extension",
+            "target_key": "pathology_details.extrathyroid_extension",
             "target_mode": "categorical_active",
             "truth_value": {
               "frequency": 0.85,
@@ -754,7 +766,10 @@
         "interface_notes": {
           "neural_truth_mapping": "variance-derived heuristic initializer for NARS-style confidence",
           "symbolic_rule_grounding": "explicit NAL deduction from direct observation before revision",
-          "revision_assumption": "neural and symbolic truths are treated as distinct evidential sources"
+          "revision_assumption": "neural and symbolic truths are treated as distinct evidential sources",
+          "rule_firing": "conditions are evaluated independently and any subset may fire",
+          "inference_pass": "revision and gated-logit recomputation occur once with no convergence loop",
+          "conflict_policy": "multiple rules targeting one logical feature are rejected pending explicit provenance-aware resolution"
         },
         "total_trigger_count": 79,
         "mapped_feature_trigger_count": 79,
@@ -802,8 +817,8 @@
           "auc_samples_mean": 0.6621587811244568,
           "auc_ci_95_lower": 0.5100720984441915,
           "auc_ci_95_upper": 0.7907666818849781,
-          "brier_samples_mean": 0.21969943709437945,
-          "brier_ci_95_lower": 0.18953733342289614,
+          "brier_samples_mean": 0.2196994370943795,
+          "brier_ci_95_lower": 0.18953733342289616,
           "brier_ci_95_upper": 0.24980725468298623,
           "ece_samples_mean": 0.20844884693908314,
           "ece_ci_95_lower": 0.13173260446334506,
@@ -811,82 +826,92 @@
         },
         "baseline": {
           "iterations": 1000,
-          "auc_samples_mean": 0.7258110563148001,
-          "auc_ci_95_lower": 0.5931287878787879,
-          "auc_ci_95_upper": 0.8453926873779815,
-          "brier_samples_mean": 0.21146087595820426,
-          "brier_ci_95_lower": 0.17995227947831155,
-          "brier_ci_95_upper": 0.24489708580076694,
-          "ece_samples_mean": 0.18575576206458652,
-          "ece_ci_95_lower": 0.11829200520355633,
-          "ece_ci_95_upper": 0.26102216540147427
+          "auc_samples_mean": 0.7314579835062327,
+          "auc_ci_95_lower": 0.5974753869216433,
+          "auc_ci_95_upper": 0.8461637931034482,
+          "brier_samples_mean": 0.21107627055048941,
+          "brier_ci_95_lower": 0.18247724510729313,
+          "brier_ci_95_upper": 0.24257818944752216,
+          "ece_samples_mean": 0.1755486473914074,
+          "ece_ci_95_lower": 0.10735998972710492,
+          "ece_ci_95_upper": 0.25169606376709286
         },
         "flat_confidence": {
           "iterations": 1000,
-          "auc_samples_mean": 0.7266107771918257,
-          "auc_ci_95_lower": 0.5934275446775447,
-          "auc_ci_95_upper": 0.8468077837195485,
-          "brier_samples_mean": 0.2114617950244488,
-          "brier_ci_95_lower": 0.17929926754197834,
-          "brier_ci_95_upper": 0.24551392772871664,
-          "ece_samples_mean": 0.1848452143218193,
-          "ece_ci_95_lower": 0.11629387033672048,
-          "ece_ci_95_upper": 0.2596672449059608
+          "auc_samples_mean": 0.733244507798272,
+          "auc_ci_95_lower": 0.6028159501996712,
+          "auc_ci_95_upper": 0.8479409969115851,
+          "brier_samples_mean": 0.21066240952867804,
+          "brier_ci_95_lower": 0.18159944440132217,
+          "brier_ci_95_upper": 0.2426503573051238,
+          "ece_samples_mean": 0.18307524748610732,
+          "ece_ci_95_lower": 0.11300419198069299,
+          "ece_ci_95_upper": 0.26405413712371323
         },
         "mc_confidence_only": {
           "iterations": 1000,
-          "auc_samples_mean": 0.7265985058093779,
-          "auc_ci_95_lower": 0.5956742424242424,
-          "auc_ci_95_upper": 0.8459660682454799,
-          "brier_samples_mean": 0.21180730758844896,
-          "brier_ci_95_lower": 0.18075487949743851,
-          "brier_ci_95_upper": 0.24512478039534769,
-          "ece_samples_mean": 0.18623690241564914,
-          "ece_ci_95_lower": 0.11766520017870366,
-          "ece_ci_95_upper": 0.26213069786795506
+          "auc_samples_mean": 0.7313714963588568,
+          "auc_ci_95_lower": 0.6007795416316232,
+          "auc_ci_95_upper": 0.8453026463963964,
+          "brier_samples_mean": 0.21070728540749276,
+          "brier_ci_95_lower": 0.1819828027429445,
+          "brier_ci_95_upper": 0.2418053373429521,
+          "ece_samples_mean": 0.17155229190839275,
+          "ece_ci_95_lower": 0.10413311026053661,
+          "ece_ci_95_upper": 0.24812524541198114
         },
         "nars_gated": {
           "iterations": 1000,
-          "auc_samples_mean": 0.7265985058093779,
-          "auc_ci_95_lower": 0.5956742424242424,
-          "auc_ci_95_upper": 0.8459660682454799,
-          "brier_samples_mean": 0.211716777270972,
-          "brier_ci_95_lower": 0.18045659080522958,
-          "brier_ci_95_upper": 0.24522664091008686,
-          "ece_samples_mean": 0.1860833545516402,
-          "ece_ci_95_lower": 0.11760323614785666,
-          "ece_ci_95_upper": 0.2618185939672086
+          "auc_samples_mean": 0.7313714963588568,
+          "auc_ci_95_lower": 0.6007795416316232,
+          "auc_ci_95_upper": 0.8453026463963964,
+          "brier_samples_mean": 0.2106979346667246,
+          "brier_ci_95_lower": 0.18197620270611292,
+          "brier_ci_95_upper": 0.2417248622037831,
+          "ece_samples_mean": 0.1715378789359055,
+          "ece_ci_95_lower": 0.10417136747209355,
+          "ece_ci_95_upper": 0.2480979029540966
         },
         "comparison": {
           "baseline_vs_nars_gated_ci_overlap": true,
           "baseline_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain.",
-          "baseline_vs_nars_gated_brier_delta_left_minus_right": -0.00025590131276772323,
-          "baseline_vs_nars_gated_brier_delta_ci_95_lower": -0.0012124102985168431,
-          "baseline_vs_nars_gated_brier_delta_ci_95_upper": 0.0007241387612109677,
+          "baseline_vs_nars_gated_brier_delta_left_minus_right": 0.0003783358837648493,
+          "baseline_vs_nars_gated_brier_delta_ci_95_lower": -0.00018002335981214185,
+          "baseline_vs_nars_gated_brier_delta_ci_95_upper": 0.0009192233023683262,
           "baseline_vs_nars_gated_brier_interpretation": "The 95% paired bootstrap interval for the brier difference includes zero.",
-          "baseline_vs_nars_gated_ece_delta_left_minus_right": -0.0003275924870536928,
-          "baseline_vs_nars_gated_ece_delta_ci_95_lower": -0.005245508501675809,
-          "baseline_vs_nars_gated_ece_delta_ci_95_upper": 0.020361961359337776,
+          "baseline_vs_nars_gated_ece_delta_left_minus_right": 0.00401076845550191,
+          "baseline_vs_nars_gated_ece_delta_ci_95_lower": -0.029281764437098935,
+          "baseline_vs_nars_gated_ece_delta_ci_95_upper": 0.05171234629973043,
           "baseline_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for the ece difference includes zero.",
           "flat_confidence_vs_nars_gated_ci_overlap": true,
           "flat_confidence_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain.",
-          "flat_confidence_vs_nars_gated_brier_delta_left_minus_right": -0.00025498224652319526,
-          "flat_confidence_vs_nars_gated_brier_delta_ci_95_lower": -0.0013238327000886173,
-          "flat_confidence_vs_nars_gated_brier_delta_ci_95_upper": 0.0008701557884121877,
+          "flat_confidence_vs_nars_gated_brier_delta_left_minus_right": -3.552513804655205e-05,
+          "flat_confidence_vs_nars_gated_brier_delta_ci_95_lower": -0.000885810045864728,
+          "flat_confidence_vs_nars_gated_brier_delta_ci_95_upper": 0.0008699674819038053,
           "flat_confidence_vs_nars_gated_brier_interpretation": "The 95% paired bootstrap interval for the brier difference includes zero.",
-          "flat_confidence_vs_nars_gated_ece_delta_left_minus_right": -0.0012381402298209264,
-          "flat_confidence_vs_nars_gated_ece_delta_ci_95_lower": -0.023662191363552153,
-          "flat_confidence_vs_nars_gated_ece_delta_ci_95_upper": 0.024523604476343035,
+          "flat_confidence_vs_nars_gated_ece_delta_left_minus_right": 0.011537368550201842,
+          "flat_confidence_vs_nars_gated_ece_delta_ci_95_lower": -0.03081475487463528,
+          "flat_confidence_vs_nars_gated_ece_delta_ci_95_upper": 0.06623343968644393,
           "flat_confidence_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for the ece difference includes zero.",
+          "mc_confidence_only_vs_nars_gated_ci_overlap": true,
+          "mc_confidence_only_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain.",
+          "mc_confidence_only_vs_nars_gated_brier_delta_left_minus_right": 9.350740768193006e-06,
+          "mc_confidence_only_vs_nars_gated_brier_delta_ci_95_lower": -3.9151323514789724e-05,
+          "mc_confidence_only_vs_nars_gated_brier_delta_ci_95_upper": 5.465749929464206e-05,
+          "mc_confidence_only_vs_nars_gated_brier_interpretation": "The 95% paired bootstrap interval for the brier difference includes zero.",
+          "mc_confidence_only_vs_nars_gated_ece_delta_left_minus_right": 1.4412972487241826e-05,
+          "mc_confidence_only_vs_nars_gated_ece_delta_ci_95_lower": -8.077955289681124e-05,
+          "mc_confidence_only_vs_nars_gated_ece_delta_ci_95_upper": 9.721764849715853e-05,
+          "mc_confidence_only_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for the ece difference includes zero.",
           "random_forest_vs_nars_gated_ci_overlap": true,
           "random_forest_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain.",
-          "random_forest_vs_nars_gated_brier_delta_left_minus_right": 0.00798265982340748,
-          "random_forest_vs_nars_gated_brier_delta_ci_95_lower": -0.011301369963078966,
-          "random_forest_vs_nars_gated_brier_delta_ci_95_upper": 0.02773086751512264,
+          "random_forest_vs_nars_gated_brier_delta_left_minus_right": 0.00900150242765491,
+          "random_forest_vs_nars_gated_brier_delta_ci_95_lower": -0.008562656652591219,
+          "random_forest_vs_nars_gated_brier_delta_ci_95_upper": 0.028646638603857077,
           "random_forest_vs_nars_gated_brier_interpretation": "The 95% paired bootstrap interval for the brier difference includes zero.",
-          "random_forest_vs_nars_gated_ece_delta_left_minus_right": 0.022365492387442915,
-          "random_forest_vs_nars_gated_ece_delta_ci_95_lower": -0.0764299858253562,
-          "random_forest_vs_nars_gated_ece_delta_ci_95_upper": 0.11806720270373779,
+          "random_forest_vs_nars_gated_ece_delta_left_minus_right": 0.03691096800317764,
+          "random_forest_vs_nars_gated_ece_delta_ci_95_lower": -0.06692258061568011,
+          "random_forest_vs_nars_gated_ece_delta_ci_95_upper": 0.13343417770820812,
           "random_forest_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for the ece difference includes zero."
         }
       },
@@ -896,8 +921,8 @@
           "auc_samples_mean": 0.6621587811244568,
           "auc_ci_95_lower": 0.5100720984441915,
           "auc_ci_95_upper": 0.7907666818849781,
-          "brier_samples_mean": 0.21969943709437945,
-          "brier_ci_95_lower": 0.18953733342289614,
+          "brier_samples_mean": 0.2196994370943795,
+          "brier_ci_95_lower": 0.18953733342289616,
           "brier_ci_95_upper": 0.24980725468298623,
           "ece_samples_mean": 0.20844884693908314,
           "ece_ci_95_lower": 0.13173260446334506,
@@ -905,144 +930,178 @@
         },
         "baseline": {
           "iterations": 1000,
-          "auc_samples_mean": 0.7258110563148001,
-          "auc_ci_95_lower": 0.5931287878787879,
-          "auc_ci_95_upper": 0.8453926873779815,
-          "brier_samples_mean": 0.21146087595820426,
-          "brier_ci_95_lower": 0.17995227947831155,
-          "brier_ci_95_upper": 0.24489708580076694,
-          "ece_samples_mean": 0.18575576206458652,
-          "ece_ci_95_lower": 0.11829200520355633,
-          "ece_ci_95_upper": 0.26102216540147427
+          "auc_samples_mean": 0.7314579835062327,
+          "auc_ci_95_lower": 0.5974753869216433,
+          "auc_ci_95_upper": 0.8461637931034482,
+          "brier_samples_mean": 0.21107627055048941,
+          "brier_ci_95_lower": 0.18247724510729313,
+          "brier_ci_95_upper": 0.24257818944752216,
+          "ece_samples_mean": 0.1755486473914074,
+          "ece_ci_95_lower": 0.10735998972710492,
+          "ece_ci_95_upper": 0.25169606376709286
         },
         "flat_confidence": {
           "iterations": 1000,
-          "auc_samples_mean": 0.7266107771918257,
-          "auc_ci_95_lower": 0.5934275446775447,
-          "auc_ci_95_upper": 0.8468077837195485,
-          "brier_samples_mean": 0.2114617950244488,
-          "brier_ci_95_lower": 0.17929926754197834,
-          "brier_ci_95_upper": 0.24551392772871664,
-          "ece_samples_mean": 0.1848452143218193,
-          "ece_ci_95_lower": 0.11629387033672048,
-          "ece_ci_95_upper": 0.2596672449059608
+          "auc_samples_mean": 0.733244507798272,
+          "auc_ci_95_lower": 0.6028159501996712,
+          "auc_ci_95_upper": 0.8479409969115851,
+          "brier_samples_mean": 0.21066240952867804,
+          "brier_ci_95_lower": 0.18159944440132217,
+          "brier_ci_95_upper": 0.2426503573051238,
+          "ece_samples_mean": 0.18307524748610732,
+          "ece_ci_95_lower": 0.11300419198069299,
+          "ece_ci_95_upper": 0.26405413712371323
         },
         "mc_confidence_only": {
           "iterations": 1000,
-          "auc_samples_mean": 0.7265985058093779,
-          "auc_ci_95_lower": 0.5956742424242424,
-          "auc_ci_95_upper": 0.8459660682454799,
-          "brier_samples_mean": 0.21180730758844896,
-          "brier_ci_95_lower": 0.18075487949743851,
-          "brier_ci_95_upper": 0.24512478039534769,
-          "ece_samples_mean": 0.18623690241564914,
-          "ece_ci_95_lower": 0.11766520017870366,
-          "ece_ci_95_upper": 0.26213069786795506
+          "auc_samples_mean": 0.7313714963588568,
+          "auc_ci_95_lower": 0.6007795416316232,
+          "auc_ci_95_upper": 0.8453026463963964,
+          "brier_samples_mean": 0.21070728540749276,
+          "brier_ci_95_lower": 0.1819828027429445,
+          "brier_ci_95_upper": 0.2418053373429521,
+          "ece_samples_mean": 0.17155229190839275,
+          "ece_ci_95_lower": 0.10413311026053661,
+          "ece_ci_95_upper": 0.24812524541198114
         },
         "nars_gated": {
           "iterations": 1000,
-          "auc_samples_mean": 0.7265985058093779,
-          "auc_ci_95_lower": 0.5956742424242424,
-          "auc_ci_95_upper": 0.8459660682454799,
-          "brier_samples_mean": 0.211716777270972,
-          "brier_ci_95_lower": 0.18045659080522958,
-          "brier_ci_95_upper": 0.24522664091008686,
-          "ece_samples_mean": 0.1860833545516402,
-          "ece_ci_95_lower": 0.11760323614785666,
-          "ece_ci_95_upper": 0.2618185939672086
+          "auc_samples_mean": 0.7313714963588568,
+          "auc_ci_95_lower": 0.6007795416316232,
+          "auc_ci_95_upper": 0.8453026463963964,
+          "brier_samples_mean": 0.2106979346667246,
+          "brier_ci_95_lower": 0.18197620270611292,
+          "brier_ci_95_upper": 0.2417248622037831,
+          "ece_samples_mean": 0.1715378789359055,
+          "ece_ci_95_lower": 0.10417136747209355,
+          "ece_ci_95_upper": 0.2480979029540966
         },
         "comparison": {
           "baseline_vs_nars_gated_ci_overlap": true,
           "baseline_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain.",
-          "baseline_vs_nars_gated_brier_delta_left_minus_right": -0.00025590131276772323,
-          "baseline_vs_nars_gated_brier_delta_ci_95_lower": -0.0012124102985168431,
-          "baseline_vs_nars_gated_brier_delta_ci_95_upper": 0.0007241387612109677,
+          "baseline_vs_nars_gated_brier_delta_left_minus_right": 0.0003783358837648493,
+          "baseline_vs_nars_gated_brier_delta_ci_95_lower": -0.00018002335981214185,
+          "baseline_vs_nars_gated_brier_delta_ci_95_upper": 0.0009192233023683262,
           "baseline_vs_nars_gated_brier_interpretation": "The 95% paired bootstrap interval for the brier difference includes zero.",
-          "baseline_vs_nars_gated_ece_delta_left_minus_right": -0.0003275924870536928,
-          "baseline_vs_nars_gated_ece_delta_ci_95_lower": -0.005245508501675809,
-          "baseline_vs_nars_gated_ece_delta_ci_95_upper": 0.020361961359337776,
+          "baseline_vs_nars_gated_ece_delta_left_minus_right": 0.00401076845550191,
+          "baseline_vs_nars_gated_ece_delta_ci_95_lower": -0.029281764437098935,
+          "baseline_vs_nars_gated_ece_delta_ci_95_upper": 0.05171234629973043,
           "baseline_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for the ece difference includes zero.",
           "flat_confidence_vs_nars_gated_ci_overlap": true,
           "flat_confidence_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain.",
-          "flat_confidence_vs_nars_gated_brier_delta_left_minus_right": -0.00025498224652319526,
-          "flat_confidence_vs_nars_gated_brier_delta_ci_95_lower": -0.0013238327000886173,
-          "flat_confidence_vs_nars_gated_brier_delta_ci_95_upper": 0.0008701557884121877,
+          "flat_confidence_vs_nars_gated_brier_delta_left_minus_right": -3.552513804655205e-05,
+          "flat_confidence_vs_nars_gated_brier_delta_ci_95_lower": -0.000885810045864728,
+          "flat_confidence_vs_nars_gated_brier_delta_ci_95_upper": 0.0008699674819038053,
           "flat_confidence_vs_nars_gated_brier_interpretation": "The 95% paired bootstrap interval for the brier difference includes zero.",
-          "flat_confidence_vs_nars_gated_ece_delta_left_minus_right": -0.0012381402298209264,
-          "flat_confidence_vs_nars_gated_ece_delta_ci_95_lower": -0.023662191363552153,
-          "flat_confidence_vs_nars_gated_ece_delta_ci_95_upper": 0.024523604476343035,
+          "flat_confidence_vs_nars_gated_ece_delta_left_minus_right": 0.011537368550201842,
+          "flat_confidence_vs_nars_gated_ece_delta_ci_95_lower": -0.03081475487463528,
+          "flat_confidence_vs_nars_gated_ece_delta_ci_95_upper": 0.06623343968644393,
           "flat_confidence_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for the ece difference includes zero.",
+          "mc_confidence_only_vs_nars_gated_ci_overlap": true,
+          "mc_confidence_only_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain.",
+          "mc_confidence_only_vs_nars_gated_brier_delta_left_minus_right": 9.350740768193006e-06,
+          "mc_confidence_only_vs_nars_gated_brier_delta_ci_95_lower": -3.9151323514789724e-05,
+          "mc_confidence_only_vs_nars_gated_brier_delta_ci_95_upper": 5.465749929464206e-05,
+          "mc_confidence_only_vs_nars_gated_brier_interpretation": "The 95% paired bootstrap interval for the brier difference includes zero.",
+          "mc_confidence_only_vs_nars_gated_ece_delta_left_minus_right": 1.4412972487241826e-05,
+          "mc_confidence_only_vs_nars_gated_ece_delta_ci_95_lower": -8.077955289681124e-05,
+          "mc_confidence_only_vs_nars_gated_ece_delta_ci_95_upper": 9.721764849715853e-05,
+          "mc_confidence_only_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for the ece difference includes zero.",
           "random_forest_vs_nars_gated_ci_overlap": true,
           "random_forest_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain.",
-          "random_forest_vs_nars_gated_brier_delta_left_minus_right": 0.00798265982340748,
-          "random_forest_vs_nars_gated_brier_delta_ci_95_lower": -0.011301369963078966,
-          "random_forest_vs_nars_gated_brier_delta_ci_95_upper": 0.02773086751512264,
+          "random_forest_vs_nars_gated_brier_delta_left_minus_right": 0.00900150242765491,
+          "random_forest_vs_nars_gated_brier_delta_ci_95_lower": -0.008562656652591219,
+          "random_forest_vs_nars_gated_brier_delta_ci_95_upper": 0.028646638603857077,
           "random_forest_vs_nars_gated_brier_interpretation": "The 95% paired bootstrap interval for the brier difference includes zero.",
-          "random_forest_vs_nars_gated_ece_delta_left_minus_right": 0.022365492387442915,
-          "random_forest_vs_nars_gated_ece_delta_ci_95_lower": -0.0764299858253562,
-          "random_forest_vs_nars_gated_ece_delta_ci_95_upper": 0.11806720270373779,
+          "random_forest_vs_nars_gated_ece_delta_left_minus_right": 0.03691096800317764,
+          "random_forest_vs_nars_gated_ece_delta_ci_95_lower": -0.06692258061568011,
+          "random_forest_vs_nars_gated_ece_delta_ci_95_upper": 0.13343417770820812,
           "random_forest_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for the ece difference includes zero."
         }
+      },
+      "auditability": {
+        "dataset": "tcga",
+        "held_out_cases": 69,
+        "cases_with_any_trigger": 42,
+        "case_coverage": 0.6086956521739131,
+        "total_rule_trigger_count": 79,
+        "mapped_feature_trigger_count": 79,
+        "mapping_coverage": 1.0,
+        "finite_trace_event_count": 79,
+        "finite_trace_rate": 1.0,
+        "confidence_changed_event_count": 79,
+        "confidence_changed_event_rate": 1.0,
+        "attention_changed_event_count": 79,
+        "attention_changed_event_rate": 1.0,
+        "mean_abs_probability_delta_triggered": 0.00205330602546153,
+        "median_abs_probability_delta_triggered": 0.0018467293350883374,
+        "max_abs_probability_delta_triggered": 0.005995342564267703,
+        "threshold_flip_count_triggered": 0,
+        "max_revision_residual": 0.0,
+        "max_gate_residual": 0.0,
+        "audit_tolerance": 1e-09,
+        "revision_fidelity_pass": true,
+        "gate_fidelity_pass": true
       },
       "gamma_ablation": [
         {
           "gamma": 0.25,
-          "baseline_auc": 0.7252100840336135,
-          "baseline_brier": 0.2118353396654129,
-          "baseline_accuracy": 0.6666666666666666,
-          "nars_gated_auc": 0.7260504201680673,
-          "nars_gated_brier": 0.21186478515307444,
+          "baseline_auc": 0.73109243697479,
+          "baseline_brier": 0.21131697297096252,
+          "baseline_accuracy": 0.6811594202898551,
+          "nars_gated_auc": 0.7336134453781513,
+          "nars_gated_brier": 0.2109076764859248,
           "nars_gated_accuracy": 0.6811594202898551,
-          "auc_delta_gated_minus_baseline": 0.0008403361344537785,
-          "brier_delta_gated_minus_baseline": 2.9445487661539094e-05,
-          "accuracy_delta_gated_minus_baseline": 0.01449275362318847
+          "auc_delta_gated_minus_baseline": 0.0025210084033613356,
+          "brier_delta_gated_minus_baseline": -0.00040929648503773564,
+          "accuracy_delta_gated_minus_baseline": 0.0
         },
         {
           "gamma": 0.5,
-          "baseline_auc": 0.7252100840336135,
-          "baseline_brier": 0.2118353396654129,
-          "baseline_accuracy": 0.6666666666666666,
-          "nars_gated_auc": 0.7260504201680673,
-          "nars_gated_brier": 0.21189544049984724,
+          "baseline_auc": 0.73109243697479,
+          "baseline_brier": 0.21131697297096252,
+          "baseline_accuracy": 0.6811594202898551,
+          "nars_gated_auc": 0.7336134453781513,
+          "nars_gated_brier": 0.21090945243787684,
           "nars_gated_accuracy": 0.6811594202898551,
-          "auc_delta_gated_minus_baseline": 0.0008403361344537785,
-          "brier_delta_gated_minus_baseline": 6.010083443433456e-05,
-          "accuracy_delta_gated_minus_baseline": 0.01449275362318847
+          "auc_delta_gated_minus_baseline": 0.0025210084033613356,
+          "brier_delta_gated_minus_baseline": -0.00040752053308568126,
+          "accuracy_delta_gated_minus_baseline": 0.0
         },
         {
           "gamma": 1.0,
-          "baseline_auc": 0.7252100840336135,
-          "baseline_brier": 0.2118353396654129,
-          "baseline_accuracy": 0.6666666666666666,
-          "nars_gated_auc": 0.7260504201680673,
-          "nars_gated_brier": 0.21196005178122812,
+          "baseline_auc": 0.73109243697479,
+          "baseline_brier": 0.21131697297096252,
+          "baseline_accuracy": 0.6811594202898551,
+          "nars_gated_auc": 0.7336134453781513,
+          "nars_gated_brier": 0.21091604414622037,
           "nars_gated_accuracy": 0.6811594202898551,
-          "auc_delta_gated_minus_baseline": 0.0008403361344537785,
-          "brier_delta_gated_minus_baseline": 0.00012471211581521757,
-          "accuracy_delta_gated_minus_baseline": 0.01449275362318847
+          "auc_delta_gated_minus_baseline": 0.0025210084033613356,
+          "brier_delta_gated_minus_baseline": -0.0004009288247421583,
+          "accuracy_delta_gated_minus_baseline": 0.0
         },
         {
           "gamma": 2.0,
-          "baseline_auc": 0.7252100840336135,
-          "baseline_brier": 0.2118353396654129,
-          "baseline_accuracy": 0.6666666666666666,
-          "nars_gated_auc": 0.7260504201680673,
-          "nars_gated_brier": 0.21210240428539698,
-          "nars_gated_accuracy": 0.6666666666666666,
-          "auc_delta_gated_minus_baseline": 0.0008403361344537785,
-          "brier_delta_gated_minus_baseline": 0.0002670646199840754,
+          "baseline_auc": 0.73109243697479,
+          "baseline_brier": 0.21131697297096252,
+          "baseline_accuracy": 0.6811594202898551,
+          "nars_gated_auc": 0.73109243697479,
+          "nars_gated_brier": 0.21094128690864986,
+          "nars_gated_accuracy": 0.6811594202898551,
+          "auc_delta_gated_minus_baseline": 0.0,
+          "brier_delta_gated_minus_baseline": -0.000375686062312669,
           "accuracy_delta_gated_minus_baseline": 0.0
         },
         {
           "gamma": 4.0,
-          "baseline_auc": 0.7252100840336135,
-          "baseline_brier": 0.2118353396654129,
-          "baseline_accuracy": 0.6666666666666666,
-          "nars_gated_auc": 0.7294117647058824,
-          "nars_gated_brier": 0.21243886577545865,
-          "nars_gated_accuracy": 0.6666666666666666,
-          "auc_delta_gated_minus_baseline": 0.004201680672268893,
-          "brier_delta_gated_minus_baseline": 0.0006035261100457434,
+          "baseline_auc": 0.73109243697479,
+          "baseline_brier": 0.21131697297096252,
+          "baseline_accuracy": 0.6811594202898551,
+          "nars_gated_auc": 0.7302521008403362,
+          "nars_gated_brier": 0.21103910859177608,
+          "nars_gated_accuracy": 0.6811594202898551,
+          "auc_delta_gated_minus_baseline": -0.0008403361344537785,
+          "brier_delta_gated_minus_baseline": -0.0002778643791864488,
           "accuracy_delta_gated_minus_baseline": 0.0
         }
       ],
@@ -1070,18 +1129,18 @@
         {
           "threshold": 0.15000000000000002,
           "random_forest_net_benefit": 0.41091219096334186,
-          "baseline_net_benefit": 0.4057971014492754,
-          "flat_confidence_net_benefit": 0.4057971014492754,
-          "nars_gated_net_benefit": 0.4057971014492754,
+          "baseline_net_benefit": 0.4032395566922421,
+          "flat_confidence_net_benefit": 0.4032395566922421,
+          "nars_gated_net_benefit": 0.4032395566922421,
           "treat_all_net_benefit": 0.4032395566922421,
           "treat_none_net_benefit": 0.0
         },
         {
           "threshold": 0.2,
           "random_forest_net_benefit": 0.3876811594202899,
-          "baseline_net_benefit": 0.39855072463768115,
-          "flat_confidence_net_benefit": 0.39855072463768115,
-          "nars_gated_net_benefit": 0.39855072463768115,
+          "baseline_net_benefit": 0.3695652173913044,
+          "flat_confidence_net_benefit": 0.37318840579710144,
+          "nars_gated_net_benefit": 0.37318840579710144,
           "treat_all_net_benefit": 0.36594202898550726,
           "treat_none_net_benefit": 0.0
         },
@@ -1106,81 +1165,81 @@
         {
           "threshold": 0.35000000000000003,
           "random_forest_net_benefit": 0.2686733556298774,
-          "baseline_net_benefit": 0.29208472686733555,
-          "flat_confidence_net_benefit": 0.2998885172798216,
-          "nars_gated_net_benefit": 0.2998885172798216,
+          "baseline_net_benefit": 0.2764771460423634,
+          "flat_confidence_net_benefit": 0.2764771460423634,
+          "nars_gated_net_benefit": 0.2764771460423634,
           "treat_all_net_benefit": 0.21962095875139348,
           "treat_none_net_benefit": 0.0
         },
         {
           "threshold": 0.4,
           "random_forest_net_benefit": 0.24154589371980675,
-          "baseline_net_benefit": 0.2318840579710145,
-          "flat_confidence_net_benefit": 0.2318840579710145,
-          "nars_gated_net_benefit": 0.2318840579710145,
+          "baseline_net_benefit": 0.23188405797101444,
+          "flat_confidence_net_benefit": 0.24154589371980673,
+          "nars_gated_net_benefit": 0.23188405797101444,
           "treat_all_net_benefit": 0.1545893719806763,
           "treat_none_net_benefit": 0.0
         },
         {
           "threshold": 0.45,
           "random_forest_net_benefit": 0.16600790513833996,
-          "baseline_net_benefit": 0.16205533596837948,
-          "flat_confidence_net_benefit": 0.16205533596837948,
-          "nars_gated_net_benefit": 0.17391304347826092,
+          "baseline_net_benefit": 0.18445322793148883,
+          "flat_confidence_net_benefit": 0.18445322793148883,
+          "nars_gated_net_benefit": 0.18445322793148883,
           "treat_all_net_benefit": 0.07773386034255603,
           "treat_none_net_benefit": 0.0
         },
         {
           "threshold": 0.5,
           "random_forest_net_benefit": 0.0869565217391304,
-          "baseline_net_benefit": 0.15942028985507245,
-          "flat_confidence_net_benefit": 0.17391304347826086,
-          "nars_gated_net_benefit": 0.15942028985507245,
+          "baseline_net_benefit": 0.17391304347826084,
+          "flat_confidence_net_benefit": 0.17391304347826084,
+          "nars_gated_net_benefit": 0.17391304347826084,
           "treat_all_net_benefit": -0.014492753623188415,
           "treat_none_net_benefit": 0.0
         },
         {
           "threshold": 0.55,
           "random_forest_net_benefit": 0.07568438003220607,
-          "baseline_net_benefit": 0.10789049919484699,
-          "flat_confidence_net_benefit": 0.10789049919484699,
-          "nars_gated_net_benefit": 0.07890499194847019,
+          "baseline_net_benefit": 0.1336553945249597,
+          "flat_confidence_net_benefit": 0.1336553945249597,
+          "nars_gated_net_benefit": 0.1336553945249597,
           "treat_all_net_benefit": -0.12721417069243174,
           "treat_none_net_benefit": 0.0
         },
         {
           "threshold": 0.6000000000000001,
           "random_forest_net_benefit": 0.03623188405797097,
-          "baseline_net_benefit": 0.03623188405797097,
-          "flat_confidence_net_benefit": 0.050724637681159354,
-          "nars_gated_net_benefit": 0.021739130434782553,
+          "baseline_net_benefit": 0.1014492753623188,
+          "flat_confidence_net_benefit": 0.1014492753623188,
+          "nars_gated_net_benefit": 0.1014492753623188,
           "treat_all_net_benefit": -0.26811594202898587,
           "treat_none_net_benefit": 0.0
         },
         {
           "threshold": 0.6500000000000001,
           "random_forest_net_benefit": 0.02070393374741196,
-          "baseline_net_benefit": 0.07453416149068322,
-          "flat_confidence_net_benefit": 0.04761904761904759,
-          "nars_gated_net_benefit": 0.07453416149068322,
+          "baseline_net_benefit": 0.07246376811594203,
+          "flat_confidence_net_benefit": 0.07246376811594203,
+          "nars_gated_net_benefit": 0.07246376811594203,
           "treat_all_net_benefit": -0.4492753623188412,
           "treat_none_net_benefit": 0.0
         },
         {
           "threshold": 0.7000000000000001,
           "random_forest_net_benefit": -0.0241545893719807,
-          "baseline_net_benefit": 0.009661835748792258,
-          "flat_confidence_net_benefit": 0.009661835748792258,
-          "nars_gated_net_benefit": 0.009661835748792258,
+          "baseline_net_benefit": 0.028985507246376812,
+          "flat_confidence_net_benefit": 0.028985507246376812,
+          "nars_gated_net_benefit": 0.028985507246376812,
           "treat_all_net_benefit": -0.6908212560386477,
           "treat_none_net_benefit": 0.0
         },
         {
           "threshold": 0.7500000000000001,
           "random_forest_net_benefit": -0.028985507246376836,
-          "baseline_net_benefit": -0.043478260869565244,
-          "flat_confidence_net_benefit": -0.043478260869565244,
-          "nars_gated_net_benefit": -0.043478260869565244,
+          "baseline_net_benefit": 0.014492753623188406,
+          "flat_confidence_net_benefit": 0.014492753623188406,
+          "nars_gated_net_benefit": 0.014492753623188406,
           "treat_all_net_benefit": -1.0289855072463778,
           "treat_none_net_benefit": 0.0
         },
@@ -1247,7 +1306,7 @@
           "variant": "random_forest"
         },
         {
-          "mean_predicted_probability": 0.499948535250489,
+          "mean_predicted_probability": 0.49994853525048893,
           "fraction_positives": 0.5714285714285714,
           "count": 7,
           "variant": "random_forest"
@@ -1277,248 +1336,248 @@
           "variant": "random_forest"
         },
         {
-          "mean_predicted_probability": 0.7282909847479112,
+          "mean_predicted_probability": 0.7282909847479111,
           "fraction_positives": 0.5714285714285714,
           "count": 7,
           "variant": "random_forest"
         },
         {
-          "mean_predicted_probability": 0.1753401266677039,
-          "fraction_positives": 0.0,
+          "mean_predicted_probability": 0.18705080449581146,
+          "fraction_positives": 0.14285714285714285,
           "count": 7,
           "variant": "baseline"
         },
         {
-          "mean_predicted_probability": 0.25997292569705416,
+          "mean_predicted_probability": 0.2580304316111973,
           "fraction_positives": 0.2857142857142857,
           "count": 7,
           "variant": "baseline"
         },
         {
-          "mean_predicted_probability": 0.36836948565074373,
-          "fraction_positives": 0.42857142857142855,
+          "mean_predicted_probability": 0.3977174588612148,
+          "fraction_positives": 0.14285714285714285,
           "count": 7,
           "variant": "baseline"
         },
         {
-          "mean_predicted_probability": 0.40778155837740215,
-          "fraction_positives": 0.5714285714285714,
-          "count": 7,
-          "variant": "baseline"
-        },
-        {
-          "mean_predicted_probability": 0.4397222527435848,
-          "fraction_positives": 0.42857142857142855,
-          "count": 7,
-          "variant": "baseline"
-        },
-        {
-          "mean_predicted_probability": 0.4619734038909276,
-          "fraction_positives": 0.3333333333333333,
-          "count": 6,
-          "variant": "baseline"
-        },
-        {
-          "mean_predicted_probability": 0.5245658585003444,
-          "fraction_positives": 0.8571428571428571,
-          "count": 7,
-          "variant": "baseline"
-        },
-        {
-          "mean_predicted_probability": 0.5790639264242989,
+          "mean_predicted_probability": 0.44030560340200153,
           "fraction_positives": 0.7142857142857143,
           "count": 7,
           "variant": "baseline"
         },
         {
-          "mean_predicted_probability": 0.6307881559644427,
+          "mean_predicted_probability": 0.46236681938171387,
           "fraction_positives": 0.42857142857142855,
           "count": 7,
           "variant": "baseline"
         },
         {
-          "mean_predicted_probability": 0.7031177878379822,
+          "mean_predicted_probability": 0.49598317841688794,
+          "fraction_positives": 0.5,
+          "count": 6,
+          "variant": "baseline"
+        },
+        {
+          "mean_predicted_probability": 0.5599219884191241,
+          "fraction_positives": 0.42857142857142855,
+          "count": 7,
+          "variant": "baseline"
+        },
+        {
+          "mean_predicted_probability": 0.5918864522661481,
           "fraction_positives": 0.8571428571428571,
           "count": 7,
           "variant": "baseline"
         },
         {
-          "mean_predicted_probability": 0.16970868359398222,
-          "fraction_positives": 0.0,
+          "mean_predicted_probability": 0.6185560056141445,
+          "fraction_positives": 0.7142857142857143,
+          "count": 7,
+          "variant": "baseline"
+        },
+        {
+          "mean_predicted_probability": 0.6773478729384286,
+          "fraction_positives": 0.7142857142857143,
+          "count": 7,
+          "variant": "baseline"
+        },
+        {
+          "mean_predicted_probability": 0.18179726639768165,
+          "fraction_positives": 0.14285714285714285,
           "count": 7,
           "variant": "flat_confidence"
         },
         {
-          "mean_predicted_probability": 0.2552387018970529,
+          "mean_predicted_probability": 0.25251374219715944,
           "fraction_positives": 0.2857142857142857,
           "count": 7,
           "variant": "flat_confidence"
         },
         {
-          "mean_predicted_probability": 0.3645186154132844,
-          "fraction_positives": 0.42857142857142855,
+          "mean_predicted_probability": 0.3951505276243404,
+          "fraction_positives": 0.14285714285714285,
           "count": 7,
           "variant": "flat_confidence"
         },
         {
-          "mean_predicted_probability": 0.4057606779473887,
-          "fraction_positives": 0.5714285714285714,
-          "count": 7,
-          "variant": "flat_confidence"
-        },
-        {
-          "mean_predicted_probability": 0.4385927239546223,
-          "fraction_positives": 0.42857142857142855,
-          "count": 7,
-          "variant": "flat_confidence"
-        },
-        {
-          "mean_predicted_probability": 0.4616308464097125,
-          "fraction_positives": 0.3333333333333333,
-          "count": 6,
-          "variant": "flat_confidence"
-        },
-        {
-          "mean_predicted_probability": 0.5250656991881545,
-          "fraction_positives": 0.8571428571428571,
-          "count": 7,
-          "variant": "flat_confidence"
-        },
-        {
-          "mean_predicted_probability": 0.5817332698711134,
+          "mean_predicted_probability": 0.43796093189764745,
           "fraction_positives": 0.7142857142857143,
           "count": 7,
           "variant": "flat_confidence"
         },
         {
-          "mean_predicted_probability": 0.6340522726933091,
+          "mean_predicted_probability": 0.4610876007327068,
           "fraction_positives": 0.42857142857142855,
           "count": 7,
           "variant": "flat_confidence"
         },
         {
-          "mean_predicted_probability": 0.7072959956437178,
+          "mean_predicted_probability": 0.49525998852189757,
+          "fraction_positives": 0.5,
+          "count": 6,
+          "variant": "flat_confidence"
+        },
+        {
+          "mean_predicted_probability": 0.560327958327434,
+          "fraction_positives": 0.42857142857142855,
+          "count": 7,
+          "variant": "flat_confidence"
+        },
+        {
+          "mean_predicted_probability": 0.5924779889354637,
           "fraction_positives": 0.8571428571428571,
           "count": 7,
           "variant": "flat_confidence"
         },
         {
-          "mean_predicted_probability": 0.1727513082332202,
-          "fraction_positives": 0.0,
+          "mean_predicted_probability": 0.6197361756543545,
+          "fraction_positives": 0.7142857142857143,
+          "count": 7,
+          "variant": "flat_confidence"
+        },
+        {
+          "mean_predicted_probability": 0.6815101490961671,
+          "fraction_positives": 0.7142857142857143,
+          "count": 7,
+          "variant": "flat_confidence"
+        },
+        {
+          "mean_predicted_probability": 0.1883007677894015,
+          "fraction_positives": 0.14285714285714285,
           "count": 7,
           "variant": "mc_confidence_only"
         },
         {
-          "mean_predicted_probability": 0.2571210321844151,
+          "mean_predicted_probability": 0.25942878901837985,
           "fraction_positives": 0.2857142857142857,
           "count": 7,
           "variant": "mc_confidence_only"
         },
         {
-          "mean_predicted_probability": 0.3628228577923665,
-          "fraction_positives": 0.42857142857142855,
+          "mean_predicted_probability": 0.39870873793263534,
+          "fraction_positives": 0.14285714285714285,
           "count": 7,
           "variant": "mc_confidence_only"
         },
         {
-          "mean_predicted_probability": 0.4032659107981614,
-          "fraction_positives": 0.5714285714285714,
-          "count": 7,
-          "variant": "mc_confidence_only"
-        },
-        {
-          "mean_predicted_probability": 0.43555129895449596,
-          "fraction_positives": 0.42857142857142855,
-          "count": 7,
-          "variant": "mc_confidence_only"
-        },
-        {
-          "mean_predicted_probability": 0.45749295854120114,
-          "fraction_positives": 0.3333333333333333,
-          "count": 6,
-          "variant": "mc_confidence_only"
-        },
-        {
-          "mean_predicted_probability": 0.5193263528824279,
-          "fraction_positives": 0.8571428571428571,
-          "count": 7,
-          "variant": "mc_confidence_only"
-        },
-        {
-          "mean_predicted_probability": 0.5727240743242851,
+          "mean_predicted_probability": 0.44191180711443356,
           "fraction_positives": 0.7142857142857143,
           "count": 7,
           "variant": "mc_confidence_only"
         },
         {
-          "mean_predicted_probability": 0.625636072972073,
+          "mean_predicted_probability": 0.4608286229362095,
           "fraction_positives": 0.42857142857142855,
           "count": 7,
           "variant": "mc_confidence_only"
         },
         {
-          "mean_predicted_probability": 0.6995727602787066,
+          "mean_predicted_probability": 0.4961021243756453,
+          "fraction_positives": 0.5,
+          "count": 6,
+          "variant": "mc_confidence_only"
+        },
+        {
+          "mean_predicted_probability": 0.5574681956448829,
+          "fraction_positives": 0.42857142857142855,
+          "count": 7,
+          "variant": "mc_confidence_only"
+        },
+        {
+          "mean_predicted_probability": 0.5893749295273186,
           "fraction_positives": 0.8571428571428571,
           "count": 7,
           "variant": "mc_confidence_only"
         },
         {
-          "mean_predicted_probability": 0.17292130481744647,
-          "fraction_positives": 0.0,
+          "mean_predicted_probability": 0.6156683267660944,
+          "fraction_positives": 0.7142857142857143,
+          "count": 7,
+          "variant": "mc_confidence_only"
+        },
+        {
+          "mean_predicted_probability": 0.6777882859570475,
+          "fraction_positives": 0.7142857142857143,
+          "count": 7,
+          "variant": "mc_confidence_only"
+        },
+        {
+          "mean_predicted_probability": 0.1883703063946684,
+          "fraction_positives": 0.14285714285714285,
           "count": 7,
           "variant": "nars_gated"
         },
         {
-          "mean_predicted_probability": 0.2573082821701581,
+          "mean_predicted_probability": 0.25943854413402584,
           "fraction_positives": 0.2857142857142857,
           "count": 7,
           "variant": "nars_gated"
         },
         {
-          "mean_predicted_probability": 0.36282199077728705,
-          "fraction_positives": 0.42857142857142855,
+          "mean_predicted_probability": 0.39833242828049764,
+          "fraction_positives": 0.14285714285714285,
           "count": 7,
           "variant": "nars_gated"
         },
         {
-          "mean_predicted_probability": 0.4032643022177295,
-          "fraction_positives": 0.5714285714285714,
-          "count": 7,
-          "variant": "nars_gated"
-        },
-        {
-          "mean_predicted_probability": 0.43555083780322007,
-          "fraction_positives": 0.42857142857142855,
-          "count": 7,
-          "variant": "nars_gated"
-        },
-        {
-          "mean_predicted_probability": 0.45749050293956534,
-          "fraction_positives": 0.3333333333333333,
-          "count": 6,
-          "variant": "nars_gated"
-        },
-        {
-          "mean_predicted_probability": 0.5202362467825284,
-          "fraction_positives": 0.8571428571428571,
-          "count": 7,
-          "variant": "nars_gated"
-        },
-        {
-          "mean_predicted_probability": 0.5751543683913448,
+          "mean_predicted_probability": 0.44173124000764286,
           "fraction_positives": 0.7142857142857143,
           "count": 7,
           "variant": "nars_gated"
         },
         {
-          "mean_predicted_probability": 0.6271846060353221,
+          "mean_predicted_probability": 0.46078958705786077,
           "fraction_positives": 0.42857142857142855,
           "count": 7,
           "variant": "nars_gated"
         },
         {
-          "mean_predicted_probability": 0.7006701178990281,
+          "mean_predicted_probability": 0.496218327816815,
+          "fraction_positives": 0.5,
+          "count": 6,
+          "variant": "nars_gated"
+        },
+        {
+          "mean_predicted_probability": 0.5573354497952429,
+          "fraction_positives": 0.42857142857142855,
+          "count": 7,
+          "variant": "nars_gated"
+        },
+        {
+          "mean_predicted_probability": 0.5894383681272307,
           "fraction_positives": 0.8571428571428571,
+          "count": 7,
+          "variant": "nars_gated"
+        },
+        {
+          "mean_predicted_probability": 0.6157345576090865,
+          "fraction_positives": 0.7142857142857143,
+          "count": 7,
+          "variant": "nars_gated"
+        },
+        {
+          "mean_predicted_probability": 0.6777786238625941,
+          "fraction_positives": 0.7142857142857143,
           "count": 7,
           "variant": "nars_gated"
         }
@@ -1531,6 +1590,8 @@
         "submission_ablation_csv": null,
         "decision_curve_csv": "results\\tcga\\metrics\\decision_curve.csv",
         "calibration_reliability_csv": "results\\tcga\\metrics\\calibration_reliability.csv",
+        "auditability_metrics_csv": "results\\tcga\\metrics\\auditability_metrics.csv",
+        "auditability_metrics_json": "results\\tcga\\metrics\\auditability_metrics.json",
         "trace_csv": "results\\tcga\\traces\\test_predictions.csv",
         "case_traces_csv": null,
         "roc_curve": "results\\tcga\\charts\\roc_curve.png",
@@ -1564,14 +1625,14 @@
         "export_case_traces": false
       },
       "environment": {
-        "python": "3.14.4",
-        "platform": "Windows-11-10.0.26100-SP0",
-        "numpy": "2.4.4",
-        "pandas": "3.0.2",
+        "python": "3.14.0",
+        "platform": "Windows-10-10.0.19045-SP0",
+        "numpy": "2.4.3",
+        "pandas": "3.0.1",
         "scikit_learn": "1.8.0",
-        "torch": "2.11.0+cpu",
-        "cuda_available": false,
-        "git_commit": "38c856a5204114067718c29361c110f0b974dcd3"
+        "torch": "2.11.0+cu126",
+        "cuda_available": true,
+        "git_commit": "581774203721bd4a497bb2cf3ea335679425ff4c"
       },
       "task": {
         "dataset": "WiDS ICU 2020",
@@ -1648,93 +1709,120 @@
       "metrics": [
         {
           "variant": "random_forest",
-          "auc": 0.8753502710013477,
-          "brier": 0.05820585521924925,
-          "accuracy": 0.9258559278912554,
-          "ece": 0.007637296503598169,
-          "auc_ci_95_lower": 0.8655394464714016,
-          "auc_ci_95_upper": 0.8858219455901339,
-          "brier_ci_95_lower": 0.05523833119602304,
-          "brier_ci_95_upper": 0.06148573714299797,
-          "ece_ci_95_lower": 0.005469149747401321,
-          "ece_ci_95_upper": 0.012420075923166381
+          "auc": 0.8768362712198378,
+          "brier": 0.05816876926300937,
+          "accuracy": 0.9257832376244821,
+          "ece": 0.007372339899687431,
+          "auc_ci_95_lower": 0.8669175671816576,
+          "auc_ci_95_upper": 0.8867520461147212,
+          "brier_ci_95_lower": 0.05520334008196045,
+          "brier_ci_95_upper": 0.061424960465216116,
+          "ece_ci_95_lower": 0.005960075247146911,
+          "ece_ci_95_upper": 0.01253608523842408
         },
         {
           "variant": "baseline",
-          "auc": 0.8829437709902892,
-          "brier": 0.05620816722512245,
-          "accuracy": 0.9287635385621865,
-          "ece": 0.006009737487192257,
-          "auc_ci_95_lower": 0.8732112968621726,
-          "auc_ci_95_upper": 0.8926051003985657,
-          "brier_ci_95_lower": 0.05333516746759415,
-          "brier_ci_95_upper": 0.059461720194667576,
-          "ece_ci_95_lower": 0.004658308057951909,
-          "ece_ci_95_upper": 0.010499803351195113
+          "auc": 0.8803399865554915,
+          "brier": 0.056527189910411835,
+          "accuracy": 0.9285454677618666,
+          "ece": 0.007496397690061542,
+          "auc_ci_95_lower": 0.8700149115209564,
+          "auc_ci_95_upper": 0.8902125095917065,
+          "brier_ci_95_lower": 0.05370839033275843,
+          "brier_ci_95_upper": 0.05966444090008736,
+          "ece_ci_95_lower": 0.004926247690678755,
+          "ece_ci_95_upper": 0.012111412822749816
         },
         {
           "variant": "flat_confidence",
-          "auc": 0.882913008131716,
-          "brier": 0.05618246475240763,
-          "accuracy": 0.9288362288289598,
-          "ece": 0.004899860317993633,
-          "auc_ci_95_lower": 0.8730948908456719,
-          "auc_ci_95_upper": 0.8924805355784745,
-          "brier_ci_95_lower": 0.05328000973083111,
-          "brier_ci_95_upper": 0.059460163601283325,
-          "ece_ci_95_lower": 0.004105570352410677,
-          "ece_ci_95_upper": 0.009685358164897939
+          "auc": 0.8802329532545297,
+          "brier": 0.0564804631786328,
+          "accuracy": 0.92861815802864,
+          "ece": 0.006181551976017444,
+          "auc_ci_95_lower": 0.8698110721699586,
+          "auc_ci_95_upper": 0.8901487833176899,
+          "brier_ci_95_lower": 0.053663574504632834,
+          "brier_ci_95_upper": 0.059637559928028494,
+          "ece_ci_95_lower": 0.004212556351544684,
+          "ece_ci_95_upper": 0.010976080611085072
         },
         {
           "variant": "mc_confidence_only",
-          "auc": 0.8828774197267,
-          "brier": 0.05618068546430419,
-          "accuracy": 0.9290542996292797,
-          "ece": 0.004948316315293253,
-          "auc_ci_95_lower": 0.8730540809860217,
-          "auc_ci_95_upper": 0.8924703921381556,
-          "brier_ci_95_lower": 0.05326830758849572,
-          "brier_ci_95_upper": 0.05945310214392899,
-          "ece_ci_95_lower": 0.003862145115463386,
-          "ece_ci_95_upper": 0.009547634878479096
+          "auc": 0.8802442128628962,
+          "brier": 0.056467597686861395,
+          "accuracy": 0.92861815802864,
+          "ece": 0.00580839851849837,
+          "auc_ci_95_lower": 0.8698039179666095,
+          "auc_ci_95_upper": 0.8901385187218775,
+          "brier_ci_95_lower": 0.053647274113433806,
+          "brier_ci_95_upper": 0.05962474919111201,
+          "ece_ci_95_lower": 0.004090190769679299,
+          "ece_ci_95_upper": 0.010617366644800855
         },
         {
           "variant": "nars_gated",
-          "auc": 0.8828853952826262,
-          "brier": 0.05617974174439984,
-          "accuracy": 0.9288362288289598,
-          "ece": 0.004943452659173563,
-          "auc_ci_95_lower": 0.8730597907583082,
-          "auc_ci_95_upper": 0.8924775247605209,
-          "brier_ci_95_lower": 0.05326707060515441,
-          "brier_ci_95_upper": 0.059451790744888,
-          "ece_ci_95_lower": 0.0038664728443344436,
-          "ece_ci_95_upper": 0.009561016692374878
+          "auc": 0.8802429394548069,
+          "brier": 0.05646863238110265,
+          "accuracy": 0.92861815802864,
+          "ece": 0.005833076653150351,
+          "auc_ci_95_lower": 0.8698052485145314,
+          "auc_ci_95_upper": 0.8901395464331447,
+          "brier_ci_95_lower": 0.05364745727904195,
+          "brier_ci_95_upper": 0.05962490301719128,
+          "ece_ci_95_lower": 0.004110097461528351,
+          "ece_ci_95_upper": 0.010635780679421997
         }
       ],
       "symbolic_rules": {
         "definitions": {
-          "rule_lactate": [
-            0.85,
-            0.8
-          ],
-          "rule_hypotension": [
-            0.75,
-            0.7
-          ],
-          "rule_age": [
-            0.65,
-            0.6
-          ],
-          "rule_creatinine": [
-            0.7,
-            0.65
-          ]
+          "rule_lactate": {
+            "condition": "maximum day-1 lactate >= 4.0 mmol/L",
+            "description": "Elevated lactate supplies prototype evidence of metabolic stress.",
+            "clinical_interpretation": "The rule increases support for the lactate feature without diagnosing shock or determining mortality.",
+            "source_column": "d1_lactate_max",
+            "truth_value": {
+              "frequency": 0.85,
+              "confidence": 0.8
+            }
+          },
+          "rule_hypotension": {
+            "condition": "minimum day-1 systolic blood pressure <= 90 mmHg",
+            "description": "Low systolic blood pressure supplies prototype evidence of hemodynamic instability.",
+            "clinical_interpretation": "The rule increases support for the blood-pressure feature; it is not a stand-alone mortality decision.",
+            "source_column": "d1_sysbp_min",
+            "truth_value": {
+              "frequency": 0.75,
+              "confidence": 0.7
+            }
+          },
+          "rule_age": {
+            "condition": "age >= 75 years",
+            "description": "Age of at least 75 years supplies prototype demographic evidence.",
+            "clinical_interpretation": "The rule increases support for the age feature without treating age as sufficient for mortality.",
+            "source_column": "age",
+            "truth_value": {
+              "frequency": 0.65,
+              "confidence": 0.6
+            }
+          },
+          "rule_creatinine": {
+            "condition": "maximum day-1 creatinine >= 2.0 mg/dL",
+            "description": "Elevated creatinine supplies prototype evidence of renal dysfunction.",
+            "clinical_interpretation": "The rule increases support for the creatinine feature without diagnosing kidney injury or determining mortality.",
+            "source_column": "d1_creatinine_max",
+            "truth_value": {
+              "frequency": 0.7,
+              "confidence": 0.65
+            }
+          }
         },
         "interface_notes": {
           "neural_truth_mapping": "variance-derived heuristic initializer for NARS-style confidence",
           "symbolic_rule_grounding": "explicit NAL deduction from direct observation before revision",
-          "revision_assumption": "neural and symbolic truths are treated as distinct evidential sources"
+          "revision_assumption": "neural and symbolic truths are treated as distinct evidential sources",
+          "rule_firing": "conditions are evaluated independently and any subset may fire",
+          "inference_pass": "revision and gated-logit recomputation occur once with no convergence loop",
+          "conflict_policy": "multiple rules targeting one logical feature are rejected pending explicit provenance-aware resolution"
         },
         "total_trigger_count": 13031,
         "mapped_feature_trigger_count": 13031,
@@ -1760,8 +1848,8 @@
           "max_depth": null,
           "min_samples_leaf": 1
         },
-        "validation_auc": 0.8762096526835169,
-        "validation_brier": 0.05835939552600211
+        "validation_auc": 0.8749365455547331,
+        "validation_brier": 0.05848512560886924
       },
       "classical_baselines": {
         "random_forest": {
@@ -1772,258 +1860,302 @@
             "max_depth": null,
             "min_samples_leaf": 1
           },
-          "validation_auc": 0.8762096526835169,
-          "validation_brier": 0.05835939552600211
+          "validation_auc": 0.8749365455547331,
+          "validation_brier": 0.05848512560886924
         }
       },
       "auc_bootstrap": {
         "random_forest": {
           "iterations": 1000,
-          "auc_samples_mean": 0.8753982770563686,
-          "auc_ci_95_lower": 0.8655394464714016,
-          "auc_ci_95_upper": 0.8858219455901339,
-          "brier_samples_mean": 0.05827124026631631,
-          "brier_ci_95_lower": 0.05523833119602304,
-          "brier_ci_95_upper": 0.06148573714299797,
-          "ece_samples_mean": 0.008906371605800682,
-          "ece_ci_95_lower": 0.005469149747401321,
-          "ece_ci_95_upper": 0.012420075923166381
+          "auc_samples_mean": 0.8768632532082704,
+          "auc_ci_95_lower": 0.8669175671816576,
+          "auc_ci_95_upper": 0.8867520461147212,
+          "brier_samples_mean": 0.05823113329799162,
+          "brier_ci_95_lower": 0.05520334008196045,
+          "brier_ci_95_upper": 0.061424960465216116,
+          "ece_samples_mean": 0.009084642651886313,
+          "ece_ci_95_lower": 0.005960075247146911,
+          "ece_ci_95_upper": 0.01253608523842408
         },
         "baseline": {
           "iterations": 1000,
-          "auc_samples_mean": 0.8829264828639896,
-          "auc_ci_95_lower": 0.8732112968621726,
-          "auc_ci_95_upper": 0.8926051003985657,
-          "brier_samples_mean": 0.056270979784429076,
-          "brier_ci_95_lower": 0.05333516746759415,
-          "brier_ci_95_upper": 0.059461720194667576,
-          "ece_samples_mean": 0.007383169410609169,
-          "ece_ci_95_lower": 0.004658308057951909,
-          "ece_ci_95_upper": 0.010499803351195113
+          "auc_samples_mean": 0.8803468246889194,
+          "auc_ci_95_lower": 0.8700149115209564,
+          "auc_ci_95_upper": 0.8902125095917065,
+          "brier_samples_mean": 0.05659443881362677,
+          "brier_ci_95_lower": 0.05370839033275843,
+          "brier_ci_95_upper": 0.05966444090008736,
+          "ece_samples_mean": 0.008453656422062139,
+          "ece_ci_95_lower": 0.004926247690678755,
+          "ece_ci_95_upper": 0.012111412822749816
         },
         "flat_confidence": {
           "iterations": 1000,
-          "auc_samples_mean": 0.882892249452161,
-          "auc_ci_95_lower": 0.8730948908456719,
-          "auc_ci_95_upper": 0.8924805355784745,
-          "brier_samples_mean": 0.056245147761920675,
-          "brier_ci_95_lower": 0.05328000973083111,
-          "brier_ci_95_upper": 0.059460163601283325,
-          "ece_samples_mean": 0.006667173812003438,
-          "ece_ci_95_lower": 0.004105570352410677,
-          "ece_ci_95_upper": 0.009685358164897939
+          "auc_samples_mean": 0.8802434052200427,
+          "auc_ci_95_lower": 0.8698110721699586,
+          "auc_ci_95_upper": 0.8901487833176899,
+          "brier_samples_mean": 0.056547897565592836,
+          "brier_ci_95_lower": 0.053663574504632834,
+          "brier_ci_95_upper": 0.059637559928028494,
+          "ece_samples_mean": 0.007545215285394779,
+          "ece_ci_95_lower": 0.004212556351544684,
+          "ece_ci_95_upper": 0.010976080611085072
         },
         "mc_confidence_only": {
           "iterations": 1000,
-          "auc_samples_mean": 0.8828564877528888,
-          "auc_ci_95_lower": 0.8730540809860217,
-          "auc_ci_95_upper": 0.8924703921381556,
-          "brier_samples_mean": 0.05624322194215141,
-          "brier_ci_95_lower": 0.05326830758849572,
-          "brier_ci_95_upper": 0.05945310214392899,
-          "ece_samples_mean": 0.0065148124889950485,
-          "ece_ci_95_lower": 0.003862145115463386,
-          "ece_ci_95_upper": 0.009547634878479096
+          "auc_samples_mean": 0.8802561694567137,
+          "auc_ci_95_lower": 0.8698039179666095,
+          "auc_ci_95_upper": 0.8901385187218775,
+          "brier_samples_mean": 0.056534701879037,
+          "brier_ci_95_lower": 0.053647274113433806,
+          "brier_ci_95_upper": 0.05962474919111201,
+          "ece_samples_mean": 0.007225649892731722,
+          "ece_ci_95_lower": 0.004090190769679299,
+          "ece_ci_95_upper": 0.010617366644800855
         },
         "nars_gated": {
           "iterations": 1000,
-          "auc_samples_mean": 0.8828643419779352,
-          "auc_ci_95_lower": 0.8730597907583082,
-          "auc_ci_95_upper": 0.8924775247605209,
-          "brier_samples_mean": 0.056242279993554266,
-          "brier_ci_95_lower": 0.05326707060515441,
-          "brier_ci_95_upper": 0.059451790744888,
-          "ece_samples_mean": 0.006523982900561277,
-          "ece_ci_95_lower": 0.0038664728443344436,
-          "ece_ci_95_upper": 0.009561016692374878
+          "auc_samples_mean": 0.8802547715479859,
+          "auc_ci_95_lower": 0.8698052485145314,
+          "auc_ci_95_upper": 0.8901395464331447,
+          "brier_samples_mean": 0.056535771480890944,
+          "brier_ci_95_lower": 0.05364745727904195,
+          "brier_ci_95_upper": 0.05962490301719128,
+          "ece_samples_mean": 0.007250898999351993,
+          "ece_ci_95_lower": 0.004110097461528351,
+          "ece_ci_95_upper": 0.010635780679421997
         },
         "comparison": {
           "baseline_vs_nars_gated_ci_overlap": true,
           "baseline_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain.",
-          "baseline_vs_nars_gated_brier_delta_left_minus_right": 2.869979087481274e-05,
-          "baseline_vs_nars_gated_brier_delta_ci_95_lower": -3.5434980334661523e-06,
-          "baseline_vs_nars_gated_brier_delta_ci_95_upper": 6.135622389011244e-05,
-          "baseline_vs_nars_gated_brier_interpretation": "The 95% paired bootstrap interval for the brier difference includes zero.",
-          "baseline_vs_nars_gated_ece_delta_left_minus_right": 0.0008591865100478936,
-          "baseline_vs_nars_gated_ece_delta_ci_95_lower": -0.00035511788999709003,
-          "baseline_vs_nars_gated_ece_delta_ci_95_upper": 0.001796045985584936,
-          "baseline_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for the ece difference includes zero.",
+          "baseline_vs_nars_gated_brier_delta_left_minus_right": 5.8667332735821025e-05,
+          "baseline_vs_nars_gated_brier_delta_ci_95_lower": 2.490123302317012e-05,
+          "baseline_vs_nars_gated_brier_delta_ci_95_upper": 9.114675079980767e-05,
+          "baseline_vs_nars_gated_brier_interpretation": "The 95% paired bootstrap interval for the brier difference excludes zero.",
+          "baseline_vs_nars_gated_ece_delta_left_minus_right": 0.0012027574227101464,
+          "baseline_vs_nars_gated_ece_delta_ci_95_lower": 2.819320960267397e-05,
+          "baseline_vs_nars_gated_ece_delta_ci_95_upper": 0.00202410670679712,
+          "baseline_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for the ece difference excludes zero.",
           "flat_confidence_vs_nars_gated_ci_overlap": true,
           "flat_confidence_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain.",
-          "flat_confidence_vs_nars_gated_brier_delta_left_minus_right": 2.867768366418208e-06,
-          "flat_confidence_vs_nars_gated_brier_delta_ci_95_lower": -9.428096758646275e-06,
-          "flat_confidence_vs_nars_gated_brier_delta_ci_95_upper": 1.4501919655425693e-05,
+          "flat_confidence_vs_nars_gated_brier_delta_left_minus_right": 1.212608470189231e-05,
+          "flat_confidence_vs_nars_gated_brier_delta_ci_95_lower": -5.00704206166571e-06,
+          "flat_confidence_vs_nars_gated_brier_delta_ci_95_upper": 2.8991211828002273e-05,
           "flat_confidence_vs_nars_gated_brier_interpretation": "The 95% paired bootstrap interval for the brier difference includes zero.",
-          "flat_confidence_vs_nars_gated_ece_delta_left_minus_right": 0.00014319091144216143,
-          "flat_confidence_vs_nars_gated_ece_delta_ci_95_lower": -0.0005978850905927856,
-          "flat_confidence_vs_nars_gated_ece_delta_ci_95_upper": 0.0007904258421052825,
+          "flat_confidence_vs_nars_gated_ece_delta_left_minus_right": 0.00029431628604278487,
+          "flat_confidence_vs_nars_gated_ece_delta_ci_95_lower": -0.0003862343223299761,
+          "flat_confidence_vs_nars_gated_ece_delta_ci_95_upper": 0.0008463635637081347,
           "flat_confidence_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for the ece difference includes zero.",
+          "mc_confidence_only_vs_nars_gated_ci_overlap": true,
+          "mc_confidence_only_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain.",
+          "mc_confidence_only_vs_nars_gated_brier_delta_left_minus_right": -1.0696018539417888e-06,
+          "mc_confidence_only_vs_nars_gated_brier_delta_ci_95_lower": -2.860694269653241e-06,
+          "mc_confidence_only_vs_nars_gated_brier_delta_ci_95_upper": 6.961318014763596e-07,
+          "mc_confidence_only_vs_nars_gated_brier_interpretation": "The 95% paired bootstrap interval for the brier difference includes zero.",
+          "mc_confidence_only_vs_nars_gated_ece_delta_left_minus_right": -2.5249106620271773e-05,
+          "mc_confidence_only_vs_nars_gated_ece_delta_ci_95_lower": -0.00016808172462168535,
+          "mc_confidence_only_vs_nars_gated_ece_delta_ci_95_upper": 0.00012552788930221854,
+          "mc_confidence_only_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for the ece difference includes zero.",
           "random_forest_vs_nars_gated_ci_overlap": true,
           "random_forest_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain.",
-          "random_forest_vs_nars_gated_brier_delta_left_minus_right": 0.0020289602727620467,
-          "random_forest_vs_nars_gated_brier_delta_ci_95_lower": 0.0013509155839201762,
-          "random_forest_vs_nars_gated_brier_delta_ci_95_upper": 0.0027255096585880774,
+          "random_forest_vs_nars_gated_brier_delta_left_minus_right": 0.0016953618171006658,
+          "random_forest_vs_nars_gated_brier_delta_ci_95_lower": 0.0009627858437944975,
+          "random_forest_vs_nars_gated_brier_delta_ci_95_upper": 0.0023993261028111674,
           "random_forest_vs_nars_gated_brier_interpretation": "The 95% paired bootstrap interval for the brier difference excludes zero.",
-          "random_forest_vs_nars_gated_ece_delta_left_minus_right": 0.002382388705239407,
-          "random_forest_vs_nars_gated_ece_delta_ci_95_lower": -0.0016824421125576018,
-          "random_forest_vs_nars_gated_ece_delta_ci_95_upper": 0.005865858793863196,
+          "random_forest_vs_nars_gated_ece_delta_left_minus_right": 0.0018337436525343194,
+          "random_forest_vs_nars_gated_ece_delta_ci_95_lower": -0.0038678633299525445,
+          "random_forest_vs_nars_gated_ece_delta_ci_95_upper": 0.007944045000295273,
           "random_forest_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for the ece difference includes zero."
         }
       },
       "metric_bootstrap": {
         "random_forest": {
           "iterations": 1000,
-          "auc_samples_mean": 0.8753982770563686,
-          "auc_ci_95_lower": 0.8655394464714016,
-          "auc_ci_95_upper": 0.8858219455901339,
-          "brier_samples_mean": 0.05827124026631631,
-          "brier_ci_95_lower": 0.05523833119602304,
-          "brier_ci_95_upper": 0.06148573714299797,
-          "ece_samples_mean": 0.008906371605800682,
-          "ece_ci_95_lower": 0.005469149747401321,
-          "ece_ci_95_upper": 0.012420075923166381
+          "auc_samples_mean": 0.8768632532082704,
+          "auc_ci_95_lower": 0.8669175671816576,
+          "auc_ci_95_upper": 0.8867520461147212,
+          "brier_samples_mean": 0.05823113329799162,
+          "brier_ci_95_lower": 0.05520334008196045,
+          "brier_ci_95_upper": 0.061424960465216116,
+          "ece_samples_mean": 0.009084642651886313,
+          "ece_ci_95_lower": 0.005960075247146911,
+          "ece_ci_95_upper": 0.01253608523842408
         },
         "baseline": {
           "iterations": 1000,
-          "auc_samples_mean": 0.8829264828639896,
-          "auc_ci_95_lower": 0.8732112968621726,
-          "auc_ci_95_upper": 0.8926051003985657,
-          "brier_samples_mean": 0.056270979784429076,
-          "brier_ci_95_lower": 0.05333516746759415,
-          "brier_ci_95_upper": 0.059461720194667576,
-          "ece_samples_mean": 0.007383169410609169,
-          "ece_ci_95_lower": 0.004658308057951909,
-          "ece_ci_95_upper": 0.010499803351195113
+          "auc_samples_mean": 0.8803468246889194,
+          "auc_ci_95_lower": 0.8700149115209564,
+          "auc_ci_95_upper": 0.8902125095917065,
+          "brier_samples_mean": 0.05659443881362677,
+          "brier_ci_95_lower": 0.05370839033275843,
+          "brier_ci_95_upper": 0.05966444090008736,
+          "ece_samples_mean": 0.008453656422062139,
+          "ece_ci_95_lower": 0.004926247690678755,
+          "ece_ci_95_upper": 0.012111412822749816
         },
         "flat_confidence": {
           "iterations": 1000,
-          "auc_samples_mean": 0.882892249452161,
-          "auc_ci_95_lower": 0.8730948908456719,
-          "auc_ci_95_upper": 0.8924805355784745,
-          "brier_samples_mean": 0.056245147761920675,
-          "brier_ci_95_lower": 0.05328000973083111,
-          "brier_ci_95_upper": 0.059460163601283325,
-          "ece_samples_mean": 0.006667173812003438,
-          "ece_ci_95_lower": 0.004105570352410677,
-          "ece_ci_95_upper": 0.009685358164897939
+          "auc_samples_mean": 0.8802434052200427,
+          "auc_ci_95_lower": 0.8698110721699586,
+          "auc_ci_95_upper": 0.8901487833176899,
+          "brier_samples_mean": 0.056547897565592836,
+          "brier_ci_95_lower": 0.053663574504632834,
+          "brier_ci_95_upper": 0.059637559928028494,
+          "ece_samples_mean": 0.007545215285394779,
+          "ece_ci_95_lower": 0.004212556351544684,
+          "ece_ci_95_upper": 0.010976080611085072
         },
         "mc_confidence_only": {
           "iterations": 1000,
-          "auc_samples_mean": 0.8828564877528888,
-          "auc_ci_95_lower": 0.8730540809860217,
-          "auc_ci_95_upper": 0.8924703921381556,
-          "brier_samples_mean": 0.05624322194215141,
-          "brier_ci_95_lower": 0.05326830758849572,
-          "brier_ci_95_upper": 0.05945310214392899,
-          "ece_samples_mean": 0.0065148124889950485,
-          "ece_ci_95_lower": 0.003862145115463386,
-          "ece_ci_95_upper": 0.009547634878479096
+          "auc_samples_mean": 0.8802561694567137,
+          "auc_ci_95_lower": 0.8698039179666095,
+          "auc_ci_95_upper": 0.8901385187218775,
+          "brier_samples_mean": 0.056534701879037,
+          "brier_ci_95_lower": 0.053647274113433806,
+          "brier_ci_95_upper": 0.05962474919111201,
+          "ece_samples_mean": 0.007225649892731722,
+          "ece_ci_95_lower": 0.004090190769679299,
+          "ece_ci_95_upper": 0.010617366644800855
         },
         "nars_gated": {
           "iterations": 1000,
-          "auc_samples_mean": 0.8828643419779352,
-          "auc_ci_95_lower": 0.8730597907583082,
-          "auc_ci_95_upper": 0.8924775247605209,
-          "brier_samples_mean": 0.056242279993554266,
-          "brier_ci_95_lower": 0.05326707060515441,
-          "brier_ci_95_upper": 0.059451790744888,
-          "ece_samples_mean": 0.006523982900561277,
-          "ece_ci_95_lower": 0.0038664728443344436,
-          "ece_ci_95_upper": 0.009561016692374878
+          "auc_samples_mean": 0.8802547715479859,
+          "auc_ci_95_lower": 0.8698052485145314,
+          "auc_ci_95_upper": 0.8901395464331447,
+          "brier_samples_mean": 0.056535771480890944,
+          "brier_ci_95_lower": 0.05364745727904195,
+          "brier_ci_95_upper": 0.05962490301719128,
+          "ece_samples_mean": 0.007250898999351993,
+          "ece_ci_95_lower": 0.004110097461528351,
+          "ece_ci_95_upper": 0.010635780679421997
         },
         "comparison": {
           "baseline_vs_nars_gated_ci_overlap": true,
           "baseline_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain.",
-          "baseline_vs_nars_gated_brier_delta_left_minus_right": 2.869979087481274e-05,
-          "baseline_vs_nars_gated_brier_delta_ci_95_lower": -3.5434980334661523e-06,
-          "baseline_vs_nars_gated_brier_delta_ci_95_upper": 6.135622389011244e-05,
-          "baseline_vs_nars_gated_brier_interpretation": "The 95% paired bootstrap interval for the brier difference includes zero.",
-          "baseline_vs_nars_gated_ece_delta_left_minus_right": 0.0008591865100478936,
-          "baseline_vs_nars_gated_ece_delta_ci_95_lower": -0.00035511788999709003,
-          "baseline_vs_nars_gated_ece_delta_ci_95_upper": 0.001796045985584936,
-          "baseline_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for the ece difference includes zero.",
+          "baseline_vs_nars_gated_brier_delta_left_minus_right": 5.8667332735821025e-05,
+          "baseline_vs_nars_gated_brier_delta_ci_95_lower": 2.490123302317012e-05,
+          "baseline_vs_nars_gated_brier_delta_ci_95_upper": 9.114675079980767e-05,
+          "baseline_vs_nars_gated_brier_interpretation": "The 95% paired bootstrap interval for the brier difference excludes zero.",
+          "baseline_vs_nars_gated_ece_delta_left_minus_right": 0.0012027574227101464,
+          "baseline_vs_nars_gated_ece_delta_ci_95_lower": 2.819320960267397e-05,
+          "baseline_vs_nars_gated_ece_delta_ci_95_upper": 0.00202410670679712,
+          "baseline_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for the ece difference excludes zero.",
           "flat_confidence_vs_nars_gated_ci_overlap": true,
           "flat_confidence_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain.",
-          "flat_confidence_vs_nars_gated_brier_delta_left_minus_right": 2.867768366418208e-06,
-          "flat_confidence_vs_nars_gated_brier_delta_ci_95_lower": -9.428096758646275e-06,
-          "flat_confidence_vs_nars_gated_brier_delta_ci_95_upper": 1.4501919655425693e-05,
+          "flat_confidence_vs_nars_gated_brier_delta_left_minus_right": 1.212608470189231e-05,
+          "flat_confidence_vs_nars_gated_brier_delta_ci_95_lower": -5.00704206166571e-06,
+          "flat_confidence_vs_nars_gated_brier_delta_ci_95_upper": 2.8991211828002273e-05,
           "flat_confidence_vs_nars_gated_brier_interpretation": "The 95% paired bootstrap interval for the brier difference includes zero.",
-          "flat_confidence_vs_nars_gated_ece_delta_left_minus_right": 0.00014319091144216143,
-          "flat_confidence_vs_nars_gated_ece_delta_ci_95_lower": -0.0005978850905927856,
-          "flat_confidence_vs_nars_gated_ece_delta_ci_95_upper": 0.0007904258421052825,
+          "flat_confidence_vs_nars_gated_ece_delta_left_minus_right": 0.00029431628604278487,
+          "flat_confidence_vs_nars_gated_ece_delta_ci_95_lower": -0.0003862343223299761,
+          "flat_confidence_vs_nars_gated_ece_delta_ci_95_upper": 0.0008463635637081347,
           "flat_confidence_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for the ece difference includes zero.",
+          "mc_confidence_only_vs_nars_gated_ci_overlap": true,
+          "mc_confidence_only_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain.",
+          "mc_confidence_only_vs_nars_gated_brier_delta_left_minus_right": -1.0696018539417888e-06,
+          "mc_confidence_only_vs_nars_gated_brier_delta_ci_95_lower": -2.860694269653241e-06,
+          "mc_confidence_only_vs_nars_gated_brier_delta_ci_95_upper": 6.961318014763596e-07,
+          "mc_confidence_only_vs_nars_gated_brier_interpretation": "The 95% paired bootstrap interval for the brier difference includes zero.",
+          "mc_confidence_only_vs_nars_gated_ece_delta_left_minus_right": -2.5249106620271773e-05,
+          "mc_confidence_only_vs_nars_gated_ece_delta_ci_95_lower": -0.00016808172462168535,
+          "mc_confidence_only_vs_nars_gated_ece_delta_ci_95_upper": 0.00012552788930221854,
+          "mc_confidence_only_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for the ece difference includes zero.",
           "random_forest_vs_nars_gated_ci_overlap": true,
           "random_forest_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain.",
-          "random_forest_vs_nars_gated_brier_delta_left_minus_right": 0.0020289602727620467,
-          "random_forest_vs_nars_gated_brier_delta_ci_95_lower": 0.0013509155839201762,
-          "random_forest_vs_nars_gated_brier_delta_ci_95_upper": 0.0027255096585880774,
+          "random_forest_vs_nars_gated_brier_delta_left_minus_right": 0.0016953618171006658,
+          "random_forest_vs_nars_gated_brier_delta_ci_95_lower": 0.0009627858437944975,
+          "random_forest_vs_nars_gated_brier_delta_ci_95_upper": 0.0023993261028111674,
           "random_forest_vs_nars_gated_brier_interpretation": "The 95% paired bootstrap interval for the brier difference excludes zero.",
-          "random_forest_vs_nars_gated_ece_delta_left_minus_right": 0.002382388705239407,
-          "random_forest_vs_nars_gated_ece_delta_ci_95_lower": -0.0016824421125576018,
-          "random_forest_vs_nars_gated_ece_delta_ci_95_upper": 0.005865858793863196,
+          "random_forest_vs_nars_gated_ece_delta_left_minus_right": 0.0018337436525343194,
+          "random_forest_vs_nars_gated_ece_delta_ci_95_lower": -0.0038678633299525445,
+          "random_forest_vs_nars_gated_ece_delta_ci_95_upper": 0.007944045000295273,
           "random_forest_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for the ece difference includes zero."
         }
+      },
+      "auditability": {
+        "dataset": "wids",
+        "held_out_cases": 13757,
+        "cases_with_any_trigger": 8551,
+        "case_coverage": 0.6215744711783092,
+        "total_rule_trigger_count": 13031,
+        "mapped_feature_trigger_count": 13031,
+        "mapping_coverage": 1.0,
+        "finite_trace_event_count": 13031,
+        "finite_trace_rate": 1.0,
+        "confidence_changed_event_count": 13031,
+        "confidence_changed_event_rate": 1.0,
+        "attention_changed_event_count": 13031,
+        "attention_changed_event_rate": 1.0,
+        "mean_abs_probability_delta_triggered": 0.0021406544231334476,
+        "median_abs_probability_delta_triggered": 0.0015850405011244434,
+        "max_abs_probability_delta_triggered": 0.031024984542785627,
+        "threshold_flip_count_triggered": 10,
+        "max_revision_residual": 0.0,
+        "max_gate_residual": 0.0,
+        "audit_tolerance": 1e-09,
+        "revision_fidelity_pass": true,
+        "gate_fidelity_pass": true
       },
       "gamma_ablation": [
         {
           "gamma": 0.25,
-          "baseline_auc": 0.8829437709902892,
-          "baseline_brier": 0.05620816722512245,
-          "baseline_accuracy": 0.9287635385621865,
-          "nars_gated_auc": 0.8829148847331104,
-          "nars_gated_brier": 0.05618203047717303,
-          "nars_gated_accuracy": 0.9288362288289598,
-          "auc_delta_gated_minus_baseline": -2.8886257178784014e-05,
-          "brier_delta_gated_minus_baseline": -2.613674794942067e-05,
-          "accuracy_delta_gated_minus_baseline": 7.269026677325652e-05
+          "baseline_auc": 0.8803399865554915,
+          "baseline_brier": 0.056527189910411835,
+          "baseline_accuracy": 0.9285454677618666,
+          "nars_gated_auc": 0.8802354330492291,
+          "nars_gated_brier": 0.05647888873594085,
+          "nars_gated_accuracy": 0.9286908482954133,
+          "auc_delta_gated_minus_baseline": -0.00010455350626237259,
+          "brier_delta_gated_minus_baseline": -4.830117447098686e-05,
+          "accuracy_delta_gated_minus_baseline": 0.00014538053354662406
         },
         {
           "gamma": 0.5,
-          "baseline_auc": 0.8829437709902892,
-          "baseline_brier": 0.05620816722512245,
-          "baseline_accuracy": 0.9287635385621865,
-          "nars_gated_auc": 0.8829094559933622,
-          "nars_gated_brier": 0.056181623546653646,
-          "nars_gated_accuracy": 0.9287635385621865,
-          "auc_delta_gated_minus_baseline": -3.431499692696516e-05,
-          "brier_delta_gated_minus_baseline": -2.6543678468805842e-05,
-          "accuracy_delta_gated_minus_baseline": 0.0
+          "baseline_auc": 0.8803399865554915,
+          "baseline_brier": 0.056527189910411835,
+          "baseline_accuracy": 0.9285454677618666,
+          "nars_gated_auc": 0.8802409288104558,
+          "nars_gated_brier": 0.0564773408872976,
+          "nars_gated_accuracy": 0.92861815802864,
+          "auc_delta_gated_minus_baseline": -9.90577450357133e-05,
+          "brier_delta_gated_minus_baseline": -4.9849023114237334e-05,
+          "accuracy_delta_gated_minus_baseline": 7.269026677336754e-05
         },
         {
           "gamma": 1.0,
-          "baseline_auc": 0.8829437709902892,
-          "baseline_brier": 0.05620816722512245,
-          "baseline_accuracy": 0.9287635385621865,
-          "nars_gated_auc": 0.8829071102416192,
-          "nars_gated_brier": 0.05618089070681269,
-          "nars_gated_accuracy": 0.9287635385621865,
-          "auc_delta_gated_minus_baseline": -3.666074867003655e-05,
-          "brier_delta_gated_minus_baseline": -2.7276518309762854e-05,
-          "accuracy_delta_gated_minus_baseline": 0.0
+          "baseline_auc": 0.8803399865554915,
+          "baseline_brier": 0.056527189910411835,
+          "baseline_accuracy": 0.9285454677618666,
+          "nars_gated_auc": 0.8802433415836773,
+          "nars_gated_brier": 0.056474326431288524,
+          "nars_gated_accuracy": 0.9286908482954133,
+          "auc_delta_gated_minus_baseline": -9.664497181416376e-05,
+          "brier_delta_gated_minus_baseline": -5.2863479123310686e-05,
+          "accuracy_delta_gated_minus_baseline": 0.00014538053354662406
         },
         {
           "gamma": 2.0,
-          "baseline_auc": 0.8829437709902892,
-          "baseline_brier": 0.05620816722512245,
-          "baseline_accuracy": 0.9287635385621865,
-          "nars_gated_auc": 0.8828853952826262,
-          "nars_gated_brier": 0.05617974174439984,
-          "nars_gated_accuracy": 0.9288362288289598,
-          "auc_delta_gated_minus_baseline": -5.837570766298317e-05,
-          "brier_delta_gated_minus_baseline": -2.8425480722613083e-05,
-          "accuracy_delta_gated_minus_baseline": 7.269026677325652e-05
+          "baseline_auc": 0.8803399865554915,
+          "baseline_brier": 0.056527189910411835,
+          "baseline_accuracy": 0.9285454677618666,
+          "nars_gated_auc": 0.8802429394548069,
+          "nars_gated_brier": 0.05646863238110265,
+          "nars_gated_accuracy": 0.92861815802864,
+          "auc_delta_gated_minus_baseline": -9.704710068458855e-05,
+          "brier_delta_gated_minus_baseline": -5.8557529309187506e-05,
+          "accuracy_delta_gated_minus_baseline": 7.269026677336754e-05
         },
         {
           "gamma": 4.0,
-          "baseline_auc": 0.8829437709902892,
-          "baseline_brier": 0.05620816722512245,
-          "baseline_accuracy": 0.9287635385621865,
-          "nars_gated_auc": 0.8828429036653375,
-          "nars_gated_brier": 0.05617864822130421,
-          "nars_gated_accuracy": 0.9290542996292797,
-          "auc_delta_gated_minus_baseline": -0.00010086732495173667,
-          "brier_delta_gated_minus_baseline": -2.9519003818243017e-05,
-          "accuracy_delta_gated_minus_baseline": 0.0002907610670931371
+          "baseline_auc": 0.8803399865554915,
+          "baseline_brier": 0.056527189910411835,
+          "baseline_accuracy": 0.9285454677618666,
+          "nars_gated_auc": 0.8802393873164533,
+          "nars_gated_brier": 0.056458657733374495,
+          "nars_gated_accuracy": 0.9284727774950934,
+          "auc_delta_gated_minus_baseline": -0.00010059923903815715,
+          "brier_delta_gated_minus_baseline": -6.853217703733927e-05,
+          "accuracy_delta_gated_minus_baseline": -7.269026677325652e-05
         }
       ],
       "submission_ablation": [],
@@ -2031,169 +2163,169 @@
       "decision_curve": [
         {
           "threshold": 0.05,
-          "random_forest_net_benefit": 0.0604936051694257,
-          "baseline_net_benefit": 0.061304675514474924,
-          "flat_confidence_net_benefit": 0.061098082124698236,
-          "nars_gated_net_benefit": 0.06123581105121603,
+          "random_forest_net_benefit": 0.0606313340959435,
+          "baseline_net_benefit": 0.060822624271662656,
+          "flat_confidence_net_benefit": 0.0609488757876373,
+          "nars_gated_net_benefit": 0.06099095962629551,
           "treat_all_net_benefit": 0.03819299648408657,
           "treat_none_net_benefit": 0.0
         },
         {
           "threshold": 0.1,
-          "random_forest_net_benefit": 0.047797888751585055,
-          "baseline_net_benefit": 0.04826633713745729,
-          "flat_confidence_net_benefit": 0.0481532633891433,
-          "nars_gated_net_benefit": 0.04810480321129445,
+          "random_forest_net_benefit": 0.047612124736497785,
+          "baseline_net_benefit": 0.048193646870684004,
+          "flat_confidence_net_benefit": 0.04823403035222472,
+          "nars_gated_net_benefit": 0.048137109996527025,
           "treat_all_net_benefit": -0.015240725933464178,
           "treat_none_net_benefit": 0.0
         },
         {
           "threshold": 0.15000000000000002,
-          "random_forest_net_benefit": 0.038307770589518064,
-          "baseline_net_benefit": 0.03941522818329919,
-          "flat_confidence_net_benefit": 0.03943233177548114,
-          "nars_gated_net_benefit": 0.03941522818329919,
+          "random_forest_net_benefit": 0.03815811415792602,
+          "baseline_net_benefit": 0.03927839944584361,
+          "flat_confidence_net_benefit": 0.038825154253021986,
+          "nars_gated_net_benefit": 0.03874391219015773,
           "treat_all_net_benefit": -0.07496076863543269,
           "treat_none_net_benefit": 0.0
         },
         {
           "threshold": 0.2,
-          "random_forest_net_benefit": 0.03185650941338955,
-          "baseline_net_benefit": 0.03307407138184197,
-          "flat_confidence_net_benefit": 0.03332848731554845,
-          "nars_gated_net_benefit": 0.033273969615468496,
+          "random_forest_net_benefit": 0.031874681980082864,
+          "baseline_net_benefit": 0.03300138111506869,
+          "flat_confidence_net_benefit": 0.032765137748055534,
+          "nars_gated_net_benefit": 0.03298320854837537,
           "treat_all_net_benefit": -0.1421458166751472,
           "treat_none_net_benefit": 0.0
         },
         {
           "threshold": 0.25,
-          "random_forest_net_benefit": 0.026483487194398005,
-          "baseline_net_benefit": 0.028930726175765063,
-          "flat_confidence_net_benefit": 0.0291487969760849,
-          "nars_gated_net_benefit": 0.029148796976084905,
+          "random_forest_net_benefit": 0.026483487194398008,
+          "baseline_net_benefit": 0.028131133241258998,
+          "flat_confidence_net_benefit": 0.028034212885561294,
+          "nars_gated_net_benefit": 0.02798575270771244,
           "treat_all_net_benefit": -0.218288871120157,
           "treat_none_net_benefit": 0.0
         },
         {
           "threshold": 0.3,
-          "random_forest_net_benefit": 0.022305527575571915,
-          "baseline_net_benefit": 0.024361623692873237,
-          "flat_confidence_net_benefit": 0.024257780454625694,
-          "nars_gated_net_benefit": 0.02403970965430586,
+          "random_forest_net_benefit": 0.02316742645302651,
+          "baseline_net_benefit": 0.024050093978130613,
+          "flat_confidence_net_benefit": 0.024070862625780117,
+          "nars_gated_net_benefit": 0.02401894100665635,
           "treat_all_net_benefit": -0.30530950477159685,
           "treat_none_net_benefit": 0.0
         },
         {
           "threshold": 0.35000000000000003,
-          "random_forest_net_benefit": 0.018754088827505996,
-          "baseline_net_benefit": 0.020945979948669487,
-          "flat_confidence_net_benefit": 0.020996303979512524,
-          "nars_gated_net_benefit": 0.020934796830704365,
+          "random_forest_net_benefit": 0.01818374981128488,
+          "baseline_net_benefit": 0.019945090890791255,
+          "flat_confidence_net_benefit": 0.020112837660268057,
+          "nars_gated_net_benefit": 0.020235851957884375,
           "treat_all_net_benefit": -0.40571792821556585,
           "treat_none_net_benefit": 0.0
         },
         {
           "threshold": 0.4,
-          "random_forest_net_benefit": 0.01594339851227254,
-          "baseline_net_benefit": 0.01899638971675026,
-          "flat_confidence_net_benefit": 0.01892369944997698,
-          "nars_gated_net_benefit": 0.018972159627825832,
+          "random_forest_net_benefit": 0.01591916842334811,
+          "baseline_net_benefit": 0.01761527464805795,
+          "flat_confidence_net_benefit": 0.017712195003755662,
+          "nars_gated_net_benefit": 0.017809115359453363,
           "treat_all_net_benefit": -0.5228610889001963,
           "treat_none_net_benefit": 0.0
         },
         {
           "threshold": 0.45,
-          "random_forest_net_benefit": 0.013447699353056624,
-          "baseline_net_benefit": 0.01714829475242356,
-          "flat_confidence_net_benefit": 0.017326716316321607,
-          "nars_gated_net_benefit": 0.01731349990418101,
+          "random_forest_net_benefit": 0.013844191717274513,
+          "baseline_net_benefit": 0.016692328533572994,
+          "flat_confidence_net_benefit": 0.017168119370634456,
+          "nars_gated_net_benefit": 0.017055779867439388,
           "treat_all_net_benefit": -0.6613030060729413,
           "treat_none_net_benefit": 0.0
         },
         {
           "threshold": 0.5,
-          "random_forest_net_benefit": 0.012139274551137603,
-          "baseline_net_benefit": 0.015046885222068766,
-          "flat_confidence_net_benefit": 0.015119575488842043,
-          "nars_gated_net_benefit": 0.015119575488842043,
+          "random_forest_net_benefit": 0.012066584284364322,
+          "baseline_net_benefit": 0.014828814421748927,
+          "flat_confidence_net_benefit": 0.014901504688522207,
+          "nars_gated_net_benefit": 0.014901504688522207,
           "treat_all_net_benefit": -0.8274333066802355,
           "treat_none_net_benefit": 0.0
         },
         {
           "threshold": 0.55,
-          "random_forest_net_benefit": 0.009344737628520429,
-          "baseline_net_benefit": 0.012971174270876238,
-          "flat_confidence_net_benefit": 0.013060017930265802,
-          "nars_gated_net_benefit": 0.01320539846381236,
+          "random_forest_net_benefit": 0.009885876281165952,
+          "baseline_net_benefit": 0.01362538667183575,
+          "flat_confidence_net_benefit": 0.01355269640506247,
+          "nars_gated_net_benefit": 0.013512312923521761,
           "treat_all_net_benefit": -1.0304814518669287,
           "treat_none_net_benefit": 0.0
         },
         {
           "threshold": 0.6000000000000001,
-          "random_forest_net_benefit": 0.008904557679726683,
-          "baseline_net_benefit": 0.011884858617431125,
-          "flat_confidence_net_benefit": 0.011630442683724646,
-          "nars_gated_net_benefit": 0.011739478083884564,
+          "random_forest_net_benefit": 0.007923239078287417,
+          "baseline_net_benefit": 0.012720796685323834,
+          "flat_confidence_net_benefit": 0.01297521261903031,
+          "nars_gated_net_benefit": 0.01275714181871047,
           "treat_all_net_benefit": -1.284291633350295,
           "treat_none_net_benefit": 0.0
         },
         {
           "threshold": 0.6500000000000001,
-          "random_forest_net_benefit": 0.006490202390471342,
-          "baseline_net_benefit": 0.009968950871763983,
-          "flat_confidence_net_benefit": 0.009979335195588737,
-          "nars_gated_net_benefit": 0.009906644928815458,
+          "random_forest_net_benefit": 0.006479818066646588,
+          "baseline_net_benefit": 0.010550473005950214,
+          "flat_confidence_net_benefit": 0.010477782739176933,
+          "nars_gated_net_benefit": 0.010259711938857097,
           "treat_all_net_benefit": -1.6106190095431947,
           "treat_none_net_benefit": 0.0
         },
         {
           "threshold": 0.7000000000000001,
-          "random_forest_net_benefit": 0.0045310266288677275,
-          "baseline_net_benefit": 0.007608247922269874,
-          "flat_confidence_net_benefit": 0.0075113275665721685,
-          "nars_gated_net_benefit": 0.0075840178333454475,
+          "random_forest_net_benefit": 0.004652177073489859,
+          "baseline_net_benefit": 0.008068619611833975,
+          "flat_confidence_net_benefit": 0.008141309878607254,
+          "nars_gated_net_benefit": 0.007850548811514138,
           "treat_all_net_benefit": -2.0457221778003927,
           "treat_none_net_benefit": 0.0
         },
         {
           "threshold": 0.7500000000000001,
-          "random_forest_net_benefit": 0.002689539870611324,
-          "baseline_net_benefit": 0.0063240532092752755,
-          "flat_confidence_net_benefit": 0.006396743476048555,
-          "nars_gated_net_benefit": 0.0063240532092752755,
+          "random_forest_net_benefit": 0.0023260885367449285,
+          "baseline_net_benefit": 0.005742531075089043,
+          "flat_confidence_net_benefit": 0.005815221341862322,
+          "nars_gated_net_benefit": 0.005669840808315764,
           "treat_all_net_benefit": -2.654866613360473,
           "treat_none_net_benefit": 0.0
         },
         {
           "threshold": 0.8,
-          "random_forest_net_benefit": 0.001599185869012139,
-          "baseline_net_benefit": 0.004216035472850185,
-          "flat_confidence_net_benefit": 0.004216035472850185,
-          "nars_gated_net_benefit": 0.004216035472850185,
+          "random_forest_net_benefit": 0.0013811150686923019,
+          "baseline_net_benefit": 0.004942938140582976,
+          "flat_confidence_net_benefit": 0.005306389474449371,
+          "nars_gated_net_benefit": 0.005088318674129534,
           "treat_all_net_benefit": -3.56858326670059,
           "treat_none_net_benefit": 0.0
         },
         {
           "threshold": 0.8500000000000001,
-          "random_forest_net_benefit": 0.0006784424898839376,
-          "baseline_net_benefit": 0.002108017736425092,
-          "flat_confidence_net_benefit": 0.001914177025029681,
-          "nars_gated_net_benefit": 0.00198686729180296,
+          "random_forest_net_benefit": 0.001308424801919023,
+          "baseline_net_benefit": 0.002229168181047224,
+          "flat_confidence_net_benefit": 0.002883380582006736,
+          "nars_gated_net_benefit": 0.0025926195149136196,
           "treat_all_net_benefit": -5.091444355600789,
           "treat_none_net_benefit": 0.0
         },
         {
           "threshold": 0.9000000000000001,
-          "random_forest_net_benefit": 7.269026677327906e-05,
-          "baseline_net_benefit": 0.0005815221341862324,
-          "flat_confidence_net_benefit": 0.00014538053354655716,
-          "nars_gated_net_benefit": 0.00014538053354655716,
+          "random_forest_net_benefit": 0.0002907610670931162,
+          "baseline_net_benefit": 7.269026677327906e-05,
+          "flat_confidence_net_benefit": 0.0001453805335465581,
+          "nars_gated_net_benefit": 7.269026677327906e-05,
           "treat_all_net_benefit": -8.13716653340119,
           "treat_none_net_benefit": 0.0
         },
         {
           "threshold": 0.9500000000000001,
-          "random_forest_net_benefit": 7.269026677327906e-05,
+          "random_forest_net_benefit": 0.0,
           "baseline_net_benefit": 0.0,
           "flat_confidence_net_benefit": 0.0,
           "nars_gated_net_benefit": 0.0,
@@ -2203,302 +2335,302 @@
       ],
       "calibration_reliability": [
         {
-          "mean_predicted_probability": 0.0002979651162790698,
-          "fraction_positives": 0.0029069767441860465,
+          "mean_predicted_probability": 0.00028343023255813956,
+          "fraction_positives": 0.003633720930232558,
           "count": 1376,
           "variant": "random_forest"
         },
         {
-          "mean_predicted_probability": 0.003522892441860465,
+          "mean_predicted_probability": 0.003553779069767442,
           "fraction_positives": 0.002180232558139535,
           "count": 1376,
           "variant": "random_forest"
         },
         {
-          "mean_predicted_probability": 0.008334545454545456,
-          "fraction_positives": 0.01090909090909091,
+          "mean_predicted_probability": 0.00818,
+          "fraction_positives": 0.008,
           "count": 1375,
           "variant": "random_forest"
         },
         {
-          "mean_predicted_probability": 0.015339752906976745,
-          "fraction_positives": 0.015261627906976744,
+          "mean_predicted_probability": 0.015421511627906979,
+          "fraction_positives": 0.014534883720930232,
           "count": 1376,
           "variant": "random_forest"
         },
         {
-          "mean_predicted_probability": 0.02484193313953488,
-          "fraction_positives": 0.023982558139534885,
+          "mean_predicted_probability": 0.024999999999999998,
+          "fraction_positives": 0.018168604651162792,
           "count": 1376,
           "variant": "random_forest"
         },
         {
-          "mean_predicted_probability": 0.03861454545454546,
-          "fraction_positives": 0.03272727272727273,
+          "mean_predicted_probability": 0.039165454545454545,
+          "fraction_positives": 0.04072727272727273,
           "count": 1375,
           "variant": "random_forest"
         },
         {
-          "mean_predicted_probability": 0.05861191860465117,
-          "fraction_positives": 0.05450581395348837,
-          "count": 1376,
-          "variant": "random_forest"
-        },
-        {
-          "mean_predicted_probability": 0.09205272727272727,
-          "fraction_positives": 0.09381818181818181,
-          "count": 1375,
-          "variant": "random_forest"
-        },
-        {
-          "mean_predicted_probability": 0.15984011627906977,
-          "fraction_positives": 0.17732558139534885,
-          "count": 1376,
-          "variant": "random_forest"
-        },
-        {
-          "mean_predicted_probability": 0.4094712936046512,
-          "fraction_positives": 0.4491279069767442,
-          "count": 1376,
-          "variant": "random_forest"
-        },
-        {
-          "mean_predicted_probability": 0.004416413629071538,
-          "fraction_positives": 0.0029069767441860465,
-          "count": 1376,
-          "variant": "baseline"
-        },
-        {
-          "mean_predicted_probability": 0.007479230652639079,
-          "fraction_positives": 0.002180232558139535,
-          "count": 1376,
-          "variant": "baseline"
-        },
-        {
-          "mean_predicted_probability": 0.012233860459517349,
-          "fraction_positives": 0.0036363636363636364,
-          "count": 1375,
-          "variant": "baseline"
-        },
-        {
-          "mean_predicted_probability": 0.0196511869096782,
-          "fraction_positives": 0.015988372093023256,
-          "count": 1376,
-          "variant": "baseline"
-        },
-        {
-          "mean_predicted_probability": 0.030270841912106546,
-          "fraction_positives": 0.02180232558139535,
-          "count": 1376,
-          "variant": "baseline"
-        },
-        {
-          "mean_predicted_probability": 0.04453071391853419,
-          "fraction_positives": 0.03563636363636364,
-          "count": 1375,
-          "variant": "baseline"
-        },
-        {
-          "mean_predicted_probability": 0.06444618841741494,
-          "fraction_positives": 0.057412790697674417,
-          "count": 1376,
-          "variant": "baseline"
-        },
-        {
-          "mean_predicted_probability": 0.0982710062102838,
-          "fraction_positives": 0.09527272727272727,
-          "count": 1375,
-          "variant": "baseline"
-        },
-        {
-          "mean_predicted_probability": 0.17094310976261662,
-          "fraction_positives": 0.16497093023255813,
-          "count": 1376,
-          "variant": "baseline"
-        },
-        {
-          "mean_predicted_probability": 0.4552723526044987,
-          "fraction_positives": 0.4629360465116279,
-          "count": 1376,
-          "variant": "baseline"
-        },
-        {
-          "mean_predicted_probability": 0.0042307255388488165,
-          "fraction_positives": 0.0029069767441860465,
-          "count": 1376,
-          "variant": "flat_confidence"
-        },
-        {
-          "mean_predicted_probability": 0.006981583705268667,
-          "fraction_positives": 0.002180232558139535,
-          "count": 1376,
-          "variant": "flat_confidence"
-        },
-        {
-          "mean_predicted_probability": 0.01138558607190932,
-          "fraction_positives": 0.004363636363636364,
-          "count": 1375,
-          "variant": "flat_confidence"
-        },
-        {
-          "mean_predicted_probability": 0.018513220263160837,
-          "fraction_positives": 0.015261627906976744,
-          "count": 1376,
-          "variant": "flat_confidence"
-        },
-        {
-          "mean_predicted_probability": 0.02897991183522515,
-          "fraction_positives": 0.02180232558139535,
-          "count": 1376,
-          "variant": "flat_confidence"
-        },
-        {
-          "mean_predicted_probability": 0.04317105406357707,
-          "fraction_positives": 0.03563636363636364,
-          "count": 1375,
-          "variant": "flat_confidence"
-        },
-        {
-          "mean_predicted_probability": 0.06293210628837621,
+          "mean_predicted_probability": 0.05950399709302325,
           "fraction_positives": 0.056686046511627904,
           "count": 1376,
-          "variant": "flat_confidence"
+          "variant": "random_forest"
         },
         {
-          "mean_predicted_probability": 0.09634274249098458,
-          "fraction_positives": 0.09381818181818181,
+          "mean_predicted_probability": 0.09297636363636363,
+          "fraction_positives": 0.0989090909090909,
           "count": 1375,
-          "variant": "flat_confidence"
+          "variant": "random_forest"
         },
         {
-          "mean_predicted_probability": 0.16872928201763066,
-          "fraction_positives": 0.16715116279069767,
+          "mean_predicted_probability": 0.15994731104651164,
+          "fraction_positives": 0.16497093023255813,
           "count": 1376,
-          "variant": "flat_confidence"
+          "variant": "random_forest"
         },
         {
-          "mean_predicted_probability": 0.4553953708670853,
-          "fraction_positives": 0.4629360465116279,
+          "mean_predicted_probability": 0.4091860465116279,
+          "fraction_positives": 0.45494186046511625,
           "count": 1376,
-          "variant": "flat_confidence"
+          "variant": "random_forest"
         },
         {
-          "mean_predicted_probability": 0.004249200556562649,
-          "fraction_positives": 0.0029069767441860465,
-          "count": 1376,
-          "variant": "mc_confidence_only"
-        },
-        {
-          "mean_predicted_probability": 0.006980020318785798,
+          "mean_predicted_probability": 0.004130384537559219,
           "fraction_positives": 0.002180232558139535,
           "count": 1376,
-          "variant": "mc_confidence_only"
+          "variant": "baseline"
         },
         {
-          "mean_predicted_probability": 0.011309922788163956,
-          "fraction_positives": 0.004363636363636364,
-          "count": 1375,
-          "variant": "mc_confidence_only"
-        },
-        {
-          "mean_predicted_probability": 0.018295990220354975,
-          "fraction_positives": 0.014534883720930232,
-          "count": 1376,
-          "variant": "mc_confidence_only"
-        },
-        {
-          "mean_predicted_probability": 0.028612005791635066,
-          "fraction_positives": 0.02252906976744186,
-          "count": 1376,
-          "variant": "mc_confidence_only"
-        },
-        {
-          "mean_predicted_probability": 0.04268080148296397,
-          "fraction_positives": 0.03563636363636364,
-          "count": 1375,
-          "variant": "mc_confidence_only"
-        },
-        {
-          "mean_predicted_probability": 0.06242637983081503,
-          "fraction_positives": 0.057412790697674417,
-          "count": 1376,
-          "variant": "mc_confidence_only"
-        },
-        {
-          "mean_predicted_probability": 0.09571282170805505,
-          "fraction_positives": 0.09309090909090909,
-          "count": 1375,
-          "variant": "mc_confidence_only"
-        },
-        {
-          "mean_predicted_probability": 0.16771061431306586,
-          "fraction_positives": 0.16569767441860464,
-          "count": 1376,
-          "variant": "mc_confidence_only"
-        },
-        {
-          "mean_predicted_probability": 0.45453030708637004,
-          "fraction_positives": 0.4643895348837209,
-          "count": 1376,
-          "variant": "mc_confidence_only"
-        },
-        {
-          "mean_predicted_probability": 0.004249227834000903,
-          "fraction_positives": 0.0029069767441860465,
-          "count": 1376,
-          "variant": "nars_gated"
-        },
-        {
-          "mean_predicted_probability": 0.006980302683385641,
+          "mean_predicted_probability": 0.006532067114211142,
           "fraction_positives": 0.002180232558139535,
           "count": 1376,
-          "variant": "nars_gated"
+          "variant": "baseline"
         },
         {
-          "mean_predicted_probability": 0.01131036436277568,
-          "fraction_positives": 0.004363636363636364,
+          "mean_predicted_probability": 0.010199129268527032,
+          "fraction_positives": 0.007272727272727273,
           "count": 1375,
-          "variant": "nars_gated"
+          "variant": "baseline"
         },
         {
-          "mean_predicted_probability": 0.018296700219900187,
+          "mean_predicted_probability": 0.01623125915919149,
           "fraction_positives": 0.014534883720930232,
           "count": 1376,
-          "variant": "nars_gated"
+          "variant": "baseline"
         },
         {
-          "mean_predicted_probability": 0.028613775929385042,
+          "mean_predicted_probability": 0.025669660401628026,
           "fraction_positives": 0.02252906976744186,
           "count": 1376,
-          "variant": "nars_gated"
+          "variant": "baseline"
         },
         {
-          "mean_predicted_probability": 0.042683218590353296,
+          "mean_predicted_probability": 0.04011747369170189,
           "fraction_positives": 0.03490909090909091,
           "count": 1375,
-          "variant": "nars_gated"
+          "variant": "baseline"
         },
         {
-          "mean_predicted_probability": 0.062430879292841045,
-          "fraction_positives": 0.05813953488372093,
+          "mean_predicted_probability": 0.06200001625409133,
+          "fraction_positives": 0.061046511627906974,
+          "count": 1376,
+          "variant": "baseline"
+        },
+        {
+          "mean_predicted_probability": 0.10155784034729004,
+          "fraction_positives": 0.08872727272727272,
+          "count": 1375,
+          "variant": "baseline"
+        },
+        {
+          "mean_predicted_probability": 0.18639599419263905,
+          "fraction_positives": 0.16569767441860464,
+          "count": 1376,
+          "variant": "baseline"
+        },
+        {
+          "mean_predicted_probability": 0.4848695307493556,
+          "fraction_positives": 0.4636627906976744,
+          "count": 1376,
+          "variant": "baseline"
+        },
+        {
+          "mean_predicted_probability": 0.0039625210224419035,
+          "fraction_positives": 0.002180232558139535,
+          "count": 1376,
+          "variant": "flat_confidence"
+        },
+        {
+          "mean_predicted_probability": 0.006135210332438906,
+          "fraction_positives": 0.002180232558139535,
+          "count": 1376,
+          "variant": "flat_confidence"
+        },
+        {
+          "mean_predicted_probability": 0.009515292651192343,
+          "fraction_positives": 0.008,
+          "count": 1375,
+          "variant": "flat_confidence"
+        },
+        {
+          "mean_predicted_probability": 0.015243267528023154,
+          "fraction_positives": 0.013808139534883721,
+          "count": 1376,
+          "variant": "flat_confidence"
+        },
+        {
+          "mean_predicted_probability": 0.024440405049751167,
+          "fraction_positives": 0.023255813953488372,
+          "count": 1376,
+          "variant": "flat_confidence"
+        },
+        {
+          "mean_predicted_probability": 0.03870682464071196,
+          "fraction_positives": 0.03563636363636364,
+          "count": 1375,
+          "variant": "flat_confidence"
+        },
+        {
+          "mean_predicted_probability": 0.060322949798062166,
+          "fraction_positives": 0.059593023255813955,
+          "count": 1376,
+          "variant": "flat_confidence"
+        },
+        {
+          "mean_predicted_probability": 0.0993259855029359,
+          "fraction_positives": 0.088,
+          "count": 1375,
+          "variant": "flat_confidence"
+        },
+        {
+          "mean_predicted_probability": 0.18348342526148143,
+          "fraction_positives": 0.16787790697674418,
+          "count": 1376,
+          "variant": "flat_confidence"
+        },
+        {
+          "mean_predicted_probability": 0.4834187393153352,
+          "fraction_positives": 0.4622093023255814,
+          "count": 1376,
+          "variant": "flat_confidence"
+        },
+        {
+          "mean_predicted_probability": 0.0040426208647432425,
+          "fraction_positives": 0.002180232558139535,
+          "count": 1376,
+          "variant": "mc_confidence_only"
+        },
+        {
+          "mean_predicted_probability": 0.006245954498667463,
+          "fraction_positives": 0.002180232558139535,
+          "count": 1376,
+          "variant": "mc_confidence_only"
+        },
+        {
+          "mean_predicted_probability": 0.009633129491013833,
+          "fraction_positives": 0.008,
+          "count": 1375,
+          "variant": "mc_confidence_only"
+        },
+        {
+          "mean_predicted_probability": 0.015322344984480051,
+          "fraction_positives": 0.013808139534883721,
+          "count": 1376,
+          "variant": "mc_confidence_only"
+        },
+        {
+          "mean_predicted_probability": 0.02442814830307362,
+          "fraction_positives": 0.02252906976744186,
+          "count": 1376,
+          "variant": "mc_confidence_only"
+        },
+        {
+          "mean_predicted_probability": 0.03857261784923022,
+          "fraction_positives": 0.03709090909090909,
+          "count": 1375,
+          "variant": "mc_confidence_only"
+        },
+        {
+          "mean_predicted_probability": 0.060062413009152056,
+          "fraction_positives": 0.059593023255813955,
+          "count": 1376,
+          "variant": "mc_confidence_only"
+        },
+        {
+          "mean_predicted_probability": 0.09885668275942794,
+          "fraction_positives": 0.08872727272727272,
+          "count": 1375,
+          "variant": "mc_confidence_only"
+        },
+        {
+          "mean_predicted_probability": 0.18256207305773667,
+          "fraction_positives": 0.16569767441860464,
+          "count": 1376,
+          "variant": "mc_confidence_only"
+        },
+        {
+          "mean_predicted_probability": 0.481097562311168,
+          "fraction_positives": 0.4629360465116279,
+          "count": 1376,
+          "variant": "mc_confidence_only"
+        },
+        {
+          "mean_predicted_probability": 0.0040426919506978045,
+          "fraction_positives": 0.002180232558139535,
           "count": 1376,
           "variant": "nars_gated"
         },
         {
-          "mean_predicted_probability": 0.0957210286276307,
-          "fraction_positives": 0.09309090909090909,
+          "mean_predicted_probability": 0.006246268559562921,
+          "fraction_positives": 0.002180232558139535,
+          "count": 1376,
+          "variant": "nars_gated"
+        },
+        {
+          "mean_predicted_probability": 0.009634233012685284,
+          "fraction_positives": 0.008,
           "count": 1375,
           "variant": "nars_gated"
         },
         {
-          "mean_predicted_probability": 0.16773339407077156,
+          "mean_predicted_probability": 0.015325289354568068,
+          "fraction_positives": 0.013808139534883721,
+          "count": 1376,
+          "variant": "nars_gated"
+        },
+        {
+          "mean_predicted_probability": 0.024432716512909267,
+          "fraction_positives": 0.02252906976744186,
+          "count": 1376,
+          "variant": "nars_gated"
+        },
+        {
+          "mean_predicted_probability": 0.03858095400500199,
+          "fraction_positives": 0.03709090909090909,
+          "count": 1375,
+          "variant": "nars_gated"
+        },
+        {
+          "mean_predicted_probability": 0.06007589032486134,
+          "fraction_positives": 0.059593023255813955,
+          "count": 1376,
+          "variant": "nars_gated"
+        },
+        {
+          "mean_predicted_probability": 0.09888315067101232,
+          "fraction_positives": 0.08872727272727272,
+          "count": 1375,
+          "variant": "nars_gated"
+        },
+        {
+          "mean_predicted_probability": 0.18262194423337452,
           "fraction_positives": 0.16569767441860464,
           "count": 1376,
           "variant": "nars_gated"
         },
         {
-          "mean_predicted_probability": 0.4546200596024456,
-          "fraction_positives": 0.4643895348837209,
+          "mean_predicted_probability": 0.4812271621420983,
+          "fraction_positives": 0.4629360465116279,
           "count": 1376,
           "variant": "nars_gated"
         }
@@ -2511,6 +2643,8 @@
         "submission_ablation_csv": null,
         "decision_curve_csv": "results\\wids\\metrics\\decision_curve.csv",
         "calibration_reliability_csv": "results\\wids\\metrics\\calibration_reliability.csv",
+        "auditability_metrics_csv": "results\\wids\\metrics\\auditability_metrics.csv",
+        "auditability_metrics_json": "results\\wids\\metrics\\auditability_metrics.json",
         "trace_csv": "results\\wids\\traces\\test_predictions.csv",
         "case_traces_csv": null,
         "roc_curve": "results\\wids\\charts\\roc_curve.png",

@@ -27,7 +27,7 @@
     "scikit_learn": "1.8.0",
     "torch": "2.11.0+cu126",
     "cuda_available": true,
-    "git_commit": "4c6133a53a5a4152d000d22a0ad53562e0e4c2e2"
+    "git_commit": "581774203721bd4a497bb2cf3ea335679425ff4c"
   },
   "task": {
     "dataset": "TCGA-THCA",
@@ -643,15 +643,15 @@
     {
       "variant": "random_forest",
       "auc": 0.6613445378151261,
-      "brier": 0.2199757527383453,
+      "brier": 0.21997575273834533,
       "accuracy": 0.5942028985507246,
-      "ece": 0.15966664988761545,
+      "ece": 0.15966664988761547,
       "auc_ci_95_lower": 0.5100720984441915,
       "auc_ci_95_upper": 0.7907666818849781,
       "brier_ci_95_lower": 0.18953733342289616,
-      "brier_ci_95_upper": 0.24980725468298617,
-      "ece_ci_95_lower": 0.1317326044633451,
-      "ece_ci_95_upper": 0.28241542665817587
+      "brier_ci_95_upper": 0.24980725468298623,
+      "ece_ci_95_lower": 0.13173260446334506,
+      "ece_ci_95_upper": 0.2824154266581759
     },
     {
       "variant": "baseline",
@@ -709,8 +709,11 @@
   "symbolic_rules": {
     "definitions": {
       "braf_mutation": {
-        "description": "BRAF mutation strongly predicts lymph node metastasis.",
+        "condition": "BRAF mutation indicator = 1",
+        "description": "A recorded BRAF mutation supplies prototype evidence toward lymph node metastasis.",
+        "clinical_interpretation": "The rule increases support for the BRAF feature when the mutation is recorded; it is not a validated risk probability.",
         "source_column": "genomic_mutation__BRAF",
+        "target_key": "genomic_mutation__BRAF",
         "target_mode": "direct",
         "truth_value": {
           "frequency": 0.85,
@@ -718,8 +721,11 @@
         }
       },
       "age_ge_55_years": {
-        "description": "Age at diagnosis >= 55 years increases metastasis risk.",
+        "condition": "age at diagnosis >= 55 years",
+        "description": "Age at diagnosis of at least 55 years supplies prototype demographic evidence.",
+        "clinical_interpretation": "The rule raises evidential support for the age feature without asserting that age alone determines metastasis.",
         "source_column": "diagnoses.age_at_diagnosis",
+        "target_key": "diagnoses.age_at_diagnosis",
         "target_mode": "direct",
         "truth_value": {
           "frequency": 0.7,
@@ -727,8 +733,11 @@
         }
       },
       "pathologic_t_t3_t4": {
-        "description": "Pathologic T3/T4 disease strongly predicts nodal spread.",
+        "condition": "pathologic T category starts with T3 or T4",
+        "description": "A recorded pathologic T3/T4 category supplies prototype staging evidence.",
+        "clinical_interpretation": "The rule increases support for the observed staging feature; it does not establish nodal spread by itself.",
         "source_column": "diagnoses.ajcc_pathologic_t",
+        "target_key": "diagnoses.ajcc_pathologic_t",
         "target_mode": "categorical_active",
         "truth_value": {
           "frequency": 0.9,
@@ -736,8 +745,11 @@
         }
       },
       "extrathyroid_extension_present": {
-        "description": "Any recorded extrathyroid extension increases metastasis risk.",
+        "condition": "extrathyroid extension is Minimal (T3), Moderate/Advanced (T4a), or Very Advanced (T4b)",
+        "description": "A recognized extrathyroid-extension category supplies prototype pathology evidence.",
+        "clinical_interpretation": "The rule raises support only for an explicitly recorded extension category; missing, placeholder, and unknown values do not fire.",
         "source_column": "pathology_details.extrathyroid_extension",
+        "target_key": "pathology_details.extrathyroid_extension",
         "target_mode": "categorical_active",
         "truth_value": {
           "frequency": 0.85,
@@ -748,7 +760,10 @@
     "interface_notes": {
       "neural_truth_mapping": "variance-derived heuristic initializer for NARS-style confidence",
       "symbolic_rule_grounding": "explicit NAL deduction from direct observation before revision",
-      "revision_assumption": "neural and symbolic truths are treated as distinct evidential sources"
+      "revision_assumption": "neural and symbolic truths are treated as distinct evidential sources",
+      "rule_firing": "conditions are evaluated independently and any subset may fire",
+      "inference_pass": "revision and gated-logit recomputation occur once with no convergence loop",
+      "conflict_policy": "multiple rules targeting one logical feature are rejected pending explicit provenance-aware resolution"
     },
     "total_trigger_count": 79,
     "mapped_feature_trigger_count": 79,
@@ -796,12 +811,12 @@
       "auc_samples_mean": 0.6621587811244568,
       "auc_ci_95_lower": 0.5100720984441915,
       "auc_ci_95_upper": 0.7907666818849781,
-      "brier_samples_mean": 0.21969943709437945,
+      "brier_samples_mean": 0.2196994370943795,
       "brier_ci_95_lower": 0.18953733342289616,
-      "brier_ci_95_upper": 0.24980725468298617,
+      "brier_ci_95_upper": 0.24980725468298623,
       "ece_samples_mean": 0.20844884693908314,
-      "ece_ci_95_lower": 0.1317326044633451,
-      "ece_ci_95_upper": 0.28241542665817587
+      "ece_ci_95_lower": 0.13173260446334506,
+      "ece_ci_95_upper": 0.2824154266581759
     },
     "baseline": {
       "iterations": 1000,
@@ -872,13 +887,23 @@
       "flat_confidence_vs_nars_gated_ece_delta_ci_95_lower": -0.03081475487463528,
       "flat_confidence_vs_nars_gated_ece_delta_ci_95_upper": 0.06623343968644393,
       "flat_confidence_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for the ece difference includes zero.",
+      "mc_confidence_only_vs_nars_gated_ci_overlap": true,
+      "mc_confidence_only_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain.",
+      "mc_confidence_only_vs_nars_gated_brier_delta_left_minus_right": 9.350740768193006e-06,
+      "mc_confidence_only_vs_nars_gated_brier_delta_ci_95_lower": -3.9151323514789724e-05,
+      "mc_confidence_only_vs_nars_gated_brier_delta_ci_95_upper": 5.465749929464206e-05,
+      "mc_confidence_only_vs_nars_gated_brier_interpretation": "The 95% paired bootstrap interval for the brier difference includes zero.",
+      "mc_confidence_only_vs_nars_gated_ece_delta_left_minus_right": 1.4412972487241826e-05,
+      "mc_confidence_only_vs_nars_gated_ece_delta_ci_95_lower": -8.077955289681124e-05,
+      "mc_confidence_only_vs_nars_gated_ece_delta_ci_95_upper": 9.721764849715853e-05,
+      "mc_confidence_only_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for the ece difference includes zero.",
       "random_forest_vs_nars_gated_ci_overlap": true,
       "random_forest_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain.",
-      "random_forest_vs_nars_gated_brier_delta_left_minus_right": 0.00900150242765489,
+      "random_forest_vs_nars_gated_brier_delta_left_minus_right": 0.00900150242765491,
       "random_forest_vs_nars_gated_brier_delta_ci_95_lower": -0.008562656652591219,
-      "random_forest_vs_nars_gated_brier_delta_ci_95_upper": 0.028646638603857074,
+      "random_forest_vs_nars_gated_brier_delta_ci_95_upper": 0.028646638603857077,
       "random_forest_vs_nars_gated_brier_interpretation": "The 95% paired bootstrap interval for the brier difference includes zero.",
-      "random_forest_vs_nars_gated_ece_delta_left_minus_right": 0.03691096800317763,
+      "random_forest_vs_nars_gated_ece_delta_left_minus_right": 0.03691096800317764,
       "random_forest_vs_nars_gated_ece_delta_ci_95_lower": -0.06692258061568011,
       "random_forest_vs_nars_gated_ece_delta_ci_95_upper": 0.13343417770820812,
       "random_forest_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for the ece difference includes zero."
@@ -890,12 +915,12 @@
       "auc_samples_mean": 0.6621587811244568,
       "auc_ci_95_lower": 0.5100720984441915,
       "auc_ci_95_upper": 0.7907666818849781,
-      "brier_samples_mean": 0.21969943709437945,
+      "brier_samples_mean": 0.2196994370943795,
       "brier_ci_95_lower": 0.18953733342289616,
-      "brier_ci_95_upper": 0.24980725468298617,
+      "brier_ci_95_upper": 0.24980725468298623,
       "ece_samples_mean": 0.20844884693908314,
-      "ece_ci_95_lower": 0.1317326044633451,
-      "ece_ci_95_upper": 0.28241542665817587
+      "ece_ci_95_lower": 0.13173260446334506,
+      "ece_ci_95_upper": 0.2824154266581759
     },
     "baseline": {
       "iterations": 1000,
@@ -966,17 +991,51 @@
       "flat_confidence_vs_nars_gated_ece_delta_ci_95_lower": -0.03081475487463528,
       "flat_confidence_vs_nars_gated_ece_delta_ci_95_upper": 0.06623343968644393,
       "flat_confidence_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for the ece difference includes zero.",
+      "mc_confidence_only_vs_nars_gated_ci_overlap": true,
+      "mc_confidence_only_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain.",
+      "mc_confidence_only_vs_nars_gated_brier_delta_left_minus_right": 9.350740768193006e-06,
+      "mc_confidence_only_vs_nars_gated_brier_delta_ci_95_lower": -3.9151323514789724e-05,
+      "mc_confidence_only_vs_nars_gated_brier_delta_ci_95_upper": 5.465749929464206e-05,
+      "mc_confidence_only_vs_nars_gated_brier_interpretation": "The 95% paired bootstrap interval for the brier difference includes zero.",
+      "mc_confidence_only_vs_nars_gated_ece_delta_left_minus_right": 1.4412972487241826e-05,
+      "mc_confidence_only_vs_nars_gated_ece_delta_ci_95_lower": -8.077955289681124e-05,
+      "mc_confidence_only_vs_nars_gated_ece_delta_ci_95_upper": 9.721764849715853e-05,
+      "mc_confidence_only_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for the ece difference includes zero.",
       "random_forest_vs_nars_gated_ci_overlap": true,
       "random_forest_vs_nars_gated_interpretation": "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain.",
-      "random_forest_vs_nars_gated_brier_delta_left_minus_right": 0.00900150242765489,
+      "random_forest_vs_nars_gated_brier_delta_left_minus_right": 0.00900150242765491,
       "random_forest_vs_nars_gated_brier_delta_ci_95_lower": -0.008562656652591219,
-      "random_forest_vs_nars_gated_brier_delta_ci_95_upper": 0.028646638603857074,
+      "random_forest_vs_nars_gated_brier_delta_ci_95_upper": 0.028646638603857077,
       "random_forest_vs_nars_gated_brier_interpretation": "The 95% paired bootstrap interval for the brier difference includes zero.",
-      "random_forest_vs_nars_gated_ece_delta_left_minus_right": 0.03691096800317763,
+      "random_forest_vs_nars_gated_ece_delta_left_minus_right": 0.03691096800317764,
       "random_forest_vs_nars_gated_ece_delta_ci_95_lower": -0.06692258061568011,
       "random_forest_vs_nars_gated_ece_delta_ci_95_upper": 0.13343417770820812,
       "random_forest_vs_nars_gated_ece_interpretation": "The 95% paired bootstrap interval for the ece difference includes zero."
     }
+  },
+  "auditability": {
+    "dataset": "tcga",
+    "held_out_cases": 69,
+    "cases_with_any_trigger": 42,
+    "case_coverage": 0.6086956521739131,
+    "total_rule_trigger_count": 79,
+    "mapped_feature_trigger_count": 79,
+    "mapping_coverage": 1.0,
+    "finite_trace_event_count": 79,
+    "finite_trace_rate": 1.0,
+    "confidence_changed_event_count": 79,
+    "confidence_changed_event_rate": 1.0,
+    "attention_changed_event_count": 79,
+    "attention_changed_event_rate": 1.0,
+    "mean_abs_probability_delta_triggered": 0.00205330602546153,
+    "median_abs_probability_delta_triggered": 0.0018467293350883374,
+    "max_abs_probability_delta_triggered": 0.005995342564267703,
+    "threshold_flip_count_triggered": 0,
+    "max_revision_residual": 0.0,
+    "max_gate_residual": 0.0,
+    "audit_tolerance": 1e-09,
+    "revision_fidelity_pass": true,
+    "gate_fidelity_pass": true
   },
   "gamma_ablation": [
     {
@@ -1223,13 +1282,13 @@
       "variant": "random_forest"
     },
     {
-      "mean_predicted_probability": 0.32144051782332633,
+      "mean_predicted_probability": 0.3214405178233264,
       "fraction_positives": 0.2857142857142857,
       "count": 7,
       "variant": "random_forest"
     },
     {
-      "mean_predicted_probability": 0.4208009137411098,
+      "mean_predicted_probability": 0.42080091374110973,
       "fraction_positives": 0.42857142857142855,
       "count": 7,
       "variant": "random_forest"
@@ -1241,7 +1300,7 @@
       "variant": "random_forest"
     },
     {
-      "mean_predicted_probability": 0.49994853525048905,
+      "mean_predicted_probability": 0.49994853525048893,
       "fraction_positives": 0.5714285714285714,
       "count": 7,
       "variant": "random_forest"
@@ -1253,7 +1312,7 @@
       "variant": "random_forest"
     },
     {
-      "mean_predicted_probability": 0.5457126924797843,
+      "mean_predicted_probability": 0.5457126924797842,
       "fraction_positives": 0.14285714285714285,
       "count": 7,
       "variant": "random_forest"
@@ -1265,13 +1324,13 @@
       "variant": "random_forest"
     },
     {
-      "mean_predicted_probability": 0.6487417237192945,
+      "mean_predicted_probability": 0.6487417237192944,
       "fraction_positives": 0.8571428571428571,
       "count": 7,
       "variant": "random_forest"
     },
     {
-      "mean_predicted_probability": 0.728290984747911,
+      "mean_predicted_probability": 0.7282909847479111,
       "fraction_positives": 0.5714285714285714,
       "count": 7,
       "variant": "random_forest"
@@ -1525,6 +1584,8 @@
     "submission_ablation_csv": null,
     "decision_curve_csv": "results\\tcga\\metrics\\decision_curve.csv",
     "calibration_reliability_csv": "results\\tcga\\metrics\\calibration_reliability.csv",
+    "auditability_metrics_csv": "results\\tcga\\metrics\\auditability_metrics.csv",
+    "auditability_metrics_json": "results\\tcga\\metrics\\auditability_metrics.json",
     "trace_csv": "results\\tcga\\traces\\test_predictions.csv",
     "case_traces_csv": null,
     "roc_curve": "results\\tcga\\charts\\roc_curve.png",
