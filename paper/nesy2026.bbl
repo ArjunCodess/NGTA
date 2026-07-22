@@ -1,0 +1,203 @@
+\begin{thebibliography}{29}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Abu-Salih et~al.(2023)]{abusalih2023}
+B.~Abu-Salih et~al.
+\newblock Healthcare knowledge graph construction: A systematic review of the
+  state-of-the-art, open issues, and opportunities.
+\newblock \emph{Journal of Big Data}, 10\penalty0 (1):\penalty0 83, 2023.
+
+\bibitem[Azizi et~al.(2021)]{azizi2021}
+S.~Azizi et~al.
+\newblock Big self-supervised models advance medical image classification.
+\newblock In \emph{Proceedings of the IEEE International Conference on Computer
+  Vision}, pages 3478--3488, 2021.
+
+\bibitem[Bhuyan et~al.(2024)Bhuyan, Ramdane-Cherif, Tomar, and
+  Singh]{bhuyan2024}
+Bikram~Pratim Bhuyan, Amar Ramdane-Cherif, Ravi Tomar, and T.~P. Singh.
+\newblock Neuro-symbolic artificial intelligence: A survey.
+\newblock \emph{Neural Computing and Applications}, 36\penalty0 (21):\penalty0
+  12809--12844, 2024.
+\newblock \doi{10.1007/s00521-024-09960-z}.
+
+\bibitem[Blundell et~al.(2015)]{blundell2015}
+C.~Blundell et~al.
+\newblock Weight uncertainty in neural networks.
+\newblock In \emph{Proceedings of the International Conference on Machine
+  Learning}, pages 1613--1622, 2015.
+
+\bibitem[Chudasama et~al.(2025)]{chudasama2025}
+Y.~Chudasama et~al.
+\newblock Towards interpretable hybrid {AI}: Integrating knowledge graphs and
+  symbolic reasoning in medicine.
+\newblock \emph{IEEE Access}, 13:\penalty0 12345--12360, 2025.
+
+\bibitem[Colelough and Regli(2025)]{colelough2025}
+B.~C. Colelough and W.~Regli.
+\newblock Neuro-symbolic {AI} in 2024: A systematic review.
+\newblock arXiv:2501.05435, 2025.
+
+\bibitem[Dai et~al.(2025)]{dai2025}
+L.~Dai et~al.
+\newblock Automated classification of clinical diagnoses in electronic health
+  records using transformer.
+\newblock \emph{PLoS One}, 20\penalty0 (1):\penalty0 e0329963, 2025.
+
+\bibitem[d'Avila Garcez et~al.(2020)]{garcez2020}
+A.~d'Avila Garcez et~al.
+\newblock Neurosymbolic {AI}: The 3rd wave.
+\newblock \emph{Artificial Intelligence}, 294:\penalty0 103504, 2020.
+
+\bibitem[d'Avila Garcez et~al.(2019)d'Avila Garcez, Gori, Lamb, Serafini,
+  Spranger, and Tran]{marra2021}
+Artur d'Avila Garcez, Marco Gori, Luis~C. Lamb, Luciano Serafini, Michael
+  Spranger, and Son~N. Tran.
+\newblock Neural-symbolic computing: An effective methodology for principled
+  integration of machine learning and reasoning.
+\newblock \emph{Journal of Applied Logics -- IfCoLog Journal of Logics and
+  their Applications}, 6\penalty0 (4):\penalty0 611--631, 2019.
+
+\bibitem[Gal and Ghahramani(2016)]{gal2016}
+Y.~Gal and Z.~Ghahramani.
+\newblock Dropout as a bayesian approximation: Representing model uncertainty
+  in deep learning.
+\newblock In \emph{Proceedings of the International Conference on Machine
+  Learning}, pages 1050--1059, 2016.
+
+\bibitem[Ghassemi et~al.(2020)Ghassemi, Naumann, Schulam, Beam, Chen, and
+  Ranganath]{ghassemi2021}
+Marzyeh Ghassemi, Tristan Naumann, Peter Schulam, Andrew~L. Beam, Irene~Y.
+  Chen, and Rajesh Ranganath.
+\newblock A review of challenges and opportunities in machine learning for
+  health.
+\newblock \emph{AMIA Joint Summits on Translational Science Proceedings},
+  2020:\penalty0 191--200, 2020.
+\newblock URL \url{https://pmc.ncbi.nlm.nih.gov/articles/PMC7233077/}.
+
+\bibitem[Goncalves et~al.(2022)]{goncalves2022}
+T.~Goncalves et~al.
+\newblock A survey on attention mechanisms for medical applications: Are we
+  moving toward better algorithms?
+\newblock \emph{IEEE Access}, 10:\penalty0 98975--99003, 2022.
+
+\bibitem[Hilario(2013)]{hilario2013}
+M.~Hilario.
+\newblock An overview of strategies for neurosymbolic integration.
+\newblock In \emph{Connectionist-Symbolic Integration}, pages 15--34.
+  Routledge, 2013.
+
+\bibitem[Jiang et~al.(2024)]{jiang2024}
+P.~Jiang et~al.
+\newblock Reasoning-enhanced healthcare predictions with knowledge graph
+  community retrieval.
+\newblock arXiv:2410.04585, 2024.
+
+\bibitem[Lakshminarayanan et~al.(2017)]{lakshminarayanan2017}
+B.~Lakshminarayanan et~al.
+\newblock Simple and scalable predictive uncertainty estimation using deep
+  ensembles.
+\newblock In \emph{Advances in Neural Information Processing Systems},
+  volume~30, 2017.
+
+\bibitem[Li et~al.(2019{\natexlab{a}})]{li2019}
+F.~Li et~al.
+\newblock Fine-tuning bidirectional encoder representations from transformers
+  ({BERT})-based models on large-scale electronic health record notes: An
+  empirical study.
+\newblock \emph{JMIR Medical Informatics}, 7\penalty0 (3):\penalty0 e14830,
+  2019{\natexlab{a}}.
+
+\bibitem[Li et~al.(2019{\natexlab{b}})Li, Wang, Wang, Yuan, Peng, and
+  Mei]{ma2019}
+Xuedong Li, Yue Wang, Dongwu Wang, Walter Yuan, Dezhong Peng, and Qiaozhu Mei.
+\newblock Improving rare disease classification using imperfect knowledge
+  graph.
+\newblock \emph{BMC Medical Informatics and Decision Making}, 19\penalty0
+  (Suppl. 5):\penalty0 238, 2019{\natexlab{b}}.
+\newblock \doi{10.1186/s12911-019-0938-1}.
+
+\bibitem[L{\'o}pez et~al.(2025)L{\'o}pez, Elsharief, Jorf, Darwish, Ma, and
+  Shamout]{abad2025}
+L.~Juli{\'a}n~Lechuga L{\'o}pez, Shaza Elsharief, Dhiyaa~Al Jorf, Firas
+  Darwish, Congbo Ma, and Farah~E. Shamout.
+\newblock Uncertainty quantification for machine learning in healthcare: A
+  survey, 2025.
+\newblock URL \url{https://arxiv.org/abs/2505.02874}.
+
+\bibitem[Nawaz et~al.(2025)Nawaz, ur~Rahaman, and Saeed]{nawaz2025}
+Uzma Nawaz, Mufti~Anees ur~Rahaman, and Zubair Saeed.
+\newblock A review of neuro-symbolic {AI} integrating reasoning and learning
+  for advanced cognitive systems.
+\newblock \emph{Intelligent Systems with Applications}, 26:\penalty0 200541,
+  2025.
+\newblock \doi{10.1016/j.iswa.2025.200541}.
+
+\bibitem[Ovadia et~al.(2019)]{ovadia2019}
+Y.~Ovadia et~al.
+\newblock Can you trust your model's uncertainty? evaluating predictive
+  uncertainty under dataset shift.
+\newblock In \emph{Advances in Neural Information Processing Systems},
+  volume~32, 2019.
+
+\bibitem[Rajabi and Kafaie(2022)]{rajabi2022}
+E.~Rajabi and S.~Kafaie.
+\newblock Knowledge graphs and explainable {AI} in healthcare.
+\newblock \emph{Information}, 13\penalty0 (10):\penalty0 459, 2022.
+
+\bibitem[Rasmy et~al.(2021)]{rasmy2021}
+L.~Rasmy et~al.
+\newblock {Med-BERT}: Pretrained contextualized embeddings on large-scale
+  structured electronic health records for disease prediction.
+\newblock \emph{npj Digital Medicine}, 4\penalty0 (1):\penalty0 86, 2021.
+
+\bibitem[{U.S. Food and Drug Administration}(2026)]{fda2026}
+{U.S. Food and Drug Administration}.
+\newblock Clinical decision support software: Guidance for industry and food
+  and drug administration staff, January 2026.
+\newblock URL
+  \url{https://www.fda.gov/regulatory-information/search-fda-guidance-documents/clinical-decision-support-software}.
+
+\bibitem[Wang(1995)]{wang1995}
+P.~Wang.
+\newblock \emph{Non-Axiomatic Reasoning System: Exploring the Essence of
+  Intelligence}.
+\newblock PhD thesis, Indiana University, 1995.
+
+\bibitem[Wang(2006)]{wang2006}
+P.~Wang.
+\newblock \emph{Rigid Flexibility: The Logic of Intelligence}.
+\newblock Springer, 2006.
+
+\bibitem[Wang(2024)]{wang2024draft}
+P.~Wang.
+\newblock Non-axiomatic logic: A model of intelligent reasoning.
+\newblock Second edition draft manuscript dated December 14, 2024, shared by
+  author, 2024.
+
+\bibitem[Wang and Awan(2013)]{wang2013}
+P.~Wang and S.~Awan.
+\newblock Reasoning in non-axiomatic logic: A case study in medical diagnosis.
+\newblock In \emph{Proceedings of the Conference on Artificial General
+  Intelligence}, pages 185--190, 2013.
+
+\bibitem[Wang(2022)]{wang2022}
+Pei Wang.
+\newblock Intelligence: From definition to design.
+\newblock In \emph{Proceedings of the Third International Workshop on
+  Self-Supervised Learning}, volume 192 of \emph{Proceedings of Machine
+  Learning Research}, pages 35--47. PMLR, 2022.
+\newblock URL \url{https://proceedings.mlr.press/v192/wang22a.html}.
+
+\bibitem[Wu et~al.(2023)]{wu2023}
+X.~Wu et~al.
+\newblock Medical knowledge graph: Data sources, construction, reasoning, and
+  applications.
+\newblock \emph{Big Data Mining and Analytics}, 6\penalty0 (2):\penalty0
+  201--217, 2023.
+
+\end{thebibliography}

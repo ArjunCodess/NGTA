@@ -1,0 +1,113 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\bibstyle{plainnat}
+\citation{ma2019,ovadia2019,ghassemi2021}
+\citation{rasmy2021,azizi2021,li2019}
+\citation{wang1995,wang2006,wang2013}
+\providecommand \oddpage@label [2]{}
+\jmlr@workshop{20th Conference on Neurosymbolic Learning and Reasoning}
+\jmlr@title{Dynamic Evidential Routing}{Dynamic Evidential Routing: A Neurosymbolic Transformer Interface for Auditable Clinical Prediction Under Extreme Missingness}
+\jmlr@author{\Name {Arjun Vijay Prakash} \Email {arjunv.prakash12345@gmail.com}\\ \addr City Montessori School, Lucknow, Uttar Pradesh, India}{\Name {Arjun Vijay Prakash} \Email {arjunv.prakash12345@gmail.com}\\ \addr City Montessori School, Lucknow, Uttar Pradesh, India}
+\newlabel{jmlrstart}{{}{1}{}{Doc-Start}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.0.1}\protected@file@percent }
+\newlabel{sec:intro}{{1}{1}{Introduction}{section.0.1}{}}
+\citation{garcez2020,marra2021,bhuyan2024,colelough2025}
+\citation{hilario2013,nawaz2025}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Inference-time dynamic evidential routing. A trained transformer produces a prediction and feature attention; MC dropout estimates uncertainty; the uncertainty signal initializes NAL truth values; triggered clinical rules revise those values; revised confidence gates attention; and the system exports a case-level trace showing where symbolic evidence changed the computation.}}{2}{figure.1}\protected@file@percent }
+\newlabel{fig:pipeline}{{1}{2}{Inference-time dynamic evidential routing. A trained transformer produces a prediction and feature attention; MC dropout estimates uncertainty; the uncertainty signal initializes NAL truth values; triggered clinical rules revise those values; revised confidence gates attention; and the system exports a case-level trace showing where symbolic evidence changed the computation}{figure.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Related Work}{2}{section.0.2}\protected@file@percent }
+\newlabel{sec:related}{{2}{2}{Related Work}{section.0.2}{}}
+\@writefile{toc}{\contentsline {paragraph}{Neurosymbolic integration.}{2}{section*.1}\protected@file@percent }
+\citation{rasmy2021,li2019,dai2025}
+\citation{goncalves2022}
+\citation{blundell2015,gal2016,lakshminarayanan2017,abad2025}
+\citation{ovadia2019}
+\citation{wang1995,wang2006,wang2022}
+\citation{wang2013}
+\citation{wu2023,abusalih2023,rajabi2022,jiang2024,chudasama2025}
+\@writefile{toc}{\contentsline {paragraph}{Clinical transformers and uncertainty.}{3}{section*.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{NARS and biomedical reasoning.}{3}{section*.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Method}{3}{section.0.3}\protected@file@percent }
+\newlabel{sec:method}{{3}{3}{Method}{section.0.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Interface Boundary}{3}{subsection.0.3.1}\protected@file@percent }
+\citation{wang2024draft}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Truth Values}{4}{subsection.0.3.2}\protected@file@percent }
+\newlabel{eq:frequency}{{1}{4}{Truth Values}{equation.1}{}}
+\newlabel{eq:confidence}{{2}{4}{Truth Values}{equation.2}{}}
+\newlabel{eq:deduction}{{3}{4}{Truth Values}{equation.3}{}}
+\newlabel{eq:revision}{{4}{4}{Truth Values}{equation.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Neural-to-Symbolic Initialization}{4}{subsection.0.3.3}\protected@file@percent }
+\newlabel{eq:neural_to_nars}{{5}{4}{Neural-to-Symbolic Initialization}{equation.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Symbolic Rule Revision}{4}{subsection.0.3.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5}Attention Gating}{5}{subsection.0.3.5}\protected@file@percent }
+\newlabel{eq:attention_update}{{6}{5}{Attention Gating}{equation.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.6}Inference-Time Data Flow}{5}{subsection.0.3.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.7}Rule-Trace Semantics}{5}{subsection.0.3.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.8}Worked Trace}{5}{subsection.0.3.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4}Experimental Setup}{6}{section.0.4}\protected@file@percent }
+\newlabel{sec:experiments}{{4}{6}{Experimental Setup}{section.0.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Baselines and Controls}{6}{subsection.0.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Rule Bases}{6}{subsection.0.4.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Prototype symbolic rules. Conditions are evaluated independently; any subset may fire. Truth values are evidential weights for the interface, not validated clinical probabilities.}}{7}{table.1}\protected@file@percent }
+\newlabel{tab:rule_inventory}{{1}{7}{Prototype symbolic rules. Conditions are evaluated independently; any subset may fire. Truth values are evidential weights for the interface, not validated clinical probabilities}{table.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Statistical Reporting}{7}{subsection.0.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Reproducibility Interface}{7}{subsection.0.4.4}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Held-out TCGA-THCA performance for lymph node metastasis prediction. Point estimates are followed by 95\% bootstrap confidence intervals where shown.}}{8}{table.2}\protected@file@percent }
+\newlabel{tab:tcga_results}{{2}{8}{Held-out TCGA-THCA performance for lymph node metastasis prediction. Point estimates are followed by 95\% bootstrap confidence intervals where shown}{table.2}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Results}{8}{section.0.5}\protected@file@percent }
+\newlabel{sec:results}{{5}{8}{Results}{section.0.5}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Held-out WiDS ICU performance for hospital mortality prediction. Point estimates are followed by 95\% bootstrap confidence intervals where shown.}}{9}{table.3}\protected@file@percent }
+\newlabel{tab:wids_results}{{3}{9}{Held-out WiDS ICU performance for hospital mortality prediction. Point estimates are followed by 95\% bootstrap confidence intervals where shown}{table.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Held-out Brier scores with 95\% bootstrap confidence intervals. Lower values are better. The transformer variants are close, so small point-estimate differences should be interpreted as descriptive unless corroborated by additional comparisons.}}{9}{figure.2}\protected@file@percent }
+\newlabel{fig:performance_ci}{{2}{9}{Held-out Brier scores with 95\% bootstrap confidence intervals. Lower values are better. The transformer variants are close, so small point-estimate differences should be interpreted as descriptive unless corroborated by additional comparisons}{figure.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Case-Level Rule Trace}{9}{subsection.0.5.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Operational auditability on held-out cases. Completeness and residuals test whether traces faithfully expose the implemented arithmetic; they do not measure clinician usability or rule validity.}}{10}{table.4}\protected@file@percent }
+\newlabel{tab:auditability}{{4}{10}{Operational auditability on held-out cases. Completeness and residuals test whether traces faithfully expose the implemented arithmetic; they do not measure clinician usability or rule validity}{table.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Calibration Interpretation}{10}{subsection.0.5.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6}Discussion and Ablation}{10}{section.0.6}\protected@file@percent }
+\newlabel{sec:analysis}{{6}{10}{Discussion and Ablation}{section.0.6}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Reported ablations. Top: NARS-gated Brier change relative to the ungated transformer across $\gamma $ (negative is lower). Bottom: held-out decision curves over informative threshold ranges. These descriptive curves do not establish clinical utility.}}{11}{figure.3}\protected@file@percent }
+\newlabel{fig:ablation}{{3}{11}{Reported ablations. Top: NARS-gated Brier change relative to the ungated transformer across $\gamma $ (negative is lower). Bottom: held-out decision curves over informative threshold ranges. These descriptive curves do not establish clinical utility}{figure.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Failure Modes}{11}{subsection.0.6.1}\protected@file@percent }
+\citation{fda2026}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}What Would Count as Stronger Evidence?}{12}{subsection.0.6.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}Clinical Audit Scenario}{12}{subsection.0.6.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.4}Deployment Boundary}{12}{subsection.0.6.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7}Limitations}{12}{section.0.7}\protected@file@percent }
+\newlabel{sec:limitations}{{7}{12}{Limitations}{section.0.7}{}}
+\bibdata{references}
+\bibcite{abusalih2023}{{1}{2023}{{Abu-Salih et~al.}}{{}}}
+\bibcite{azizi2021}{{2}{2021}{{Azizi et~al.}}{{}}}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Conclusion}{13}{section.0.8}\protected@file@percent }
+\newlabel{sec:conclusion}{{8}{13}{Conclusion}{section.0.8}{}}
+\bibcite{bhuyan2024}{{3}{2024}{{Bhuyan et~al.}}{{Bhuyan, Ramdane-Cherif, Tomar, and Singh}}}
+\bibcite{blundell2015}{{4}{2015}{{Blundell et~al.}}{{}}}
+\bibcite{chudasama2025}{{5}{2025}{{Chudasama et~al.}}{{}}}
+\bibcite{colelough2025}{{6}{2025}{{Colelough and Regli}}{{}}}
+\bibcite{dai2025}{{7}{2025}{{Dai et~al.}}{{}}}
+\bibcite{garcez2020}{{8}{2020}{{d'Avila Garcez et~al.}}{{}}}
+\bibcite{marra2021}{{9}{2019}{{d'Avila Garcez et~al.}}{{d'Avila Garcez, Gori, Lamb, Serafini, Spranger, and Tran}}}
+\bibcite{gal2016}{{10}{2016}{{Gal and Ghahramani}}{{}}}
+\bibcite{ghassemi2021}{{11}{2020}{{Ghassemi et~al.}}{{Ghassemi, Naumann, Schulam, Beam, Chen, and Ranganath}}}
+\bibcite{goncalves2022}{{12}{2022}{{Goncalves et~al.}}{{}}}
+\bibcite{hilario2013}{{13}{2013}{{Hilario}}{{}}}
+\bibcite{jiang2024}{{14}{2024}{{Jiang et~al.}}{{}}}
+\bibcite{lakshminarayanan2017}{{15}{2017}{{Lakshminarayanan et~al.}}{{}}}
+\bibcite{li2019}{{16}{2019{a}}{{Li et~al.}}{{}}}
+\bibcite{ma2019}{{17}{2019{b}}{{Li et~al.}}{{Li, Wang, Wang, Yuan, Peng, and Mei}}}
+\bibcite{abad2025}{{18}{2025}{{L{\'o}pez et~al.}}{{L{\'o}pez, Elsharief, Jorf, Darwish, Ma, and Shamout}}}
+\bibcite{nawaz2025}{{19}{2025}{{Nawaz et~al.}}{{Nawaz, ur~Rahaman, and Saeed}}}
+\bibcite{ovadia2019}{{20}{2019}{{Ovadia et~al.}}{{}}}
+\bibcite{rajabi2022}{{21}{2022}{{Rajabi and Kafaie}}{{}}}
+\bibcite{rasmy2021}{{22}{2021}{{Rasmy et~al.}}{{}}}
+\bibcite{fda2026}{{23}{2026}{{U.S. Food and Drug Administration}}{{}}}
+\bibcite{wang1995}{{24}{1995}{{Wang}}{{}}}
+\bibcite{wang2006}{{25}{2006}{{Wang}}{{}}}
+\bibcite{wang2024draft}{{26}{2024}{{Wang}}{{}}}
+\bibcite{wang2013}{{27}{2013}{{Wang and Awan}}{{}}}
+\bibcite{wang2022}{{28}{2022}{{Wang}}{{}}}
+\bibcite{wu2023}{{29}{2023}{{Wu et~al.}}{{}}}
+\newlabel{jmlrend}{{8}{15}{end of Dynamic Evidential Routing}{section*.7}{}}
+\gdef \@abspage@last{15}
