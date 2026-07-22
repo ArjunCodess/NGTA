@@ -22,11 +22,12 @@ from sklearn.metrics import accuracy_score, brier_score_loss, roc_auc_score, roc
 from torch import nn
 
 from .attention_hook import apply_confidence_gate, revise_attention_truths
+from .auditability import compute_operational_audit
 from .data_loader import DEFAULT_ID_COLUMN, DEFAULT_TARGET_COLUMN, load_data_bundle
 from .knowledge_base import SYMBOLIC_RULES, build_symbolic_truth_matrices
 from .nars_interface import neural_to_nars
 from .neural_encoder import TabularTransformerClassifier
-from .wids_knowledge_base import WIDS_SYMBOLIC_RULES, build_wids_symbolic_truth_matrices
+from .wids_knowledge_base import WIDS_RULE_DEFINITIONS, build_wids_symbolic_truth_matrices
 from .wids_loader import WIDS_ID_COLUMN, WIDS_TARGET_COLUMN, load_wids_data_bundle
 
 GAMMA_ABLATION_VALUES = (0.25, 0.5, 1.0, 2.0, 4.0)
@@ -50,7 +51,7 @@ DATASET_METADATA: dict[str, dict[str, Any]] = {
         "id_column": WIDS_ID_COLUMN,
         "target_column": WIDS_TARGET_COLUMN,
         "loader": load_wids_data_bundle,
-        "symbolic_rules": WIDS_SYMBOLIC_RULES,
+        "symbolic_rules": WIDS_RULE_DEFINITIONS,
         "symbolic_builder": "wids",
         "batch_size": 512,
         "source_description": "WiDS ICU CSV file.",
@@ -374,6 +375,15 @@ def _bootstrap_metric_intervals(
             else "The 95% bootstrap AUC confidence intervals do not overlap, so the observed difference is likely real on this test split."
         )
         _add_delta_intervals(comparisons, "flat_confidence", "nars_gated")
+    if "mc_confidence_only" in intervals and "nars_gated" in intervals:
+        overlap = _interval_overlap(intervals["mc_confidence_only"], intervals["nars_gated"])
+        comparisons["mc_confidence_only_vs_nars_gated_ci_overlap"] = overlap
+        comparisons["mc_confidence_only_vs_nars_gated_interpretation"] = (
+            "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain."
+            if overlap
+            else "The 95% bootstrap AUC confidence intervals do not overlap, so the observed difference is likely real on this test split."
+        )
+        _add_delta_intervals(comparisons, "mc_confidence_only", "nars_gated")
     if "random_forest" in intervals and "nars_gated" in intervals:
         overlap = _interval_overlap(intervals["random_forest"], intervals["nars_gated"])
         comparisons["random_forest_vs_nars_gated_ci_overlap"] = overlap
@@ -689,6 +699,8 @@ def _build_trace_frame(
     revised_feature_confidence: np.ndarray,
     gated_attention: np.ndarray,
     token_score_mean: np.ndarray,
+    flat_probabilities: np.ndarray,
+    mc_probabilities: np.ndarray,
     gated_probabilities: np.ndarray,
     symbolic_rule_counts: np.ndarray,
     symbolic_any_rule_triggered: np.ndarray,
@@ -703,6 +715,9 @@ def _build_trace_frame(
             "baseline_variance": probabilities_var,
             "neural_frequency": neural_frequency,
             "neural_confidence": neural_confidence,
+            "flat_confidence_probability": flat_probabilities,
+            "mc_confidence_only_probability": mc_probabilities,
+            "nars_gated_probability": gated_probabilities,
             "gated_probability": gated_probabilities,
             "symbolic_rule_count": symbolic_rule_counts,
             "symbolic_any_rule_triggered": symbolic_any_rule_triggered.astype(int),
@@ -835,6 +850,7 @@ def _json_feature_trace(
     attention_mean: np.ndarray,
     gated_attention: np.ndarray,
     symbolic_trigger_mask: np.ndarray,
+    rule_definitions: dict[str, dict[str, Any]],
 ) -> str:
     triggered_indices = np.flatnonzero(symbolic_trigger_mask[patient_index])
     if triggered_indices.size == 0:
@@ -842,9 +858,20 @@ def _json_feature_trace(
         triggered_indices = np.argsort(changed)[-3:][::-1]
     records = []
     for feature_index in triggered_indices[:6]:
+        feature_name = feature_names[int(feature_index)]
+        matching_rules = [
+            (rule_id, definition)
+            for rule_id, definition in rule_definitions.items()
+            if feature_name == str(definition.get("source_column", ""))
+            or feature_name.startswith(f"{definition.get('source_column', '')}_")
+        ]
+        rule_id, rule_definition = matching_rules[0] if len(matching_rules) == 1 else (None, {})
         records.append(
             {
-                "feature": feature_names[int(feature_index)],
+                "feature": feature_name,
+                "rule_id": rule_id,
+                "rule_condition": rule_definition.get("condition"),
+                "rule_description": rule_definition.get("description"),
                 "neural_f": float(neural_frequency[patient_index, feature_index]),
                 "neural_c": float(neural_confidence[patient_index, feature_index]),
                 "symbolic_f": float(symbolic_frequency[patient_index, feature_index]),
@@ -871,6 +898,7 @@ def _build_case_trace_frame(
     attention_mean: np.ndarray,
     gated_attention: np.ndarray,
     id_column: str,
+    rule_definitions: dict[str, dict[str, Any]],
 ) -> pd.DataFrame:
     predictions = (gated_probabilities >= 0.5).astype(int)
     missingness = _missingness_fraction(bundle.test_frame)
@@ -932,6 +960,7 @@ def _build_case_trace_frame(
                 attention_mean=attention_mean,
                 gated_attention=gated_attention,
                 symbolic_trigger_mask=symbolic_knowledge.symbolic_trigger_mask,
+                rule_definitions=rule_definitions,
             ),
         }
         rows.append(row)
@@ -1057,6 +1086,33 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
     metrics_frame.to_csv(output_dirs["metrics"] / "metrics.csv", index=False)
     reliability_frame.to_csv(output_dirs["metrics"] / "calibration_reliability.csv", index=False)
 
+    auditability_metrics = compute_operational_audit(
+        dataset=effective_config.dataset,
+        patient_any_rule_triggered=symbolic_knowledge.patient_any_rule_triggered,
+        total_rule_trigger_count=symbolic_knowledge.total_trigger_count,
+        mapped_feature_trigger_count=symbolic_knowledge.mapped_feature_trigger_count,
+        symbolic_trigger_mask=symbolic_knowledge.symbolic_trigger_mask,
+        neural_frequency=attention_truths.neural_frequency,
+        neural_confidence=attention_truths.neural_confidence,
+        symbolic_frequency=symbolic_knowledge.symbolic_frequency,
+        symbolic_confidence=symbolic_knowledge.symbolic_confidence,
+        revised_frequency=attention_truths.revised_frequency,
+        revised_confidence=attention_truths.revised_confidence,
+        attention_before=summary.attention_mean,
+        attention_after=gated_attention,
+        baseline_probabilities=summary.probabilities_mean,
+        gated_probabilities=gated_probabilities,
+        gamma=effective_config.gamma,
+    )
+    pd.DataFrame([auditability_metrics]).to_csv(
+        output_dirs["metrics"] / "auditability_metrics.csv",
+        index=False,
+    )
+    (output_dirs["metrics"] / "auditability_metrics.json").write_text(
+        json.dumps(auditability_metrics, indent=2, default=_json_default),
+        encoding="utf-8",
+    )
+
     trace_frame = _build_trace_frame(
         bundle=bundle,
         probabilities_mean=summary.probabilities_mean,
@@ -1069,6 +1125,8 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         revised_feature_confidence=attention_truths.revised_confidence,
         gated_attention=gated_attention,
         token_score_mean=summary.token_score_mean,
+        flat_probabilities=flat_probabilities,
+        mc_probabilities=mc_probabilities,
         gated_probabilities=gated_probabilities,
         symbolic_rule_counts=symbolic_knowledge.patient_rule_counts,
         symbolic_any_rule_triggered=symbolic_knowledge.patient_any_rule_triggered,
@@ -1090,6 +1148,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
             attention_mean=summary.attention_mean,
             gated_attention=gated_attention,
             id_column=dataset_metadata["id_column"],
+            rule_definitions=dataset_metadata["symbolic_rules"],
         )
         case_trace_frame.to_csv(output_dirs["traces"] / "case_traces.csv", index=False)
 
@@ -1166,6 +1225,9 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
                 "neural_truth_mapping": "variance-derived heuristic initializer for NARS-style confidence",
                 "symbolic_rule_grounding": "explicit NAL deduction from direct observation before revision",
                 "revision_assumption": "neural and symbolic truths are treated as distinct evidential sources",
+                "rule_firing": "conditions are evaluated independently and any subset may fire",
+                "inference_pass": "revision and gated-logit recomputation occur once with no convergence loop",
+                "conflict_policy": "multiple rules targeting one logical feature are rejected pending explicit provenance-aware resolution",
             },
             "total_trigger_count": symbolic_knowledge.total_trigger_count,
             "mapped_feature_trigger_count": symbolic_knowledge.mapped_feature_trigger_count,
@@ -1192,6 +1254,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         },
         "auc_bootstrap": metric_bootstrap,
         "metric_bootstrap": metric_bootstrap,
+        "auditability": auditability_metrics,
         "gamma_ablation": gamma_ablation_frame.to_dict(orient="records"),
         "submission_ablation": submission_ablation_frame.to_dict(orient="records"),
         "case_traces": case_trace_frame.to_dict(orient="records"),
@@ -1205,6 +1268,8 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
             "submission_ablation_csv": str(output_dirs["metrics"] / "submission_ablation.csv") if effective_config.ablation_set == "submission" else None,
             "decision_curve_csv": str(output_dirs["metrics"] / "decision_curve.csv"),
             "calibration_reliability_csv": str(output_dirs["metrics"] / "calibration_reliability.csv"),
+            "auditability_metrics_csv": str(output_dirs["metrics"] / "auditability_metrics.csv"),
+            "auditability_metrics_json": str(output_dirs["metrics"] / "auditability_metrics.json"),
             "trace_csv": str(output_dirs["traces"] / "test_predictions.csv"),
             "case_traces_csv": str(output_dirs["traces"] / "case_traces.csv") if effective_config.export_case_traces else None,
             "roc_curve": str(output_dirs["charts"] / "roc_curve.png"),

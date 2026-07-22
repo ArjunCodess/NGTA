@@ -168,6 +168,8 @@ def _write_submission_outputs(summaries: list[dict[str, Any]], output_dir: str |
     baseline_rows: list[dict[str, Any]] = []
     ablation_rows: list[dict[str, Any]] = []
     case_trace_rows: list[dict[str, Any]] = []
+    auditability_rows: list[dict[str, Any]] = []
+    paired_metric_rows: list[dict[str, Any]] = []
 
     for summary in summaries:
         dataset = summary["task"]["dataset_key"]
@@ -181,6 +183,36 @@ def _write_submission_outputs(summaries: list[dict[str, Any]], output_dir: str |
             ablation_rows.append({"dataset": dataset, "seed": seed, **ablation})
         for case_trace in summary.get("case_traces", []):
             case_trace_rows.append({"dataset": dataset, "seed": seed, **case_trace})
+        if summary.get("auditability"):
+            auditability_rows.append({"dataset": dataset, "seed": seed, **summary["auditability"]})
+        comparisons = summary.get("metric_bootstrap", {}).get("comparison", {})
+        for left_variant in ("baseline", "flat_confidence", "mc_confidence_only"):
+            comparison = f"{left_variant}_vs_nars_gated"
+            paired_metric_rows.append(
+                {
+                    "dataset": dataset,
+                    "seed": seed,
+                    "comparison": comparison,
+                    "brier_delta_left_minus_right": comparisons.get(
+                        f"{comparison}_brier_delta_left_minus_right"
+                    ),
+                    "brier_delta_ci_95_lower": comparisons.get(
+                        f"{comparison}_brier_delta_ci_95_lower"
+                    ),
+                    "brier_delta_ci_95_upper": comparisons.get(
+                        f"{comparison}_brier_delta_ci_95_upper"
+                    ),
+                    "ece_delta_left_minus_right": comparisons.get(
+                        f"{comparison}_ece_delta_left_minus_right"
+                    ),
+                    "ece_delta_ci_95_lower": comparisons.get(
+                        f"{comparison}_ece_delta_ci_95_lower"
+                    ),
+                    "ece_delta_ci_95_upper": comparisons.get(
+                        f"{comparison}_ece_delta_ci_95_upper"
+                    ),
+                }
+            )
 
     metrics_frame = pd.DataFrame(metric_rows)
     if not metrics_frame.empty:
@@ -207,6 +239,8 @@ def _write_submission_outputs(summaries: list[dict[str, Any]], output_dir: str |
     pd.DataFrame(baseline_rows).to_csv(submission_dir / "baseline_comparison.csv", index=False)
     pd.DataFrame(ablation_rows).to_csv(submission_dir / "ablation_summary.csv", index=False)
     pd.DataFrame(case_trace_rows).to_csv(submission_dir / "case_traces.csv", index=False)
+    pd.DataFrame(auditability_rows).to_csv(submission_dir / "auditability_metrics.csv", index=False)
+    pd.DataFrame(paired_metric_rows).to_csv(submission_dir / "paired_metric_deltas.csv", index=False)
 
     if write_paper_tables:
         (submission_dir / "paper_tables.tex").write_text(_metrics_to_latex(aggregate), encoding="utf-8")
