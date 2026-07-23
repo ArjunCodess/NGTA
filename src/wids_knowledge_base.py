@@ -4,21 +4,51 @@ from typing import Sequence
 
 import numpy as np
 
-from .knowledge_base import SymbolicKnowledgeResult
+from .knowledge_base import SymbolicKnowledgeResult, validate_unique_rule_targets
 from .nars_interface import deduce_truth_values
 
+WIDS_RULE_DEFINITIONS: dict[str, dict[str, object]] = {
+    "rule_lactate": {
+        "condition": "maximum day-1 lactate >= 4.0 mmol/L",
+        "description": "Elevated lactate supplies prototype evidence of metabolic stress.",
+        "clinical_interpretation": "The rule increases support for the lactate feature without diagnosing shock or determining mortality.",
+        "source_column": "d1_lactate_max",
+        "truth_value": {"frequency": 0.85, "confidence": 0.80},
+    },
+    "rule_hypotension": {
+        "condition": "minimum day-1 systolic blood pressure <= 90 mmHg",
+        "description": "Low systolic blood pressure supplies prototype evidence of hemodynamic instability.",
+        "clinical_interpretation": "The rule increases support for the blood-pressure feature; it is not a stand-alone mortality decision.",
+        "source_column": "d1_sysbp_min",
+        "truth_value": {"frequency": 0.75, "confidence": 0.70},
+    },
+    "rule_age": {
+        "condition": "age >= 75 years",
+        "description": "Age of at least 75 years supplies prototype demographic evidence.",
+        "clinical_interpretation": "The rule increases support for the age feature without treating age as sufficient for mortality.",
+        "source_column": "age",
+        "truth_value": {"frequency": 0.65, "confidence": 0.60},
+    },
+    "rule_creatinine": {
+        "condition": "maximum day-1 creatinine >= 2.0 mg/dL",
+        "description": "Elevated creatinine supplies prototype evidence of renal dysfunction.",
+        "clinical_interpretation": "The rule increases support for the creatinine feature without diagnosing kidney injury or determining mortality.",
+        "source_column": "d1_creatinine_max",
+        "truth_value": {"frequency": 0.70, "confidence": 0.65},
+    },
+}
+
 WIDS_SYMBOLIC_RULES: dict[str, tuple[float, float]] = {
-    "rule_lactate": (0.85, 0.80),
-    "rule_hypotension": (0.75, 0.70),
-    "rule_age": (0.65, 0.60),
-    "rule_creatinine": (0.70, 0.65),
+    rule_id: (
+        float(definition["truth_value"]["frequency"]),
+        float(definition["truth_value"]["confidence"]),
+    )
+    for rule_id, definition in WIDS_RULE_DEFINITIONS.items()
 }
 
 RULE_TO_FEATURE_NAME: dict[str, str] = {
-    "rule_lactate": "d1_lactate_max",
-    "rule_hypotension": "d1_sysbp_min",
-    "rule_age": "age",
-    "rule_creatinine": "d1_creatinine_max",
+    rule_id: str(definition["source_column"])
+    for rule_id, definition in WIDS_RULE_DEFINITIONS.items()
 }
 
 RULE_ORDER: tuple[str, ...] = tuple(WIDS_SYMBOLIC_RULES.keys())
@@ -52,6 +82,7 @@ def build_wids_symbolic_truth_matrices(
     feature_names: Sequence[str],
     rule_names: Sequence[str] | None = None,
 ) -> SymbolicKnowledgeResult:
+    validate_unique_rule_targets(RULE_TO_FEATURE_NAME)
     trigger_array = np.asarray(rule_triggers, dtype=bool)
     active_rule_names = tuple(rule_names or RULE_ORDER)
     feature_name_list = list(feature_names)

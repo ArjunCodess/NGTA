@@ -12,30 +12,48 @@ EMPIRICAL_OBSERVATION_CONFIDENCE = 0.95
 
 SYMBOLIC_RULES: dict[str, dict[str, Any]] = {
     "braf_mutation": {
-        "description": "BRAF mutation strongly predicts lymph node metastasis.",
+        "condition": "BRAF mutation indicator = 1",
+        "description": "A recorded BRAF mutation supplies prototype evidence toward lymph node metastasis.",
+        "clinical_interpretation": "The rule increases support for the BRAF feature when the mutation is recorded; it is not a validated risk probability.",
         "source_column": "genomic_mutation__BRAF",
+        "target_key": "genomic_mutation__BRAF",
         "target_mode": "direct",
         "truth_value": {"frequency": 0.85, "confidence": 0.75},
     },
     "age_ge_55_years": {
-        "description": "Age at diagnosis >= 55 years increases metastasis risk.",
+        "condition": "age at diagnosis >= 55 years",
+        "description": "Age at diagnosis of at least 55 years supplies prototype demographic evidence.",
+        "clinical_interpretation": "The rule raises evidential support for the age feature without asserting that age alone determines metastasis.",
         "source_column": "diagnoses.age_at_diagnosis",
+        "target_key": "diagnoses.age_at_diagnosis",
         "target_mode": "direct",
         "truth_value": {"frequency": 0.70, "confidence": 0.60},
     },
     "pathologic_t_t3_t4": {
-        "description": "Pathologic T3/T4 disease strongly predicts nodal spread.",
+        "condition": "pathologic T category starts with T3 or T4",
+        "description": "A recorded pathologic T3/T4 category supplies prototype staging evidence.",
+        "clinical_interpretation": "The rule increases support for the observed staging feature; it does not establish nodal spread by itself.",
         "source_column": "diagnoses.ajcc_pathologic_t",
+        "target_key": "diagnoses.ajcc_pathologic_t",
         "target_mode": "categorical_active",
         "truth_value": {"frequency": 0.90, "confidence": 0.85},
     },
     "extrathyroid_extension_present": {
-        "description": "Any recorded extrathyroid extension increases metastasis risk.",
+        "condition": "extrathyroid extension is Minimal (T3), Moderate/Advanced (T4a), or Very Advanced (T4b)",
+        "description": "A recognized extrathyroid-extension category supplies prototype pathology evidence.",
+        "clinical_interpretation": "The rule raises support only for an explicitly recorded extension category; missing, placeholder, and unknown values do not fire.",
         "source_column": "pathology_details.extrathyroid_extension",
+        "target_key": "pathology_details.extrathyroid_extension",
         "target_mode": "categorical_active",
         "truth_value": {"frequency": 0.85, "confidence": 0.80},
     },
 }
+
+EXTRATHYROID_EXTENSION_VALUES: tuple[str, ...] = (
+    "Minimal (T3)",
+    "Moderate/Advanced (T4a)",
+    "Very Advanced (T4b)",
+)
 
 
 @dataclass
@@ -64,9 +82,35 @@ def _assign_truth_value(
     frequency_value: float,
     confidence_value: float,
 ) -> None:
+    if trigger_mask[patient_index, feature_index]:
+        raise ValueError(
+            "Multiple symbolic rules targeted the same feature for one case; "
+            "explicit provenance-aware conflict resolution is required."
+        )
     frequency[patient_index, feature_index] = frequency_value
     confidence[patient_index, feature_index] = confidence_value
     trigger_mask[patient_index, feature_index] = True
+
+
+def validate_unique_rule_targets(rule_targets: dict[str, str]) -> None:
+    """Reject order-dependent rule bases that target the same logical feature."""
+    target_to_rules: dict[str, list[str]] = {}
+    for rule_id, target_key in rule_targets.items():
+        target_to_rules.setdefault(target_key, []).append(rule_id)
+    collisions = {
+        target_key: rule_ids
+        for target_key, rule_ids in target_to_rules.items()
+        if len(rule_ids) > 1
+    }
+    if collisions:
+        details = "; ".join(
+            f"{target_key}: {', '.join(rule_ids)}"
+            for target_key, rule_ids in sorted(collisions.items())
+        )
+        raise ValueError(
+            "Multiple symbolic rules target the same logical feature. "
+            f"Resolve conflicts explicitly before inference ({details})."
+        )
 
 
 def _deduced_ground_truth(rule_truth_value: dict[str, float]) -> tuple[float, float]:
@@ -97,6 +141,9 @@ def build_symbolic_truth_matrices(
     case_frame: pd.DataFrame,
     feature_names: Sequence[str],
 ) -> SymbolicKnowledgeResult:
+    validate_unique_rule_targets(
+        {rule_id: str(rule["target_key"]) for rule_id, rule in SYMBOLIC_RULES.items()}
+    )
     feature_name_list = list(feature_names)
     feature_index = {name: index for index, name in enumerate(feature_name_list)}
     n_cases = int(len(case_frame))
@@ -192,7 +239,7 @@ def build_symbolic_truth_matrices(
 
         elif rule_id == "extrathyroid_extension_present":
             extension_series = case_frame[source_column]
-            triggered_patients = extension_series.notna().to_numpy(dtype=bool)
+            triggered_patients = extension_series.isin(EXTRATHYROID_EXTENSION_VALUES).to_numpy(dtype=bool)
             for patient_index, extension_value in enumerate(extension_series):
                 if pd.isna(extension_value):
                     continue

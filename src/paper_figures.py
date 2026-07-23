@@ -5,6 +5,10 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import pandas as pd
+from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
+
+from .knowledge_base import SYMBOLIC_RULES
+from .wids_knowledge_base import WIDS_RULE_DEFINITIONS
 
 
 COLORS = {
@@ -39,17 +43,6 @@ RULE_LABELS = {
 }
 
 
-FEATURE_LABELS = {
-    "d1_sysbp_min": "Systolic BP min",
-    "d1_lactate_max": "Lactate max",
-    "d1_creatinine_max": "Creatinine max",
-    "age": "Age",
-}
-
-
-CLASSIFICATION_THRESHOLD = 0.5
-
-
 def _set_style() -> None:
     plt.rcParams.update(
         {
@@ -75,6 +68,73 @@ def _save(fig: plt.Figure, figures_dir: Path, name: str) -> None:
     plt.close(fig)
 
 
+def _pipeline_architecture(figures_dir: Path) -> None:
+    fig, ax = plt.subplots(figsize=(7.1, 2.8))
+    ax.set_xlim(0, 12)
+    ax.set_ylim(0, 4.4)
+    ax.axis("off")
+
+    stages = [
+        (0.15, "1  Input", "Sparse clinical\nrecord", "#DBEAFE", "#2563EB"),
+        (2.05, "2  Transformer", "Prediction $p$\nattention $\\alpha$\ntoken scores", "#EDE9FE", "#7C3AED"),
+        (3.95, "3  MC dropout", "$T$ stochastic passes\nvariance $\\sigma^2$", "#FEF3C7", "#D97706"),
+        (5.85, "4  NAL init", "Neural truth\n$(f,c)$", "#DCFCE7", "#16A34A"),
+        (7.75, "5  Rule revision", "Independent triggers\nrevised $(f',c')$", "#FCE7F3", "#DB2777"),
+        (9.65, "6  Gate + output", "$\\alpha'_i=\\frac{\\alpha_i(c'_i)^\\gamma}{\\sum_j\\alpha_j(c'_j)^\\gamma}$\nfinal $p^*$\nCSV/JSON trace", "#CFFAFE", "#0891B2"),
+    ]
+    for x, title, body, face, edge in stages:
+        width = 2.15 if x == 9.65 else 1.65
+        box = FancyBboxPatch(
+            (x, 1.35),
+            width,
+            2.2,
+            boxstyle="round,pad=0.08,rounding_size=0.12",
+            facecolor=face,
+            edgecolor=edge,
+            linewidth=1.4,
+        )
+        ax.add_patch(box)
+        ax.text(x + width / 2, 3.22, title, ha="center", va="center", weight="bold", color=edge, fontsize=9)
+        ax.text(x + width / 2, 2.35, body, ha="center", va="center", fontsize=8.2)
+
+    for left, right in zip(stages[:-1], stages[1:]):
+        left_width = 2.15 if left[0] == 9.65 else 1.65
+        ax.add_patch(
+            FancyArrowPatch(
+                (left[0] + left_width, 2.45),
+                (right[0], 2.45),
+                arrowstyle="-|>",
+                mutation_scale=11,
+                linewidth=1.2,
+                color="#475569",
+            )
+        )
+
+    rule_box = FancyBboxPatch(
+        (7.95, 0.15),
+        1.25,
+        0.65,
+        boxstyle="round,pad=0.05,rounding_size=0.08",
+        facecolor="#FFF1F2",
+        edgecolor="#E11D48",
+        linewidth=1.2,
+    )
+    ax.add_patch(rule_box)
+    ax.text(8.575, 0.48, "Rule base", ha="center", va="center", fontsize=8.5, weight="bold", color="#BE123C")
+    ax.add_patch(
+        FancyArrowPatch(
+            (8.575, 0.8),
+            (8.575, 1.35),
+            arrowstyle="-|>",
+            mutation_scale=10,
+            linewidth=1.1,
+            color="#E11D48",
+        )
+    )
+    ax.text(5.9, 0.46, "Single inference pass; no recurrent convergence loop", ha="center", va="center", fontsize=8.5, color="#334155")
+    _save(fig, figures_dir, "figure-1")
+
+
 def _dataset_result_dir(results_dir: Path, dataset: str, seeds: list[int] | None) -> Path:
     direct = results_dir / dataset
     if direct.exists():
@@ -90,16 +150,6 @@ def _dataset_result_dir(results_dir: Path, dataset: str, seeds: list[int] | None
     if nested_seeded_dirs:
         return nested_seeded_dirs[0]
     raise FileNotFoundError(f"Could not locate results for dataset '{dataset}' under {results_dir}.")
-
-
-def _case_traces_path(results_dir: Path, wids_dir: Path) -> Path:
-    direct = wids_dir / "traces" / "case_traces.csv"
-    if direct.exists():
-        return direct
-    submission = results_dir / "submission" / "case_traces.csv"
-    if submission.exists():
-        return submission
-    raise FileNotFoundError(f"Could not locate WiDS case traces under {results_dir}.")
 
 
 def _performance_ci(dataset_dirs: dict[str, Path], figures_dir: Path) -> None:
@@ -129,128 +179,101 @@ def _performance_ci(dataset_dirs: dict[str, Path], figures_dir: Path) -> None:
     _save(fig, figures_dir, "figure-2-performance-ci")
 
 
-def _rule_firing_counts(dataset_dirs: dict[str, Path], figures_dir: Path) -> None:
-    rows = []
-    for dataset, key in [("TCGA-THCA", "tcga"), ("WiDS ICU", "wids")]:
-        summary = json.loads((dataset_dirs[key] / "metrics" / "run_summary.json").read_text(encoding="utf-8"))
-        counts = summary["symbolic_rules"]["per_rule_trigger_counts"]
-        for rule, count in counts.items():
-            rows.append({"dataset": dataset, "rule": RULE_LABELS.get(rule, rule), "count": count})
+def _ablation_and_decision_curves(dataset_dirs: dict[str, Path], figures_dir: Path) -> None:
+    fig, axes = plt.subplots(2, 2, figsize=(7.1, 5.0))
+    for column, (dataset, key) in enumerate((("TCGA-THCA", "tcga"), ("WiDS ICU", "wids"))):
+        gamma = pd.read_csv(dataset_dirs[key] / "metrics" / "gamma_ablation.csv")
+        decision = pd.read_csv(dataset_dirs[key] / "metrics" / "decision_curve.csv")
 
-    df = pd.DataFrame(rows)
-    fig, axes = plt.subplots(1, 2, figsize=(7.1, 2.9), sharey=False)
-    for ax, dataset in zip(axes, ["TCGA-THCA", "WiDS ICU"]):
-        sub = df[df["dataset"] == dataset].sort_values("count", ascending=True)
-        ax.barh(sub["rule"], sub["count"], color="#4C78A8" if dataset == "TCGA-THCA" else "#54A24B")
-        ax.set_title(dataset)
-        ax.set_xlabel("Triggered rules on held-out cases")
-        ax.grid(axis="x", color="#E5E7EB", linewidth=0.7)
-        for i, value in enumerate(sub["count"]):
-            ax.text(value, i, f" {int(value):,}", va="center", fontsize=8)
-    _save(fig, figures_dir, "figure-3-rule-firing")
+        ax = axes[0, column]
+        ax.axhline(0.0, color="#6B7280", linewidth=0.8, linestyle="--")
+        ax.plot(
+            gamma["gamma"],
+            gamma["brier_delta_gated_minus_baseline"],
+            color=COLORS["nars_gated"],
+            marker="o",
+            linewidth=1.3,
+        )
+        ax.set_xscale("log", base=2)
+        ax.set_xticks(gamma["gamma"], [str(value) for value in gamma["gamma"]])
+        ax.set_title(f"{dataset}: gating sensitivity")
+        ax.set_xlabel("$\\gamma$")
+        ax.set_ylabel("Brier delta vs. baseline")
+        ax.grid(color="#E5E7EB", linewidth=0.7)
 
-
-def _select_case_trace(traces: pd.DataFrame) -> pd.Series:
-    if "dataset" in traces.columns:
-        traces = traces[traces["dataset"].astype(str).str.lower() == "wids"]
-    traces = traces.copy()
-    if traces.empty:
-        raise ValueError("No WiDS case traces are available for Figure 4.")
-
-    traces["probability_delta"] = (traces["nars_gated_probability"] - traces["baseline_probability"]).abs()
-    traces["distance_to_threshold"] = (traces["baseline_probability"] - CLASSIFICATION_THRESHOLD).abs()
-    traces["baseline_prediction"] = (traces["baseline_probability"] >= CLASSIFICATION_THRESHOLD).astype(int)
-    traces["gated_prediction"] = (traces["nars_gated_probability"] >= CLASSIFICATION_THRESHOLD).astype(int)
-    traces["prediction_changed"] = traces["baseline_prediction"] != traces["gated_prediction"]
-
-    if "case_category" in traces.columns:
-        near = traces[
-            traces["case_category"].astype(str).str.contains("near", case=False, na=False)
-            & (traces["symbolic_rule_count"] > 0)
-        ]
-        if not near.empty:
-            return near.sort_values(
-                ["prediction_changed", "symbolic_rule_count", "probability_delta", "distance_to_threshold"],
-                ascending=[False, False, False, True],
-            ).iloc[0]
-
-    symbolic = traces[traces["symbolic_rule_count"] > 0]
-    if not symbolic.empty:
-        return symbolic.sort_values(
-            ["prediction_changed", "symbolic_rule_count", "probability_delta", "distance_to_threshold"],
-            ascending=[False, False, False, True],
-        ).iloc[0]
-
-    return traces.sort_values(["probability_delta", "distance_to_threshold"], ascending=[False, True]).iloc[0]
+        ax = axes[1, column]
+        max_threshold = 0.8 if key == "tcga" else 0.5
+        decision = decision[decision["threshold"] <= max_threshold]
+        for variant, label in (
+            ("baseline_net_benefit", "Baseline"),
+            ("flat_confidence_net_benefit", "Flat confidence"),
+            ("nars_gated_net_benefit", "NARS-gated"),
+            ("treat_all_net_benefit", "Treat all"),
+        ):
+            style = "--" if variant == "treat_all_net_benefit" else "-"
+            color_key = variant.replace("_net_benefit", "")
+            ax.plot(
+                decision["threshold"],
+                decision[variant],
+                label=label,
+                color=COLORS.get(color_key, COLORS["gray"]),
+                linestyle=style,
+                linewidth=1.1,
+            )
+        ax.axhline(0.0, color="#111827", linewidth=0.7, linestyle=":")
+        ax.set_title(f"{dataset}: decision curve")
+        ax.set_xlabel("Decision threshold")
+        ax.set_ylabel("Net benefit")
+        ax.grid(color="#E5E7EB", linewidth=0.7)
+        if column == 1:
+            ax.legend(frameon=False, loc="best", ncol=2)
+    _save(fig, figures_dir, "figure-3-ablation")
 
 
 def _latex_escape(value: object) -> str:
-    return str(value).replace("\\", "\\textbackslash{}").replace("_", "\\_").replace("%", "\\%")
-
-
-def _write_metadata(figures_dir: Path, row: pd.Series) -> None:
-    case_id = row.get("case_id", row.get("encounter_id", "selected"))
-    baseline_probability = float(row["baseline_probability"])
-    nars_gated_probability = float(row["nars_gated_probability"])
-    symbolic_rule_count = int(row["symbolic_rule_count"])
-    baseline_prediction = int(baseline_probability >= CLASSIFICATION_THRESHOLD)
-    gated_prediction = int(nars_gated_probability >= CLASSIFICATION_THRESHOLD)
-    target = int(row["target"]) if "target" in row else -1
-    metadata = "\n".join(
-        [
-            "% Auto-generated by src.paper_figures.generate_paper_figures.",
-            f"\\newcommand{{\\GeneratedCaseTraceId}}{{{_latex_escape(case_id)}}}",
-            f"\\newcommand{{\\GeneratedCaseTraceBaselineProbability}}{{{baseline_probability:.4f}}}",
-            f"\\newcommand{{\\GeneratedCaseTraceNarsProbability}}{{{nars_gated_probability:.4f}}}",
-            f"\\newcommand{{\\GeneratedCaseTraceRuleCount}}{{{symbolic_rule_count}}}",
-            f"\\newcommand{{\\GeneratedCaseTraceBaselinePrediction}}{{{baseline_prediction}}}",
-            f"\\newcommand{{\\GeneratedCaseTraceNarsPrediction}}{{{gated_prediction}}}",
-            f"\\newcommand{{\\GeneratedCaseTraceTarget}}{{{target}}}",
-            "",
-        ]
+    return (
+        str(value)
+        .replace("\\", "\\textbackslash{}")
+        .replace("&", "\\&")
+        .replace("_", "\\_")
+        .replace("%", "\\%")
+        .replace("#", "\\#")
     )
-    figures_dir.mkdir(parents=True, exist_ok=True)
-    (figures_dir / "generated_figure_metadata.tex").write_text(metadata, encoding="utf-8")
 
 
-def _format_truth(frequency: float, confidence: float) -> str:
-    return f"$({frequency:.4f},{confidence:.4f})$"
-
-
-def _write_case_trace_table(figures_dir: Path, row: pd.Series, trace_frame: pd.DataFrame) -> None:
-    case_id = row.get("case_id", row.get("encounter_id", "selected"))
-    table_rows = []
-    for item in trace_frame.sort_values("feature_label").to_dict(orient="records"):
-        feature = _latex_escape(item["feature_label"])
-        neural = _format_truth(float(item["neural_f"]), float(item["neural_c"]))
-        symbolic = _format_truth(float(item["symbolic_f"]), float(item["symbolic_c"]))
-        revised = _format_truth(float(item["revised_f"]), float(item["revised_c"]))
-        attention = f"${float(item['attention_before']):.4f} \\rightarrow {float(item['attention_after']):.4f}$"
-        table_rows.append(f"{feature} & {neural} & {symbolic} & {revised} & {attention} \\\\")
-
+def _write_rule_table(figures_dir: Path) -> None:
+    rows: list[str] = []
+    for dataset, definitions in (("TCGA", SYMBOLIC_RULES), ("WiDS", WIDS_RULE_DEFINITIONS)):
+        for rule_id, definition in definitions.items():
+            truth = definition["truth_value"]
+            frequency = float(truth["frequency"])
+            confidence = float(truth["confidence"])
+            rows.append(
+                " & ".join(
+                    [
+                        dataset,
+                        _latex_escape(RULE_LABELS.get(rule_id, rule_id)),
+                        _latex_escape(definition["condition"]),
+                        f"$({frequency:.2f},{confidence:.2f})$",
+                        _latex_escape(definition["clinical_interpretation"]),
+                    ]
+                )
+                + " \\\\"
+            )
     content = "\n".join(
         [
             "% Auto-generated by src.paper_figures.generate_paper_figures.",
             "\\begin{table}[t]",
-            (
-                "\\caption{Concrete WiDS rule trace for held-out encounter "
-                f"{_latex_escape(case_id)}. Probability changed from "
-                "\\GeneratedCaseTraceBaselineProbability{} before routing to "
-                "\\GeneratedCaseTraceNarsProbability{} after NARS-gated routing; "
-                "the thresholded prediction changed from "
-                "\\GeneratedCaseTraceBaselinePrediction{} to "
-                "\\GeneratedCaseTraceNarsPrediction{}, while the target was "
-                "\\GeneratedCaseTraceTarget.}"
-            ),
-            "\\label{tab:case_trace}",
+            "\\caption{Prototype symbolic rules. Conditions are evaluated independently; any subset may fire. Truth values are evidential weights for the interface, not validated clinical probabilities.}",
+            "\\label{tab:rule_inventory}",
             "\\centering",
-            "\\scriptsize",
-            "\\setlength{\\tabcolsep}{3pt}",
-            "\\begin{tabular}{@{}lcccc@{}}",
+            "\\tiny",
+            "\\setlength{\\tabcolsep}{2pt}",
+            "\\begin{tabular}{@{}llp{0.22\\linewidth}cp{0.42\\linewidth}@{}}",
             "\\toprule",
-            "Feature & Neural $(f,c)$ & Rule $(f,c)$ & Revised $(f,c)$ & Attention before $\\rightarrow$ after \\\\",
+            "Data & Rule & Trigger condition & $(f,c)$ & Clinical reading \\\\ ",
             "\\midrule",
-            *table_rows,
+            *rows,
             "\\bottomrule",
             "\\end{tabular}",
             "\\end{table}",
@@ -258,65 +281,49 @@ def _write_case_trace_table(figures_dir: Path, row: pd.Series, trace_frame: pd.D
         ]
     )
     figures_dir.mkdir(parents=True, exist_ok=True)
-    (figures_dir / "generated_case_trace_table.tex").write_text(content, encoding="utf-8")
+    (figures_dir / "generated_rule_table.tex").write_text(content, encoding="utf-8")
 
 
-def _case_trace(results_dir: Path, wids_dir: Path, figures_dir: Path) -> None:
-    traces = pd.read_csv(_case_traces_path(results_dir, wids_dir))
-    row = _select_case_trace(traces)
-    feature_trace = json.loads(row["feature_trace_json"])
-    df = pd.DataFrame(feature_trace)
-    df["feature_label"] = df["feature"].map(FEATURE_LABELS).fillna(df["feature"])
-    df = df.sort_values("attention_delta")
-
-    case_id = row.get("case_id", row.get("encounter_id", "selected"))
-    fig, axes = plt.subplots(1, 2, figsize=(7.1, 2.85), gridspec_kw={"width_ratios": [1.0, 1.45]})
-
-    ax = axes[0]
-    probs = [row["baseline_probability"], row["nars_gated_probability"]]
-    labels = ["Before routing", "After routing"]
-    ax.plot([0, 1], probs, color=COLORS["gray"], linewidth=1.2)
-    ax.scatter([0, 1], probs, color=[COLORS["baseline"], COLORS["nars_gated"]], s=40, zorder=3)
-    ax.axhline(
-        CLASSIFICATION_THRESHOLD,
-        color=COLORS["accent"],
-        linestyle="--",
-        linewidth=1,
-        label=f"{CLASSIFICATION_THRESHOLD:.1f} threshold",
+def _write_auditability_table(dataset_dirs: dict[str, Path], figures_dir: Path) -> None:
+    audit_paths = {
+        key: dataset_dirs[key] / "metrics" / "auditability_metrics.json"
+        for key in ("tcga", "wids")
+    }
+    if not all(path.exists() for path in audit_paths.values()):
+        return
+    rows: list[str] = []
+    for dataset, key in (("TCGA-THCA", "tcga"), ("WiDS ICU", "wids")):
+        audit = json.loads(audit_paths[key].read_text(encoding="utf-8"))
+        rows.append(
+            f"{dataset} & {audit['cases_with_any_trigger']:,}/{audit['held_out_cases']:,} "
+            f"({100 * audit['case_coverage']:.1f}\\%) & {audit['mapped_feature_trigger_count']:,} & "
+            f"{100 * audit['finite_trace_rate']:.1f}\\% & "
+            f"{100 * audit['confidence_changed_event_rate']:.1f}\\% & "
+            f"{audit['threshold_flip_count_triggered']:,} & "
+            f"{max(audit['max_revision_residual'], audit['max_gate_residual']):.1e} \\\\"
+        )
+    content = "\n".join(
+        [
+            "% Auto-generated by src.paper_figures.generate_paper_figures.",
+            "\\begin{table}[t]",
+            "\\caption{Operational auditability on held-out cases. Completeness and residuals test whether traces faithfully expose the implemented arithmetic; they do not measure clinician usability or rule validity.}",
+            "\\label{tab:auditability}",
+            "\\centering",
+            "\\scriptsize",
+            "\\setlength{\\tabcolsep}{3pt}",
+            "\\begin{tabular}{@{}lrrrrrr@{}}",
+            "\\toprule",
+            "Data & Cases covered & Events & Complete & $c$ changed & Flips & Max residual \\\\ ",
+            "\\midrule",
+            *rows,
+            "\\bottomrule",
+            "\\end{tabular}",
+            "\\end{table}",
+            "",
+        ]
     )
-    ax.set_xticks([0, 1])
-    ax.set_xticklabels(labels, rotation=0)
-    ax.set_ylabel("Predicted probability")
-    ymin = min(0.49, min(probs) - 0.01)
-    ymax = max(0.515, max(probs) + 0.01)
-    ax.set_ylim(ymin, ymax)
-    ax.set_xlim(-0.08, 1.08)
-    ax.set_title(f"Encounter {case_id}")
-    for x, y in zip([0, 1], probs):
-        dy = -0.0018 if x == 0 else 0.0012
-        ax.text(x, y + dy, f"{y:.4f}", ha="center", fontsize=8)
-    ax.legend(frameon=False, loc="lower left")
-
-    ax = axes[1]
-    y = list(range(len(df)))
-    ax.barh(y, df["attention_delta"], color=[COLORS["accent"] if v < 0 else COLORS["nars_gated"] for v in df["attention_delta"]])
-    ax.axvline(0, color="#111827", linewidth=0.8)
-    ax.set_yticks(y)
-    ax.set_yticklabels(df["feature_label"])
-    ax.set_xlabel("Attention change after rule revision")
-    ax.set_title("Fired-rule attention deltas")
-    ax.grid(axis="x", color="#E5E7EB", linewidth=0.7)
-    xmin = min(df["attention_delta"].min() * 1.18, -0.00025)
-    xmax = max(df["attention_delta"].max() * 1.45, 0.00025)
-    ax.set_xlim(xmin, xmax)
-    for i, value in enumerate(df["attention_delta"]):
-        if value < 0:
-            ax.text(value / 2, i, f"{value:+.4f}", va="center", ha="center", fontsize=8, color="white")
-        else:
-            ax.text(value + 0.00008, i, f"{value:+.4f}", va="center", ha="left", fontsize=8)
-    _save(fig, figures_dir, "figure-4-case-trace")
-    _write_metadata(figures_dir, row)
-    _write_case_trace_table(figures_dir, row, df)
+    figures_dir.mkdir(parents=True, exist_ok=True)
+    (figures_dir / "generated_auditability_table.tex").write_text(content, encoding="utf-8")
 
 
 def generate_paper_figures(
@@ -332,14 +339,17 @@ def generate_paper_figures(
     }
 
     _set_style()
+    _pipeline_architecture(figures_path)
     _performance_ci(dataset_dirs, figures_path)
-    _rule_firing_counts(dataset_dirs, figures_path)
-    _case_trace(results_path, dataset_dirs["wids"], figures_path)
+    _ablation_and_decision_curves(dataset_dirs, figures_path)
+    _write_rule_table(figures_path)
+    _write_auditability_table(dataset_dirs, figures_path)
 
-    return [
+    generated = [
+        figures_path / "figure-1.png",
         figures_path / "figure-2-performance-ci.png",
-        figures_path / "figure-3-rule-firing.png",
-        figures_path / "figure-4-case-trace.png",
-        figures_path / "generated_figure_metadata.tex",
-        figures_path / "generated_case_trace_table.tex",
+        figures_path / "figure-3-ablation.png",
+        figures_path / "generated_rule_table.tex",
+        figures_path / "generated_auditability_table.tex",
     ]
+    return [path for path in generated if path.exists()]
