@@ -1,19 +1,21 @@
-\documentclass[final]{nesy2026}
+\documentclass{article}
 
- % The following packages will be automatically loaded:
- % amsmath, amssymb, natbib, graphicx, url, algorithm2e
+% Anonymous double-blind workshop submission using the supplied NeurIPS 2026 style.
+\makeatletter
+\def\input@path{{../Formatting_Instructions_For_NeurIPS_2026/}}
+\makeatother
+\usepackage[dblblindworkshop]{neurips_2026}
+\workshoptitle{The Third Workshop on GenAI for Health: Agentic Systems, Clinical Trust, and Future Potential}
 
- %\usepackage{rotating}% for sideways figures and tables
-\usepackage{longtable}% for long tables
-
- % The booktabs package is used by this sample document
- % (it provides \toprule, \midrule and \bottomrule).
- % Remove the next line if you don't require it.
-\usepackage{booktabs}
-
-\usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
 \usepackage{array}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{url}
 
  % Use \Name{Author Name} to specify the name.
 
@@ -28,11 +30,10 @@
 
  % *** Make sure there's no spurious space before \nametag ***
 
-\title[Dynamic Evidential Routing]{Dynamic Evidential Routing: A Neurosymbolic Transformer Interface for Auditable Clinical Prediction Under Extreme Missingness}
+\title{Dynamic Evidential Routing: An Auditable Neurosymbolic Interface for Clinical Transformers Under Extreme Missingness}
 
  % Two authors with the same address
-\clearauthor{\Name{Arjun Vijay Prakash} \Email{arjunv.prakash12345@gmail.com}\\
-\addr City Montessori School, Lucknow, Uttar Pradesh, India}
+\author{Anonymous Authors}
 
 \begin{document}
 
@@ -45,11 +46,11 @@ Dynamic evidential routing adds an auditable expert-intervention channel to tran
 \section{Introduction}
 \label{sec:intro}
 
-Clinical AI systems need more than discrimination: reviewers must be able to inspect weak evidence and expert interventions. A sparse ICU record may contain a few abnormal measurements, many unmeasured variables, and an apparently precise risk score. Missingness, irregular measurement, and cohort shift are common in hospital data, yet standard neural predictors usually collapse the available evidence into one probability \citep{ma2019,ovadia2019,ghassemi2021}. An overconfident error is then difficult to defer, audit, or correct.
+Clinical AI systems, including emerging generative and agentic systems, need an inspectable way to represent weak evidence and expert intervention. A sparse ICU record may contain a few abnormal measurements, many unmeasured variables, and an apparently precise risk score. Missingness, irregular measurement, and cohort shift are common in hospital data, yet standard neural predictors usually collapse the available evidence into one probability \citep{ma2019,ovadia2019,ghassemi2021}. Any downstream assistant that consumes that score inherits its hidden uncertainty, making an overconfident error difficult to defer, audit, or correct.
 
 The challenge is that current model components expose different pieces of the problem but do not connect them cleanly. Transformers are flexible function approximators for clinical prediction \citep{rasmy2021,azizi2021,li2019}, but attention weights are not themselves evidential confidences. Uncertainty estimators can summarize prediction instability, but they usually do not provide a symbolic intervention point. Rule-based explanations can be readable, but post-hoc rules often describe a prediction without changing the computation. What is missing is an inference-time interface in which neural uncertainty, symbolic evidence, and attention control share an auditable representation.
 
-We propose dynamic evidential routing as that interface. A neural predictive distribution is first mapped into a two-dimensional truth value $(f,c)$, where frequency $f$ describes the balance of evidence and confidence $c$ describes evidential support \citep{wang1995,wang2006,wang2013}. Explicit clinical rules then revise feature-level truths in the same NAL truth-value space, and the revised confidence values control a normalized attention gate. This design separates what the model predicts from how strongly the available evidence supports that prediction.
+We propose dynamic evidential routing as that interface. A neural predictive distribution is first mapped into a two-dimensional truth value $(f,c)$, where frequency $f$ describes the balance of evidence and confidence $c$ describes evidential support \citep{wang1995,wang2006,wang2013}. Explicit clinical rules then revise feature-level truths in the same NAL truth-value space, and the revised confidence values control a normalized attention gate. This design separates what the model predicts from how strongly the available evidence supports that prediction and exposes a trust signal that a clinical model, copilot, or agent can inspect before acting.
 
 We evaluate the interface on two complementary clinical benchmarks. TCGA-THCA tests the mechanism under clinical-genomic feature fusion; WiDS ICU hospital-mortality prediction tests scale and extreme missingness. The contribution is an operational neurosymbolic intervention path with arithmetic traces, quantitative coverage and fidelity checks, and comparable held-out predictive behavior. The controls also delimit the claim: they do not isolate symbolic revision as a source of improved calibration.
 
@@ -273,50 +274,27 @@ Figure~\ref{fig:ablation} reports the gamma sweeps and decision curves rather th
 \label{fig:ablation}
 \end{figure}}{}
 
-\subsection{Failure Modes}
+\subsection{Failure Modes and Deployment Boundary}
 
-The interface can fail in three main ways. First, the neural uncertainty estimate can be wrong. If MC dropout underestimates epistemic uncertainty under shift, the initializer in Eq.~\eqref{eq:neural_to_nars} will assign confidence that is too high. Second, proposition extraction can misalign encoded features with clinical concepts. A one-hot category, imputed value, or missingness indicator may not correspond cleanly to the symbolic condition. Third, the rule truth values can be weak, conflicting, or clinically disputed.
+The interface can fail when MC dropout underestimates uncertainty, proposition extraction misaligns encoded features with clinical concepts, or rule truth values are weak or disputed. The trace localizes these failures: a reviewer can verify the extracted condition, inspect the rule and revised truth values, and rerun a case after editing or disabling the rule. This supports human oversight, but it is not a clinical safety mechanism.
 
-These are general risks whenever learned uncertainty is coupled to external rules, not failures caused by the baseline or control variants. Dynamic evidential routing makes them inspectable: a bad rule leaves a trace, a misfired proposition can be counted, and the gate can be ablated. The interface is not a clinical safety mechanism by itself.
-
-\subsection{What Would Count as Stronger Evidence?}
-
-Stronger evidence would require at least three additions. First, the rule base should be curated independently of the evaluation split, preferably with multiple clinicians or domain experts assigning truth values and resolving disagreement. Second, external validation should be performed without retuning the preprocessing, thresholds, or rule definitions. Third, uncertainty estimators should be compared directly, including MC dropout, deep ensembles, and possibly conformal or distribution-shift-aware variants.
-
-The most informative future ablation would freeze the trained transformer and evaluate four inference modes on multiple external cohorts: baseline attention, flat-confidence attention, MC-confidence attention, and NARS-revised attention. Symbolic revision would be isolated only if NARS-revised attention separates from the first three modes on calibration or decision utility with intervals that exclude zero.
-
-\subsection{Clinical Audit Scenario}
-
-A practical use case for the trace interface is review of cases near a decision threshold. Suppose the model predicts a risk close to an escalation threshold and the final probability changes after a hypotension rule fires. The exported trace can show the original neural truth value, the rule's symbolic truth value, the revised confidence, and the resulting attention gain. A clinician or reviewer can then ask whether the rule condition was extracted correctly and whether the assigned symbolic truth value is appropriate for that clinical context.
-
-This is different from asking whether an attention heat map looks plausible. The trace records a concrete intervention in the computation. If the rule is considered inappropriate, it can be edited or disabled and the same case can be rerun. That workflow is modest, but it is a realistic step toward human-in-the-loop neurosymbolic clinical systems.
-
-\subsection{Deployment Boundary}
-
-The current system is not a clinical decision device. It has no external validation, prospective monitoring, independently curated rule ontology, or clinician-facing user study. Its appropriate status is a methods prototype for studying how neural uncertainty and symbolic evidence can share a truth-value interface.
-
-The deployment boundary also shapes how the metrics should be read. Competitive AUC and calibration are necessary but insufficient. Depending on intended use and jurisdiction, clinical decision-support software may remain subject to medical-device oversight; current U.S. guidance distinguishes non-device CDS from functions that remain devices \citep{fda2026}. A deployment would need locked preprocessing, external validation, shift monitoring, rule governance, human-factors evidence, and clinician override. Inspectable traces could contribute evidence for review, but do not themselves satisfy regulatory or clinical requirements.
+The current system remains a methods prototype rather than a clinical decision device. Deployment would require a rule base curated independently by domain experts, external validation without retuning, shift monitoring, rule governance, human-factors evaluation, and clinician override. Stronger evidence for symbolic revision would also require separation from baseline, flat-confidence, and uncertainty-only controls across external cohorts.
 
 \section{Limitations}
 \label{sec:limitations}
 
-The current evidence is a methods evaluation, not a clinical validation study. TCGA has only 69 held-out cases, so tiny AUC and calibration differences are not reliable. WiDS is much larger, but all experiments use an internal split rather than an external temporal or institutional cohort. The rule bases are prototype probes; deployment would require independently curated rules, sensitivity analysis, and clinician review.
-
-The neural-to-NAL initializer depends on MC-dropout variance, which can be miscalibrated under shift. The method would over-trust a weak prediction if the uncertainty estimator underestimates epistemic uncertainty. Future runs should compare MC dropout with ensembles and should test shifted cohorts.
+The current evidence is a methods evaluation, not a clinical validation study. TCGA has only 69 held-out cases, WiDS uses an internal split rather than an external cohort, and both rule bases are prototype probes. The neural-to-NAL initializer can also over-trust a prediction when MC dropout underestimates uncertainty under shift; future work should compare ensembles and shift-aware estimators on temporally or institutionally independent cohorts.
 
 Finally, the repository implements NAL truth-value functions and feature-level rule revision, but not the complete NARS architecture. It does not maintain concept priority dynamics, task scheduling, or explicit evidential-base records. The claims should therefore be read as interface-level claims about truth-value-guided fusion and attention control.
 
 \section{Conclusion}
 \label{sec:conclusion}
 
-Dynamic evidential routing provides an auditable inference-time interface for uncertainty-aware clinical prediction under missingness while preserving comparable held-out behavior. Across TCGA-THCA and WiDS ICU, explicit rules revise NAL-style confidence, alter normalized attention, and export complete arithmetic traces; the ICU experiment demonstrates that path at scale. On WiDS, paired comparisons support small Brier and ECE improvements over the ungated transformer, while flat-confidence and MC-confidence-only controls prevent attributing those improvements specifically to symbolic revision. Future work should test clinician-curated and conflict-aware rule bases, stronger uncertainty estimators, external cohorts, and human evaluation of whether the traces support real review decisions.
+Dynamic evidential routing makes uncertainty-conditioned clinical inference inspectable: explicit rules revise confidence, change attention, and leave arithmetic traces while preserving competitive held-out behavior. The controls support confidence routing but do not isolate symbolic revision as the source of improved calibration. External cohorts, expert-curated rules, stronger uncertainty estimators, and human evaluation are needed before clinical use.
 
-\section*{Ethics, Data, and Code Availability}
+\paragraph{Ethics and reproducibility.} This study uses public, de-identified benchmarks and collected no new patient data. An anonymized implementation accompanies the submission. Large language models assisted with drafting, formulation, and code generation; the authors checked the derivations, implementation, references, and results and take responsibility for the work.
 
-This work uses public, de-identified benchmark data and did not collect new patient data. Code and generated artifacts are available at \url{https://github.com/arjuncodess/ngta}. Large language models assisted with drafting, mathematical formulation, and code generation; the author independently checked the derivations, implementation, references, and reported results and takes full responsibility for the work.
-
-\acks{The author thanks Pei Wang for feedback on the distinction between statistical variance and NAL evidence amount, and on the manuscript's deduction-confidence formulation. The author also thanks Prof. Leilani H. Gilpin for detailed feedback on the central neurosymbolic-systems framing, NAL/NARS boundary, pipeline and audit-trace presentation, rule-base discussion, references, and calibration claims. Finally, the author thanks the NeSy 2026 reviewers for their careful reviews and constructive feedback.}
-
+\bibliographystyle{plainnat}
 \bibliography{references}
 
 \end{document}

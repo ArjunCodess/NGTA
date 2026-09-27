@@ -9,7 +9,7 @@ NGTA is a neurosymbolic clinical prediction architecture that maps neural uncert
 - `tcga`: TCGA-THCA lymph node metastasis prediction from merged clinical tables plus a mutation-derived binary gene panel
 - `wids`: WiDS Datathon 2020 ICU hospital mortality prediction from a high-missingness ICU tabular cohort
 
-The camera-ready manuscript source is [`paper/nesy2026.tex`](paper/nesy2026.tex).
+The anonymous NeurIPS 2026 workshop manuscript is [`paper/main.tex`](paper/main.tex), with the compiled submission at [`paper/main.pdf`](paper/main.pdf).
 
 ## April 21, 2026 Feedback Update
 
@@ -145,7 +145,7 @@ This writes:
 - `results/submission/paper_tables.tex`
 - refreshed paper figures under `paper/figures`
 
-Paper figures are regenerated automatically at the end of a complete run when both TCGA and WiDS result directories are available under the selected `--output-dir`. The LaTeX paper references stable figure paths, so recompiling `paper/nesy2026.tex` picks up the updated images and generated tables. The same step can be run directly:
+Paper figures are regenerated automatically at the end of a complete run when both TCGA and WiDS result directories are available under the selected `--output-dir`. The LaTeX paper references stable figure paths, so recompiling `paper/main.tex` picks up the updated images and generated tables. The same step can be run directly:
 
 ```bash
 python -c "from src.paper_figures import generate_paper_figures; generate_paper_figures('results')"
@@ -307,7 +307,8 @@ Role in the paper: primary scale test for missingness, calibration, and operatio
 - [`src/nars_interface.py`](src/nars_interface.py): heuristic neural truth mapping plus standard NAL deduction, revision, and evidential utility operators
 - [`src/attention_hook.py`](src/attention_hook.py): confidence-based attention gating
 - [`src/pipeline.py`](src/pipeline.py): training, baselines, evaluation, plotting, and summary generation
-- [`paper/nesy2026.tex`](paper/nesy2026.tex): camera-ready manuscript source
+- [`paper/main.tex`](paper/main.tex): anonymous NeurIPS 2026 workshop manuscript source
+- [`paper/main.pdf`](paper/main.pdf): compiled submission PDF
 
 ## Acknowledgments
 
