@@ -170,3 +170,20 @@ class TabularTransformerClassifier(nn.Module):
             token_score_mean=token_scores.mean(axis=0),
             cls_logit_mean=cls_logits.mean(axis=0),
         )
+
+    def predict_proba(self, features: np.ndarray, device: torch.device, batch_size: int = 256) -> np.ndarray:
+        """Deterministic probabilities. Used for ensemble members and frozen shift scoring."""
+        was_training = self.training
+        self.eval()
+        outputs: list[np.ndarray] = []
+        with torch.no_grad():
+            for start in range(0, len(features), batch_size):
+                batch = torch.as_tensor(features[start : start + batch_size], dtype=torch.float32, device=device)
+                outputs.append(torch.sigmoid(self(batch).logits).cpu().numpy())
+        if not was_training:
+            self.eval()
+        else:
+            self.train()
+        if not outputs:
+            return np.empty((0,), dtype=np.float64)
+        return np.concatenate(outputs, axis=0)
