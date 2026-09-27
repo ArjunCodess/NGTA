@@ -207,3 +207,15 @@ marimo/_lsp/
 __marimo__/
 
 *.pkl
+
+# LaTeX build files; keep .tex and PDFs
+*.aux
+*.bbl
+*.blg
+*.out
+*.toc
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.synctex.gz
