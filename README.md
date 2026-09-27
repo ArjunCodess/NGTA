@@ -2,7 +2,7 @@
 
 **NARS-Guided Transformer Attention for clinical transformers under extreme missingness**
 
-**TL;DR:** NGTA is a clinical transformer that does not just rank patients; it tries to tell the truth about its own uncertainty. It estimates epistemic uncertainty with MC Dropout, heuristically converts that uncertainty into initial NARS-style truth values, injects explicit human-written medical rules at inference time, and feeds the revised confidence back into attention so brittle evidence is downweighted before the final prediction is made.
+**TL;DR:** NGTA is an auditable inference-time interface for uncertainty-conditioned symbolic intervention. It is not a demonstrated clinical performance improvement. It estimates epistemic uncertainty with MC Dropout, heuristically converts that uncertainty into initial NARS-style truth values, injects explicit prototype rules at inference time, and feeds the revised confidence back into attention. Rule removal, rule shuffling, random truth values, and fixed priors recompute revision so the symbolic path can be separated from confidence gating.
 
 NGTA is a neurosymbolic clinical prediction architecture that maps neural uncertainty into NARS truth values and feeds revised confidence back into Transformer attention during inference. The repository now supports two benchmarks in parallel:
 
@@ -27,7 +27,7 @@ Repository updates made from that feedback:
 ## Key Achievements
 
 - **Inference-Time Logic Injection:** Fuses MC-Dropout epistemic uncertainty with NARS symbolic logic and pushes the revised confidence signal directly into Transformer attention during inference.
-- **Scale & Calibration:** Benchmarked on `91,713` ICU stays. The baseline has the highest AUC point estimate (`0.88034`), while MC-confidence-only has the lowest Brier (`0.056468`) and ECE (`0.005808`) point estimates. NARS-gated is nearly identical to MC-confidence-only. Its paired Brier and ECE improvements over the ungated baseline exclude zero, but its comparisons with flat-confidence and MC-confidence-only include zero, so the run supports confidence gating without isolating a symbolic-revision advantage.
+- **Scale & Calibration:** Benchmarked on `91,713` ICU stays. The baseline has the highest AUC point estimate (`0.88034`), while MC-confidence-only has the lowest Brier (`0.056468`) and ECE (`0.005808`) point estimates. NARS-gated is nearly identical to MC-confidence-only. Paired Brier and ECE differences versus the ungated baseline exclude zero on this saved run, but comparisons with flat-confidence and MC-confidence-only include zero. That is not a clinical performance improvement and does not isolate symbolic revision.
 - **Glass-Box Activity:** On held-out WiDS ICU data, explicit symbolic rules fired in `8551` of `13757` stays for `13031` total feature-level revisions, showing that the logic layer is active rather than decorative.
 - **Multi-Modal Ready:** Demonstrated on fused clinical tabular features and genomic mutation matrices on TCGA-THCA, where the same interface remains operational as a clinical-plus-genomic proof of concept. The TCGA transformer variants are not statistically separated from one another on the 69-case held-out split.
 
@@ -120,6 +120,8 @@ Useful flags:
 - `--export-case-traces`: write curated glass-box case traces for representative held-out patients
 - `--paper-tables`: export aggregate CSV and LaTeX tables under `results/submission`
 - `--skip-paper-figures`: skip automatic regeneration of the paper figures under `paper/figures`
+- `--ensemble-size 5`: train five seeded models and compare MC-dropout variance, predictive entropy, and deep-ensemble variance
+- `--shift-eval`: score prespecified feature masks without refitting the model, preprocessing, rules, or threshold
 
 Notes:
 
