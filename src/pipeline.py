@@ -27,6 +27,9 @@ from .data_loader import DEFAULT_ID_COLUMN, DEFAULT_TARGET_COLUMN, load_data_bun
 from .knowledge_base import SYMBOLIC_RULES, build_symbolic_truth_matrices
 from .nars_interface import neural_to_nars
 from .neural_encoder import TabularTransformerClassifier
+from .shift_eval import evaluate_frozen_shift
+from .symbolic_ablations import build_symbolic_isolation_frame, scale_symbolic_confidence, score_revised_gate
+from .uncertainty import compare_uncertainty_estimators, deep_ensemble_statistics, mc_predictive_entropy
 from .wids_knowledge_base import WIDS_RULE_DEFINITIONS, build_wids_symbolic_truth_matrices
 from .wids_loader import WIDS_ID_COLUMN, WIDS_TARGET_COLUMN, load_wids_data_bundle
 
@@ -116,6 +119,8 @@ class PipelineConfig:
     baseline_set: str = "minimal"
     ablation_set: str = "quick"
     export_case_traces: bool = False
+    ensemble_size: int = 0
+    run_shift_eval: bool = False
 
 
 def set_seed(seed: int) -> None:
@@ -774,8 +779,10 @@ def _build_submission_ablation_frame(
     y_true: np.ndarray,
     baseline_probabilities: np.ndarray,
     attention_mean: np.ndarray,
+    attention_var: np.ndarray,
     neural_confidence: np.ndarray,
     revised_confidence: np.ndarray,
+    symbolic_frequency: np.ndarray,
     symbolic_confidence: np.ndarray,
     symbolic_trigger_mask: np.ndarray,
     cls_logit_mean: np.ndarray,
@@ -807,14 +814,21 @@ def _build_submission_ablation_frame(
         _add_row("symbolic_disabled_mc_confidence_only", float(gamma), neural_confidence)
 
     for scale in (0.5, 0.75, 1.25, 1.5):
-        scaled_symbolic_confidence = np.where(
+        scaled_symbolic_confidence = scale_symbolic_confidence(
+            symbolic_confidence,
             symbolic_trigger_mask,
-            np.clip(symbolic_confidence * scale, 0.0, 1.0),
-            neural_confidence,
+            scale,
         )
-        revised_scaled_confidence = np.where(symbolic_trigger_mask, scaled_symbolic_confidence, neural_confidence)
-        gated_attention = apply_confidence_gate(attention_mean, revised_scaled_confidence, gamma=2.0)
-        probabilities = _sigmoid(cls_logit_mean + np.sum(gated_attention * token_score_mean, axis=1))
+        probabilities, _ = score_revised_gate(
+            attention_mean,
+            attention_var,
+            symbolic_frequency,
+            scaled_symbolic_confidence,
+            symbolic_trigger_mask,
+            cls_logit_mean,
+            token_score_mean,
+            gamma=2.0,
+        )
         metrics = _compute_metrics(y_true, probabilities)
         rows.append(
             {
@@ -967,19 +981,31 @@ def _build_case_trace_frame(
     return pd.DataFrame(rows)
 
 
-def _resolve_symbolic_knowledge(bundle, config: PipelineConfig):
+def _rebuild_symbolic_knowledge(bundle, config: PipelineConfig, disabled_rule_ids: set[str]):
     dataset_metadata = _get_dataset_metadata(config.dataset)
     if dataset_metadata["symbolic_builder"] == "tcga":
-        return build_symbolic_truth_matrices(bundle.test_frame, bundle.preprocessor.feature_names)
+        return build_symbolic_truth_matrices(
+            bundle.test_frame,
+            bundle.preprocessor.feature_names,
+            disabled_rule_ids=disabled_rule_ids,
+        )
     encoded_test = _get_encoded_split(bundle, "test")
-    print("WiDS ICU rule trigger counts on the test set:")
-    for rule_name, count in zip(bundle.preprocessor.rule_names, encoded_test.rule_triggers.sum(axis=0).astype(int)):
-        print(f"  {rule_name}: {int(count)}")
     return build_wids_symbolic_truth_matrices(
         encoded_test.rule_triggers,
         bundle.preprocessor.feature_names,
         rule_names=bundle.preprocessor.rule_names,
+        disabled_rule_ids=disabled_rule_ids,
     )
+
+
+def _resolve_symbolic_knowledge(bundle, config: PipelineConfig):
+    dataset_metadata = _get_dataset_metadata(config.dataset)
+    if dataset_metadata["symbolic_builder"] == "wids":
+        encoded_test = _get_encoded_split(bundle, "test")
+        print("WiDS ICU rule trigger counts on the test set:")
+        for rule_name, count in zip(bundle.preprocessor.rule_names, encoded_test.rule_triggers.sum(axis=0).astype(int)):
+            print(f"  {rule_name}: {int(count)}")
+    return _rebuild_symbolic_knowledge(bundle, config, set())
 
 
 def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
@@ -1168,14 +1194,94 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
             y_true=y_true,
             baseline_probabilities=summary.probabilities_mean,
             attention_mean=summary.attention_mean,
+            attention_var=summary.attention_var,
             neural_confidence=attention_truths.neural_confidence,
             revised_confidence=attention_truths.revised_confidence,
+            symbolic_frequency=symbolic_knowledge.symbolic_frequency,
             symbolic_confidence=symbolic_knowledge.symbolic_confidence,
             symbolic_trigger_mask=symbolic_knowledge.symbolic_trigger_mask,
             cls_logit_mean=summary.cls_logit_mean,
             token_score_mean=summary.token_score_mean,
         )
         submission_ablation_frame.to_csv(output_dirs["metrics"] / "submission_ablation.csv", index=False)
+
+    symbolic_isolation_frame = build_symbolic_isolation_frame(
+        y_true=y_true,
+        attention_mean=summary.attention_mean,
+        attention_var=summary.attention_var,
+        symbolic_frequency=symbolic_knowledge.symbolic_frequency,
+        symbolic_confidence=symbolic_knowledge.symbolic_confidence,
+        symbolic_trigger_mask=symbolic_knowledge.symbolic_trigger_mask,
+        cls_logit_mean=summary.cls_logit_mean,
+        token_score_mean=summary.token_score_mean,
+        gamma=effective_config.gamma,
+        seed=effective_config.seed,
+        rule_ids=list(symbolic_knowledge.rule_trigger_counts),
+        rebuild_without_rules=lambda disabled: _rebuild_symbolic_knowledge(bundle, effective_config, disabled),
+    )
+    symbolic_isolation_frame.to_csv(output_dirs["metrics"] / "symbolic_isolation.csv", index=False)
+
+    uncertainty_comparison: dict[str, Any] | None = None
+    if effective_config.ensemble_size >= 2:
+        member_seeds = [effective_config.seed + index for index in range(effective_config.ensemble_size)]
+        member_probabilities: list[np.ndarray] = []
+        encoded_test = _get_encoded_split(bundle, "test")
+        for member_seed in member_seeds:
+            set_seed(member_seed)
+            member = TabularTransformerClassifier(
+                input_dim=bundle.preprocessor.input_dim,
+                d_model=effective_config.d_model,
+                nhead=effective_config.num_heads,
+                num_layers=effective_config.num_layers,
+                dropout=effective_config.dropout,
+            ).to(device)
+            _train_model(model=member, bundle=bundle, config=effective_config, device=device)
+            member_probabilities.append(
+                member.predict_proba(
+                    encoded_test.features,
+                    device,
+                    batch_size=effective_config.batch_size,
+                )
+            )
+        ensemble_statistics = deep_ensemble_statistics(np.stack(member_probabilities, axis=0))
+        baseline_errors = (
+            (summary.probabilities_mean >= 0.5).astype(int) != y_true
+        ).astype(int)
+        uncertainty_comparison = compare_uncertainty_estimators(
+            {
+                "mc_dropout_variance": summary.probabilities_var,
+                "mc_predictive_entropy": mc_predictive_entropy(summary.probabilities_mean),
+                "deep_ensemble_variance": ensemble_statistics["variance"],
+            },
+            errors=baseline_errors,
+            seeds=member_seeds,
+        )
+        (output_dirs["metrics"] / "uncertainty_comparison.json").write_text(
+            json.dumps(uncertainty_comparison, indent=2, default=_json_default),
+            encoding="utf-8",
+        )
+
+    shift_frame = pd.DataFrame()
+    if effective_config.run_shift_eval:
+        encoded_test = _get_encoded_split(bundle, "test")
+
+        def _frozen_parameters() -> dict[str, np.ndarray]:
+            scaler = bundle.preprocessor.scaler
+            parameter_sum = sum(float(parameter.detach().sum().cpu()) for parameter in model.parameters())
+            return {
+                "scaler_mean": np.asarray(scaler.mean_, dtype=np.float64),
+                "symbolic_confidence": np.asarray(symbolic_knowledge.symbolic_confidence, dtype=np.float64),
+                "parameter_sum": np.asarray([parameter_sum], dtype=np.float64),
+            }
+
+        shift_frame = evaluate_frozen_shift(
+            lambda features: model.predict_proba(features, device, batch_size=effective_config.batch_size),
+            encoded_test.features,
+            y_true,
+            _frozen_parameters,
+            seed=effective_config.seed,
+        )
+        shift_frame.to_csv(output_dirs["metrics"] / "shift_eval.csv", index=False)
 
     decision_curve_frame = _build_decision_curve_frame(
         y_true=y_true,
@@ -1257,6 +1363,9 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         "auditability": auditability_metrics,
         "gamma_ablation": gamma_ablation_frame.to_dict(orient="records"),
         "submission_ablation": submission_ablation_frame.to_dict(orient="records"),
+        "symbolic_isolation": symbolic_isolation_frame.to_dict(orient="records"),
+        "uncertainty_comparison": uncertainty_comparison,
+        "shift_eval": shift_frame.to_dict(orient="records"),
         "case_traces": case_trace_frame.to_dict(orient="records"),
         "decision_curve": decision_curve_frame.to_dict(orient="records"),
         "calibration_reliability": reliability_frame.to_dict(orient="records"),
@@ -1266,6 +1375,9 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
             "training_history_csv": str(output_dirs["metrics"] / "training_history.csv"),
             "gamma_ablation_csv": str(output_dirs["metrics"] / "gamma_ablation.csv"),
             "submission_ablation_csv": str(output_dirs["metrics"] / "submission_ablation.csv") if effective_config.ablation_set == "submission" else None,
+            "symbolic_isolation_csv": str(output_dirs["metrics"] / "symbolic_isolation.csv"),
+            "uncertainty_comparison_json": str(output_dirs["metrics"] / "uncertainty_comparison.json") if uncertainty_comparison is not None else None,
+            "shift_eval_csv": str(output_dirs["metrics"] / "shift_eval.csv") if effective_config.run_shift_eval else None,
             "decision_curve_csv": str(output_dirs["metrics"] / "decision_curve.csv"),
             "calibration_reliability_csv": str(output_dirs["metrics"] / "calibration_reliability.csv"),
             "auditability_metrics_csv": str(output_dirs["metrics"] / "auditability_metrics.csv"),

@@ -130,6 +130,17 @@ def parse_args() -> argparse.Namespace:
         help="Export curated glass-box case traces for representative held-out cases.",
     )
     parser.add_argument(
+        "--ensemble-size",
+        type=int,
+        default=0,
+        help="Train this many seeded models and compare MC dropout, entropy, and ensemble variance. 0 skips the comparison.",
+    )
+    parser.add_argument(
+        "--shift-eval",
+        action="store_true",
+        help="Score prespecified feature masks with the model, rules, and preprocessing frozen.",
+    )
+    parser.add_argument(
         "--paper-tables",
         action="store_true",
         help="Write submission-ready aggregate CSV and LaTeX table artifacts under <output-dir>/submission.",
@@ -269,6 +280,8 @@ def main() -> None:
         baseline_set=args.baseline_set,
         ablation_set=args.ablation_set,
         export_case_traces=args.export_case_traces,
+        ensemble_size=args.ensemble_size,
+        run_shift_eval=args.shift_eval,
     )
 
     requested_seeds = args.seeds or [args.seed]
