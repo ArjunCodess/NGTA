@@ -9,6 +9,15 @@ import pandas as pd
 from .nars_interface import deduce_truth_values
 
 EMPIRICAL_OBSERVATION_CONFIDENCE = 0.95
+REQUIRED_RULE_FIELDS = ("source", "provenance", "expert_review", "contradiction_group")
+ALLOWED_EXPERT_REVIEW = {"not_reviewed", "reviewed"}
+RULE_GENERATION_PROCESS = (
+    "Specify one predicate, record its clinical source and provenance id, "
+    "assign a prototype truth value, set expert_review explicitly, and give the "
+    "rule a contradiction group. Rules that share a contradiction group and a "
+    "target feature are rejected. Sensitivity rescores revision under fixed "
+    "priors and confidence scales and does not retune the transformer."
+)
 
 SYMBOLIC_RULES: dict[str, dict[str, Any]] = {
     "braf_mutation": {
@@ -19,6 +28,10 @@ SYMBOLIC_RULES: dict[str, dict[str, Any]] = {
         "target_key": "genomic_mutation__BRAF",
         "target_mode": "direct",
         "truth_value": {"frequency": 0.85, "confidence": 0.75},
+        "source": "Prototype genomic probe. BRAF alteration is common in papillary thyroid carcinoma; this rule is not a metastasis probability.",
+        "provenance": "ngta.rule.tcga.braf_mutation.v1",
+        "expert_review": "not_reviewed",
+        "contradiction_group": "braf_recorded",
     },
     "age_ge_55_years": {
         "condition": "age at diagnosis >= 55 years",
@@ -28,6 +41,10 @@ SYMBOLIC_RULES: dict[str, dict[str, Any]] = {
         "target_key": "diagnoses.age_at_diagnosis",
         "target_mode": "direct",
         "truth_value": {"frequency": 0.70, "confidence": 0.60},
+        "source": "Prototype demographic probe motivated by the AJCC 8th-edition thyroid age cutoff of 55 years. Not an NGTA risk model.",
+        "provenance": "ngta.rule.tcga.age_ge_55_years.v1",
+        "expert_review": "not_reviewed",
+        "contradiction_group": "age_at_least_55",
     },
     "pathologic_t_t3_t4": {
         "condition": "pathologic T category starts with T3 or T4",
@@ -37,6 +54,10 @@ SYMBOLIC_RULES: dict[str, dict[str, Any]] = {
         "target_key": "diagnoses.ajcc_pathologic_t",
         "target_mode": "categorical_active",
         "truth_value": {"frequency": 0.90, "confidence": 0.85},
+        "source": "Prototype staging probe using AJCC pathologic T3/T4 categories. Not a validated nodal-metastasis rule.",
+        "provenance": "ngta.rule.tcga.pathologic_t_t3_t4.v1",
+        "expert_review": "not_reviewed",
+        "contradiction_group": "pathologic_t_high",
     },
     "extrathyroid_extension_present": {
         "condition": "extrathyroid extension is Minimal (T3), Moderate/Advanced (T4a), or Very Advanced (T4b)",
@@ -46,6 +67,10 @@ SYMBOLIC_RULES: dict[str, dict[str, Any]] = {
         "target_key": "pathology_details.extrathyroid_extension",
         "target_mode": "categorical_active",
         "truth_value": {"frequency": 0.85, "confidence": 0.80},
+        "source": "Prototype pathology probe using recognized extrathyroid-extension categories. Missing and unknown values are not evidence.",
+        "provenance": "ngta.rule.tcga.extrathyroid_extension_present.v1",
+        "expert_review": "not_reviewed",
+        "contradiction_group": "extrathyroid_extension_present",
     },
 }
 
@@ -90,6 +115,30 @@ def _assign_truth_value(
     frequency[patient_index, feature_index] = frequency_value
     confidence[patient_index, feature_index] = confidence_value
     trigger_mask[patient_index, feature_index] = True
+
+
+def validate_rule_registry(rules: dict[str, dict[str, Any]]) -> None:
+    """Require source, provenance, review status, and non-contradictory targets."""
+    grouped: dict[tuple[str, str], list[str]] = {}
+    for rule_id, rule in rules.items():
+        missing = [field for field in REQUIRED_RULE_FIELDS if not str(rule.get(field, "")).strip()]
+        if missing:
+            raise ValueError(f"Rule {rule_id} is missing registry fields: {', '.join(missing)}.")
+        review_status = str(rule["expert_review"])
+        if review_status not in ALLOWED_EXPERT_REVIEW:
+            raise ValueError(f"Rule {rule_id} has unsupported expert_review status: {review_status}.")
+        target = str(rule.get("target_key", rule.get("source_column", "")))
+        grouped.setdefault((str(rule["contradiction_group"]), target), []).append(rule_id)
+    collisions = {key: rule_ids for key, rule_ids in grouped.items() if len(rule_ids) > 1}
+    if collisions:
+        details = "; ".join(
+            f"{group} on {target}: {', '.join(rule_ids)}"
+            for (group, target), rule_ids in sorted(collisions.items())
+        )
+        raise ValueError(
+            "Contradictory rules share a contradiction group and target feature. "
+            f"Resolve them before inference ({details})."
+        )
 
 
 def validate_unique_rule_targets(rule_targets: dict[str, str]) -> None:
@@ -140,10 +189,13 @@ def _deduced_ground_truth(rule_truth_value: dict[str, float]) -> tuple[float, fl
 def build_symbolic_truth_matrices(
     case_frame: pd.DataFrame,
     feature_names: Sequence[str],
+    disabled_rule_ids: set[str] | None = None,
 ) -> SymbolicKnowledgeResult:
+    validate_rule_registry(SYMBOLIC_RULES)
     validate_unique_rule_targets(
         {rule_id: str(rule["target_key"]) for rule_id, rule in SYMBOLIC_RULES.items()}
     )
+    disabled = set(disabled_rule_ids or ())
     feature_name_list = list(feature_names)
     feature_index = {name: index for index, name in enumerate(feature_name_list)}
     n_cases = int(len(case_frame))
@@ -170,6 +222,10 @@ def build_symbolic_truth_matrices(
         )
 
     for rule_id, rule in SYMBOLIC_RULES.items():
+        if rule_id in disabled:
+            rule_trigger_counts[rule_id] = 0
+            mapped_rule_trigger_counts[rule_id] = 0
+            continue
         frequency_value, confidence_value = _deduced_ground_truth(rule["truth_value"])
         source_column = str(rule["source_column"])
         triggered_patients = np.zeros(n_cases, dtype=bool)
