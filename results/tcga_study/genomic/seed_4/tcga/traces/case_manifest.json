@@ -1,0 +1,10 @@
+{
+  "case_file": "split_ids.csv",
+  "id_column": "case_submitter_id",
+  "cases": 457,
+  "split_counts": {
+    "train": 319,
+    "val": 69,
+    "test": 69
+  }
+}
