@@ -22,9 +22,12 @@ from src.trace_replay import replay_bundle
 from src.uncertainty import deep_ensemble_statistics, mc_predictive_entropy, compare_uncertainty_estimators
 
 
-def analyze_study(root, seeds, mask_seeds=(), cache_dir=".cache/ngta", iterations=1000):
+def analyze_study(root, seeds, mask_seeds=(), cache_dir=".cache/ngta", iterations=1000, dataset="wids"):
     root = Path(root)
-    selected = [root / f"seed_{seed}" / "wids" for seed in seeds]
+    if mask_seeds and dataset!="wids":
+        raise ValueError("The masking protocol is defined for WiDS")
+    selected = [root / f"seed_{seed}" / dataset for seed in seeds]
+    id_column="encounter_id" if dataset=="wids" else "case_submitter_id"
     if not all((path / "metrics" / "run_summary.json").exists() for path in selected):
         raise ValueError("Every selected seed must have completed evaluation")
     specs = [json.loads((path / "evaluation_spec.json").read_text()) for path in selected]
@@ -42,9 +45,9 @@ def analyze_study(root, seeds, mask_seeds=(), cache_dir=".cache/ngta", iteration
         with np.load(path / "traces" / "inference_cache.npz") as cache:
             if labels is None:
                 labels = cache["labels"].copy()
-                case_ids = raw.encounter_id.to_numpy()
-                groups = raw.hospital_id.to_numpy()
-            elif not np.array_equal(labels, cache["labels"]) or not np.array_equal(case_ids, raw.encounter_id):
+                case_ids = raw[id_column].to_numpy()
+                groups = raw.hospital_id.to_numpy() if dataset=="wids" else None
+            elif not np.array_equal(labels, cache["labels"]) or not np.array_equal(case_ids, raw[id_column]):
                 raise ValueError("Study seed predictions are not case aligned")
             deterministic.append(cache["probability__deterministic"].copy())
             mc_variance.append(cache["probability_passes"].var(axis=0))
@@ -100,7 +103,7 @@ def analyze_study(root, seeds, mask_seeds=(), cache_dir=".cache/ngta", iteration
     observed = np.mean([draws.mean() for draws in repeats])
     hierarchy = dict(brier_nars_minus_mc=float(observed), lower_95=float(np.percentile(bootstrap, 2.5)),
         upper_95=float(np.percentile(bootstrap, 97.5)), seeds=list(seeds), mc_repeats=[len(draws) for draws in repeats],
-        bootstrap_iterations=iterations, sampling_units=["hospital", "training_seed", "dropout_repeat"],
+        bootstrap_iterations=iterations, sampling_units=["hospital" if groups is not None else "case", "training_seed", "dropout_repeat"],
         scope="one fixed development split; excludes variability across different source cohorts and split selections",
         minimum_symbolic_gain=.0001, brier_margin_met=bool(-observed >= .0001))
     (destination / "hierarchical_symbolic_comparison.json").write_text(json.dumps(hierarchy, indent=2))
@@ -126,6 +129,7 @@ def analyze_study(root, seeds, mask_seeds=(), cache_dir=".cache/ngta", iteration
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", required=True)
+    parser.add_argument("--dataset",choices=("wids","tcga"),default="wids")
     parser.add_argument("--seeds", nargs="+", type=int, default=[0,1,2,3,4])
     parser.add_argument("--mask-seeds", nargs="*", type=int, default=[])
     parser.add_argument("--cache-dir", default=".cache/ngta")
