@@ -1,0 +1,19 @@
+{
+  "seed": 0,
+  "materials": "synthetic ICU-style records, not patient data",
+  "practice_cases": 4,
+  "evaluation_cases": 80,
+  "reviewers": 24,
+  "design": "each reviewer sees each evaluation case once, half in each format; every case balanced across formats",
+  "outcomes": [
+    "correct localization",
+    "correction accuracy",
+    "completion time",
+    "false reassurance"
+  ],
+  "primary_analysis": "crossed reviewer/case bootstrap of balanced format differences",
+  "mixed_effects_sensitivity": "binomial crossed random intercepts for reviewer and case, adjusted for period; variational Bayes credible intervals",
+  "acceptance": "localization gain >= .10 with positive 95% bootstrap lower bound and false-reassurance upper delta <= .05",
+  "blinding": "format identifiers conceal naming, but format richness is visible; never give participants the investigator folder",
+  "status": "prepared only; requires protocol approval, qualified participants and real responses"
+}
