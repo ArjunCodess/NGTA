@@ -229,6 +229,23 @@ def build_symbolic_isolation_frame(
         _score("rules_shuffled", shuffled_frequency, shuffled_confidence, shuffled_mask),
         _score("random_truth_values", random_frequency, random_confidence, random_mask),
     ]
+    # Shuffle only confidence values among fired cells, preserving predicates,
+    # frequencies and the multiset of confidence assignments.
+    confidence_permuted = np.array(symbolic_confidence, copy=True)
+    confidence_permuted[symbolic_trigger_mask] = rng.permutation(confidence_permuted[symbolic_trigger_mask])
+    rows.append(_score("confidence_assignment_permutation", symbolic_frequency, confidence_permuted, symbolic_trigger_mask))
+    # Explicit arbitrary predicate controls preserve per-feature prevalence and
+    # confidence/frequency distributions without clinical meaning.
+    irrelevant_f = np.zeros_like(symbolic_frequency)
+    irrelevant_c = np.zeros_like(symbolic_confidence)
+    irrelevant_mask = np.zeros_like(symbolic_trigger_mask)
+    for feature in range(symbolic_trigger_mask.shape[1]):
+        active = np.flatnonzero(symbolic_trigger_mask[:, feature])
+        target = rng.choice(len(labels), size=len(active), replace=False)
+        irrelevant_mask[target, feature] = True
+        irrelevant_f[target, feature] = symbolic_frequency[active, feature]
+        irrelevant_c[target, feature] = symbolic_confidence[active, feature]
+    rows.append(_score("matched_irrelevant_predicates", irrelevant_f, irrelevant_c, irrelevant_mask))
     for prior_frequency, prior_confidence in FIXED_SYMBOLIC_PRIORS:
         prior_f, prior_c, prior_mask = replace_with_fixed_prior(
             symbolic_frequency,

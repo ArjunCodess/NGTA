@@ -24,6 +24,8 @@ from sklearn.metrics import accuracy_score, brier_score_loss, roc_auc_score, roc
 from torch import nn
 
 from .apache_baselines import apache_baselines
+from .bundle_cache import load_cached_bundle
+from .recalibration import probability_logits, validation_recalibrator
 from .attention_hook import apply_confidence_gate, revise_attention_truths
 from .auditability import compute_operational_audit
 from .evaluation import binary_metrics, calibration_error, paired_bootstrap_indices
@@ -135,6 +137,8 @@ class PipelineConfig:
     include_apache: bool = True
     evaluation_lock: str | None = None
     encoder_intervention: bool = False
+    imputation: str = "knn"
+    cache_dir: str | None = None
 
 
 def set_seed(seed: int) -> None:
@@ -944,12 +948,14 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
     effective_config = PipelineConfig(**{**asdict(config), "batch_size": effective_batch_size})
 
     set_seed(effective_config.seed)
-    loader_options = {"split_mode": config.split_mode, "include_apache": config.include_apache} if config.dataset == "wids" else {}
-    bundle = dataset_metadata["loader"](data_dir=effective_config.data_dir, batch_size=effective_config.batch_size, seed=effective_config.split_seed, **loader_options)
+    loader_options = {"split_mode": config.split_mode, "include_apache": config.include_apache, "imputation": config.imputation} if config.dataset == "wids" else {}
+    bundle = load_cached_bundle(dataset_metadata["loader"], dataset=config.dataset, data_dir=effective_config.data_dir,
+                                batch_size=effective_config.batch_size, seed=effective_config.split_seed,
+                                cache_dir=config.cache_dir, **loader_options)
     split_ids = pd.concat([getattr(bundle, f"{name}_frame")[[bundle.preprocessor.id_column]].assign(split=name)
                            for name in ("train", "val", "test")])
     locked_config = {key: value for key, value in asdict(effective_config).items()
-                     if key not in {"data_dir", "output_dir", "evaluation_lock", "export_case_traces"}}
+                     if key not in {"data_dir", "output_dir", "evaluation_lock", "export_case_traces", "cache_dir"}}
     evaluation_spec = {"schema_version": 2, "config": locked_config,
                        "rules": dataset_metadata["symbolic_rules"], "sources": source_manifest(effective_config.data_dir, effective_config.dataset),
                        "split_ids_sha256": hashlib.sha256(split_ids.to_csv(index=False).encode("utf-8")).hexdigest(),
@@ -1046,6 +1052,14 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         "mc_confidence_only": mc_probabilities,
         "nars_gated": gated_probabilities,
     }
+    encoded_val = _get_encoded_split(bundle, "val")
+    validation_summary = model.predict_with_mc_dropout(bundle.val_loader, device, effective_config.mc_samples)
+    recalibrator = validation_recalibrator(encoded_val.target, validation_summary.probabilities_mean)
+    probability_map["transformer_recalibrated"] = recalibrator.predict_proba(
+        probability_logits(summary.probabilities_mean))[:, 1]
+    joblib.dump(recalibrator, output_dirs["root"] / "transformer_recalibrator.joblib", compress=3)
+    np.savez_compressed(output_dirs["traces"] / "validation_calibration.npz",
+                        labels=encoded_val.target, probabilities=validation_summary.probabilities_mean)
     replay_report = export_replay_bundle(output_dirs["traces"], bundle=bundle, summary=summary,
                                          knowledge=symbolic_knowledge, truths=attention_truths,
                                          rules=dataset_metadata["symbolic_rules"], dataset=config.dataset,

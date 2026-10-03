@@ -85,6 +85,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--audit-data", action="store_true", help="Export source hashes, missingness, coverage, and split lineage without training.")
     parser.add_argument("--split-mode", choices=("patient", "hospital", "row"), default="patient", help="WiDS split grouping; patient and hospital modes enforce disjoint groups.")
     parser.add_argument("--without-apache", action="store_true", help="Exclude APACHE from transformer and feature-based baselines.")
+    parser.add_argument("--imputation", choices=("knn", "median"), default="knn", help="Training-fitted WiDS numeric imputation strategy.")
+    parser.add_argument("--cache-dir", default=None, help="Reuse trusted local preprocessing after checking source, loader and dependency hashes.")
     parser.add_argument("--run-all", action="store_true", help="Run the full TCGA and WiDS pipelines sequentially.")
     parser.add_argument(
         "--dataset",
@@ -270,6 +272,8 @@ def main() -> None:
         num_heads=args.num_heads,
         num_layers=args.num_layers,
         dropout=args.dropout,
+        imputation=args.imputation,
+        cache_dir=args.cache_dir,
         baseline_set=args.baseline_set,
         ablation_set=args.ablation_set,
         export_case_traces=args.export_case_traces,
