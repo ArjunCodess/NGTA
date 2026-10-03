@@ -80,6 +80,8 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Run the NGTA dual-dataset neurosymbolic tabular pipeline.",
     )
+    parser.add_argument("--split-mode", choices=("patient", "hospital", "row"), default="patient", help="WiDS split grouping; patient and hospital modes enforce disjoint groups.")
+    parser.add_argument("--without-apache", action="store_true", help="Exclude APACHE from transformer and feature-based baselines.")
     parser.add_argument("--run-all", action="store_true", help="Run the full TCGA and WiDS pipelines sequentially.")
     parser.add_argument(
         "--dataset",
@@ -282,6 +284,8 @@ def main() -> None:
         export_case_traces=args.export_case_traces,
         ensemble_size=args.ensemble_size,
         run_shift_eval=args.shift_eval,
+        split_mode=args.split_mode,
+        include_apache=not args.without_apache,
     )
 
     requested_seeds = args.seeds or [args.seed]

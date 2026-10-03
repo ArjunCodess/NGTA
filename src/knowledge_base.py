@@ -297,7 +297,7 @@ def build_symbolic_truth_matrices(
             extension_series = case_frame[source_column]
             triggered_patients = extension_series.isin(EXTRATHYROID_EXTENSION_VALUES).to_numpy(dtype=bool)
             for patient_index, extension_value in enumerate(extension_series):
-                if pd.isna(extension_value):
+                if not triggered_patients[patient_index]:
                     continue
                 feature_name = _categorical_feature_name(source_column, extension_value)
                 feature_position = feature_index.get(feature_name)

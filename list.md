@@ -11,9 +11,9 @@
 ## 2. Data Validity and Preprocessing
 
 - [ ] **Fix TCGA genomic coverage.** Separate unavailable mutation data from confirmed mutation absence and verify assay coverage before making multimodal claims.
-- [ ] **Correct feature selection leakage.** Move sparse-column filtering and mutation-panel selection inside the training split.
+- [x] **Correct feature selection leakage.** Move sparse-column filtering and mutation-panel selection inside the training split.
 - [ ] **Audit TCGA record merging.** Check whether collapsed records combine measurements from different times and whether predictors are available at the intended prediction time.
-- [ ] **Clarify prediction timing.** Define the prediction landmark and assess whether pathological stage, extension, and residual disease are valid inputs.
+- [x] **Clarify prediction timing.** Define the prediction landmark and assess whether pathological stage, extension, and residual disease are valid inputs.
 - [ ] **Audit WiDS missingness.** Document feature-level missingness and avoid broad claims of extreme missingness based on one highly incomplete feature.
 - [ ] **Check APACHE data.** Resolve negative mortality probability values, document score provenance and availability, and test the model without APACHE.
 - [ ] **Review imputation.** Evaluate KNN distance weighting, distinguish observed from imputed values, and check whether imputed values trigger symbolic rules.
@@ -36,9 +36,9 @@
 
 - [ ] **Expand rule validation.** Document clinical sources, rule provenance, expert review, contradictory rules, and sensitivity to rule choices.
 - [ ] **Test rule necessity.** Disable individual rules and all rules, shuffle predicates, and compare correct rules against matched random controls.
-- [ ] **Separate observed and imputed triggers.** Measure how much symbolic intervention depends on imputed rather than directly observed clinical values.
+- [x] **Separate observed and imputed triggers.** Measure how much symbolic intervention depends on imputed rather than directly observed clinical values.
 - [ ] **Test truth-value sensitivity.** Vary symbolic confidence and frequency while correctly rerunning the revision process.
-- [ ] **Fix rule extraction.** Test missing, unknown, negative, boundary, unseen-category, and conflicting inputs, including the extension-category trigger-mask bug.
+- [x] **Fix rule extraction.** Test missing, unknown, negative, boundary, unseen-category, and conflicting inputs, including the extension-category trigger-mask bug.
 - [ ] **Check multimodal rule behavior.** Verify that genomic rules actually fire on patients with documented genomic measurements.
 - [ ] **Test rule-conditioned confidence boosts.** Compare the NARS mechanism against simpler alternatives that do not use NAL frequency calculations.
 
@@ -79,7 +79,7 @@
 - [ ] **Clarify revision validation.** Describe the existing audit as a consistency check using production arithmetic.
 - [ ] **Qualify trust-signal claims.** Treat the signal as heuristic until its relationship with errors and uncertainty is validated.
 - [ ] **Avoid equivalence claims.** Describe close point estimates on internal splits without claiming formal equivalence or noninferiority.
-- [ ] **Qualify preprocessing claims.** Acknowledge that some feature selection occurs before splitting.
+- [x] **Qualify preprocessing claims.** Acknowledge that some feature selection occurs before splitting.
 - [ ] **Limit human-oversight claims.** Describe current instrumentation as inspectable numerical traces until independent replay and user evaluation are complete.
 - [ ] **Separate symbolic effects from inference effects.** Do not attribute baseline-to-NARS prediction changes solely to symbolic intervention.
 
@@ -101,3 +101,9 @@
 - [ ] **Third: Make traces independently replayable.** Fix audit circularity, export completeness, and rule extraction errors.
 - [ ] **Fourth: Strengthen baselines and validation.** Test APACHE dependence, rule necessity, uncertainty quality, robustness, and external generalization.
 - [ ] **Fifth: Rewrite unsupported claims.** Keep negative findings intact and make every scientific claim match the evidence currently available.
+## v2 implementation evidence
+
+- Data selection now fits training only. Genomic unknowns retain missing indicators; negative calls require a sourced, verified case/gene assay manifest. The available cohort still has no recorded held-out variants, so verified multimodal evaluation remains open.
+- TCGA selects one physical record per source table and exports repeated-field conflicts. Cross-table chronology is unverified; the defined task is retrospective post-pathology association.
+- WiDS defaults to patient-disjoint partitions, offers hospital-disjoint evaluation, standardizes KNN distances, masks invalid APACHE probabilities, and suppresses imputed-only rule triggers. Full robustness and APACHE-dependence experiments remain open.
+- Regression checks: `tests/test_data_validity.py`. Real TCGA lineage audit: `results/v2_validation/tcga/traces/data_quality.json`.

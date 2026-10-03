@@ -1,0 +1,61 @@
+{
+  "schema_version": 2,
+  "dataset": "tcga",
+  "sources": [
+    {
+      "file": "1feaf21d-8259-4c70-bcb7-7e3fb0887ea4.wxs.aliquot_ensemble_masked.maf",
+      "bytes": 12745,
+      "sha256": "7577f42c06cbe3173e5e088d3b669505ca39633b9fa563e0925df16c9915c3b4"
+    },
+    {
+      "file": "c2e3ad0c-d449-449d-b3a3-793b90bdc793.wxs.aliquot_ensemble_masked.maf",
+      "bytes": 164373,
+      "sha256": "11aef91532e7ca2edfc9c9f709d872d04e343be33d2ecf8ae68ab9b0db386d61"
+    },
+    {
+      "file": "clinical.tsv",
+      "bytes": 2826598,
+      "sha256": "b93441500485aed507291296867f6bd897e7a366743f7572d2bf61adeea5464c"
+    },
+    {
+      "file": "exposure.tsv",
+      "bytes": 4559,
+      "sha256": "68f0b0cca5fc3a6e9a9d312657becdddf7e0f7ac53877a50f7b07b535d6b52a3"
+    },
+    {
+      "file": "family_history.tsv",
+      "bytes": 6201,
+      "sha256": "e5589bda35fe7891ce4eb21980ee064ba19dee5ffc3d7fe1ef6fe94b0e02d580"
+    },
+    {
+      "file": "follow_up.tsv",
+      "bytes": 2184682,
+      "sha256": "da1810be81be24be46a32da8b318d5849f802bac92baef8bc4f4a16475f6fee1"
+    },
+    {
+      "file": "pathology_detail.tsv",
+      "bytes": 265560,
+      "sha256": "8790212382cfd4e347c5bf3975015596323734190458ce8ea54a4ca64da6a0c2"
+    }
+  ],
+  "group_overlap": {},
+  "duplicate_feature_rows": 0,
+  "overall_missing_fraction": 0.7576014892713675,
+  "prediction_landmark": "retrospective post-pathology association; not preoperative prediction",
+  "genomic_coverage": {
+    "train": {
+      "cases_with_any_recorded_variant": 2,
+      "cases_with_complete_panel": 0
+    },
+    "val": {
+      "cases_with_any_recorded_variant": 0,
+      "cases_with_complete_panel": 0
+    },
+    "test": {
+      "cases_with_any_recorded_variant": 0,
+      "cases_with_complete_panel": 0
+    }
+  },
+  "clinical_timing_verified": false,
+  "conflicting_case_fields": 5170
+}

@@ -23,6 +23,7 @@ from torch import nn
 
 from .attention_hook import apply_confidence_gate, revise_attention_truths
 from .auditability import compute_operational_audit
+from .data_quality import export_data_quality
 from .data_loader import DEFAULT_ID_COLUMN, DEFAULT_TARGET_COLUMN, load_data_bundle
 from .knowledge_base import SYMBOLIC_RULES, build_symbolic_truth_matrices
 from .nars_interface import neural_to_nars
@@ -121,6 +122,8 @@ class PipelineConfig:
     export_case_traces: bool = False
     ensemble_size: int = 0
     run_shift_eval: bool = False
+    split_mode: str = "patient"
+    include_apache: bool = True
 
 
 def set_seed(seed: int) -> None:
@@ -1015,7 +1018,9 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
 
     set_seed(effective_config.seed)
     output_dirs = _ensure_output_directories(effective_config.output_dir, effective_config.dataset)
-    bundle = dataset_metadata["loader"](data_dir=effective_config.data_dir, batch_size=effective_config.batch_size, seed=effective_config.seed)
+    loader_options = {"split_mode": config.split_mode, "include_apache": config.include_apache} if config.dataset == "wids" else {}
+    bundle = dataset_metadata["loader"](data_dir=effective_config.data_dir, batch_size=effective_config.batch_size, seed=effective_config.seed, **loader_options)
+    export_data_quality(bundle, output_dirs["traces"], effective_config.data_dir, effective_config.dataset)
     bundle.preprocessor.save(output_dirs["traces"] / "preprocessing_metadata.json")
     (output_dirs["traces"] / "split_summary.json").write_text(json.dumps(bundle.split_summary, indent=2), encoding="utf-8")
 
