@@ -1,0 +1,2 @@
+results/hospital_study/**/*.joblib filter=lfs diff=lfs merge=lfs -text
+results/hospital_study/**/*.npz filter=lfs diff=lfs merge=lfs -text
