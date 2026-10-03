@@ -28,6 +28,7 @@ from torch import nn
 from .apache_baselines import apache_baselines
 from .bundle_cache import load_cached_bundle
 from .recalibration import probability_logits, validation_recalibrator
+from .modality import select_tcga_modality
 from .attention_hook import apply_confidence_gate, revise_attention_truths
 from .auditability import compute_operational_audit
 from .evaluation import binary_metrics, calibration_error, paired_bootstrap_indices
@@ -144,6 +145,7 @@ class PipelineConfig:
     resume: bool = False
     shuffle_training_labels: bool = False
     mc_repeats: int = 1
+    feature_mode: str = "all"
 
 
 def set_seed(seed: int) -> None:
@@ -961,10 +963,17 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
     effective_config = PipelineConfig(**{**asdict(config), "batch_size": effective_batch_size})
 
     set_seed(effective_config.seed)
+    if config.dataset == "tcga":
+        from .gdc_acquisition import verify_pinned_sources
+        verify_pinned_sources(effective_config.data_dir)
     loader_options = {"split_mode": config.split_mode, "include_apache": config.include_apache, "imputation": config.imputation} if config.dataset == "wids" else {}
     bundle = load_cached_bundle(dataset_metadata["loader"], dataset=config.dataset, data_dir=effective_config.data_dir,
                                 batch_size=effective_config.batch_size, seed=effective_config.split_seed,
                                 cache_dir=config.cache_dir, **loader_options)
+    if config.dataset == "tcga":
+        bundle = select_tcga_modality(bundle, config.feature_mode, effective_config.batch_size)
+    elif config.feature_mode != "all":
+        raise ValueError("Clinical/genomic feature modes apply only to TCGA")
     split_ids = pd.concat([getattr(bundle, f"{name}_frame")[[bundle.preprocessor.id_column]].assign(split=name)
                            for name in ("train", "val", "test")])
     locked_config = {key: value for key, value in asdict(effective_config).items()
