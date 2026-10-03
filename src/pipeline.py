@@ -27,7 +27,7 @@ from .apache_baselines import apache_baselines
 from .attention_hook import apply_confidence_gate, revise_attention_truths
 from .auditability import compute_operational_audit
 from .evaluation import binary_metrics, calibration_error, paired_bootstrap_indices
-from .data_quality import export_data_quality
+from .data_quality import export_data_quality, source_manifest
 from .data_loader import DEFAULT_ID_COLUMN, DEFAULT_TARGET_COLUMN, load_data_bundle
 from .knowledge_base import SYMBOLIC_RULES, build_symbolic_truth_matrices
 from .matched_inference import score_cached_passes, sigmoid
@@ -943,21 +943,23 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
     effective_config = PipelineConfig(**{**asdict(config), "batch_size": effective_batch_size})
 
     set_seed(effective_config.seed)
-    output_dirs = _ensure_output_directories(effective_config.output_dir, effective_config.dataset)
     loader_options = {"split_mode": config.split_mode, "include_apache": config.include_apache} if config.dataset == "wids" else {}
     bundle = dataset_metadata["loader"](data_dir=effective_config.data_dir, batch_size=effective_config.batch_size, seed=effective_config.split_seed, **loader_options)
-    data_quality = export_data_quality(bundle, output_dirs["traces"], effective_config.data_dir, effective_config.dataset)
+    split_ids = pd.concat([getattr(bundle, f"{name}_frame")[[bundle.preprocessor.id_column]].assign(split=name)
+                           for name in ("train", "val", "test")])
     locked_config = {key: value for key, value in asdict(effective_config).items()
                      if key not in {"data_dir", "output_dir", "evaluation_lock", "export_case_traces"}}
     evaluation_spec = {"schema_version": 2, "config": locked_config,
-                       "rules": dataset_metadata["symbolic_rules"], "sources": data_quality["sources"],
-                       "split_ids_sha256": hashlib.sha256((output_dirs["traces"] / "split_ids.csv").read_bytes()).hexdigest(),
+                       "rules": dataset_metadata["symbolic_rules"], "sources": source_manifest(effective_config.data_dir, effective_config.dataset),
+                       "split_ids_sha256": hashlib.sha256(split_ids.to_csv(index=False).encode("utf-8")).hexdigest(),
                        "thresholds": [.1, .2, .5], "primary_metric": "brier",
                        "confirmation_brier_margin": 1e-4, "bootstrap_unit": "hospital" if config.dataset == "wids" else "case"}
     if config.evaluation_lock is not None:
         expected_spec = json.loads(Path(config.evaluation_lock.format(seed=config.seed, dataset=config.dataset)).read_text(encoding="utf-8"))
         if expected_spec != evaluation_spec:
             raise ValueError("Evaluation configuration, data, split IDs, or rules differ from the supplied lock")
+    output_dirs = _ensure_output_directories(effective_config.output_dir, effective_config.dataset)
+    data_quality = export_data_quality(bundle, output_dirs["traces"], effective_config.data_dir, effective_config.dataset)
     (output_dirs["root"] / "evaluation_spec.json").write_text(json.dumps(evaluation_spec, indent=2), encoding="utf-8")
     bundle.preprocessor.save(output_dirs["traces"] / "preprocessing_metadata.json")
     (output_dirs["traces"] / "split_summary.json").write_text(json.dumps(bundle.split_summary, indent=2), encoding="utf-8")

@@ -7,6 +7,29 @@ from main import _write_submission_outputs
 from src.paper_figures import generate_paper_figures
 
 
+def test_mismatched_evaluation_lock_preserves_existing_artifacts(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+    import src.pipeline as pipeline
+
+    frame = lambda value: pd.DataFrame({"case_submitter_id": [value]})
+    bundle = SimpleNamespace(preprocessor=SimpleNamespace(id_column="case_submitter_id"),
+                             train_frame=frame("train"), val_frame=frame("val"), test_frame=frame("test"))
+    monkeypatch.setitem(pipeline.DATASET_METADATA["tcga"], "loader", lambda **kwargs: bundle)
+    monkeypatch.setattr(pipeline, "source_manifest", lambda *args: [])
+    output = tmp_path / "output"
+    traces = output / "tcga/traces"
+    traces.mkdir(parents=True)
+    sentinel = traces / "split_ids.csv"
+    sentinel.write_text("existing audit")
+    lock = tmp_path / "lock.json"
+    lock.write_text("{}")
+    with pytest.raises(ValueError, match="supplied lock"):
+        pipeline.run_pipeline(pipeline.PipelineConfig(output_dir=str(output), evaluation_lock=str(lock)))
+    assert sentinel.read_text() == "existing audit"
+    assert sorted(path.relative_to(output).as_posix() for path in output.rglob("*")) == [
+        "tcga", "tcga/traces", "tcga/traces/split_ids.csv"]
+
+
 def test_single_seed_does_not_claim_zero_variability_and_exports_apache_comparison(tmp_path):
     summary = {"task": {"dataset_key": "wids"}, "config": {"seed": 0},
                "metrics": [{"variant": "nars_gated", "auc": .7, "brier": .1, "accuracy": .8, "ece": .02}],
