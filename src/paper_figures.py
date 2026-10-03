@@ -139,19 +139,51 @@ def _pipeline_architecture(figures_dir: Path) -> None:
 
 def _dataset_result_dir(results_dir: Path, dataset: str, seeds: list[int] | None) -> Path:
     direct = results_dir / dataset
-    if direct.exists():
-        return direct
-    for seed in seeds or []:
-        seeded = results_dir / f"seed_{seed}" / dataset
-        if seeded.exists():
-            return seeded
-    seeded_dirs = sorted(results_dir.glob(f"seed_*{dataset}"))
-    if seeded_dirs:
-        return seeded_dirs[0]
     nested_seeded_dirs = sorted(results_dir.glob(f"seed_*/{dataset}"))
-    if nested_seeded_dirs:
-        return nested_seeded_dirs[0]
+    if seeds:
+        selected = [results_dir / f"seed_{seed}" / dataset for seed in seeds]
+        if not all(path.exists() for path in selected):
+            raise FileNotFoundError(f"Missing explicitly selected {dataset} seed result")
+        return selected[0] if len(selected) == 1 else _aggregate_figure_sources(results_dir, dataset, selected)
+    choices = ([direct] if direct.exists() else []) + nested_seeded_dirs
+    if len(choices) > 1:
+        raise ValueError("Ambiguous figure sources; select training seeds explicitly")
+    if choices:
+        return choices[0]
     raise FileNotFoundError(f"Could not locate results for dataset '{dataset}' under {results_dir}.")
+
+
+def _aggregate_figure_sources(results_dir, dataset, selected):
+    from scipy.stats import t
+    from .trace_replay import replay_bundle
+
+    specs = [json.loads((p / "evaluation_spec.json").read_text()) for p in selected]
+    for spec in specs[1:]:
+        if any(spec[key] != specs[0][key] for key in ("sources", "split_ids_sha256", "rules")):
+            raise ValueError("Seed figures require identical source data, partitions and rules")
+    for path in selected:
+        if not replay_bundle(path / "traces")["passed"]:
+            raise ValueError("Figure source failed independent artifact replay")
+    metrics = [pd.read_csv(p / "metrics" / "metrics.csv").set_index("variant") for p in selected]
+    if any(not frame.index.equals(metrics[0].index) for frame in metrics[1:]):
+        raise ValueError("Seed figures require matching predictive comparators")
+    combined = pd.concat(metrics, keys=range(len(metrics)))
+    means = combined.groupby(level=1).mean(numeric_only=True)
+    brier = combined["brier"].unstack(level=1)
+    half = t.ppf(.975, len(metrics)-1) * brier.std(ddof=1) / np.sqrt(len(metrics))
+    means["brier_ci_95_lower"] = means.brier - half
+    means["brier_ci_95_upper"] = means.brier + half
+    root = results_dir / "figure_sources" / ("_".join(p.parent.name for p in selected)) / dataset
+    (root / "metrics").mkdir(parents=True, exist_ok=True)
+    means.reset_index().to_csv(root / "metrics" / "metrics.csv", index=False)
+    for name, axis in (("gamma_ablation.csv", "gamma"), ("decision_curve.csv", "threshold")):
+        frames = [pd.read_csv(p / "metrics" / name) for p in selected]
+        pd.concat(frames).groupby(axis).mean(numeric_only=True).reset_index().to_csv(root / "metrics" / name, index=False)
+    # Event counts vary with model outcomes; leave the per-fit table in source bundles.
+    (root / "metrics" / "run_summary.json").write_text(json.dumps({
+        "schema_version": 2, "persisted_replay": {"passed": True}, "source_bundles": [str(p) for p in selected],
+        "interval_scope": "training_seed_variability_fixed_cohort", "seed_count": len(selected)}, indent=2))
+    return root
 
 
 def _performance_ci(dataset_dirs: dict[str, Path], figures_dir: Path) -> None:
@@ -176,7 +208,9 @@ def _performance_ci(dataset_dirs: dict[str, Path], figures_dir: Path) -> None:
         ax.set_yticklabels([VARIANT_LABELS[v] for v in df["variant"]])
         ax.invert_yaxis()
         ax.set_title(dataset)
-        ax.set_xlabel("Brier score, 95% bootstrap CI")
+        summary = json.loads((path.parent / "run_summary.json").read_text())
+        interval = "95% seed-mean t CI" if summary.get("interval_scope") else "95% bootstrap CI"
+        ax.set_xlabel(f"Brier score, {interval}")
         ax.grid(axis="x", color="#E5E7EB", linewidth=0.7)
     _save(fig, figures_dir, "figure-2-performance-ci")
 
@@ -210,8 +244,11 @@ def _ablation_and_decision_curves(dataset_dirs: dict[str, Path], figures_dir: Pa
             ("baseline_net_benefit", "Baseline"),
             ("flat_confidence_net_benefit", "Flat confidence"),
             ("nars_gated_net_benefit", "NARS-gated"),
+            ("mc_confidence_only_net_benefit", "MC-only"),
             ("treat_all_net_benefit", "Treat all"),
         ):
+            if variant not in decision:
+                continue
             style = "--" if variant == "treat_all_net_benefit" else "-"
             color_key = variant.replace("_net_benefit", "")
             ax.plot(
@@ -351,6 +388,12 @@ def generate_paper_figures(
             raise ValueError("Figure generation requires successful v2 replay")
     if len(set(schemas)) != 1:
         raise ValueError("Refusing to mix legacy and v2 result bundles in paper figures")
+    from .trace_replay import replay_bundle
+    for directory in dataset_dirs.values():
+        summary = json.loads((directory / "metrics" / "run_summary.json").read_text())
+        sources = summary.get("source_bundles", [str(directory)])
+        if summary.get("schema_version") == 2 and any(not replay_bundle(Path(source) / "traces")["passed"] for source in sources):
+            raise ValueError("Figure generation requires current independent replay")
     _set_style()
     _pipeline_architecture(figures_path)
     _performance_ci(dataset_dirs, figures_path)

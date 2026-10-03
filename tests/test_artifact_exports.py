@@ -57,3 +57,45 @@ def test_figures_reject_mixed_legacy_and_v2_bundles(tmp_path):
     with pytest.raises(ValueError, match="mix legacy and v2"):
         generate_paper_figures(tmp_path, figures_dir=tmp_path / "figures")
     assert not (tmp_path / "figures").exists()
+
+
+def test_explicit_figure_seed_overrides_stale_direct_results(tmp_path):
+    from src.paper_figures import _dataset_result_dir
+    (tmp_path / "tcga").mkdir()
+    selected = tmp_path / "seed_4" / "tcga"
+    selected.mkdir(parents=True)
+    assert _dataset_result_dir(tmp_path, "tcga", [4]) == selected
+    with pytest.raises(ValueError, match="Ambiguous"):
+        _dataset_result_dir(tmp_path, "tcga", None)
+    with pytest.raises(FileNotFoundError, match="explicitly"):
+        _dataset_result_dir(tmp_path, "tcga", [3])
+
+
+def test_resume_validation_preserves_artifacts_before_rejecting_changed_training(tmp_path, monkeypatch):
+    import hashlib
+    from dataclasses import asdict
+    from types import SimpleNamespace
+    import torch
+    import src.pipeline as pipeline
+
+    frames = [pd.DataFrame({"case_submitter_id": [name]}) for name in ("train", "val", "test")]
+    processor = SimpleNamespace(id_column="case_submitter_id", feature_names=["x"])
+    bundle = SimpleNamespace(preprocessor=processor, train_frame=frames[0], val_frame=frames[1], test_frame=frames[2])
+    monkeypatch.setitem(pipeline.DATASET_METADATA["tcga"], "loader", lambda **kwargs: bundle)
+    monkeypatch.setattr(pipeline, "source_manifest", lambda *args: [])
+    config = pipeline.PipelineConfig(output_dir=str(tmp_path), resume=True)
+    root = tmp_path / "tcga"
+    root.mkdir()
+    split = pd.concat([f.assign(split=name) for f, name in zip(frames, ("train", "val", "test"))])
+    spec = dict(sources=[], split_ids_sha256=hashlib.sha256(split.to_csv(index=False).encode()).hexdigest(),
+                rules=pipeline.DATASET_METADATA["tcga"]["symbolic_rules"])
+    spec_path = root / "evaluation_spec.json"
+    original = json.dumps(spec)
+    spec_path.write_text(original)
+    changed = asdict(config)
+    changed["epochs"] += 1
+    torch.save(dict(config=changed, training_spec=spec, feature_names=["x"]), root / "model.pt")
+    with pytest.raises(ValueError, match="changed epochs"):
+        pipeline.run_pipeline(config)
+    assert spec_path.read_text() == original
+    assert not (root / "traces").exists()
