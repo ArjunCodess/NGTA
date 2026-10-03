@@ -13,6 +13,7 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import brier_score_loss, log_loss, roc_auc_score
 
+from .matched_inference import score_cached_passes
 from .attention_hook import apply_confidence_gate, revise_attention_truths
 
 FIXED_SYMBOLIC_PRIORS: tuple[tuple[float, float], ...] = (
@@ -118,6 +119,7 @@ def score_revised_gate(
     cls_logit_mean: np.ndarray,
     token_score_mean: np.ndarray,
     gamma: float,
+    cached_passes: tuple | None = None,
 ) -> tuple[np.ndarray, np.ndarray]:
     """Rerun revision and confidence gating. Returns probabilities and revised confidence."""
     truths = revise_attention_truths(
@@ -127,6 +129,9 @@ def score_revised_gate(
         symbolic_confidence=symbolic_confidence,
         symbolic_trigger_mask=symbolic_trigger_mask,
     )
+    if cached_passes is not None:
+        probabilities, _ = score_cached_passes(*cached_passes, truths.revised_confidence, gamma)
+        return probabilities, np.asarray(truths.revised_confidence, dtype=np.float64)
     gated_attention = apply_confidence_gate(attention_mean, truths.revised_confidence, gamma=gamma)
     logits = np.asarray(cls_logit_mean, dtype=np.float64) + np.sum(gated_attention * token_score_mean, axis=1)
     return _sigmoid(logits), np.asarray(truths.revised_confidence, dtype=np.float64)
@@ -161,6 +166,8 @@ def build_symbolic_isolation_frame(
     seed: int,
     rule_ids: Sequence[str] | None = None,
     rebuild_without_rules: Callable[[set[str]], Any] | None = None,
+    cached_passes: tuple | None = None,
+    permutations: int = 100,
 ) -> pd.DataFrame:
     """Score NARS gating against controls that recompute revision."""
     rng = np.random.default_rng(seed)
@@ -181,6 +188,7 @@ def build_symbolic_isolation_frame(
             cls_logit_mean,
             token_score_mean,
             gamma,
+            cached_passes=cached_passes,
         )
         triggered = np.asarray(mask, dtype=bool)
         if int(triggered.sum()) == 0:
@@ -237,6 +245,26 @@ def build_symbolic_isolation_frame(
                 prior_mask,
             )
         )
+    for frequency_value in (0.1, 0.5, 0.9):
+        changed_frequency = np.where(symbolic_trigger_mask, frequency_value, symbolic_frequency)
+        rows.append(_score("symbolic_frequency", changed_frequency, symbolic_confidence, symbolic_trigger_mask))
+        rows[-1]["symbolic_frequency"] = frequency_value
+    for index in range(permutations):
+        shuffled = shuffle_rules_across_patients(symbolic_frequency, symbolic_confidence, symbolic_trigger_mask, rng)
+        rows.append(_score("predicate_permutation", *shuffled))
+        rows[-1]["permutation"] = index
+    # Closed-form confidence accumulation is a simpler non-frequency control.
+    from .attention_hook import attention_to_nars
+    _, neural_c = attention_to_nars(attention_mean, attention_var)
+    a = np.clip(neural_c, 1e-6, 1 - 1e-6)
+    b = np.clip(symbolic_confidence, 1e-6, 1 - 1e-6)
+    boosted = np.where(symbolic_trigger_mask, (a + b - 2*a*b) / (1 - a*b), neural_c)
+    if cached_passes is not None:
+        probabilities, _ = score_cached_passes(*cached_passes, boosted, gamma)
+    else:
+        attention = apply_confidence_gate(attention_mean, boosted, gamma)
+        probabilities = _sigmoid(cls_logit_mean + np.sum(attention * token_score_mean, axis=1))
+    rows.append(_metric_row("confidence_boost", labels, probabilities, gamma=float(gamma), revision_rerun=False))
     for scale in CONFIDENCE_SCALES:
         scaled_confidence = scale_symbolic_confidence(symbolic_confidence, symbolic_trigger_mask, scale)
         rows.append(

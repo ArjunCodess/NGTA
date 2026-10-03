@@ -25,6 +25,10 @@ class MCPredictionSummary:
     attention_var: np.ndarray
     token_score_mean: np.ndarray
     cls_logit_mean: np.ndarray
+    probability_passes: np.ndarray
+    attention_passes: np.ndarray
+    token_score_passes: np.ndarray
+    cls_logit_passes: np.ndarray
 
 
 class AttentionEncoderLayer(nn.Module):
@@ -121,6 +125,11 @@ class TabularTransformerClassifier(nn.Module):
         device: torch.device,
         mc_samples: int,
     ) -> MCPredictionSummary:
+        if mc_samples < 2:
+            raise ValueError("MC uncertainty requires at least two passes")
+        from torch.utils.data import SequentialSampler
+        if not isinstance(loader.sampler, SequentialSampler):
+            raise ValueError("MC inference requires a sequential loader to align cases across passes")
         was_training = self.training
         labels = None
         probability_passes = []
@@ -169,6 +178,10 @@ class TabularTransformerClassifier(nn.Module):
             attention_var=attentions.var(axis=0),
             token_score_mean=token_scores.mean(axis=0),
             cls_logit_mean=cls_logits.mean(axis=0),
+            probability_passes=probabilities,
+            attention_passes=attentions,
+            token_score_passes=token_scores,
+            cls_logit_passes=cls_logits,
         )
 
     def predict_proba(self, features: np.ndarray, device: torch.device, batch_size: int = 256) -> np.ndarray:

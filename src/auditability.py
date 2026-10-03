@@ -4,7 +4,7 @@ from typing import Any
 
 import numpy as np
 
-from .nars_interface import revise_truth_values
+
 
 
 def compute_operational_audit(
@@ -26,6 +26,7 @@ def compute_operational_audit(
     gated_probabilities: np.ndarray,
     gamma: float,
     tolerance: float = 1e-9,
+    attention_passes: np.ndarray | None = None,
 ) -> dict[str, Any]:
     """Quantify trace completeness and arithmetic fidelity, not clinical usability."""
     trigger_mask = np.asarray(symbolic_trigger_mask, dtype=bool)
@@ -84,18 +85,21 @@ def compute_operational_audit(
     )
     finite_event_count = int(np.isfinite(finite_fields).all(axis=1).sum()) if event_count else 0
 
-    expected_f, expected_c = revise_truth_values(neural_f, neural_c, symbolic_f, symbolic_c)
+    expected_f, expected_c = reference_revision(neural_f, neural_c, symbolic_f, symbolic_c)
     revision_residual = np.maximum(
         np.abs(np.asarray(expected_f) - revised_f),
         np.abs(np.asarray(expected_c) - revised_c),
     )
     max_revision_residual = float(np.max(revision_residual[trigger_mask])) if event_count else 0.0
 
-    normalized_attention = attention / np.clip(attention.sum(axis=-1, keepdims=True), 1e-8, None)
+    gate_input = attention if attention_passes is None else np.asarray(attention_passes, dtype=np.float64)
+    normalized_attention = gate_input / np.clip(gate_input.sum(axis=-1, keepdims=True), 1e-8, None)
     expected_gate = normalized_attention * np.power(np.clip(revised_c, 0.0, 1.0), float(gamma))
     denominator = expected_gate.sum(axis=-1, keepdims=True)
     expected_gate = np.divide(expected_gate, np.where(denominator > 0.0, denominator, 1.0))
     expected_gate = np.where(denominator > 0.0, expected_gate, normalized_attention)
+    if attention_passes is not None:
+        expected_gate = expected_gate.mean(axis=0)
     max_gate_residual = float(np.max(np.abs(expected_gate - gated_attention))) if case_count else 0.0
 
     confidence_changed = np.abs(revised_c - neural_c) > tolerance
@@ -129,3 +133,18 @@ def compute_operational_audit(
         "revision_fidelity_pass": bool(max_revision_residual <= tolerance),
         "gate_fidelity_pass": bool(max_gate_residual <= tolerance),
     }
+
+
+def reference_revision(f1, c1, f2, c2):
+    """Independent closed form for revision; no production truth operators.
+
+    Algebraically eliminates evidence weights to expose shared implementation errors.
+    Endpoint behavior reproduces the specified 1e-6 confidence clamp.
+    """
+    a = np.clip(np.asarray(c1, dtype=np.float64), 1e-6, 1 - 1e-6)
+    b = np.clip(np.asarray(c2, dtype=np.float64), 1e-6, 1 - 1e-6)
+    left = a * (1 - b)
+    right = b * (1 - a)
+    frequency = (left * np.clip(f1, 0, 1) + right * np.clip(f2, 0, 1)) / (left + right)
+    confidence = (left + right) / (1 - a * b)
+    return frequency, confidence

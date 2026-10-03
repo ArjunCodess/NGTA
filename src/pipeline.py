@@ -26,6 +26,7 @@ from .auditability import compute_operational_audit
 from .data_quality import export_data_quality
 from .data_loader import DEFAULT_ID_COLUMN, DEFAULT_TARGET_COLUMN, load_data_bundle
 from .knowledge_base import SYMBOLIC_RULES, build_symbolic_truth_matrices
+from .matched_inference import score_cached_passes, sigmoid
 from .nars_interface import neural_to_nars
 from .neural_encoder import TabularTransformerClassifier
 from .shift_eval import evaluate_frozen_shift
@@ -753,13 +754,14 @@ def _build_gamma_ablation_frame(
     feature_confidence: np.ndarray,
     cls_logit_mean: np.ndarray,
     token_score_mean: np.ndarray,
+    cached_passes: tuple | None = None,
 ) -> pd.DataFrame:
     baseline_metrics = _compute_metrics(y_true, baseline_probabilities)
     rows: list[dict[str, float]] = []
     for gamma in GAMMA_ABLATION_VALUES:
         gated_attention = apply_confidence_gate(attention_mean, feature_confidence, gamma=gamma)
         gated_logits = cls_logit_mean + np.sum(gated_attention * token_score_mean, axis=1)
-        gated_probabilities = _sigmoid(gated_logits)
+        gated_probabilities = _sigmoid(gated_logits) if cached_passes is None else score_cached_passes(*cached_passes, feature_confidence, gamma)[0]
         gated_metrics = _compute_metrics(y_true, gated_probabilities)
         rows.append(
             {
@@ -790,13 +792,14 @@ def _build_submission_ablation_frame(
     symbolic_trigger_mask: np.ndarray,
     cls_logit_mean: np.ndarray,
     token_score_mean: np.ndarray,
+    cached_passes: tuple | None = None,
 ) -> pd.DataFrame:
     rows: list[dict[str, float | str]] = []
 
     def _add_row(ablation: str, gamma: float, confidence: np.ndarray) -> None:
         ablated_attention = apply_confidence_gate(attention_mean, confidence, gamma=gamma)
         ablated_logits = cls_logit_mean + np.sum(ablated_attention * token_score_mean, axis=1)
-        ablated_probabilities = _sigmoid(ablated_logits)
+        ablated_probabilities = _sigmoid(ablated_logits) if cached_passes is None else score_cached_passes(*cached_passes, confidence, gamma)[0]
         metrics = _compute_metrics(y_true, ablated_probabilities)
         rows.append(
             {
@@ -831,6 +834,7 @@ def _build_submission_ablation_frame(
             cls_logit_mean,
             token_score_mean,
             gamma=2.0,
+            cached_passes=cached_passes,
         )
         metrics = _compute_metrics(y_true, probabilities)
         rows.append(
@@ -1063,24 +1067,24 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         symbolic_confidence=symbolic_knowledge.symbolic_confidence,
         symbolic_trigger_mask=symbolic_knowledge.symbolic_trigger_mask,
     )
-    gated_attention = apply_confidence_gate(summary.attention_mean, attention_truths.revised_confidence, gamma=effective_config.gamma)
-    mc_attention = apply_confidence_gate(summary.attention_mean, attention_truths.neural_confidence, gamma=effective_config.gamma)
-    flat_attention = apply_confidence_gate(
-        summary.attention_mean,
-        np.full_like(attention_truths.revised_confidence, 0.5, dtype=np.float64),
-        gamma=effective_config.gamma,
-    )
-    flat_logits = summary.cls_logit_mean + np.sum(flat_attention * summary.token_score_mean, axis=1)
-    flat_probabilities = _sigmoid(flat_logits)
-    mc_logits = summary.cls_logit_mean + np.sum(mc_attention * summary.token_score_mean, axis=1)
-    mc_probabilities = _sigmoid(mc_logits)
-    gated_logits = summary.cls_logit_mean + np.sum(gated_attention * summary.token_score_mean, axis=1)
-    gated_probabilities = _sigmoid(gated_logits)
+    cached = (summary.attention_passes, summary.token_score_passes, summary.cls_logit_passes)
+    baseline_probabilities, _ = score_cached_passes(*cached)
+    gated_probabilities, gated_attention = score_cached_passes(*cached, attention_truths.revised_confidence, effective_config.gamma)
+    mc_probabilities, mc_attention = score_cached_passes(*cached, attention_truths.neural_confidence, effective_config.gamma)
+    flat_probabilities, flat_attention = score_cached_passes(*cached, np.full_like(attention_truths.neural_confidence, 0.5), effective_config.gamma)
+    if not np.allclose(baseline_probabilities, flat_probabilities, atol=1e-7, rtol=0):
+        raise RuntimeError("Uniform gate must match the ungated cached-pass prediction")
+    # Preserve per-pass covariance and sigmoid nonlinearity for all gate variants.
+    summary.probabilities_mean = baseline_probabilities
+    deterministic_probabilities = model.predict_proba(_get_encoded_split(bundle, "test").features, device, effective_config.batch_size)
+    mean_logits = (summary.cls_logit_passes + np.sum(summary.attention_passes * summary.token_score_passes, axis=-1)).mean(axis=0)
 
     y_true = summary.labels.astype(int)
     tree_probabilities = tree_baseline["test_probabilities"]
     probability_map = {
         **{label: baseline["test_probabilities"] for label, baseline in classical_baselines.items()},
+        "deterministic": deterministic_probabilities,
+        "mean_logit": sigmoid(mean_logits),
         "baseline": summary.probabilities_mean,
         "flat_confidence": flat_probabilities,
         "mc_confidence_only": mc_probabilities,
@@ -1134,6 +1138,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         baseline_probabilities=summary.probabilities_mean,
         gated_probabilities=gated_probabilities,
         gamma=effective_config.gamma,
+        attention_passes=summary.attention_passes,
     )
     pd.DataFrame([auditability_metrics]).to_csv(
         output_dirs["metrics"] / "auditability_metrics.csv",
@@ -1190,6 +1195,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         feature_confidence=attention_truths.revised_confidence,
         cls_logit_mean=summary.cls_logit_mean,
         token_score_mean=summary.token_score_mean,
+        cached_passes=cached,
     )
     gamma_ablation_frame.to_csv(output_dirs["metrics"] / "gamma_ablation.csv", index=False)
     _save_gamma_ablation_plot(gamma_ablation_frame, output_dirs["charts"] / "gamma_ablation_auc.png", dataset_metadata["positive_class"])
@@ -1207,6 +1213,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
             symbolic_trigger_mask=symbolic_knowledge.symbolic_trigger_mask,
             cls_logit_mean=summary.cls_logit_mean,
             token_score_mean=summary.token_score_mean,
+            cached_passes=cached,
         )
         submission_ablation_frame.to_csv(output_dirs["metrics"] / "submission_ablation.csv", index=False)
 
@@ -1223,6 +1230,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         seed=effective_config.seed,
         rule_ids=list(symbolic_knowledge.rule_trigger_counts),
         rebuild_without_rules=lambda disabled: _rebuild_symbolic_knowledge(bundle, effective_config, disabled),
+        cached_passes=cached,
     )
     symbolic_isolation_frame.to_csv(output_dirs["metrics"] / "symbolic_isolation.csv", index=False)
 
@@ -1318,6 +1326,8 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
     )
 
     summary_frame = {
+        "schema_version": 2,
+        "aggregation": "mean of per-pass sigmoid probabilities using identical cached dropout samples",
         "config": asdict(effective_config),
         "environment": _get_environment_info(),
         "task": {

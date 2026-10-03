@@ -22,8 +22,8 @@
 
 ## 3. Prediction and Calibration
 
-- [ ] **Fix the aggregation mismatch.** Ensure baseline and gated models use identical prediction aggregation and dropout samples.
-- [ ] **Add matched inference baselines.** Compare ungated, uniform-gate, MC-confidence-only, and NARS-gated predictions under identical aggregation.
+- [x] **Fix the aggregation mismatch.** Ensure baseline and gated models use identical prediction aggregation and dropout samples.
+- [x] **Add matched inference baselines.** Compare ungated, uniform-gate, MC-confidence-only, and NARS-gated predictions under identical aggregation.
 - [ ] **Add stronger predictive baselines.** Include deterministic inference, mean-logit inference, calibrated logistic regression, tuned gradient boosting, and recalibrated APACHE.
 - [ ] **Test APACHE dependence.** Compare APACHE-only models and transformer variants with and without APACHE to establish whether NGTA adds predictive value.
 - [ ] **Clarify the symbolic mechanism.** Investigate whether NAL frequency semantics contribute anything beyond a rule-conditioned confidence boost.
@@ -44,7 +44,7 @@
 
 ## 5. Auditability and Trace Exports
 
-- [ ] **Make audit checks independent.** Implement separate revision arithmetic rather than using the same production function for both actual and expected values.
+- [x] **Make audit checks independent.** Implement separate revision arithmetic rather than using the same production function for both actual and expected values.
 - [ ] **Improve trace completeness.** Export every intervention with rule identifiers, symbolic and neural truth values, revised frequencies, attention effects, and provenance.
 - [ ] **Record raw and imputed values.** Include raw measurements, imputation status, rule versions, and counterfactual rule-off effects in event traces.
 - [ ] **Fix incomplete exports.** Remove dependence on optional sampled case traces and ensure all events can be reconstructed from persisted files.
@@ -64,7 +64,7 @@
 
 - [ ] **Run multiple seeds.** Replace single-seed evidence with repeated training runs and report actual variability.
 - [ ] **Fix stale outputs.** Synchronize submission metrics, prediction exports, case traces, and figures with the current experiment results.
-- [ ] **Correct ablation implementations.** Fix rule-confidence sensitivity analysis so it reruns revision rather than substituting a confidence value.
+- [x] **Correct ablation implementations.** Fix rule-confidence sensitivity analysis so it reruns revision rather than substituting a confidence value.
 - [ ] **Prevent test-set tuning.** Restrict hyperparameter and rule selection to training and validation data, with a new locked evaluation for confirmation.
 - [ ] **Improve artifact preservation.** Save model checkpoints, fitted preprocessing objects, per-pass MC outputs, exact split IDs, and dependency versions.
 - [ ] **Make data acquisition reproducible.** Add immutable dataset manifests and hashes, and verify cohort coverage rather than relying on file size.
@@ -107,3 +107,5 @@
 - TCGA selects one physical record per source table and exports repeated-field conflicts. Cross-table chronology is unverified; the defined task is retrospective post-pathology association.
 - WiDS defaults to patient-disjoint partitions, offers hospital-disjoint evaluation, standardizes KNN distances, masks invalid APACHE probabilities, and suppresses imputed-only rule triggers. Full robustness and APACHE-dependence experiments remain open.
 - Regression checks: `tests/test_data_validity.py`. Real TCGA lineage audit: `results/v2_validation/tcga/traces/data_quality.json`.
+
+- Matched inference uses cached per-pass attention, token scores, and CLS logits for ungated, uniform, MC-only, NARS, and symbolic controls. Uniform gating is checked against ungated predictions. Deterministic and mean-logit controls are separately labelled; revision audit arithmetic has its own closed-form implementation. Checks: `tests/test_matched_inference.py`.
