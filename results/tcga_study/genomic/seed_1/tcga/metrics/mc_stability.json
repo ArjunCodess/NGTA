@@ -1,0 +1,5 @@
+{
+  "repeats": 3,
+  "mean_case_probability_std": 0.0058188685029724905,
+  "purpose": "independent dropout-draw stability, conditional on one fitted model"
+}
