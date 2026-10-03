@@ -1,0 +1,21 @@
+{
+  "estimators": [
+    "mc_dropout_variance",
+    "mc_predictive_entropy"
+  ],
+  "seeds": [
+    3
+  ],
+  "seed_count": 1,
+  "mean_score": {
+    "mc_dropout_variance": 0.0004380141079509777,
+    "mc_predictive_entropy": 0.21924777567539136
+  },
+  "pairwise_spearman": {
+    "mc_dropout_variance_vs_mc_predictive_entropy_spearman": 0.9764190292978864
+  },
+  "error_detection_auroc": {
+    "mc_dropout_variance": 0.8411811955235707,
+    "mc_predictive_entropy": 0.8496427700205609
+  }
+}
