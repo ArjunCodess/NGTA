@@ -8,7 +8,7 @@ def external_compatibility(labels, nars, mc, groups=None, iterations=1000, seed=
     y=np.asarray(labels)
     left=np.asarray(nars,dtype=float)
     right=np.asarray(mc,dtype=float)
-    if left.shape!=y.shape or right.shape!=y.shape or not np.isfinite([left,right]).all() or np.any((np.array([left,right])<0)|(np.array([left,right])>1)):
+    if y.ndim != 1 or not np.isin(y, [0,1]).all() or iterations < 1 or left.shape!=y.shape or right.shape!=y.shape or not np.isfinite([left,right]).all() or np.any((np.array([left,right])<0)|(np.array([left,right])>1)):
         raise ValueError("Compatibility requires aligned finite probabilities")
     indices=paired_bootstrap_indices(y,iterations,np.random.default_rng(seed),groups)
     brier=(left-y)**2-(right-y)**2
@@ -28,7 +28,8 @@ def robustness_acceptance(labels, nars_by_rate, mc_by_rate, rates, groups=None, 
     rates=np.asarray(rates,dtype=float)
     left=np.asarray(nars_by_rate,dtype=float)
     right=np.asarray(mc_by_rate,dtype=float)
-    if (left.shape != right.shape or left.shape!=(len(rates),len(y)) or len(rates)<2
+    if (y.ndim != 1 or not np.isin(y, [0,1]).all() or iterations < 1 or not np.isfinite(rates).all()
+            or np.any((rates < 0) | (rates > 1)) or left.shape != right.shape or left.shape!=(len(rates),len(y)) or len(rates)<2
             or rates[0]!=0 or np.any(np.diff(rates)<=0) or not np.isfinite([left,right]).all()
             or np.any((np.array([left,right])<0)|(np.array([left,right])>1))):
         raise ValueError("Robustness requires aligned probabilities at increasing rates starting at zero")

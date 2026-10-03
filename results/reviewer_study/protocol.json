@@ -15,5 +15,8 @@
   "mixed_effects_sensitivity": "binomial crossed random intercepts for reviewer and case, adjusted for period; variational Bayes credible intervals",
   "acceptance": "localization gain >= .10 with positive 95% bootstrap lower bound and false-reassurance upper delta <= .05",
   "blinding": "format identifiers conceal naming, but format richness is visible; never give participants the investigator folder",
-  "status": "prepared only; requires protocol approval, qualified participants and real responses"
+  "status": "prepared only; requires protocol approval, qualified participants and real responses",
+  "grading": "correction_correct is coded by an investigator against the sealed key, never self-scored by participants",
+  "false_reassurance_denominator": "fault-bearing cases only",
+  "repository_demo": "published materials are a demonstration; generate a fresh private package before recruitment because this repository includes the example investigator key"
 }

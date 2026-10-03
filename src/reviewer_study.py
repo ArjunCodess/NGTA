@@ -119,6 +119,9 @@ def create_reviewer_package(output_dir, reviewers=24, cases=80, seed=0):
         mixed_effects_sensitivity="binomial crossed random intercepts for reviewer and case, adjusted for period; variational Bayes credible intervals",
         acceptance="localization gain >= .10 with positive 95% bootstrap lower bound and false-reassurance upper delta <= .05",
         blinding="format identifiers conceal naming, but format richness is visible; never give participants the investigator folder",
+        grading="correction_correct is coded by an investigator against the sealed key, never self-scored by participants",
+        false_reassurance_denominator="fault-bearing cases only",
+        repository_demo="published materials are a demonstration; generate a fresh private package before recruitment because this repository includes the example investigator key",
         status="prepared only; requires protocol approval, qualified participants and real responses")
     (root / "protocol.json").write_text(json.dumps(protocol, indent=2), encoding="utf-8")
     (root / "power.json").write_text(json.dumps(reviewer_power(reviewers, cases, seed=seed), indent=2), encoding="utf-8")
@@ -145,7 +148,8 @@ def analyze_reviewer_responses(package_dir, responses_csv, iterations=2000, seed
             raise ValueError(f"Complete binary {field} responses are required")
     if not frame.localized_fault.isin(FAULTS).all() or not np.isfinite(frame.completion_seconds).all() or (frame.completion_seconds <= 0).any():
         raise ValueError("Responses require valid fault categories and positive finite completion times")
-    frame["false_reassurance"] = frame.reassured * frame.case_id.map(truth).ne("none")
+    frame["false_reassurance"] = frame.reassured
+    fault_cases = frame.case_id.map(truth).ne("none").to_numpy()
     rng = np.random.default_rng(seed)
     reviewers, reviewer_index = np.unique(frame.participant_id, return_inverse=True)
     cases, case_index = np.unique(frame.case_id, return_inverse=True)
@@ -159,12 +163,17 @@ def analyze_reviewer_responses(package_dir, responses_csv, iterations=2000, seed
             continue
         for name in contrasts:
             values = frame[name].to_numpy()
-            contrasts[name].append(float(np.average(values[treatment == 1], weights=weight[treatment == 1])
-                                        - np.average(values[treatment == 0], weights=weight[treatment == 0])))
+            eligible = fault_cases if name == "false_reassurance" else np.ones(len(frame), dtype=bool)
+            left, right = (treatment == 1) & eligible, (treatment == 0) & eligible
+            if weight[left].sum() == 0 or weight[right].sum() == 0:
+                continue
+            contrasts[name].append(float(np.average(values[left], weights=weight[left])
+                                        - np.average(values[right], weights=weight[right])))
     report = dict(participants=len(reviewers), cases=len(cases), response_count=len(frame),
                   interpretation="human results only; requires completed protocol and recruitment records", outcomes={})
     for name, values in contrasts.items():
-        observed = frame.loc[frame.trace.eq(1), name].mean() - frame.loc[frame.trace.eq(0), name].mean()
+        eligible = fault_cases if name == "false_reassurance" else np.ones(len(frame), dtype=bool)
+        observed = frame.loc[frame.trace.eq(1) & eligible, name].mean() - frame.loc[frame.trace.eq(0) & eligible, name].mean()
         report["outcomes"][name] = dict(trace_minus_structured=float(observed),
             lower_95=float(np.percentile(values, 2.5)), upper_95=float(np.percentile(values, 97.5)))
     if frame.localized.nunique() == 2:

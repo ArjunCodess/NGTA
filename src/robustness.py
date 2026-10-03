@@ -3,12 +3,14 @@ from __future__ import annotations
 
 import hashlib
 import json
+import inspect
 from pathlib import Path
 
 import joblib
 import numpy as np
 import pandas as pd
 import torch
+import uuid
 from torch.utils.data import DataLoader, TensorDataset
 
 from .attention_hook import revise_attention_truths
@@ -77,6 +79,7 @@ def evaluate_raw_missingness(bundle, model, device, config, rules, output_dir):
     if transform_cache:
         transform_cache.mkdir(parents=True, exist_ok=True)
     processor_hash = joblib.hash(preprocessor)
+    transform_source_hash = hashlib.sha256(Path(inspect.getfile(type(preprocessor))).read_bytes()).hexdigest()
     scenarios = ("random", "feature_dependent", "outcome_dependent_simulation")
     for scenario in scenarios:
         paired_predictions = {"nars_gated": [], "mc_confidence_only": []}
@@ -84,13 +87,13 @@ def evaluate_raw_missingness(bundle, model, device, config, rules, output_dir):
         for rate in RATES:
             raw, mask = mask_observed_values(bundle.test_frame, columns, rate, np.random.default_rng(config.split_seed), scenario, labels)
             masks[f"{scenario}_{rate:.1f}"] = mask
-            cache_path = (transform_cache / (joblib.hash((processor_hash, raw, scenario, rate)) + ".joblib")) if transform_cache else None
+            cache_path = (transform_cache / (joblib.hash((processor_hash, transform_source_hash, raw, scenario, rate)) + ".joblib")) if transform_cache else None
             if cache_path and cache_path.exists():
                 encoded = joblib.load(cache_path)
             else:
                 encoded = preprocessor.transform_components(raw) if config.dataset == "wids" else preprocessor.transform(raw)
                 if cache_path:
-                    temporary = cache_path.with_suffix(".tmp")
+                    temporary = cache_path.with_suffix("." + uuid.uuid4().hex + ".tmp")
                     joblib.dump(encoded, temporary, compress=3)
                     temporary.replace(cache_path)
             if config.dataset == "wids":
