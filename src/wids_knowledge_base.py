@@ -118,6 +118,7 @@ def build_wids_symbolic_truth_matrices(
     symbolic_trigger_mask = np.zeros((n_cases, n_features), dtype=bool)
     rule_trigger_counts: dict[str, int] = {}
     mapped_rule_trigger_counts: dict[str, int] = {}
+    rule_case_masks: dict[str, np.ndarray] = {}
 
     if trigger_array.ndim != 2 or trigger_array.shape[1] != len(active_rule_names):
         raise ValueError("Rule trigger array shape does not match the expected rule ordering.")
@@ -128,6 +129,7 @@ def build_wids_symbolic_truth_matrices(
             mapped_rule_trigger_counts[rule_name] = 0
             continue
         triggered_patients = trigger_array[:, column_index]
+        rule_case_masks[rule_name] = triggered_patients.copy()
         trigger_count = int(triggered_patients.sum())
         rule_trigger_counts[rule_name] = trigger_count
 
@@ -162,4 +164,5 @@ def build_wids_symbolic_truth_matrices(
         patient_any_rule_triggered=patient_any_rule_triggered,
         total_trigger_count=int(sum(rule_trigger_counts.values())),
         mapped_feature_trigger_count=int(symbolic_trigger_mask.sum()),
+        rule_case_masks=rule_case_masks,
     )

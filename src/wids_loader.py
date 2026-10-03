@@ -308,6 +308,9 @@ def load_wids_data_bundle(
 
 def clean_numeric(frame: pd.DataFrame) -> pd.DataFrame:
     numeric = frame.apply(pd.to_numeric, errors="coerce").replace([np.inf, -np.inf], np.nan)
+    for column in ("age", "d1_lactate_max", "d1_sysbp_min", "d1_creatinine_max"):
+        if column in numeric:
+            numeric[column] = numeric[column].where(numeric[column] >= 0)
     apache = "apache_4a_hospital_death_prob"
     if apache in numeric:
         numeric[apache] = numeric[apache].where(numeric[apache].between(0.0, 1.0))

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Sequence
 
 import numpy as np
@@ -92,6 +92,7 @@ class SymbolicKnowledgeResult:
     patient_any_rule_triggered: np.ndarray
     total_trigger_count: int
     mapped_feature_trigger_count: int
+    rule_case_masks: dict[str, np.ndarray] = field(default_factory=dict)
 
 
 def _categorical_feature_name(column: str, value: Any) -> str:
@@ -207,6 +208,7 @@ def build_symbolic_truth_matrices(
     patient_rule_counts = np.zeros(n_cases, dtype=np.int64)
     rule_trigger_counts: dict[str, int] = {}
     mapped_rule_trigger_counts: dict[str, int] = {}
+    rule_case_masks: dict[str, np.ndarray] = {}
 
     if n_cases == 0 or n_features == 0:
         return SymbolicKnowledgeResult(
@@ -314,6 +316,7 @@ def build_symbolic_truth_matrices(
                 )
                 mapped_patients[patient_index] = True
 
+        rule_case_masks[rule_id] = triggered_patients.copy()
         rule_trigger_counts[rule_id] = int(triggered_patients.sum())
         mapped_rule_trigger_counts[rule_id] = int(mapped_patients.sum())
         patient_rule_counts += triggered_patients.astype(np.int64)
@@ -329,4 +332,5 @@ def build_symbolic_truth_matrices(
         patient_any_rule_triggered=patient_any_rule_triggered,
         total_trigger_count=int(sum(rule_trigger_counts.values())),
         mapped_feature_trigger_count=int(symbolic_trigger_mask.sum()),
+        rule_case_masks=rule_case_masks,
     )
