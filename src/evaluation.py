@@ -13,8 +13,9 @@ def calibration_error(labels, probabilities, bins=10, quantile=False):
     if len(edges) == 1:
         return float(abs(p.mean() - y.mean()))
     indices = np.clip(np.searchsorted(edges, p, side="right") - 1, 0, len(edges)-2)
-    return float(sum(np.mean(indices == i) * abs(p[indices == i].mean() - y[indices == i].mean())
-                     for i in np.unique(indices)))
+    total_p = np.bincount(indices, weights=p, minlength=len(edges)-1)
+    total_y = np.bincount(indices, weights=y, minlength=len(edges)-1)
+    return float(np.abs(total_p-total_y).sum() / len(y))
 
 
 def binary_metrics(labels, probabilities):

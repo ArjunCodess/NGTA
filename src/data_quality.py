@@ -41,7 +41,7 @@ def export_data_quality(bundle, directory: str | Path, data_dir: str | Path, dat
     missingness.to_csv(root / "missingness.csv", index=False)
     genomic = [c for c in columns if c.startswith("genomic_mutation__")]
     clinical = [c for c in columns if c not in genomic]
-    split_ids.to_csv(root / "case_manifest.csv", index=False)
+    (root / "case_manifest.json").write_text(json.dumps({"case_file": "split_ids.csv", "id_column": id_column, "cases": len(split_ids), "split_counts": {name: len(frame) for name, frame in splits.items()}}, indent=2), encoding="utf-8")
     if genomic:
         assay = pd.concat([part[[id_column, *genomic]].assign(split=name).melt(id_vars=[id_column, "split"], var_name="feature", value_name="mutation") for name, part in splits.items()])
         assay["status"] = assay["mutation"].map({0.0: "verified_negative", 1.0: "recorded_positive"}).fillna("unavailable")

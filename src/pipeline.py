@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import platform
 import random
@@ -25,7 +26,7 @@ from torch import nn
 from .apache_baselines import apache_baselines
 from .attention_hook import apply_confidence_gate, revise_attention_truths
 from .auditability import compute_operational_audit
-from .evaluation import binary_metrics, paired_bootstrap_indices
+from .evaluation import binary_metrics, calibration_error, paired_bootstrap_indices
 from .data_quality import export_data_quality
 from .data_loader import DEFAULT_ID_COLUMN, DEFAULT_TARGET_COLUMN, load_data_bundle
 from .knowledge_base import SYMBOLIC_RULES, build_symbolic_truth_matrices
@@ -131,6 +132,7 @@ class PipelineConfig:
     run_shift_eval: bool = False
     split_mode: str = "patient"
     include_apache: bool = True
+    evaluation_lock: str | None = None
 
 
 def set_seed(seed: int) -> None:
@@ -276,126 +278,49 @@ def _bootstrap_metric_intervals(
     seed: int = 0,
     groups: np.ndarray | None = None,
 ) -> dict[str, Any]:
-    rng = np.random.default_rng(seed)
-    bootstrap_indices = paired_bootstrap_indices(y_true, iterations, rng, groups)
-
-    intervals: dict[str, Any] = {}
-    for variant, probabilities in probability_map.items():
-        clipped_probabilities = np.clip(probabilities, 1e-6, 1.0 - 1e-6)
-        auc_samples = np.asarray(
-            [roc_auc_score(y_true[index_set], clipped_probabilities[index_set]) for index_set in bootstrap_indices],
-            dtype=np.float64,
-        )
-        brier_samples = np.asarray(
-            [brier_score_loss(y_true[index_set], clipped_probabilities[index_set]) for index_set in bootstrap_indices],
-            dtype=np.float64,
-        )
-        ece_samples = np.asarray(
-            [
-                _compute_ece(_build_reliability_frame(y_true[index_set], clipped_probabilities[index_set], n_bins=10))
-                for index_set in bootstrap_indices
-            ],
-            dtype=np.float64,
-        )
-        intervals[variant] = {
-            "sampling_unit": "hospital" if groups is not None else "case",
-            "iterations": iterations,
-            "auc_samples_mean": float(np.mean(auc_samples)),
-            "auc_ci_95_lower": float(np.percentile(auc_samples, 2.5)),
-            "auc_ci_95_upper": float(np.percentile(auc_samples, 97.5)),
-            "brier_samples_mean": float(np.mean(brier_samples)),
-            "brier_ci_95_lower": float(np.percentile(brier_samples, 2.5)),
-            "brier_ci_95_upper": float(np.percentile(brier_samples, 97.5)),
-            "ece_samples_mean": float(np.mean(ece_samples)),
-            "ece_ci_95_lower": float(np.percentile(ece_samples, 2.5)),
-            "ece_ci_95_upper": float(np.percentile(ece_samples, 97.5)),
-        }
-
-    def _interval_overlap(left: dict[str, float], right: dict[str, float]) -> bool:
-        return not (
-            left["auc_ci_95_upper"] < right["auc_ci_95_lower"]
-            or right["auc_ci_95_upper"] < left["auc_ci_95_lower"]
-        )
-
-    def _metric_samples(metric_name: str, variant: str) -> np.ndarray:
-        probabilities = np.clip(probability_map[variant], 1e-6, 1.0 - 1e-6)
-        if metric_name == "brier":
-            return np.asarray(
-                [brier_score_loss(y_true[index_set], probabilities[index_set]) for index_set in bootstrap_indices],
-                dtype=np.float64,
-            )
-        if metric_name == "ece":
-            return np.asarray(
-                [
-                    _compute_ece(_build_reliability_frame(y_true[index_set], probabilities[index_set], n_bins=10))
-                    for index_set in bootstrap_indices
-                ],
-                dtype=np.float64,
-            )
-        raise ValueError(f"Unsupported bootstrap metric: {metric_name}")
-
-    def _add_delta_intervals(comparisons: dict[str, Any], left_variant: str, right_variant: str) -> None:
-        comparison_key = f"{left_variant}_vs_{right_variant}"
-        for metric_name in ("brier", "ece"):
-            left_samples = _metric_samples(metric_name, left_variant)
-            right_samples = _metric_samples(metric_name, right_variant)
-            delta_samples = left_samples - right_samples
-            metric_fn = (lambda y, p: brier_score_loss(y, p)) if metric_name == "brier" else (lambda y, p: _compute_ece(_build_reliability_frame(y, p)))
-            comparisons[f"{comparison_key}_{metric_name}_delta_left_minus_right"] = float(metric_fn(y_true, probability_map[left_variant]) - metric_fn(y_true, probability_map[right_variant]))
-            comparisons[f"{comparison_key}_{metric_name}_bootstrap_mean_delta"] = float(np.mean(delta_samples))
-            # Eight prespecified paired Brier/ECE comparisons, Bonferroni family intervals.
-            comparisons[f"{comparison_key}_{metric_name}_delta_family_95_lower"] = float(np.percentile(delta_samples, .3125))
-            comparisons[f"{comparison_key}_{metric_name}_delta_family_95_upper"] = float(np.percentile(delta_samples, 99.6875))
-            comparisons[f"{comparison_key}_{metric_name}_delta_ci_95_lower"] = float(np.percentile(delta_samples, 2.5))
-            comparisons[f"{comparison_key}_{metric_name}_delta_ci_95_upper"] = float(np.percentile(delta_samples, 97.5))
-            comparisons[f"{comparison_key}_{metric_name}_interpretation"] = (
-                f"The 95% paired bootstrap interval for the {metric_name} difference excludes zero."
-                if (
-                    comparisons[f"{comparison_key}_{metric_name}_delta_ci_95_lower"] > 0.0
-                    or comparisons[f"{comparison_key}_{metric_name}_delta_ci_95_upper"] < 0.0
-                )
-                else f"The 95% paired bootstrap interval for the {metric_name} difference includes zero."
-            )
-
-    comparisons: dict[str, Any] = {}
-    if "baseline" in intervals and "nars_gated" in intervals:
-        overlap = _interval_overlap(intervals["baseline"], intervals["nars_gated"])
-        comparisons["baseline_vs_nars_gated_ci_overlap"] = overlap
-        comparisons["baseline_vs_nars_gated_interpretation"] = (
-            "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain."
-            if overlap
-            else "Marginal AUC intervals do not overlap; use paired comparisons for inference."
-        )
-        _add_delta_intervals(comparisons, "baseline", "nars_gated")
-    if "flat_confidence" in intervals and "nars_gated" in intervals:
-        overlap = _interval_overlap(intervals["flat_confidence"], intervals["nars_gated"])
-        comparisons["flat_confidence_vs_nars_gated_ci_overlap"] = overlap
-        comparisons["flat_confidence_vs_nars_gated_interpretation"] = (
-            "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain."
-            if overlap
-            else "Marginal AUC intervals do not overlap; use paired comparisons for inference."
-        )
-        _add_delta_intervals(comparisons, "flat_confidence", "nars_gated")
-    if "mc_confidence_only" in intervals and "nars_gated" in intervals:
-        overlap = _interval_overlap(intervals["mc_confidence_only"], intervals["nars_gated"])
-        comparisons["mc_confidence_only_vs_nars_gated_ci_overlap"] = overlap
-        comparisons["mc_confidence_only_vs_nars_gated_interpretation"] = (
-            "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain."
-            if overlap
-            else "Marginal AUC intervals do not overlap; use paired comparisons for inference."
-        )
-        _add_delta_intervals(comparisons, "mc_confidence_only", "nars_gated")
-    if "random_forest" in intervals and "nars_gated" in intervals:
-        overlap = _interval_overlap(intervals["random_forest"], intervals["nars_gated"])
-        comparisons["random_forest_vs_nars_gated_ci_overlap"] = overlap
-        comparisons["random_forest_vs_nars_gated_interpretation"] = (
-            "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain."
-            if overlap
-            else "Marginal AUC intervals do not overlap; use paired comparisons for inference."
-        )
-        _add_delta_intervals(comparisons, "random_forest", "nars_gated")
-    if comparisons:
-        intervals["comparison"] = comparisons
+    indices = paired_bootstrap_indices(y_true, iterations, np.random.default_rng(seed), groups)
+    metrics = {
+        "auc": lambda y, p: float(roc_auc_score(y, p)),
+        "brier": lambda y, p: float(np.mean((y-p)**2)),
+        "ece": lambda y, p: calibration_error(y, p),
+        "log_loss": lambda y, p: float(np.mean(-y*np.log(p)-(1-y)*np.log1p(-p))),
+    }
+    samples, observed, intervals = {}, {}, {}
+    for variant, values in probability_map.items():
+        p = np.clip(values, 1e-6, 1-1e-6)
+        samples[variant] = {name: np.array([fn(y_true[i], p[i]) for i in indices]) for name, fn in metrics.items()}
+        observed[variant] = {name: fn(y_true, p) for name, fn in metrics.items()}
+        row = {"sampling_unit": "hospital" if groups is not None else "case", "iterations": iterations}
+        for name, values in samples[variant].items():
+            row.update({f"{name}_observed": observed[variant][name],
+                        f"{name}_samples_mean": float(values.mean()),
+                        f"{name}_ci_95_lower": float(np.percentile(values, 2.5)),
+                        f"{name}_ci_95_upper": float(np.percentile(values, 97.5))})
+        intervals[variant] = row
+    if "nars_gated" not in intervals:
+        return intervals
+    comparisons = {}
+    comparators = [name for name in probability_map if name != "nars_gated"]
+    family_count = len(comparators) * len(metrics)
+    tail = 2.5 / family_count
+    for variant in comparators:
+        key = f"{variant}_vs_nars_gated"
+        left, right = intervals[variant], intervals["nars_gated"]
+        comparisons[key + "_ci_overlap"] = not (left["auc_ci_95_upper"] < right["auc_ci_95_lower"] or right["auc_ci_95_upper"] < left["auc_ci_95_lower"])
+        comparisons[key + "_interpretation"] = "Use the paired, multiplicity-adjusted intervals; marginal AUC overlap is descriptive."
+        for metric in metrics:
+            delta = samples[variant][metric] - samples["nars_gated"][metric]
+            lower, upper = np.percentile(delta, [tail, 100-tail])
+            prefix = f"{key}_{metric}"
+            comparisons.update({prefix + "_delta_left_minus_right": observed[variant][metric] - observed["nars_gated"][metric],
+                                prefix + "_bootstrap_mean_delta": float(delta.mean()),
+                                prefix + "_delta_ci_95_lower": float(np.percentile(delta, 2.5)),
+                                prefix + "_delta_ci_95_upper": float(np.percentile(delta, 97.5)),
+                                prefix + "_delta_family_95_lower": float(lower),
+                                prefix + "_delta_family_95_upper": float(upper),
+                                prefix + "_interpretation": "The Bonferroni paired family interval excludes zero." if lower > 0 or upper < 0 else "The Bonferroni paired family interval includes zero."})
+    comparisons["multiplicity_family_size"] = family_count
+    intervals["comparison"] = comparisons
     return intervals
 
 
@@ -1019,7 +944,19 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
     output_dirs = _ensure_output_directories(effective_config.output_dir, effective_config.dataset)
     loader_options = {"split_mode": config.split_mode, "include_apache": config.include_apache} if config.dataset == "wids" else {}
     bundle = dataset_metadata["loader"](data_dir=effective_config.data_dir, batch_size=effective_config.batch_size, seed=effective_config.seed, **loader_options)
-    export_data_quality(bundle, output_dirs["traces"], effective_config.data_dir, effective_config.dataset)
+    data_quality = export_data_quality(bundle, output_dirs["traces"], effective_config.data_dir, effective_config.dataset)
+    locked_config = {key: value for key, value in asdict(effective_config).items()
+                     if key not in {"data_dir", "output_dir", "evaluation_lock", "export_case_traces"}}
+    evaluation_spec = {"schema_version": 2, "config": locked_config,
+                       "rules": dataset_metadata["symbolic_rules"], "sources": data_quality["sources"],
+                       "split_ids_sha256": hashlib.sha256((output_dirs["traces"] / "split_ids.csv").read_bytes()).hexdigest(),
+                       "thresholds": [.1, .2, .5], "primary_metric": "brier",
+                       "confirmation_brier_margin": 1e-4, "bootstrap_unit": "hospital" if config.dataset == "wids" else "case"}
+    if config.evaluation_lock is not None:
+        expected_spec = json.loads(Path(config.evaluation_lock).read_text(encoding="utf-8"))
+        if expected_spec != evaluation_spec:
+            raise ValueError("Evaluation configuration, data, split IDs, or rules differ from the supplied lock")
+    (output_dirs["root"] / "evaluation_spec.json").write_text(json.dumps(evaluation_spec, indent=2), encoding="utf-8")
     bundle.preprocessor.save(output_dirs["traces"] / "preprocessing_metadata.json")
     (output_dirs["traces"] / "split_summary.json").write_text(json.dumps(bundle.split_summary, indent=2), encoding="utf-8")
 
