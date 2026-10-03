@@ -1,0 +1,27 @@
+{
+  "estimators": [
+    "mc_dropout_variance",
+    "mc_predictive_entropy",
+    "deep_ensemble_variance"
+  ],
+  "seeds": [
+    0,
+    1
+  ],
+  "seed_count": 2,
+  "mean_score": {
+    "mc_dropout_variance": 0.0024209918962723336,
+    "mc_predictive_entropy": 0.6905073579172005,
+    "deep_ensemble_variance": 0.00047257426496204603
+  },
+  "pairwise_spearman": {
+    "mc_dropout_variance_vs_mc_predictive_entropy_spearman": -0.29053708439897696,
+    "mc_dropout_variance_vs_deep_ensemble_variance_spearman": -0.04866642309097552,
+    "mc_predictive_entropy_vs_deep_ensemble_variance_spearman": -0.15498721227621484
+  },
+  "error_detection_auroc": {
+    "mc_dropout_variance": 0.4683760683760684,
+    "mc_predictive_entropy": 0.5307692307692308,
+    "deep_ensemble_variance": 0.7153846153846154
+  }
+}
