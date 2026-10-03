@@ -19,10 +19,13 @@ def calibration_error(labels, probabilities, bins=10, quantile=False):
 
 
 def binary_metrics(labels, probabilities):
-    y = np.asarray(labels, dtype=int)
-    p = np.clip(np.asarray(probabilities, dtype=float), 1e-6, 1-1e-6)
-    if y.shape != p.shape or not np.isfinite(p).all() or not np.isin(y, [0, 1]).all():
-        raise ValueError("Metrics require aligned binary labels and finite probabilities")
+    y = np.asarray(labels)
+    p = np.asarray(probabilities, dtype=float)
+    if (y.ndim != 1 or not y.size or y.shape != p.shape or not np.isfinite(p).all()
+            or not np.isin(y, [0, 1]).all() or np.any((p < 0) | (p > 1))):
+        raise ValueError("Metrics require nonempty aligned binary labels and finite probabilities in [0, 1]")
+    y = y.astype(int)
+    p = np.clip(p, 1e-6, 1-1e-6)
     two_classes = np.unique(y).size == 2
     result = {"auc": float(roc_auc_score(y, p)) if two_classes else float("nan"),
               "pr_auc": float(average_precision_score(y, p)) if two_classes else float("nan"),

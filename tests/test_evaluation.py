@@ -5,6 +5,15 @@ from src.evaluation import binary_metrics, calibration_error, paired_bootstrap_i
 from src.pipeline import _bootstrap_metric_intervals, _build_reliability_frame, _compute_ece
 
 
+@pytest.mark.parametrize("labels, probabilities", [
+    ([0, .5], [.2, .8]), ([0, 1], [.2, np.inf]),
+    ([0, 1], [-.1, .8]), ([], []), ([[0, 1]], [[.2, .8]]),
+])
+def test_metrics_reject_invalid_inputs_before_conversion(labels, probabilities):
+    with pytest.raises(ValueError):
+        binary_metrics(labels, probabilities)
+
+
 def test_calibration_and_threshold_metrics_are_defined():
     labels = np.array([0, 1, 0, 1])
     probabilities = np.array([.1, .8, .2, .9])
