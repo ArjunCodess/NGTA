@@ -15,11 +15,11 @@ from torch.utils.data import DataLoader, TensorDataset
 from .acceptance import external_compatibility
 from .attention_hook import revise_attention_truths
 from .evaluation import binary_metrics
-from .knowledge_base import build_symbolic_truth_matrices
+from .knowledge_base import build_symbolic_truth_matrices, SYMBOLIC_RULES
 from .matched_inference import score_cached_passes
 from .neural_encoder import TabularTransformerClassifier
 from .trace_replay import export_replay_bundle
-from .wids_knowledge_base import build_wids_symbolic_truth_matrices
+from .wids_knowledge_base import build_wids_symbolic_truth_matrices, WIDS_RULE_DEFINITIONS
 
 
 def harmonize_cohort(frame, policy, processor, development_ids, development_patient_ids=None, rule_source_columns=()):
@@ -83,6 +83,15 @@ def evaluate_external(checkpoint_dir, cohort_csv, mapping_json, output_dir, mc_s
         raise ValueError("External evaluation requires a checkpoint with immutable training provenance")
     processor = joblib.load(checkpoint_dir / "preprocessor.joblib")
     manifest = pd.read_csv(checkpoint_dir / "traces" / "split_ids.csv")
+    if saved.get("feature_names")!=processor.feature_names or saved["input_dim"]!=processor.input_dim:
+        raise ValueError("Frozen checkpoint and preprocessor feature order differ")
+    registry=WIDS_RULE_DEFINITIONS if config["dataset"]=="wids" else SYMBOLIC_RULES
+    if training_spec["rules"]!=registry:
+        raise ValueError("Current rule definitions differ from the frozen checkpoint")
+    split_columns=manifest[[processor.id_column,"split"]]
+    split_hashes={hashlib.sha256(split_columns.to_csv(index=False,lineterminator=ending).encode()).hexdigest() for ending in ("\n","\r\n")}
+    if training_spec["split_ids_sha256"] not in split_hashes:
+        raise ValueError("Development case partitions differ from the frozen checkpoint")
     policy = json.loads(Path(mapping_json).read_text(encoding="utf-8"))
     # Validate the frozen study definitions before reading any external outcomes.
     expected_outcome = "hospital_mortality" if config["dataset"] == "wids" else "lymph_node_metastasis"
@@ -115,11 +124,12 @@ def evaluate_external(checkpoint_dir, cohort_csv, mapping_json, output_dir, mc_s
     cached = summary.attention_passes, summary.token_score_passes, summary.cls_logit_passes
     mc, _ = score_cached_passes(*cached, truths.neural_confidence, config["gamma"])
     nars, attention = score_cached_passes(*cached, truths.revised_confidence, config["gamma"])
+    flat,_=score_cached_passes(*cached,np.full_like(truths.neural_confidence,.5),config["gamma"])
     if fingerprint != joblib.hash(processor):
         raise RuntimeError("External evaluation changed frozen preprocessing")
     root = Path(output_dir)
     root.mkdir(parents=True, exist_ok=True)
-    probabilities = {"baseline": summary.probabilities_mean, "mc_confidence_only": mc, "nars_gated": nars}
+    probabilities = {"baseline": summary.probabilities_mean, "flat_confidence":flat,"mc_confidence_only": mc, "nars_gated": nars}
     report = external_compatibility(encoded.target, nars, mc, groups=groups, seed=seed)
     pd.DataFrame([dict(variant=name, **binary_metrics(encoded.target, p)) for name, p in probabilities.items()]).to_csv(root / "metrics.csv", index=False)
     bundle = SimpleNamespace(preprocessor=processor, test_frame=mapped, encoded_test=encoded)
@@ -128,6 +138,7 @@ def evaluate_external(checkpoint_dir, cohort_csv, mapping_json, output_dir, mc_s
         probabilities=probabilities, attention_after=attention)
     report["mapping"] = policy
     report["checkpoint_sha256"] = hashlib.sha256((checkpoint_dir / "model.pt").read_bytes()).hexdigest()
+    report["preprocessor_sha256"] = hashlib.sha256((checkpoint_dir / "preprocessor.joblib").read_bytes()).hexdigest()
     report["cohort_sha256"] = hashlib.sha256(Path(cohort_csv).read_bytes()).hexdigest()
     report["mc_samples"] = mc_samples
     report["independence_verification"] = "case and patient identifier overlap checked; independent source identity requires the documented cohort provenance"

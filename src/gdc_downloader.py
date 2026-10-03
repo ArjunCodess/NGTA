@@ -4,7 +4,10 @@ import os
 
 import pandas as pd
 
-from .gdc_acquisition import pin_thca_manifest, download_pinned_manifest
+if __package__:
+    from .gdc_acquisition import pin_thca_manifest, download_pinned_manifest
+else:
+    from gdc_acquisition import pin_thca_manifest, download_pinned_manifest
 
 
 def _find_existing_maf(download_dir: str | os.PathLike[str]) -> Path | None:
