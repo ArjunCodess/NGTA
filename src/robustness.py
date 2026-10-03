@@ -69,7 +69,7 @@ def evaluate_raw_missingness(bundle, model, device, config, rules, output_dir):
     for scenario in ("random", "feature_dependent"):
         # Nested masks use the same draws, making higher-rate observations a subset.
         for rate in RATES:
-            raw, mask = mask_observed_values(bundle.test_frame, columns, rate, np.random.default_rng(config.seed), scenario)
+            raw, mask = mask_observed_values(bundle.test_frame, columns, rate, np.random.default_rng(config.split_seed), scenario)
             masks[f"{scenario}_{rate:.1f}"] = mask
             if config.dataset == "wids":
                 encoded = preprocessor.transform_components(raw)
@@ -117,7 +117,7 @@ def evaluate_raw_missingness(bundle, model, device, config, rules, output_dir):
     pd.concat(predictions).to_csv(root / "missingness_predictions.csv", index=False)
     np.savez_compressed(root / "raw_masks.npz", **masks)
     (root / "missingness_spec.json").write_text(json.dumps({"schema_version": 2, "mask_columns": columns,
-        "rates": RATES, "seed": config.seed, "scenarios": ["random", "feature_dependent"],
+        "rates": RATES, "seed": config.split_seed, "scenarios": ["random", "feature_dependent"],
         "frozen_digest": before, "rule_input_policy": "observed_only",
         "feature_dependent_weights": np.linspace(.5, 1.5, len(columns)).tolist()}, indent=2), encoding="utf-8")
     return metrics

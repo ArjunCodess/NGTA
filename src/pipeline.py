@@ -120,6 +120,7 @@ class PipelineConfig:
     mc_samples: int = 50
     gamma: float = 2.0
     seed: int = 0
+    split_seed: int = 0
     patience: int = 12
     d_model: int = 64
     num_heads: int = 4
@@ -944,7 +945,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
     set_seed(effective_config.seed)
     output_dirs = _ensure_output_directories(effective_config.output_dir, effective_config.dataset)
     loader_options = {"split_mode": config.split_mode, "include_apache": config.include_apache} if config.dataset == "wids" else {}
-    bundle = dataset_metadata["loader"](data_dir=effective_config.data_dir, batch_size=effective_config.batch_size, seed=effective_config.seed, **loader_options)
+    bundle = dataset_metadata["loader"](data_dir=effective_config.data_dir, batch_size=effective_config.batch_size, seed=effective_config.split_seed, **loader_options)
     data_quality = export_data_quality(bundle, output_dirs["traces"], effective_config.data_dir, effective_config.dataset)
     locked_config = {key: value for key, value in asdict(effective_config).items()
                      if key not in {"data_dir", "output_dir", "evaluation_lock", "export_case_traces"}}
@@ -954,7 +955,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
                        "thresholds": [.1, .2, .5], "primary_metric": "brier",
                        "confirmation_brier_margin": 1e-4, "bootstrap_unit": "hospital" if config.dataset == "wids" else "case"}
     if config.evaluation_lock is not None:
-        expected_spec = json.loads(Path(config.evaluation_lock).read_text(encoding="utf-8"))
+        expected_spec = json.loads(Path(config.evaluation_lock.format(seed=config.seed, dataset=config.dataset)).read_text(encoding="utf-8"))
         if expected_spec != evaluation_spec:
             raise ValueError("Evaluation configuration, data, split IDs, or rules differ from the supplied lock")
     (output_dirs["root"] / "evaluation_spec.json").write_text(json.dumps(evaluation_spec, indent=2), encoding="utf-8")

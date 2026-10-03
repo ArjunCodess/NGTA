@@ -102,7 +102,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--batch-size", type=int, default=32, help="Batch size for training and evaluation.")
     parser.add_argument("--mc-samples", type=int, default=50, help="Number of MC dropout inference passes.")
     parser.add_argument("--gamma", type=float, default=2.0, help="Confidence gating exponent.")
-    parser.add_argument("--seed", type=int, default=0, help="Random seed.")
+    parser.add_argument("--seed", type=int, default=0, help="Model training and MC random seed.")
+    parser.add_argument("--split-seed", type=int, default=0, help="Fixed cohort split and raw mask seed, shared across training seeds.")
     parser.add_argument("--learning-rate", type=float, default=1e-3, help="Optimizer learning rate.")
     parser.add_argument("--weight-decay", type=float, default=1e-4, help="AdamW weight decay.")
     parser.add_argument("--patience", type=int, default=12, help="Early-stopping patience.")
@@ -247,7 +248,7 @@ def main() -> None:
     if args.audit_data:
         from src.data_quality import audit_data
         for dataset in (("tcga", "wids") if args.run_all else (args.dataset,)):
-            report = audit_data(args.data_dir, args.output_dir, dataset, args.seed, args.split_mode)
+            report = audit_data(args.data_dir, args.output_dir, dataset, args.split_seed, args.split_mode)
             print(json.dumps(report, indent=2))
         return
     _run_self_checks()
@@ -263,6 +264,7 @@ def main() -> None:
         mc_samples=args.mc_samples,
         gamma=args.gamma,
         seed=args.seed,
+        split_seed=args.split_seed,
         patience=args.patience,
         d_model=args.d_model,
         num_heads=args.num_heads,

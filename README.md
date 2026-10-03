@@ -43,11 +43,11 @@ Use the existing environment or install `requirements.txt` into a Python environ
 Additional experiment options:
 
 - `--without-apache` excludes the score from feature-based predictors; raw APACHE, APACHE-only logistic regression, and logit recalibration remain separate comparators fitted on training outcomes.
-- `--seeds 0 1 2 3 4` trains separate models and exports actual seed variability. One run cannot estimate a standard deviation across seeds.
+- `--seeds 0 1 2 3 4` trains separate models and exports actual seed variability. One run cannot estimate a standard deviation across seeds. `--split-seed` defaults to 0 and holds cohort partitions and masking draws fixed across those training seeds.
 - `--ensemble-size 5` trains and preserves five seeded ensemble checkpoints and member probabilities.
 - `--shift-eval` masks originally observed raw values at 0%, 10%, 30%, 50%, and 70%, then reruns frozen preprocessing, rule extraction, and matched MC inference. Random and prespecified feature-dependent masks are saved.
 - `--encoder-intervention` compares readout gating with intervention inside the encoder.
-- `--evaluation-lock PATH` checks configuration, sources, split IDs, and rules against an existing `evaluation_spec.json` before training.
+- `--evaluation-lock PATH` checks configuration, sources, split IDs, and rules against an existing `evaluation_spec.json` before training. Paths may include `{seed}` and `{dataset}` for per-run locks.
 - `--export-case-traces` adds sampled case summaries. Complete intervention events are always exported.
 
 Symbolic controls remove all or individual rules, shuffle cases, randomize truth values, sweep frequency and confidence, apply fixed priors, and compare a closed-form confidence boost. One hundred prevalence-preserving predicate permutations support empirical Brier/log-loss tests with Holm adjustment. These diagnostics do not prove clinical rule value without the locked confirmation study.
