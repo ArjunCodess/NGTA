@@ -90,6 +90,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--resume", action="store_true", help="Reuse a completed checkpoint after checking its configuration; rerun evaluation.")
     parser.add_argument("--shuffle-training-labels", action="store_true", help="Transformer training-label shuffle negative control; keep validation/test labels intact.")
     parser.add_argument("--mc-repeats", type=int, default=1, help="Independent dropout evaluations per trained model for MC stability diagnostics.")
+    parser.add_argument("--feature-mode", choices=("all", "clinical", "genomic"), default="all", help="TCGA input modality, with the same case partitions and train-only preprocessing.")
     parser.add_argument("--run-all", action="store_true", help="Run the full TCGA and WiDS pipelines sequentially.")
     parser.add_argument(
         "--dataset",
@@ -280,6 +281,7 @@ def main() -> None:
         resume=args.resume,
         shuffle_training_labels=args.shuffle_training_labels,
         mc_repeats=args.mc_repeats,
+        feature_mode=args.feature_mode,
         baseline_set=args.baseline_set,
         ablation_set=args.ablation_set,
         export_case_traces=args.export_case_traces,
