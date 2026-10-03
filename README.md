@@ -9,7 +9,7 @@ NGTA is a neurosymbolic clinical prediction architecture that maps neural uncert
 - `tcga`: TCGA-THCA lymph node metastasis prediction from merged clinical tables plus a mutation-derived binary gene panel
 - `wids`: WiDS Datathon 2020 ICU hospital mortality prediction from first-day ICU measurements with feature-specific missingness
 
-The anonymous NeurIPS 2026 workshop manuscript is [`paper/main.tex`](paper/main.tex), The existing [`paper/main.pdf`](paper/main.pdf) is stale because the local compiler setup/access checks failed. NeurIPS formatting files are local to `paper/`.
+The anonymous NeurIPS 2026 workshop manuscript is [`paper/main.tex`](paper/main.tex), with its compiled PDF at [`paper/main.pdf`](paper/main.pdf). NeurIPS formatting files are local to `paper/`.
 
 ## April 21, 2026 Feedback Update
 
@@ -58,14 +58,14 @@ This is not a complete NARS cognitive architecture. Neural feature frequency is 
 
 ### Why there are two datasets
 
-- `tcga` exercises the clinical/genomic input interface for retrospective post-pathology lymph-node association. The local held-out cases have no recorded variants or complete verified assay panels, so they cannot demonstrate genomic fusion or genomic intervention.
+- `tcga` exercises the clinical/genomic input interface for retrospective post-pathology lymph-node association. The acquired cohort now has recorded mutation positives in 50 of 69 held-out cases and 39 BRAF rule events; complete callable assay panels and measurement chronology remain unverified.
 - `wids` supplies a larger first-day ICU mortality task. Patient- and hospital-disjoint splitting is supported. Training separate models on these two tasks is not independent-cohort validation.
 
 ### What we found
 
-The current implementation passes matched-inference, data-validity and numerical replay checks. Five short TCGA training runs share identical split IDs and export actual seed variability. The integrated TCGA bundle replays all 74 rule events, including 24 unmapped events, and synthetic WiDS integration exercises score baselines and missingness controls.
+The current development studies contain 20 hospital-held-out WiDS fits across KNN/median imputation, APACHE inclusion/exclusion and five seeds, plus 15 TCGA clinical-only/genomic-only/fused fits. Each uses up to 60 epochs with validation early stopping, 50 matched dropout passes and three independent dropout repeats. Five-model ensembles, validation recalibration, symbolic controls, subgroup metrics and decision curves are exported alongside complete intervention replay.
 
-These two-epoch integration runs do not meet the clinical experiment protocol in [plan.md](plan.md). The TCGA smoke study does not establish symbolic benefit over MC-only; its 100-permutation Holm-adjusted p-value is 1. The older full-run numerical tables are retained below as historical evidence, but their differing dropout aggregation, imputed rule triggers and production-reused audit prevent a corrected gating-benefit claim.
+The planned symbolic Brier benefit of 0.0001 is not established. For WiDS KNN, mean NARS-minus-MC Brier is -0.000000243 with hierarchical 95% interval [-0.000000691, 0.000000164]. Removing APACHE reduces mean ungated AUROC from 0.875721 to 0.841118. These are development results on already inspected cohorts; internal held-out hospitals do not establish external compatibility. The original numerical tables below remain historical evidence with their aggregation and audit limitations disclosed.
 
 [list.md](list.md) tracks genuinely completed work. The detailed research audit is in [docs/research-audit.md](docs/research-audit.md), leaving this README focused on the project and its use.
 
@@ -114,6 +114,12 @@ Useful flags:
 - `--without-apache`: remove APACHE from feature-based predictors while preserving score-only comparators
 - `--encoder-intervention`: compare intervention inside every encoder attention layer with readout gating
 - `--evaluation-lock PATH`: reject changed configuration, sources, splits or rules before training/exports; this is not prospective preregistration
+- `--imputation knn|median`: select the training-fitted imputer
+- `--mc-repeats 3`: save independent dropout repetitions in addition to training-seed variation
+- `--cache-dir .cache/ngta`: reuse preprocessing only when source hashes, splits, options and preprocessing code match
+- `--resume`: reuse a compatible saved checkpoint; reject changed training provenance before writing artifacts
+- `--feature-mode all|clinical|genomic`: compare TCGA modalities on identical case partitions with training-only preprocessing
+- `--shuffle-training-labels`: run a labeled neural negative control without changing classical baseline targets
 
 Notes:
 
@@ -139,10 +145,11 @@ This writes submission artifacts under the selected output directory:
 - `results/submission/paper_tables.tex`
 - run-specific figures under `<output-dir>/paper_figures`
 
-Paper figures are regenerated automatically at the end of a complete run when both TCGA and WiDS result directories are available under the selected `--output-dir`. The manuscript retains its historical figure paths; new figure exports are separated until their evidence and provenance are reviewed. Mixed historical/current bundles are rejected. The same step can be run directly:
+Paper figures require matching result schemas and independently replayed sources. The manuscript's existing figure paths now contain explicitly selected five-seed TCGA fused and WiDS KNN results. Current tables record their sources in `paper/figures/current_results_manifest.json`; seed-mean intervals are distinct from case-bootstrap intervals. Regenerate them with:
 
 ```bash
-python -c "from src.paper_figures import generate_paper_figures; generate_paper_figures('results', figures_dir='results/paper_figures')"
+python -c "from src.paper_figures import generate_paper_figures; generate_paper_figures(seeds=[0,1,2,3,4], dataset_roots={'tcga':'results/tcga_study/fused','wids':'results/hospital_study/knn'})"
+python scripts/refresh_paper_results.py
 ```
 
 The submission artifacts support an auditability-first framing: NGTA is a glass-box evidential routing interface for clinical transformers, with performance treated as compatibility evidence rather than as a claim of universal superiority. `auditability_metrics.csv/json` reports held-out rule coverage, trace completeness, arithmetic residuals, attention effects, probability changes, and threshold flips. These are operational checks, not a clinician usability evaluation.
@@ -164,7 +171,7 @@ WiDS expects:
 
 - `wids_icu.csv` with patient/hospital IDs for the corresponding grouped split
 
-An optional `assay_manifest.csv` contains `case_submitter_id,gene,source,verified`, with unique case/gene pairs and sourced callable coverage for verified negatives. A missing mutation record is unknown, not a negative. Local manifests show variants in only two TCGA training cases and none in validation/test. Cross-table timing is unverified; pathology features support retrospective association, not preoperative prediction.
+An optional `assay_manifest.csv` contains `case_submitter_id,gene,source,verified`, with unique case/gene pairs and sourced callable coverage for verified negatives. A missing mutation record is unknown, not a negative. The acquired source is isolated under `data/acquired_tcga/`: its immutable manifest pins 498 GDC files, publisher checksums, exact extracted-byte hashes and coverage. Sixteen expected clinical cases lack file-associated coverage; coverage is not gene-level callability. Original sparse source files remain historical. Cross-table timing is unverified; pathology features support retrospective association, not preoperative prediction.
 
 ```powershell
 python main.py --run-all --audit-data --split-mode hospital --output-dir results/source_audit
@@ -185,12 +192,12 @@ Rules require observed values: lactate >=4 mmol/L, systolic pressure in [0,90] m
 
 This repository is a research implementation, not a clinical validation package.
 
-- The local TCGA held-out split has 69 cases and no recorded genomic measurements. Clinical-genomic feasibility is an input capability, not a supported held-out result.
+- The acquired TCGA held-out split has 69 cases with recorded positives and replayed genomic interventions, but complete callable panels and verified negatives remain unavailable. The earlier sparse source did not demonstrate held-out genomic intervention.
 - The four thyroid and four ICU rules are prototype probes with version/source metadata; all require clinical expert review. Shared inputs do not establish independent evidence, and same-target collision checks do not resolve correlated propositions.
 - Following Pei Wang's April 21, 2026 feedback, variance-to-confidence is an application-specific heuristic, not native NARS evidence amount.
-- Matched inference and complete numerical replay establish implementation behavior. Clinical symbolic benefit, robustness, equivalence, external compatibility and reviewer usefulness need their planned studies.
+- Matched inference and complete numerical replay establish implementation behavior. Full development comparisons fail the symbolic benefit threshold; masking criteria apply to their stated simulations. Clinical equivalence, external compatibility and reviewer usefulness remain unestablished.
 - Existing outcomes have already been inspected. A file lock preserves configuration but cannot make those outcomes unseen; prospective confirmation needs a defensible fresh evaluation.
-- Verified assay/timing metadata, an eligible independent cohort, expert review and reviewer participants are external dependencies. Remaining controls and full-data execution are work the project can perform; [docs/research-audit.md](docs/research-audit.md) distinguishes them.
+- Verified assay/timing metadata, an eligible independent cohort, expert review and reviewer participants are external dependencies. [docs/research-audit.md](docs/research-audit.md) lists the exact evidence and actions needed for each unfinished task.
 
 ## Outputs
 
@@ -208,6 +215,18 @@ Top-level orchestration output:
 - `<output-dir>/run_all_summary.json`
 
 Per-dataset bundles also preserve `model.pt`, fitted `preprocessor.joblib`, classical estimators, `evaluation_spec.json`, source hashes and split IDs. Complete replay uses `raw_test.csv`, `inference_cache.npz`, `replay_spec.json`, `intervention_events.csv`, hashes and saved MC RNG. Optional ensemble/encoder outputs remain separate.
+
+Full studies are under `results/hospital_study/` and `results/tcga_study/`; each condition has five seed directories, aggregate submission exports and `analysis/` seed/ensemble/hierarchical comparisons. Missingness outputs preserve raw masks, matched probabilities, selective-risk curves and paired acceptance reports. Large hospital estimators and arrays use Git LFS, so run `git lfs install` and `git lfs pull` after cloning.
+
+To reproduce the main hospital study and its frozen masking analysis:
+
+```bash
+python main.py --dataset wids --split-mode hospital --imputation knn --seeds 0 1 2 3 4 --split-seed 0 --epochs 60 --mc-samples 50 --mc-repeats 3 --cache-dir .cache/ngta --baseline-set standard --ablation-set submission --skip-paper-figures --output-dir results/hospital_study/knn
+python scripts/evaluate_study.py --root results/hospital_study/knn --mask-seeds 0 1 2 3 4
+python scripts/uncertainty_intervals.py --root results/hospital_study/knn
+```
+
+`scripts/tcga_controls.py` runs the clinical/genomic controls. `scripts/evaluate_external.py --help` documents frozen independent-cohort evaluation with explicit units, windows, rule-only inputs and patient overlap checks. `scripts/reviewer_study.py --help` prepares and analyzes a reviewer study; the committed package is a demonstration with public investigator answers, so generate a fresh private package before recruitment. `requirements-lock.windows-py314.txt` records the actual run environment; its CUDA Torch wheel uses the matching PyTorch wheel index.
 
 Per-dataset metrics/traces include:
 
@@ -245,7 +264,7 @@ The numerical summary below is sourced from these per-dataset artifacts. The exi
 
 TCGA-THCA full-run summary:
 
-Role in the paper: multi-modal proof of concept for clinical-plus-genomic fusion
+Historical role: clinical/genomic input demonstration; its sparse held-out source did not establish genomic fusion.
 
 - Split: `319 / 69 / 69` train/validation/test from `457` labeled cases
 - Best default AUC: `0.73277` for `flat_confidence` with 95% CI `[0.60282, 0.84794]`
@@ -256,7 +275,7 @@ Role in the paper: multi-modal proof of concept for clinical-plus-genomic fusion
 - NARS-gated: AUC `0.73109`, Brier `0.21094`, ECE `0.11837`, accuracy `0.68116`
 - Symbolic activity: `42 / 69` held-out cases with any trigger, `79` total feature-level revisions
 - Operational auditability: `100%` trigger mapping and finite traces; all `79` rule events changed confidence and attention; mean/median/maximum absolute probability changes among triggered cases were `0.00205 / 0.00185 / 0.00600`; no triggered case crossed the `0.5` threshold; revision and gate residuals were `0`.
-- Interpretation: the flat-confidence control is strongest by TCGA point estimates, but all paired Brier/ECE comparisons between NARS-gated and the Transformer controls include zero. The 69-case split supports multimodal feasibility, not model-ranking or symbolic-gating superiority.
+- Interpretation: the flat-confidence control is strongest by these historical point estimates, but all paired Brier/ECE comparisons between NARS-gated and the transformer controls include zero. This sparse held-out source did not establish multimodal feasibility or symbolic benefit.
 
 WiDS ICU full-run summary:
 
@@ -281,7 +300,7 @@ Role in the paper: primary scale test for missingness, calibration, and operatio
 - `random_forest -> nars_gated` Brier `0.058169 -> 0.056469`; paired delta CI `[0.0009628, 0.0023993]`
 - `random_forest -> nars_gated` ECE `0.007372 -> 0.005833`; paired delta CI `[-0.0038679, 0.0079440]`
 - AUC confidence intervals overlap across all WiDS variants.
-- Interpretation: the paired baseline comparison supports a small calibration benefit from confidence-gated inference, while the flat-confidence and MC-confidence comparisons do not isolate an additional benefit from symbolic revision. The `10` baseline-to-NARS threshold flips likewise measure the entire routing path; the updated prediction export has no threshold flips between MC-confidence-only and NARS-gated predictions.
+- Interpretation: unmatched dropout aggregation confounds the historical baseline comparison, so its small calibration difference cannot establish a gating benefit. The `10` baseline-to-NARS threshold flips measure the entire inference change; MC-confidence-only and NARS-gated predictions had no different threshold decisions in that archived run.
 - Per-rule test triggers:
   - `rule_lactate: 1936`
   - `rule_hypotension: 5338`
