@@ -11,7 +11,7 @@ import pandas as pd
 def source_manifest(data_dir: str | Path, dataset: str) -> list[dict]:
     root = Path(data_dir)
     paths = [root / "wids_icu.csv"] if dataset == "wids" else sorted(
-        p for p in root.iterdir() if p.suffix in {".tsv", ".maf", ".csv"} and p.name != "wids_icu.csv"
+        p for p in root.iterdir() if (p.suffix in {".tsv", ".maf", ".csv"} or p.name in {"acquisition_manifest.json", "download_verification.json"}) and p.name != "wids_icu.csv"
     )
     records = []
     for path in paths:
