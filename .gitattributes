@@ -1,2 +1,7 @@
 results/hospital_study/**/*.joblib filter=lfs diff=lfs merge=lfs -text
 results/hospital_study/**/*.npz filter=lfs diff=lfs merge=lfs -text
+data/acquired_tcga/** -text
+results/**/traces/raw_test.csv -text
+results/**/traces/replay_spec.json -text
+results/**/traces/intervention_events.csv -text
+results/**/traces/replay_hashes.json -text
