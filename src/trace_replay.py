@@ -43,6 +43,18 @@ def _hash(path: Path) -> str:
     return digest.hexdigest()
 
 
+def native_logit_check(attention, scores, cls_logits, native_logits):
+    """Bound float32 multiply/reduction error, including cancellation near zero."""
+    products = attention.astype(float) * scores.astype(float)
+    expected = cls_logits.astype(float) + products.sum(-1)
+    residual = np.abs(expected - native_logits.astype(float))
+    unit = np.finfo(np.float32).eps / 2
+    operations = attention.shape[-1] + 2
+    gamma = operations * unit / (1 - operations * unit)
+    bound = gamma * (np.abs(cls_logits.astype(float)) + np.abs(products).sum(-1)) + 1e-7
+    return bool(np.isfinite(residual).all() and np.all(residual <= bound)), float(residual.max()), float(bound.max())
+
+
 EVENT_COLUMNS = ["case_index", "case_id", "rule_id", "rule_version", "source", "expert_review",
                  "source_column", "raw_value", "imputed_value", "was_imputed", "mapped", "feature_index",
                  "neural_frequency", "neural_confidence", "symbolic_frequency", "symbolic_confidence",
@@ -153,8 +165,8 @@ def replay_bundle(directory: str | Path, tolerance: float = 1e-7) -> dict:
     original_logits = data["logit_passes"].astype(float)
     residuals["original_probability_passes"] = float(np.max(np.abs(
         np.exp(-np.logaddexp(0, -original_logits)) - data["probability_passes"])))
-    components = data["cls_logit_passes"].astype(float) + (attention.astype(float) * data["token_score_passes"]).sum(-1)
-    native_logit_consistency = np.allclose(components, original_logits, atol=1e-7, rtol=1e-6)
+    native_logit_consistency, native_residual, native_bound = native_logit_check(
+        attention, data["token_score_passes"], data["cls_logit_passes"], original_logits)
     for name, expected in (("trigger_mask", mask), ("symbolic_frequency", symbolic_f), ("symbolic_confidence", symbolic_c),
                            ("neural_frequency", freq), ("neural_confidence", confidence),
                            ("revised_frequency", revised_f), ("revised_confidence", revised_c)):
@@ -237,6 +249,7 @@ def replay_bundle(directory: str | Path, tolerance: float = 1e-7) -> dict:
     return {"schema_version": 2, "passed": bool(passed), "artifact_integrity": bool(integrity),
             "event_completeness": bool(complete), "events": len(events), "expected_events": len(expected_events),
             "native_float32_logit_consistency": bool(native_logit_consistency),
+            "native_logit_max_residual": native_residual, "native_logit_rounding_bound_max": native_bound,
             "tolerance": tolerance, "max_residuals": residuals}
 
 

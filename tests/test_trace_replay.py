@@ -13,6 +13,16 @@ from src.knowledge_base import SYMBOLIC_RULES, build_symbolic_truth_matrices
 from src.matched_inference import score_cached_passes
 from src.neural_encoder import TabularTransformerClassifier
 from src.trace_replay import export_replay_bundle, replay_bundle, reference_predicate
+from src.trace_replay import native_logit_check
+
+
+def test_native_logit_check_bounds_float32_cancellation_but_rejects_corruption():
+    attention = np.ones((1,1,3),dtype=np.float32)
+    scores = np.array([[[1000,.0001,-1000]]],dtype=np.float32)
+    cls = np.zeros((1,1),dtype=np.float32)
+    native = (attention*scores).sum(-1)+cls
+    assert native_logit_check(attention,scores,cls,native)[0]
+    assert not native_logit_check(attention,scores,cls,native+1)[0]
 
 
 def _export(tmp_path):
