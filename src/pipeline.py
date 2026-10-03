@@ -22,6 +22,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, brier_score_loss, roc_auc_score, roc_curve
 from torch import nn
 
+from .apache_baselines import apache_baselines
 from .attention_hook import apply_confidence_gate, revise_attention_truths
 from .auditability import compute_operational_audit
 from .evaluation import binary_metrics, paired_bootstrap_indices
@@ -32,8 +33,10 @@ from .matched_inference import score_cached_passes, sigmoid
 from .nars_interface import neural_to_nars
 from .neural_encoder import TabularTransformerClassifier
 from .trace_replay import export_replay_bundle
+from .robustness import evaluate_raw_missingness
 from .shift_eval import evaluate_frozen_shift
-from .symbolic_ablations import build_symbolic_isolation_frame, scale_symbolic_confidence, score_revised_gate
+from .subgroups import subgroup_reports
+from .symbolic_ablations import symbolic_hypothesis_tests, build_symbolic_isolation_frame, scale_symbolic_confidence, score_revised_gate
 from .uncertainty import compare_uncertainty_estimators, deep_ensemble_statistics, mc_predictive_entropy
 from .wids_knowledge_base import WIDS_RULE_DEFINITIONS, build_wids_symbolic_truth_matrices
 from .wids_loader import WIDS_ID_COLUMN, WIDS_TARGET_COLUMN, load_wids_data_bundle
@@ -537,6 +540,8 @@ def _train_classical_baselines(bundle, config: PipelineConfig) -> dict[str, dict
             x_test=x_test,
         )
         baselines[label]["test_labels"] = y_test
+    if config.dataset == "wids":
+        baselines.update(apache_baselines(bundle))
     return baselines
 
 
@@ -1050,7 +1055,8 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
     joblib.dump(bundle.preprocessor, output_dirs["root"] / "preprocessor.joblib", compress=3)
     classical_baselines = _train_classical_baselines(bundle=bundle, config=effective_config)
     for name, baseline in classical_baselines.items():
-        joblib.dump(baseline["model"], output_dirs["root"] / f"baseline_{name}.joblib", compress=3)
+        if baseline["model"] is not None:
+            joblib.dump(baseline["model"], output_dirs["root"] / f"baseline_{name}.joblib", compress=3)
     tree_baseline = classical_baselines[TREE_BASELINE_LABEL]
 
     summary = model.predict_with_mc_dropout(loader=bundle.test_loader, device=device, mc_samples=effective_config.mc_samples)
@@ -1121,6 +1127,9 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         )
     metrics_frame = pd.DataFrame(metric_rows)
     metrics_frame.to_csv(output_dirs["metrics"] / "metrics.csv", index=False)
+    subgroup_metrics, subgroup_curves = subgroup_reports(bundle.test_frame, y_true, probability_map)
+    subgroup_metrics.to_csv(output_dirs["metrics"] / "subgroup_metrics.csv", index=False)
+    subgroup_curves.to_csv(output_dirs["metrics"] / "subgroup_decision_curves.csv", index=False)
     reliability_frame.to_csv(output_dirs["metrics"] / "calibration_reliability.csv", index=False)
 
     auditability_metrics = compute_operational_audit(
@@ -1235,6 +1244,8 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         cached_passes=cached,
     )
     symbolic_isolation_frame.to_csv(output_dirs["metrics"] / "symbolic_isolation.csv", index=False)
+    hypothesis_tests = symbolic_hypothesis_tests(symbolic_isolation_frame)
+    (output_dirs["metrics"] / "symbolic_hypothesis_tests.json").write_text(json.dumps(hypothesis_tests, indent=2), encoding="utf-8")
 
     uncertainty_comparison: dict[str, Any] | None = None
     if effective_config.ensemble_size >= 2:
@@ -1251,6 +1262,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
                 dropout=effective_config.dropout,
             ).to(device)
             _train_model(model=member, bundle=bundle, config=effective_config, device=device)
+            torch.save({"state_dict": member.state_dict(), "seed": member_seed}, output_dirs["root"] / f"ensemble_{member_seed}.pt")
             member_probabilities.append(
                 member.predict_proba(
                     encoded_test.features,
@@ -1258,6 +1270,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
                     batch_size=effective_config.batch_size,
                 )
             )
+        np.savez_compressed(output_dirs["traces"] / "ensemble_predictions.npz", probabilities=np.stack(member_probabilities, axis=0), seeds=member_seeds)
         ensemble_statistics = deep_ensemble_statistics(np.stack(member_probabilities, axis=0))
         baseline_errors = (
             (summary.probabilities_mean >= 0.5).astype(int) != y_true
@@ -1276,26 +1289,17 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
             encoding="utf-8",
         )
 
+    if uncertainty_comparison is None:
+        uncertainty_comparison = compare_uncertainty_estimators(
+            {"mc_dropout_variance": summary.probabilities_var,
+             "mc_predictive_entropy": mc_predictive_entropy(summary.probability_passes)},
+            errors=(summary.probabilities_mean >= .5) != y_true, seeds=[effective_config.seed])
+        (output_dirs["metrics"] / "uncertainty_comparison.json").write_text(
+            json.dumps(uncertainty_comparison, indent=2, default=_json_default), encoding="utf-8")
     shift_frame = pd.DataFrame()
     if effective_config.run_shift_eval:
-        encoded_test = _get_encoded_split(bundle, "test")
-
-        def _frozen_parameters() -> dict[str, np.ndarray]:
-            scaler = bundle.preprocessor.scaler
-            parameter_sum = sum(float(parameter.detach().sum().cpu()) for parameter in model.parameters())
-            return {
-                "scaler_mean": np.asarray(scaler.mean_, dtype=np.float64),
-                "symbolic_confidence": np.asarray(symbolic_knowledge.symbolic_confidence, dtype=np.float64),
-                "parameter_sum": np.asarray([parameter_sum], dtype=np.float64),
-            }
-
-        shift_frame = evaluate_frozen_shift(
-            lambda features: model.predict_proba(features, device, batch_size=effective_config.batch_size),
-            encoded_test.features,
-            y_true,
-            _frozen_parameters,
-            seed=effective_config.seed,
-        )
+        shift_frame = evaluate_raw_missingness(bundle, model, device, effective_config,
+                                              dataset_metadata["symbolic_rules"], output_dirs["metrics"])
         shift_frame.to_csv(output_dirs["metrics"] / "shift_eval.csv", index=False)
 
     decision_curve_frame = _build_decision_curve_frame(
@@ -1382,6 +1386,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         "gamma_ablation": gamma_ablation_frame.to_dict(orient="records"),
         "submission_ablation": submission_ablation_frame.to_dict(orient="records"),
         "symbolic_isolation": symbolic_isolation_frame.to_dict(orient="records"),
+        "symbolic_hypothesis_tests": hypothesis_tests,
         "uncertainty_comparison": uncertainty_comparison,
         "shift_eval": shift_frame.to_dict(orient="records"),
         "case_traces": case_trace_frame.to_dict(orient="records"),

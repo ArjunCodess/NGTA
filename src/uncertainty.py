@@ -9,6 +9,7 @@ from __future__ import annotations
 from typing import Any
 
 import numpy as np
+from scipy.stats import rankdata
 from sklearn.metrics import roc_auc_score
 
 
@@ -43,14 +44,8 @@ def _spearman(left: np.ndarray, right: np.ndarray) -> float:
     if left_values.shape != right_values.shape or left_values.size < 2:
         return float("nan")
 
-    def _rank(values: np.ndarray) -> np.ndarray:
-        order = np.argsort(values, kind="mergesort")
-        ranks = np.empty(values.shape[0], dtype=np.float64)
-        ranks[order] = np.arange(values.shape[0], dtype=np.float64)
-        return ranks
-
-    left_rank = _rank(left_values)
-    right_rank = _rank(right_values)
+    left_rank = rankdata(left_values, method="average")
+    right_rank = rankdata(right_values, method="average")
     left_centered = left_rank - left_rank.mean()
     right_centered = right_rank - right_rank.mean()
     denominator = float(np.sqrt(np.sum(left_centered**2) * np.sum(right_centered**2)))

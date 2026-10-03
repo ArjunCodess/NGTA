@@ -294,3 +294,25 @@ def build_symbolic_isolation_frame(
     if not reference.empty:
         frame["brier_minus_mc_confidence_only"] = frame["brier"] - float(reference.iloc[0])
     return frame
+
+
+def symbolic_hypothesis_tests(frame: pd.DataFrame) -> dict:
+    """Empirical permutation comparisons with Holm adjustment, retaining losses."""
+    actual = frame.loc[frame.variant.eq("nars_gated")].iloc[0]
+    mc = frame.loc[frame.variant.eq("mc_confidence_only")].iloc[0]
+    null = frame.loc[frame.variant.eq("predicate_permutation")]
+    if null.empty:
+        return {"permutations": 0, "tests": {}}
+    pvalues = {metric: float((1 + (null[metric] <= actual[metric]).sum()) / (len(null) + 1))
+               for metric in ("brier", "log_loss")}
+    ordered = sorted(pvalues, key=pvalues.get)
+    adjusted, previous = {}, 0.0
+    for rank, metric in enumerate(ordered):
+        previous = max(previous, min(1.0, pvalues[metric] * (len(ordered) - rank)))
+        adjusted[metric] = previous
+    return {"permutations": len(null), "brier_gain_over_mc": float(mc.brier - actual.brier),
+            "minimum_prespecified_brier_gain": 1e-4,
+            "tests": {metric: {"empirical_p": pvalues[metric], "holm_p": adjusted[metric],
+                               "direction": "correct predicates have lower loss than permuted predicates"}
+                      for metric in ordered},
+            "interpretation": "development diagnostics; confirm on locked hospitals across five seeds"}

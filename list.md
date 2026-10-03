@@ -2,10 +2,10 @@
 
 ## 1. Core Research and Methodology
 
-- [x] **Prove the symbolic component matters.** Add ablations that isolate NARS revision from confidence gating, including rule removal, rule shuffling, random truth values, and fixed symbolic priors.
-- [x] **Strengthen uncertainty estimation.** Compare MC dropout with deep ensembles and other uncertainty methods across multiple random seeds.
-- [x] **Improve the rule base.** Develop a principled rule-generation and validation process with clinical sources, expert review, provenance, contradiction handling, and sensitivity analysis.
-- [x] **Add external validation.** Test on independent cohorts or distribution-shift settings without retuning rules or models.
+- [ ] **Prove the symbolic component matters.** Add ablations that isolate NARS revision from confidence gating, including rule removal, rule shuffling, random truth values, and fixed symbolic priors.
+- [ ] **Strengthen uncertainty estimation.** Compare MC dropout with deep ensembles and other uncertainty methods across multiple random seeds.
+- [ ] **Improve the rule base.** Develop a principled rule-generation and validation process with clinical sources, expert review, provenance, contradiction handling, and sensitivity analysis.
+- [ ] **Add external validation.** Test on independent cohorts or distribution-shift settings without retuning rules or models.
 - [x] **Tighten the scientific framing.** Present NGTA as an auditable inference-time interface for uncertainty-conditioned symbolic intervention, not as a proven clinical performance improvement.
 
 ## 2. Data Validity and Preprocessing
@@ -14,10 +14,10 @@
 - [x] **Correct feature selection leakage.** Move sparse-column filtering and mutation-panel selection inside the training split.
 - [ ] **Audit TCGA record merging.** Check whether collapsed records combine measurements from different times and whether predictors are available at the intended prediction time.
 - [x] **Clarify prediction timing.** Define the prediction landmark and assess whether pathological stage, extension, and residual disease are valid inputs.
-- [ ] **Audit WiDS missingness.** Document feature-level missingness and avoid broad claims of extreme missingness based on one highly incomplete feature.
+- [x] **Audit WiDS missingness.** Document feature-level missingness and avoid broad claims of extreme missingness based on one highly incomplete feature.
 - [ ] **Check APACHE data.** Resolve negative mortality probability values, document score provenance and availability, and test the model without APACHE.
-- [ ] **Review imputation.** Evaluate KNN distance weighting, distinguish observed from imputed values, and check whether imputed values trigger symbolic rules.
-- [ ] **Verify data integrity.** Create case and assay manifests, check source hashes, verify duplicate and overlap counts, and preserve exact data lineage.
+- [x] **Review imputation.** Evaluate KNN distance weighting, distinguish observed from imputed values, and check whether imputed values trigger symbolic rules.
+- [x] **Verify data integrity.** Create case and assay manifests, check source hashes, verify duplicate and overlap counts, and preserve exact data lineage.
 - [ ] **Use stronger data splits.** Introduce patient-disjoint and hospital-disjoint evaluation, with verified genomic coverage for TCGA.
 
 ## 3. Prediction and Calibration
@@ -35,7 +35,7 @@
 ## 4. Rule System and Symbolic Intervention
 
 - [ ] **Expand rule validation.** Document clinical sources, rule provenance, expert review, contradictory rules, and sensitivity to rule choices.
-- [ ] **Test rule necessity.** Disable individual rules and all rules, shuffle predicates, and compare correct rules against matched random controls.
+- [x] **Test rule necessity.** Disable individual rules and all rules, shuffle predicates, and compare correct rules against matched random controls.
 - [x] **Separate observed and imputed triggers.** Measure how much symbolic intervention depends on imputed rather than directly observed clinical values.
 - [x] **Test truth-value sensitivity.** Vary symbolic confidence and frequency while correctly rerunning the revision process.
 - [x] **Fix rule extraction.** Test missing, unknown, negative, boundary, unseen-category, and conflicting inputs, including the extension-category trigger-mask bug.
@@ -113,3 +113,7 @@
 - Every triggered rule now exports its id, source, version, raw value, observed status, truth values, attention effect, and rule-off probability. Unmapped triggers remain explicit events. Replay independently checks predicates, revisions, gates, predictions, counterfactuals, completeness, and hashes from persisted files. `tests/test_trace_replay.py` includes deletion and corruption tests.
 - Calibration includes log loss, PR-AUC, slope/intercept diagnostics, fixed and quantile ECE, and locked threshold metrics. Hospital-clustered paired bootstrap reports observed deltas separately from bootstrap means and adds Bonferroni family intervals. `tests/test_evaluation.py` verifies whole-cluster resampling.
 - Models, fitted preprocessors, classical estimators, exact split IDs, source hashes, dependency versions, and per-pass MC outputs are preserved. The two-epoch TCGA smoke run is implementation validation, not a new clinical result.
+
+- Completion audit reopened the first four research claims: controls and ensemble/shift tooling exist, but symbolic superiority, a full clinical ensemble study, expert rule review, and independent-cohort validation have not been established. Synthetic checks and a training smoke run do not satisfy those requirements.
+- Real WiDS audit now persists case IDs, raw feature missingness, hashes, and patient/hospital/ICU overlap under the hospital-disjoint design. The measured selected-feature missing fraction is 10.36% after masking invalid APACHE scores. No overlap or duplicate selected-feature rows were found.
+- APACHE-only logistic and logit recalibration comparators are fitted on training outcomes; the no-APACHE model option is available. Score sentinel documentation and a full paired hospital experiment remain outstanding. Raw missingness evaluation reprocesses 0/10/30/50/70% masks with frozen state; its integration is tested, but population robustness is not yet established.

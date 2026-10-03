@@ -40,6 +40,7 @@
   ],
   "group_overlap": {},
   "duplicate_feature_rows": 0,
+  "clinical_missing_fraction": 0.05122924443300296,
   "overall_missing_fraction": 0.7576014892713675,
   "prediction_landmark": "retrospective post-pathology association; not preoperative prediction",
   "genomic_coverage": {

@@ -102,7 +102,10 @@ class WIDSPreprocessor:
         categorical_frame = frame[self.categorical_columns].astype("object")
 
         self.distance_scaler = StandardScaler()
-        distance_scaled = self.distance_scaler.fit_transform(numeric_frame)
+        distance_frame = numeric_frame.copy()
+        distance_frame.loc[:, distance_frame.isna().all()] = 0.0
+        self.distance_scaler.fit(distance_frame)
+        distance_scaled = self.distance_scaler.transform(numeric_frame)
         self.distance_scaler.mean_ = np.nan_to_num(self.distance_scaler.mean_)
         self.distance_scaler.scale_ = np.nan_to_num(self.distance_scaler.scale_, nan=1.0)
         self.numeric_imputer = KNNImputer(n_neighbors=5, keep_empty_features=True)
@@ -228,18 +231,7 @@ def load_wids_data_bundle(
     split_mode: str = "patient",
     include_apache: bool = True,
 ) -> DataBundle:
-    csv_path = Path(data_dir) / "wids_icu.csv"
-    if not csv_path.exists():
-        raise FileNotFoundError(f"Missing WiDS CSV: {csv_path}")
-
-    columns = pd.read_csv(csv_path, nrows=0).columns
-    optional = [c for c in ("patient_id", "hospital_id", "icu_id") if c in columns]
-    frame = pd.read_csv(csv_path, na_values=["NA"], usecols=list(WIDS_REQUIRED_COLUMNS) + optional)
-    if frame[WIDS_ID_COLUMN].isna().any() or frame[WIDS_ID_COLUMN].duplicated().any():
-        raise ValueError("WiDS encounter IDs must be present and unique")
-    frame["apache_4a_hospital_death_prob"] = clean_numeric(frame[["apache_4a_hospital_death_prob"]]).iloc[:, 0]
-    frame = frame.dropna(subset=[WIDS_TARGET_COLUMN]).reset_index(drop=True)
-    frame[WIDS_TARGET_COLUMN] = frame[WIDS_TARGET_COLUMN].astype(np.int64)
+    frame = read_wids_frame(data_dir)
 
     if split_mode == "row":
         train_frame, val_frame, test_frame = _stratified_split(frame, WIDS_TARGET_COLUMN, seed)
@@ -329,3 +321,20 @@ def grouped_split(frame: pd.DataFrame, group_column: str, seed: int):
     if any(part[WIDS_TARGET_COLUMN].nunique() != 2 for part in parts):
         raise ValueError("Grouped split requires both labels in every partition; change the prespecified seed")
     return tuple(part.reset_index(drop=True) for part in parts)
+
+
+def read_wids_frame(data_dir: str | Path) -> pd.DataFrame:
+    csv_path = Path(data_dir) / "wids_icu.csv"
+    if not csv_path.exists():
+        raise FileNotFoundError(f"Missing WiDS CSV: {csv_path}")
+
+    columns = pd.read_csv(csv_path, nrows=0).columns
+    optional = [c for c in ("patient_id", "hospital_id", "icu_id") if c in columns]
+    frame = pd.read_csv(csv_path, na_values=["NA"], usecols=list(WIDS_REQUIRED_COLUMNS) + optional)
+    if frame[WIDS_ID_COLUMN].isna().any() or frame[WIDS_ID_COLUMN].duplicated().any():
+        raise ValueError("WiDS encounter IDs must be present and unique")
+    frame["apache_4a_hospital_death_prob"] = clean_numeric(frame[["apache_4a_hospital_death_prob"]]).iloc[:, 0]
+    frame = frame.dropna(subset=[WIDS_TARGET_COLUMN]).reset_index(drop=True)
+    frame[WIDS_TARGET_COLUMN] = frame[WIDS_TARGET_COLUMN].astype(np.int64)
+
+    return frame

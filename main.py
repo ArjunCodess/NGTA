@@ -80,6 +80,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Run the NGTA dual-dataset neurosymbolic tabular pipeline.",
     )
+    parser.add_argument("--audit-data", action="store_true", help="Export source hashes, missingness, coverage, and split lineage without training.")
     parser.add_argument("--split-mode", choices=("patient", "hospital", "row"), default="patient", help="WiDS split grouping; patient and hospital modes enforce disjoint groups.")
     parser.add_argument("--without-apache", action="store_true", help="Exclude APACHE from transformer and feature-based baselines.")
     parser.add_argument("--run-all", action="store_true", help="Run the full TCGA and WiDS pipelines sequentially.")
@@ -261,6 +262,12 @@ def _write_submission_outputs(summaries: list[dict[str, Any]], output_dir: str |
 
 def main() -> None:
     args = parse_args()
+    if args.audit_data:
+        from src.data_quality import audit_data
+        for dataset in (("tcga", "wids") if args.run_all else (args.dataset,)):
+            report = audit_data(args.data_dir, args.output_dir, dataset, args.seed, args.split_mode)
+            print(json.dumps(report, indent=2))
+        return
     _run_self_checks()
 
     config = PipelineConfig(
