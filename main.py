@@ -153,7 +153,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--skip-paper-figures",
         action="store_true",
-        help="Skip regenerating paper figures under paper/figures after the pipeline finishes.",
+        help="Skip generating figures under <output-dir>/paper_figures after the pipeline finishes.",
     )
     return parser.parse_args()
 
@@ -202,33 +202,14 @@ def _write_submission_outputs(summaries: list[dict[str, Any]], output_dir: str |
         if summary.get("auditability"):
             auditability_rows.append({"dataset": dataset, "seed": seed, **summary["auditability"]})
         comparisons = summary.get("metric_bootstrap", {}).get("comparison", {})
-        for left_variant in ("baseline", "flat_confidence", "mc_confidence_only"):
-            comparison = f"{left_variant}_vs_nars_gated"
-            paired_metric_rows.append(
-                {
-                    "dataset": dataset,
-                    "seed": seed,
-                    "comparison": comparison,
-                    "brier_delta_left_minus_right": comparisons.get(
-                        f"{comparison}_brier_delta_left_minus_right"
-                    ),
-                    "brier_delta_ci_95_lower": comparisons.get(
-                        f"{comparison}_brier_delta_ci_95_lower"
-                    ),
-                    "brier_delta_ci_95_upper": comparisons.get(
-                        f"{comparison}_brier_delta_ci_95_upper"
-                    ),
-                    "ece_delta_left_minus_right": comparisons.get(
-                        f"{comparison}_ece_delta_left_minus_right"
-                    ),
-                    "ece_delta_ci_95_lower": comparisons.get(
-                        f"{comparison}_ece_delta_ci_95_lower"
-                    ),
-                    "ece_delta_ci_95_upper": comparisons.get(
-                        f"{comparison}_ece_delta_ci_95_upper"
-                    ),
-                }
-            )
+        comparison_names = sorted({key.removesuffix("_brier_delta_left_minus_right") for key in comparisons if key.endswith("_brier_delta_left_minus_right")})
+        for comparison in comparison_names:
+            row = {"dataset": dataset, "seed": seed, "comparison": comparison,
+                   "multiplicity_family_size": comparisons.get("multiplicity_family_size")}
+            for metric in ("auc", "brier", "ece", "log_loss"):
+                for suffix in ("delta_left_minus_right", "bootstrap_mean_delta", "delta_ci_95_lower", "delta_ci_95_upper", "delta_family_95_lower", "delta_family_95_upper"):
+                    row[f"{metric}_{suffix}"] = comparisons.get(f"{comparison}_{metric}_{suffix}")
+            paired_metric_rows.append(row)
 
     metrics_frame = pd.DataFrame(metric_rows)
     if not metrics_frame.empty:
@@ -245,7 +226,6 @@ def _write_submission_outputs(summaries: list[dict[str, Any]], output_dir: str |
                 ece_std=("ece", "std"),
                 runs=("seed", "nunique"),
             )
-            .fillna(0.0)
         )
         aggregate.to_csv(submission_dir / "multiseed_metrics.csv", index=False)
     else:
@@ -331,11 +311,11 @@ def main() -> None:
 
     if not args.skip_paper_figures:
         try:
-            generated_figures = generate_paper_figures(args.output_dir, seeds=requested_seeds)
+            generated_figures = generate_paper_figures(args.output_dir, figures_dir=Path(args.output_dir) / "paper_figures", seeds=requested_seeds)
             print("Regenerated paper figures:")
             for figure_path in generated_figures:
                 print(f"- {figure_path}")
-        except FileNotFoundError as exc:
+        except (FileNotFoundError, ValueError) as exc:
             print(f"Skipping paper figure generation: {exc}")
 
     print(json.dumps(summary, indent=2, default=_json_default))
