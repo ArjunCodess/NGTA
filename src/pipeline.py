@@ -11,6 +11,8 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -139,6 +141,9 @@ class PipelineConfig:
     encoder_intervention: bool = False
     imputation: str = "knn"
     cache_dir: str | None = None
+    resume: bool = False
+    shuffle_training_labels: bool = False
+    mc_repeats: int = 1
 
 
 def set_seed(seed: int) -> None:
@@ -586,6 +591,7 @@ def _build_decision_curve_frame(
     baseline_probabilities: np.ndarray,
     flat_probabilities: np.ndarray,
     gated_probabilities: np.ndarray,
+    mc_probabilities: np.ndarray | None = None,
 ) -> pd.DataFrame:
     thresholds = np.arange(0.05, 1.0, 0.05, dtype=np.float64)
     prevalence = float(np.mean(y_true))
@@ -603,7 +609,10 @@ def _build_decision_curve_frame(
                 "treat_none_net_benefit": 0.0,
             }
         )
-    return pd.DataFrame(rows)
+    result = pd.DataFrame(rows)
+    if mc_probabilities is not None:
+        result["mc_confidence_only_net_benefit"] = [_compute_net_benefit(y_true, mc_probabilities, float(t)) for t in thresholds]
+    return result
 
 
 def _save_decision_curve_plot(decision_curve_frame: pd.DataFrame, output_path: Path, positive_class_label: str) -> None:
@@ -612,6 +621,8 @@ def _save_decision_curve_plot(decision_curve_frame: pd.DataFrame, output_path: P
     plt.plot(decision_curve_frame["threshold"], decision_curve_frame["baseline_net_benefit"], marker="o", label="Baseline transformer")
     plt.plot(decision_curve_frame["threshold"], decision_curve_frame["flat_confidence_net_benefit"], marker="o", label="Flat-confidence transformer")
     plt.plot(decision_curve_frame["threshold"], decision_curve_frame["nars_gated_net_benefit"], marker="o", label="NARS-gated transformer")
+    if "mc_confidence_only_net_benefit" in decision_curve_frame:
+        plt.plot(decision_curve_frame["threshold"], decision_curve_frame["mc_confidence_only_net_benefit"], marker="o", label="MC-only transformer")
     plt.plot(decision_curve_frame["threshold"], decision_curve_frame["treat_all_net_benefit"], linestyle="--", label="Treat all")
     plt.plot(decision_curve_frame["threshold"], decision_curve_frame["treat_none_net_benefit"], linestyle=":", label="Treat none")
     plt.xlabel(f"Threshold Probability ({positive_class_label})")
@@ -943,6 +954,8 @@ def _resolve_symbolic_knowledge(bundle, config: PipelineConfig):
 
 
 def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
+    if config.mc_repeats < 1:
+        raise ValueError("MC repeats must be positive")
     dataset_metadata = _get_dataset_metadata(config.dataset)
     effective_batch_size = int(dataset_metadata["batch_size"] or config.batch_size)
     effective_config = PipelineConfig(**{**asdict(config), "batch_size": effective_batch_size})
@@ -955,7 +968,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
     split_ids = pd.concat([getattr(bundle, f"{name}_frame")[[bundle.preprocessor.id_column]].assign(split=name)
                            for name in ("train", "val", "test")])
     locked_config = {key: value for key, value in asdict(effective_config).items()
-                     if key not in {"data_dir", "output_dir", "evaluation_lock", "export_case_traces", "cache_dir"}}
+                     if key not in {"data_dir", "output_dir", "evaluation_lock", "export_case_traces", "cache_dir", "resume"}}
     evaluation_spec = {"schema_version": 2, "config": locked_config,
                        "rules": dataset_metadata["symbolic_rules"], "sources": source_manifest(effective_config.data_dir, effective_config.dataset),
                        "split_ids_sha256": hashlib.sha256(split_ids.to_csv(index=False).encode("utf-8")).hexdigest(),
@@ -965,6 +978,28 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         expected_spec = json.loads(Path(config.evaluation_lock.format(seed=config.seed, dataset=config.dataset)).read_text(encoding="utf-8"))
         if expected_spec != evaluation_spec:
             raise ValueError("Evaluation configuration, data, split IDs, or rules differ from the supplied lock")
+    existing_spec_path = Path(config.output_dir) / config.dataset / "evaluation_spec.json"
+    if config.resume and existing_spec_path.exists():
+        previous_spec = json.loads(existing_spec_path.read_text(encoding="utf-8"))
+        if any(previous_spec[key] != evaluation_spec[key] for key in ("sources", "split_ids_sha256")):
+            raise ValueError("Cannot reuse checkpoint with changed source data or case partitions")
+    resume_path = Path(config.output_dir) / config.dataset / "model.pt"
+    saved = None
+    if config.resume and resume_path.exists():
+        saved = torch.load(resume_path, map_location="cpu", weights_only=True)
+        training_spec = saved.get("training_spec", previous_spec if existing_spec_path.exists() else None)
+        if training_spec is None or any(training_spec[key] != evaluation_spec[key]
+                                       for key in ("sources", "split_ids_sha256", "rules")):
+            raise ValueError("Cannot reuse checkpoint without matching training source, partitions and rules")
+        operational = {"cache_dir", "resume", "export_case_traces", "mc_repeats", "encoder_intervention",
+                       "ensemble_size", "run_shift_eval", "baseline_set", "ablation_set"}
+        for key, value in saved["config"].items():
+            if key not in operational and getattr(effective_config, key) != value:
+                raise ValueError(f"Cannot reuse checkpoint: changed {key}")
+        if saved["config"].get("shuffle_training_labels", False) != effective_config.shuffle_training_labels:
+            raise ValueError("Cannot reuse checkpoint: changed training-label control")
+        if saved["feature_names"] != bundle.preprocessor.feature_names:
+            raise ValueError("Cannot reuse checkpoint with different feature names")
     output_dirs = _ensure_output_directories(effective_config.output_dir, effective_config.dataset)
     data_quality = export_data_quality(bundle, output_dirs["traces"], effective_config.data_dir, effective_config.dataset)
     (output_dirs["root"] / "evaluation_spec.json").write_text(json.dumps(evaluation_spec, indent=2), encoding="utf-8")
@@ -994,11 +1029,28 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         dropout=effective_config.dropout,
     ).to(device)
 
-    history = _train_model(model=model, bundle=bundle, config=effective_config, device=device)
+    checkpoint_path = output_dirs["root"] / "model.pt"
+    reused_checkpoint = False
+    if effective_config.resume and checkpoint_path.exists():
+        model.load_state_dict(saved["state_dict"])
+        history = pd.read_csv(output_dirs["metrics"] / "training_history.csv")
+        reused_checkpoint = True
+        print("Reusing completed checkpoint after configuration validation", flush=True)
+    else:
+        original_targets = bundle.train_loader.dataset.target.clone()
+        try:
+            if effective_config.shuffle_training_labels:
+                permutation = torch.randperm(len(original_targets), generator=torch.Generator().manual_seed(config.seed))
+                bundle.train_loader.dataset.target = original_targets[permutation]
+                np.save(output_dirs["traces"] / "training_label_permutation.npy", permutation.numpy())
+            history = _train_model(model=model, bundle=bundle, config=effective_config, device=device)
+        finally:
+            bundle.train_loader.dataset.target = original_targets
     history.to_csv(output_dirs["metrics"] / "training_history.csv", index=False)
     _save_training_plot(history, output_dirs["charts"] / "training_history.png", dataset_metadata["display_name"])
     torch.save({"state_dict": model.state_dict(), "config": asdict(effective_config),
-                "input_dim": bundle.preprocessor.input_dim, "feature_names": bundle.preprocessor.feature_names},
+                "input_dim": bundle.preprocessor.input_dim, "feature_names": bundle.preprocessor.feature_names,
+                "training_spec": evaluation_spec},
                output_dirs["root"] / "model.pt")
     joblib.dump(bundle.preprocessor, output_dirs["root"] / "preprocessor.joblib", compress=3)
     classical_baselines = _train_classical_baselines(bundle=bundle, config=effective_config)
@@ -1007,7 +1059,9 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
             joblib.dump(baseline["model"], output_dirs["root"] / f"baseline_{name}.joblib", compress=3)
     tree_baseline = classical_baselines[TREE_BASELINE_LABEL]
 
-    summary = model.predict_with_mc_dropout(loader=bundle.test_loader, device=device, mc_samples=effective_config.mc_samples)
+    replay_rng = (torch.load(output_dirs["traces"] / "mc_rng.pt", map_location="cpu", weights_only=True)
+                  if reused_checkpoint and (output_dirs["traces"] / "mc_rng.pt").exists() else None)
+    summary = model.predict_with_mc_dropout(loader=bundle.test_loader, device=device, mc_samples=effective_config.mc_samples, replay_rng=replay_rng)
     symbolic_knowledge = _resolve_symbolic_knowledge(bundle, effective_config)
     neural_frequency, neural_confidence = neural_to_nars(summary.probabilities_mean, summary.probabilities_var)
     attention_truths = revise_attention_truths(
@@ -1214,6 +1268,42 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
     symbolic_isolation_frame.to_csv(output_dirs["metrics"] / "symbolic_isolation.csv", index=False)
     hypothesis_tests = symbolic_hypothesis_tests(symbolic_isolation_frame)
     (output_dirs["metrics"] / "symbolic_hypothesis_tests.json").write_text(json.dumps(hypothesis_tests, indent=2), encoding="utf-8")
+    if effective_config.mc_repeats > 1:
+        cpu_rng = torch.get_rng_state()
+        cuda_rng = torch.cuda.get_rng_state_all() if torch.cuda.is_available() else []
+        repeat_rows = []
+        repeat_means = []
+        try:
+            for repeat in range(effective_config.mc_repeats):
+                dropout_seed = effective_config.seed + 100000 + repeat
+                if repeat == 0:
+                    repeated = summary
+                else:
+                    torch.manual_seed(dropout_seed)
+                    if torch.cuda.is_available():
+                        torch.cuda.manual_seed_all(dropout_seed)
+                    repeated = model.predict_with_mc_dropout(bundle.test_loader, device, effective_config.mc_samples)
+                repeated_truths = revise_attention_truths(repeated.attention_mean, repeated.attention_var,
+                    symbolic_knowledge.symbolic_frequency, symbolic_knowledge.symbolic_confidence,
+                    symbolic_knowledge.symbolic_trigger_mask)
+                repeated_cache = repeated.attention_passes, repeated.token_score_passes, repeated.cls_logit_passes
+                values = {"baseline": repeated.probabilities_mean,
+                          "mc_confidence_only": score_cached_passes(*repeated_cache, repeated_truths.neural_confidence, effective_config.gamma)[0],
+                          "nars_gated": score_cached_passes(*repeated_cache, repeated_truths.revised_confidence, effective_config.gamma)[0]}
+                repeat_means.append(values["baseline"])
+                for variant, probabilities in values.items():
+                    repeat_rows.append({"repeat": repeat, "dropout_seed": dropout_seed if repeat else None,
+                                        "variant": variant, **binary_metrics(y_true, probabilities)})
+                np.savez_compressed(output_dirs["traces"] / f"mc_repeat_{repeat}.npz",
+                                    probability_passes=repeated.probability_passes, **values)
+        finally:
+            torch.set_rng_state(cpu_rng)
+            if cuda_rng:
+                torch.cuda.set_rng_state_all(cuda_rng)
+        pd.DataFrame(repeat_rows).to_csv(output_dirs["metrics"] / "mc_repeat_metrics.csv", index=False)
+        (output_dirs["metrics"] / "mc_stability.json").write_text(json.dumps({"repeats": len(repeat_means),
+            "mean_case_probability_std": float(np.std(repeat_means, axis=0, ddof=1).mean()),
+            "purpose": "independent dropout-draw stability, conditional on one fitted model"}, indent=2), encoding="utf-8")
 
     uncertainty_comparison: dict[str, Any] | None = None
     if effective_config.ensemble_size >= 2:
@@ -1276,6 +1366,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         baseline_probabilities=summary.probabilities_mean,
         flat_probabilities=flat_probabilities,
         gated_probabilities=gated_probabilities,
+        mc_probabilities=mc_probabilities,
     )
     decision_curve_frame.to_csv(output_dirs["metrics"] / "decision_curve.csv", index=False)
     _save_decision_curve_plot(decision_curve_frame, output_dirs["charts"] / "decision_curve.png", dataset_metadata["positive_class"])

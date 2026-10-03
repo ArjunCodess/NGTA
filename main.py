@@ -87,6 +87,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--without-apache", action="store_true", help="Exclude APACHE from transformer and feature-based baselines.")
     parser.add_argument("--imputation", choices=("knn", "median"), default="knn", help="Training-fitted WiDS numeric imputation strategy.")
     parser.add_argument("--cache-dir", default=None, help="Reuse trusted local preprocessing after checking source, loader and dependency hashes.")
+    parser.add_argument("--resume", action="store_true", help="Reuse a completed checkpoint after checking its configuration; rerun evaluation.")
+    parser.add_argument("--shuffle-training-labels", action="store_true", help="Transformer training-label shuffle negative control; keep validation/test labels intact.")
+    parser.add_argument("--mc-repeats", type=int, default=1, help="Independent dropout evaluations per trained model for MC stability diagnostics.")
     parser.add_argument("--run-all", action="store_true", help="Run the full TCGA and WiDS pipelines sequentially.")
     parser.add_argument(
         "--dataset",
@@ -274,6 +277,9 @@ def main() -> None:
         dropout=args.dropout,
         imputation=args.imputation,
         cache_dir=args.cache_dir,
+        resume=args.resume,
+        shuffle_training_labels=args.shuffle_training_labels,
+        mc_repeats=args.mc_repeats,
         baseline_set=args.baseline_set,
         ablation_set=args.ablation_set,
         export_case_traces=args.export_case_traces,
