@@ -122,6 +122,8 @@ def verify_pinned_sources(directory):
         raise ValueError("Pinned acquisition manifest has changed")
     if {row["file_id"] for row in report["files"]} != {row["file_id"] for row in manifest["files"]}:
         raise ValueError("Acquisition verification does not include every pinned file")
+    if {path.name for path in root.glob("*.maf")} != {row["file_name"] for row in report["files"]}:
+        raise ValueError("MAF source directory contains missing or unpinned files")
     for record in report["files"]:
         name = record["file_name"]
         if Path(name).name != name or digest_file(root / name) != record["sha256"]:

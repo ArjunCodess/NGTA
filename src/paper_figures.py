@@ -161,6 +161,9 @@ def _aggregate_figure_sources(results_dir, dataset, selected):
     for spec in specs[1:]:
         if any(spec[key] != specs[0][key] for key in ("sources", "split_ids_sha256", "rules")):
             raise ValueError("Seed figures require identical source data, partitions and rules")
+        comparable = lambda value: {"feature_mode": "all", **{key:item for key,item in value["config"].items() if key != "seed"}}
+        if comparable(spec) != comparable(specs[0]):
+            raise ValueError("Seed figures require matching training and evaluation settings")
     for path in selected:
         if not replay_bundle(path / "traces")["passed"]:
             raise ValueError("Figure source failed independent artifact replay")
@@ -324,15 +327,19 @@ def _write_rule_table(figures_dir: Path) -> None:
 
 
 def _write_auditability_table(dataset_dirs: dict[str, Path], figures_dir: Path) -> None:
-    audit_paths = {
-        key: dataset_dirs[key] / "metrics" / "auditability_metrics.json"
-        for key in ("tcga", "wids")
-    }
-    if not all(path.exists() for path in audit_paths.values()):
-        return
-    rows: list[str] = []
+    audit_paths = []
     for dataset, key in (("TCGA-THCA", "tcga"), ("WiDS ICU", "wids")):
-        audit = json.loads(audit_paths[key].read_text(encoding="utf-8"))
+        summary = json.loads((dataset_dirs[key] / "metrics" / "run_summary.json").read_text())
+        sources = summary.get("source_bundles", [str(dataset_dirs[key])])
+        for source in sources:
+            path = Path(source)
+            label = dataset + (" " + path.parent.name if len(sources) > 1 else "")
+            audit_paths.append((label, path / "metrics" / "auditability_metrics.json"))
+    if not all(path.exists() for _, path in audit_paths):
+        raise ValueError("Current figures require per-fit auditability sources")
+    rows: list[str] = []
+    for dataset, path in audit_paths:
+        audit = json.loads(path.read_text(encoding="utf-8"))
         rows.append(
             f"{dataset} & {audit['cases_with_any_trigger']:,}/{audit['held_out_cases']:,} "
             f"({100 * audit['case_coverage']:.1f}\\%) & {audit['mapped_feature_trigger_count']:,} & "
@@ -369,12 +376,13 @@ def generate_paper_figures(
     results_dir: str | Path = "results",
     figures_dir: str | Path = "paper/figures",
     seeds: list[int] | None = None,
+    dataset_roots: dict[str, str | Path] | None = None,
 ) -> list[Path]:
     results_path = Path(results_dir)
     figures_path = Path(figures_dir)
     dataset_dirs = {
-        "tcga": _dataset_result_dir(results_path, "tcga", seeds),
-        "wids": _dataset_result_dir(results_path, "wids", seeds),
+        key: _dataset_result_dir(Path((dataset_roots or {}).get(key, results_path)), key, seeds)
+        for key in ("tcga", "wids")
     }
 
     schemas = []

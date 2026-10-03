@@ -32,6 +32,10 @@ def export_data_quality(bundle, directory: str | Path, data_dir: str | Path, dat
     if split_ids[id_column].isna().any() or split_ids[id_column].duplicated().any():
         raise ValueError("Case IDs must be present and disjoint across partitions")
     split_ids.to_csv(root / "split_ids.csv", index=False)
+    grouping_columns = [column for column in ("patient_id", "hospital_id", "icu_id") if column in bundle.labeled_frame]
+    if grouping_columns:
+        pd.concat([frame[[id_column, *grouping_columns]].assign(split=name) for name, frame in splits.items()]).to_csv(
+            root / "development_groups.csv", index=False)
     columns = bundle.preprocessor.numeric_columns + bundle.preprocessor.binary_columns + bundle.preprocessor.categorical_columns
     missingness = pd.DataFrame([
         {"split": name, "feature": column, "rows": len(frame),
