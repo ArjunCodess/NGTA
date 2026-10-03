@@ -26,10 +26,10 @@
 - [x] **Add matched inference baselines.** Compare ungated, uniform-gate, MC-confidence-only, and NARS-gated predictions under identical aggregation.
 - [ ] **Add stronger predictive baselines.** Include deterministic inference, mean-logit inference, calibrated logistic regression, tuned gradient boosting, and recalibrated APACHE.
 - [ ] **Test APACHE dependence.** Compare APACHE-only models and transformer variants with and without APACHE to establish whether NGTA adds predictive value.
-- [ ] **Clarify the symbolic mechanism.** Investigate whether NAL frequency semantics contribute anything beyond a rule-conditioned confidence boost.
+- [x] **Clarify the symbolic mechanism.** Investigate whether NAL frequency semantics contribute anything beyond a rule-conditioned confidence boost.
 - [ ] **Test encoder-level intervention.** Compare current readout gating with methods that actually intervene in encoder attention and contextual representations.
-- [ ] **Evaluate calibration properly.** Report Brier score, log loss, AUROC, PR-AUC, calibration slope and intercept, multiple ECE definitions, and threshold-specific metrics.
-- [ ] **Correct statistical comparisons.** Use paired hospital-clustered bootstrap intervals, control for multiple comparisons, and distinguish observed effect sizes from bootstrap means.
+- [x] **Evaluate calibration properly.** Report Brier score, log loss, AUROC, PR-AUC, calibration slope and intercept, multiple ECE definitions, and threshold-specific metrics.
+- [x] **Correct statistical comparisons.** Use paired hospital-clustered bootstrap intervals, control for multiple comparisons, and distinguish observed effect sizes from bootstrap means.
 - [ ] **Preserve negative results.** Report cases where MC-only performs better, gating reduces AUC, or comparisons remain inconclusive.
 
 ## 4. Rule System and Symbolic Intervention
@@ -37,18 +37,18 @@
 - [ ] **Expand rule validation.** Document clinical sources, rule provenance, expert review, contradictory rules, and sensitivity to rule choices.
 - [ ] **Test rule necessity.** Disable individual rules and all rules, shuffle predicates, and compare correct rules against matched random controls.
 - [x] **Separate observed and imputed triggers.** Measure how much symbolic intervention depends on imputed rather than directly observed clinical values.
-- [ ] **Test truth-value sensitivity.** Vary symbolic confidence and frequency while correctly rerunning the revision process.
+- [x] **Test truth-value sensitivity.** Vary symbolic confidence and frequency while correctly rerunning the revision process.
 - [x] **Fix rule extraction.** Test missing, unknown, negative, boundary, unseen-category, and conflicting inputs, including the extension-category trigger-mask bug.
 - [ ] **Check multimodal rule behavior.** Verify that genomic rules actually fire on patients with documented genomic measurements.
-- [ ] **Test rule-conditioned confidence boosts.** Compare the NARS mechanism against simpler alternatives that do not use NAL frequency calculations.
+- [x] **Test rule-conditioned confidence boosts.** Compare the NARS mechanism against simpler alternatives that do not use NAL frequency calculations.
 
 ## 5. Auditability and Trace Exports
 
 - [x] **Make audit checks independent.** Implement separate revision arithmetic rather than using the same production function for both actual and expected values.
-- [ ] **Improve trace completeness.** Export every intervention with rule identifiers, symbolic and neural truth values, revised frequencies, attention effects, and provenance.
-- [ ] **Record raw and imputed values.** Include raw measurements, imputation status, rule versions, and counterfactual rule-off effects in event traces.
-- [ ] **Fix incomplete exports.** Remove dependence on optional sampled case traces and ensure all events can be reconstructed from persisted files.
-- [ ] **Validate end-to-end replay.** Independently reconstruct rule triggers, truth-value revisions, gates, and predictions from saved artifacts.
+- [x] **Improve trace completeness.** Export every intervention with rule identifiers, symbolic and neural truth values, revised frequencies, attention effects, and provenance.
+- [x] **Record raw and imputed values.** Include raw measurements, imputation status, rule versions, and counterfactual rule-off effects in event traces.
+- [x] **Fix incomplete exports.** Remove dependence on optional sampled case traces and ensure all events can be reconstructed from persisted files.
+- [x] **Validate end-to-end replay.** Independently reconstruct rule triggers, truth-value revisions, gates, and predictions from saved artifacts.
 - [ ] **Evaluate human oversight.** Compare NGTA traces with ordinary structured logs in a blinded fault-localization study to test whether they actually help reviewers.
 
 ## 6. Robustness and Generalization
@@ -66,7 +66,7 @@
 - [ ] **Fix stale outputs.** Synchronize submission metrics, prediction exports, case traces, and figures with the current experiment results.
 - [x] **Correct ablation implementations.** Fix rule-confidence sensitivity analysis so it reruns revision rather than substituting a confidence value.
 - [ ] **Prevent test-set tuning.** Restrict hyperparameter and rule selection to training and validation data, with a new locked evaluation for confirmation.
-- [ ] **Improve artifact preservation.** Save model checkpoints, fitted preprocessing objects, per-pass MC outputs, exact split IDs, and dependency versions.
+- [x] **Improve artifact preservation.** Save model checkpoints, fitted preprocessing objects, per-pass MC outputs, exact split IDs, and dependency versions.
 - [ ] **Make data acquisition reproducible.** Add immutable dataset manifests and hashes, and verify cohort coverage rather than relying on file size.
 - [ ] **Audit references.** Correct the identified bibliographic metadata error and conduct a complete citation audit.
 
@@ -109,3 +109,7 @@
 - Regression checks: `tests/test_data_validity.py`. Real TCGA lineage audit: `results/v2_validation/tcga/traces/data_quality.json`.
 
 - Matched inference uses cached per-pass attention, token scores, and CLS logits for ungated, uniform, MC-only, NARS, and symbolic controls. Uniform gating is checked against ungated predictions. Deterministic and mean-logit controls are separately labelled; revision audit arithmetic has its own closed-form implementation. Checks: `tests/test_matched_inference.py`.
+
+- Every triggered rule now exports its id, source, version, raw value, observed status, truth values, attention effect, and rule-off probability. Unmapped triggers remain explicit events. Replay independently checks predicates, revisions, gates, predictions, counterfactuals, completeness, and hashes from persisted files. `tests/test_trace_replay.py` includes deletion and corruption tests.
+- Calibration includes log loss, PR-AUC, slope/intercept diagnostics, fixed and quantile ECE, and locked threshold metrics. Hospital-clustered paired bootstrap reports observed deltas separately from bootstrap means and adds Bonferroni family intervals. `tests/test_evaluation.py` verifies whole-cluster resampling.
+- Models, fitted preprocessors, classical estimators, exact split IDs, source hashes, dependency versions, and per-pass MC outputs are preserved. The two-epoch TCGA smoke run is implementation validation, not a new clinical result.

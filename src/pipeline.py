@@ -13,6 +13,7 @@ from typing import Any
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import joblib
 import sklearn
 import torch
 from sklearn.calibration import CalibratedClassifierCV
@@ -23,12 +24,14 @@ from torch import nn
 
 from .attention_hook import apply_confidence_gate, revise_attention_truths
 from .auditability import compute_operational_audit
+from .evaluation import binary_metrics, paired_bootstrap_indices
 from .data_quality import export_data_quality
 from .data_loader import DEFAULT_ID_COLUMN, DEFAULT_TARGET_COLUMN, load_data_bundle
 from .knowledge_base import SYMBOLIC_RULES, build_symbolic_truth_matrices
 from .matched_inference import score_cached_passes, sigmoid
 from .nars_interface import neural_to_nars
 from .neural_encoder import TabularTransformerClassifier
+from .trace_replay import export_replay_bundle
 from .shift_eval import evaluate_frozen_shift
 from .symbolic_ablations import build_symbolic_isolation_frame, scale_symbolic_confidence, score_revised_gate
 from .uncertainty import compare_uncertainty_estimators, deep_ensemble_statistics, mc_predictive_entropy
@@ -238,7 +241,7 @@ def _build_reliability_frame(y_true: np.ndarray, probabilities: np.ndarray, n_bi
     frame = pd.DataFrame(
         {"probability": np.asarray(probabilities, dtype=np.float64), "label": np.asarray(y_true, dtype=np.float64)}
     ).sort_values("probability", kind="mergesort").reset_index(drop=True)
-    frame["bin"] = pd.qcut(frame.index, q=n_bins, labels=False, duplicates="drop")
+    frame["bin"] = pd.cut(frame["probability"], bins=np.linspace(0, 1, n_bins + 1), labels=False, include_lowest=True)
     return (
         frame.groupby("bin", observed=True)
         .agg(
@@ -260,15 +263,7 @@ def _compute_ece(reliability_frame: pd.DataFrame) -> float:
 
 
 def _compute_metrics(y_true: np.ndarray, probabilities: np.ndarray) -> dict[str, float]:
-    clipped_probabilities = np.clip(probabilities, 1e-6, 1.0 - 1e-6)
-    predictions = (clipped_probabilities >= 0.5).astype(int)
-    reliability = _build_reliability_frame(y_true, clipped_probabilities, n_bins=10)
-    return {
-        "auc": float(roc_auc_score(y_true, clipped_probabilities)),
-        "brier": float(brier_score_loss(y_true, clipped_probabilities)),
-        "accuracy": float(accuracy_score(y_true, predictions)),
-        "ece": _compute_ece(reliability),
-    }
+    return binary_metrics(y_true, probabilities)
 
 
 def _bootstrap_metric_intervals(
@@ -276,22 +271,10 @@ def _bootstrap_metric_intervals(
     probability_map: dict[str, np.ndarray],
     iterations: int = 1000,
     seed: int = 0,
+    groups: np.ndarray | None = None,
 ) -> dict[str, Any]:
     rng = np.random.default_rng(seed)
-    n_samples = len(y_true)
-    bootstrap_indices: list[np.ndarray] = []
-    max_attempts = iterations * 100
-    attempts = 0
-
-    while len(bootstrap_indices) < iterations:
-        if attempts >= max_attempts:
-            raise RuntimeError("Unable to generate enough valid bootstrap samples for metric estimation.")
-        sampled_indices = rng.integers(0, n_samples, size=n_samples)
-        sampled_labels = y_true[sampled_indices]
-        attempts += 1
-        if np.unique(sampled_labels).size < 2:
-            continue
-        bootstrap_indices.append(sampled_indices)
+    bootstrap_indices = paired_bootstrap_indices(y_true, iterations, rng, groups)
 
     intervals: dict[str, Any] = {}
     for variant, probabilities in probability_map.items():
@@ -312,6 +295,7 @@ def _bootstrap_metric_intervals(
             dtype=np.float64,
         )
         intervals[variant] = {
+            "sampling_unit": "hospital" if groups is not None else "case",
             "iterations": iterations,
             "auc_samples_mean": float(np.mean(auc_samples)),
             "auc_ci_95_lower": float(np.percentile(auc_samples, 2.5)),
@@ -353,7 +337,12 @@ def _bootstrap_metric_intervals(
             left_samples = _metric_samples(metric_name, left_variant)
             right_samples = _metric_samples(metric_name, right_variant)
             delta_samples = left_samples - right_samples
-            comparisons[f"{comparison_key}_{metric_name}_delta_left_minus_right"] = float(np.mean(delta_samples))
+            metric_fn = (lambda y, p: brier_score_loss(y, p)) if metric_name == "brier" else (lambda y, p: _compute_ece(_build_reliability_frame(y, p)))
+            comparisons[f"{comparison_key}_{metric_name}_delta_left_minus_right"] = float(metric_fn(y_true, probability_map[left_variant]) - metric_fn(y_true, probability_map[right_variant]))
+            comparisons[f"{comparison_key}_{metric_name}_bootstrap_mean_delta"] = float(np.mean(delta_samples))
+            # Eight prespecified paired Brier/ECE comparisons, Bonferroni family intervals.
+            comparisons[f"{comparison_key}_{metric_name}_delta_family_95_lower"] = float(np.percentile(delta_samples, .3125))
+            comparisons[f"{comparison_key}_{metric_name}_delta_family_95_upper"] = float(np.percentile(delta_samples, 99.6875))
             comparisons[f"{comparison_key}_{metric_name}_delta_ci_95_lower"] = float(np.percentile(delta_samples, 2.5))
             comparisons[f"{comparison_key}_{metric_name}_delta_ci_95_upper"] = float(np.percentile(delta_samples, 97.5))
             comparisons[f"{comparison_key}_{metric_name}_interpretation"] = (
@@ -372,7 +361,7 @@ def _bootstrap_metric_intervals(
         comparisons["baseline_vs_nars_gated_interpretation"] = (
             "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain."
             if overlap
-            else "The 95% bootstrap AUC confidence intervals do not overlap, so the observed difference is likely real on this test split."
+            else "Marginal AUC intervals do not overlap; use paired comparisons for inference."
         )
         _add_delta_intervals(comparisons, "baseline", "nars_gated")
     if "flat_confidence" in intervals and "nars_gated" in intervals:
@@ -381,7 +370,7 @@ def _bootstrap_metric_intervals(
         comparisons["flat_confidence_vs_nars_gated_interpretation"] = (
             "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain."
             if overlap
-            else "The 95% bootstrap AUC confidence intervals do not overlap, so the observed difference is likely real on this test split."
+            else "Marginal AUC intervals do not overlap; use paired comparisons for inference."
         )
         _add_delta_intervals(comparisons, "flat_confidence", "nars_gated")
     if "mc_confidence_only" in intervals and "nars_gated" in intervals:
@@ -390,7 +379,7 @@ def _bootstrap_metric_intervals(
         comparisons["mc_confidence_only_vs_nars_gated_interpretation"] = (
             "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain."
             if overlap
-            else "The 95% bootstrap AUC confidence intervals do not overlap, so the observed difference is likely real on this test split."
+            else "Marginal AUC intervals do not overlap; use paired comparisons for inference."
         )
         _add_delta_intervals(comparisons, "mc_confidence_only", "nars_gated")
     if "random_forest" in intervals and "nars_gated" in intervals:
@@ -399,7 +388,7 @@ def _bootstrap_metric_intervals(
         comparisons["random_forest_vs_nars_gated_interpretation"] = (
             "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain."
             if overlap
-            else "The 95% bootstrap AUC confidence intervals do not overlap, so the observed difference is likely real on this test split."
+            else "Marginal AUC intervals do not overlap; use paired comparisons for inference."
         )
         _add_delta_intervals(comparisons, "random_forest", "nars_gated")
     if comparisons:
@@ -441,6 +430,7 @@ def _fit_best_baseline(
         raise RuntimeError(f"Failed to train baseline: {label}")
 
     return {
+        "model": best_model,
         "label": label,
         "best_config": best_config,
         "val_brier": best_val_brier,
@@ -1054,7 +1044,13 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
     history = _train_model(model=model, bundle=bundle, config=effective_config, device=device)
     history.to_csv(output_dirs["metrics"] / "training_history.csv", index=False)
     _save_training_plot(history, output_dirs["charts"] / "training_history.png", dataset_metadata["display_name"])
+    torch.save({"state_dict": model.state_dict(), "config": asdict(effective_config),
+                "input_dim": bundle.preprocessor.input_dim, "feature_names": bundle.preprocessor.feature_names},
+               output_dirs["root"] / "model.pt")
+    joblib.dump(bundle.preprocessor, output_dirs["root"] / "preprocessor.joblib", compress=3)
     classical_baselines = _train_classical_baselines(bundle=bundle, config=effective_config)
+    for name, baseline in classical_baselines.items():
+        joblib.dump(baseline["model"], output_dirs["root"] / f"baseline_{name}.joblib", compress=3)
     tree_baseline = classical_baselines[TREE_BASELINE_LABEL]
 
     summary = model.predict_with_mc_dropout(loader=bundle.test_loader, device=device, mc_samples=effective_config.mc_samples)
@@ -1090,6 +1086,11 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         "mc_confidence_only": mc_probabilities,
         "nars_gated": gated_probabilities,
     }
+    replay_report = export_replay_bundle(output_dirs["traces"], bundle=bundle, summary=summary,
+                                         knowledge=symbolic_knowledge, truths=attention_truths,
+                                         rules=dataset_metadata["symbolic_rules"], dataset=config.dataset,
+                                         gamma=effective_config.gamma, probabilities=probability_map,
+                                         attention_after=gated_attention)
     reliability_frame = pd.concat(
         [
             _build_reliability_frame(y_true, probabilities, n_bins=10).assign(variant=variant)
@@ -1102,6 +1103,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         probability_map=probability_map,
         iterations=1000,
         seed=effective_config.seed,
+        groups=bundle.test_frame["hospital_id"].to_numpy() if effective_config.dataset == "wids" and "hospital_id" in bundle.test_frame else None,
     )
     metric_rows: list[dict[str, Any]] = []
     for variant, probabilities in probability_map.items():
@@ -1375,6 +1377,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         },
         "auc_bootstrap": metric_bootstrap,
         "metric_bootstrap": metric_bootstrap,
+        "persisted_replay": replay_report,
         "auditability": auditability_metrics,
         "gamma_ablation": gamma_ablation_frame.to_dict(orient="records"),
         "submission_ablation": submission_ablation_frame.to_dict(orient="records"),
