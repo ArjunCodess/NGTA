@@ -133,6 +133,7 @@ class PipelineConfig:
     split_mode: str = "patient"
     include_apache: bool = True
     evaluation_lock: str | None = None
+    encoder_intervention: bool = False
 
 
 def set_seed(seed: int) -> None:
@@ -1018,10 +1019,22 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
     deterministic_probabilities = model.predict_proba(_get_encoded_split(bundle, "test").features, device, effective_config.batch_size)
     mean_logits = (summary.cls_logit_passes + np.sum(summary.attention_passes * summary.token_score_passes, axis=-1)).mean(axis=0)
 
+    torch.save(summary.rng_states, output_dirs["traces"] / "mc_rng.pt")
+    encoder_probabilities = {}
+    if effective_config.encoder_intervention:
+        for name, confidence in (("encoder_mc_confidence", attention_truths.neural_confidence),
+                                  ("encoder_nars_confidence", attention_truths.revised_confidence)):
+            encoder_summary = model.predict_with_mc_dropout(bundle.test_loader, device, effective_config.mc_samples,
+                feature_confidence=confidence, gamma=effective_config.gamma, replay_rng=summary.rng_states)
+            encoder_probabilities[name] = encoder_summary.probabilities_mean
+            np.savez_compressed(output_dirs["traces"] / f"{name}.npz", probability_passes=encoder_summary.probability_passes,
+                                attention_passes=encoder_summary.attention_passes, token_score_passes=encoder_summary.token_score_passes,
+                                cls_logit_passes=encoder_summary.cls_logit_passes)
     y_true = summary.labels.astype(int)
     tree_probabilities = tree_baseline["test_probabilities"]
     probability_map = {
         **{label: baseline["test_probabilities"] for label, baseline in classical_baselines.items()},
+        **encoder_probabilities,
         "deterministic": deterministic_probabilities,
         "mean_logit": sigmoid(mean_logits),
         "baseline": summary.probabilities_mean,

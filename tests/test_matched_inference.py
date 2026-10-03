@@ -50,3 +50,18 @@ def test_cached_passes_reconstruct_model_baseline():
         model.predict_with_mc_dropout(DataLoader(dataset, shuffle=True), torch.device("cpu"), 4)
     with pytest.raises(ValueError, match="at least two"):
         model.predict_with_mc_dropout(loader, torch.device("cpu"), 1)
+
+
+def test_encoder_intervention_reuses_dropout_and_changes_contextual_scores():
+    torch.manual_seed(2)
+    model = TabularTransformerClassifier(3, 8, 2, 1, .3)
+    loader = DataLoader(TensorDataset(torch.randn(6, 3), torch.tensor([0, 1]*3)), batch_size=3)
+    baseline = model.predict_with_mc_dropout(loader, torch.device("cpu"), 3)
+    identity = model.predict_with_mc_dropout(loader, torch.device("cpu"), 3,
+                                            feature_confidence=np.ones((6, 3)), replay_rng=baseline.rng_states)
+    np.testing.assert_allclose(identity.probability_passes, baseline.probability_passes, atol=1e-7)
+    confidence = np.tile([.01, .5, .9], (6, 1))
+    intervened = model.predict_with_mc_dropout(loader, torch.device("cpu"), 3,
+                                               feature_confidence=confidence, replay_rng=baseline.rng_states)
+    assert not np.allclose(intervened.token_score_passes, baseline.token_score_passes)
+    assert not np.allclose(intervened.probability_passes, baseline.probability_passes)

@@ -27,7 +27,7 @@
 - [ ] **Add stronger predictive baselines.** Include deterministic inference, mean-logit inference, calibrated logistic regression, tuned gradient boosting, and recalibrated APACHE.
 - [ ] **Test APACHE dependence.** Compare APACHE-only models and transformer variants with and without APACHE to establish whether NGTA adds predictive value.
 - [x] **Clarify the symbolic mechanism.** Investigate whether NAL frequency semantics contribute anything beyond a rule-conditioned confidence boost.
-- [ ] **Test encoder-level intervention.** Compare current readout gating with methods that actually intervene in encoder attention and contextual representations.
+- [x] **Test encoder-level intervention.** Compare current readout gating with methods that actually intervene in encoder attention and contextual representations.
 - [x] **Evaluate calibration properly.** Report Brier score, log loss, AUROC, PR-AUC, calibration slope and intercept, multiple ECE definitions, and threshold-specific metrics.
 - [x] **Correct statistical comparisons.** Use paired hospital-clustered bootstrap intervals, control for multiple comparisons, and distinguish observed effect sizes from bootstrap means.
 - [ ] **Preserve negative results.** Report cases where MC-only performs better, gating reduces AUC, or comparisons remain inconclusive.
@@ -117,3 +117,5 @@
 - Completion audit reopened the first four research claims: controls and ensemble/shift tooling exist, but symbolic superiority, a full clinical ensemble study, expert rule review, and independent-cohort validation have not been established. Synthetic checks and a training smoke run do not satisfy those requirements.
 - Real WiDS audit now persists case IDs, raw feature missingness, hashes, and patient/hospital/ICU overlap under the hospital-disjoint design. The measured selected-feature missing fraction is 10.36% after masking invalid APACHE scores. No overlap or duplicate selected-feature rows were found.
 - APACHE-only logistic and logit recalibration comparators are fitted on training outcomes; the no-APACHE model option is available. Score sentinel documentation and a full paired hospital experiment remain outstanding. Raw missingness evaluation reprocesses 0/10/30/50/70% masks with frozen state; its integration is tested, but population robustness is not yet established.
+
+- Encoder intervention now applies confidence to feature keys inside every attention layer and recomputes contextual representations, while replaying the original dropout RNG states. The readout and encoder variants are saved separately. Identity and context-change checks: `tests/test_matched_inference.py`.
