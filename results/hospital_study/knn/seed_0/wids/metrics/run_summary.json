@@ -4005,8 +4005,9 @@
       "baseline_net_benefit": 0.06123762834150403,
       "flat_confidence_net_benefit": 0.06123762834150403,
       "nars_gated_net_benefit": 0.061270927758764214,
-      "treat_all_net_benefit": 0.03890481916566459,
-      "treat_none_net_benefit": 0.0
+      "treat_all_net_benefit": 0.03890481904933327,
+      "treat_none_net_benefit": 0.0,
+      "mc_confidence_only_net_benefit": 0.06127462769401535
     },
     {
       "threshold": 0.1,
@@ -4014,8 +4015,9 @@
       "baseline_net_benefit": 0.047022066002733835,
       "flat_confidence_net_benefit": 0.047022066002733835,
       "nars_gated_net_benefit": 0.047045498925991025,
-      "treat_all_net_benefit": -0.014489357547354045,
-      "treat_none_net_benefit": 0.0
+      "treat_all_net_benefit": -0.014489357670148223,
+      "treat_none_net_benefit": 0.0,
+      "mc_confidence_only_net_benefit": 0.047045498925991025
     },
     {
       "threshold": 0.15000000000000002,
@@ -4023,8 +4025,9 @@
       "baseline_net_benefit": 0.03889589579241186,
       "flat_confidence_net_benefit": 0.03889589579241186,
       "nars_gated_net_benefit": 0.03900341155794479,
-      "treat_all_net_benefit": -0.07416520210896313,
-      "treat_none_net_benefit": 0.0
+      "treat_all_net_benefit": -0.07416520223898049,
+      "treat_none_net_benefit": 0.0,
+      "mc_confidence_only_net_benefit": 0.03900341155794479
     },
     {
       "threshold": 0.2,
@@ -4032,8 +4035,9 @@
       "baseline_net_benefit": 0.03319859402460457,
       "flat_confidence_net_benefit": 0.03319859402460457,
       "nars_gated_net_benefit": 0.03328646748681898,
-      "treat_all_net_benefit": -0.1413005272407733,
-      "treat_none_net_benefit": 0.0
+      "treat_all_net_benefit": -0.14130052737891674,
+      "treat_none_net_benefit": 0.0,
+      "mc_confidence_only_net_benefit": 0.03328646748681898
     },
     {
       "threshold": 0.25,
@@ -4041,8 +4045,9 @@
       "baseline_net_benefit": 0.028986526069127123,
       "flat_confidence_net_benefit": 0.028986526069127123,
       "nars_gated_net_benefit": 0.028822495606326888,
-      "treat_all_net_benefit": -0.21738722905682484,
-      "treat_none_net_benefit": 0.0
+      "treat_all_net_benefit": -0.21738722920417786,
+      "treat_none_net_benefit": 0.0,
+      "mc_confidence_only_net_benefit": 0.02875219683655536
     },
     {
       "threshold": 0.3,
@@ -4050,8 +4055,9 @@
       "baseline_net_benefit": 0.02383128295254833,
       "flat_confidence_net_benefit": 0.02383128295254833,
       "nars_gated_net_benefit": 0.023861410996736124,
-      "treat_all_net_benefit": -0.30434345970374094,
-      "treat_none_net_benefit": 0.0
+      "treat_all_net_benefit": -0.30434345986161915,
+      "treat_none_net_benefit": 0.0,
+      "mc_confidence_only_net_benefit": 0.023861410996736124
     },
     {
       "threshold": 0.35000000000000003,
@@ -4059,8 +4065,9 @@
       "baseline_net_benefit": 0.02018115452210355,
       "flat_confidence_net_benefit": 0.02018115452210355,
       "nars_gated_net_benefit": 0.019878329052318504,
-      "treat_all_net_benefit": -0.4046775719886441,
-      "treat_none_net_benefit": 0.0
+      "treat_all_net_benefit": -0.40467757215866684,
+      "treat_none_net_benefit": 0.0,
+      "mc_confidence_only_net_benefit": 0.01994862782209003
     },
     {
       "threshold": 0.4,
@@ -4068,8 +4075,9 @@
       "baseline_net_benefit": 0.01719976567076743,
       "flat_confidence_net_benefit": 0.01719976567076743,
       "nars_gated_net_benefit": 0.016942003514938485,
-      "treat_all_net_benefit": -0.5217340363210312,
-      "treat_none_net_benefit": 0.0
+      "treat_all_net_benefit": -0.5217340365052224,
+      "treat_none_net_benefit": 0.0,
+      "mc_confidence_only_net_benefit": 0.016942003514938485
     },
     {
       "threshold": 0.45,
@@ -4077,8 +4085,9 @@
       "baseline_net_benefit": 0.014436810992171274,
       "flat_confidence_net_benefit": 0.014436810992171274,
       "nars_gated_net_benefit": 0.014666879693241732,
-      "treat_all_net_benefit": -0.6600734941683974,
-      "treat_none_net_benefit": 0.0
+      "treat_all_net_benefit": -0.6600734943693334,
+      "treat_none_net_benefit": 0.0,
+      "mc_confidence_only_net_benefit": 0.014666879693241732
     },
     {
       "threshold": 0.5,
@@ -4086,8 +4095,9 @@
       "baseline_net_benefit": 0.013075571177504393,
       "flat_confidence_net_benefit": 0.013075571177504393,
       "nars_gated_net_benefit": 0.013145869947275922,
-      "treat_all_net_benefit": -0.8260808435852374,
-      "treat_none_net_benefit": 0.0
+      "treat_all_net_benefit": -0.8260808438062668,
+      "treat_none_net_benefit": 0.0,
+      "mc_confidence_only_net_benefit": 0.013145869947275922
     },
     {
       "threshold": 0.55,
@@ -4095,8 +4105,9 @@
       "baseline_net_benefit": 0.011521187268111695,
       "flat_confidence_net_benefit": 0.011521187268111695,
       "nars_gated_net_benefit": 0.011708650654169107,
-      "treat_all_net_benefit": -1.0289787150947085,
-      "treat_none_net_benefit": 0.0
+      "treat_all_net_benefit": -1.0289787153402967,
+      "treat_none_net_benefit": 0.0,
+      "mc_confidence_only_net_benefit": 0.011708650654169107
     },
     {
       "threshold": 0.6000000000000001,
@@ -4104,8 +4115,9 @@
       "baseline_net_benefit": 0.009349736379613352,
       "flat_confidence_net_benefit": 0.009349736379613352,
       "nars_gated_net_benefit": 0.009209138840070297,
-      "treat_all_net_benefit": -1.2826010544815474,
-      "treat_none_net_benefit": 0.0
+      "treat_all_net_benefit": -1.2826010547578341,
+      "treat_none_net_benefit": 0.0,
+      "mc_confidence_only_net_benefit": 0.009209138840070297
     },
     {
       "threshold": 0.6500000000000001,
@@ -4113,8 +4125,9 @@
       "baseline_net_benefit": 0.007793120763243783,
       "flat_confidence_net_benefit": 0.007793120763243783,
       "nars_gated_net_benefit": 0.007853376851619381,
-      "treat_all_net_benefit": -1.608686919407483,
-      "treat_none_net_benefit": 0.0
+      "treat_all_net_benefit": -1.6086869197232394,
+      "treat_none_net_benefit": 0.0,
+      "mc_confidence_only_net_benefit": 0.007853376851619381
     },
     {
       "threshold": 0.7000000000000001,
@@ -4122,8 +4135,9 @@
       "baseline_net_benefit": 0.005717633274751024,
       "flat_confidence_net_benefit": 0.005717633274751024,
       "nars_gated_net_benefit": 0.005717633274751024,
-      "treat_all_net_benefit": -2.043468072642063,
-      "treat_none_net_benefit": 0.0
+      "treat_all_net_benefit": -2.043468073010445,
+      "treat_none_net_benefit": 0.0,
+      "mc_confidence_only_net_benefit": 0.005717633274751024
     },
     {
       "threshold": 0.7500000000000001,
@@ -4131,8 +4145,9 @@
       "baseline_net_benefit": 0.004217926186291738,
       "flat_confidence_net_benefit": 0.004217926186291738,
       "nars_gated_net_benefit": 0.0040773286467486805,
-      "treat_all_net_benefit": -2.6521616871704765,
-      "treat_none_net_benefit": 0.0
+      "treat_all_net_benefit": -2.6521616876125353,
+      "treat_none_net_benefit": 0.0,
+      "mc_confidence_only_net_benefit": 0.004147627416520209
     },
     {
       "threshold": 0.8,
@@ -4140,8 +4155,9 @@
       "baseline_net_benefit": 0.003304042179261863,
       "flat_confidence_net_benefit": 0.003304042179261863,
       "nars_gated_net_benefit": 0.003304042179261863,
-      "treat_all_net_benefit": -3.5652021089630943,
-      "treat_none_net_benefit": 0.0
+      "treat_all_net_benefit": -3.565202109515668,
+      "treat_none_net_benefit": 0.0,
+      "mc_confidence_only_net_benefit": 0.003304042179261863
     },
     {
       "threshold": 0.8500000000000001,
@@ -4149,8 +4165,9 @@
       "baseline_net_benefit": 0.0016871704745166952,
       "flat_confidence_net_benefit": 0.0016871704745166952,
       "nars_gated_net_benefit": 0.0016871704745166952,
-      "treat_all_net_benefit": -5.0869361452841275,
-      "treat_none_net_benefit": 0.0
+      "treat_all_net_benefit": -5.086936146020893,
+      "treat_none_net_benefit": 0.0,
+      "mc_confidence_only_net_benefit": 0.0016871704745166952
     },
     {
       "threshold": 0.9000000000000001,
@@ -4158,8 +4175,9 @@
       "baseline_net_benefit": 0.001054481546572935,
       "flat_confidence_net_benefit": 0.001054481546572935,
       "nars_gated_net_benefit": 0.001054481546572935,
-      "treat_all_net_benefit": -8.1304042179262,
-      "treat_none_net_benefit": 0.0
+      "treat_all_net_benefit": -8.130404219031346,
+      "treat_none_net_benefit": 0.0,
+      "mc_confidence_only_net_benefit": 0.001054481546572935
     },
     {
       "threshold": 0.9500000000000001,
@@ -4167,8 +4185,9 @@
       "baseline_net_benefit": 0.0,
       "flat_confidence_net_benefit": 0.0,
       "nars_gated_net_benefit": 0.0,
-      "treat_all_net_benefit": -17.2608084358524,
-      "treat_none_net_benefit": 0.0
+      "treat_all_net_benefit": -17.260808438062693,
+      "treat_none_net_benefit": 0.0,
+      "mc_confidence_only_net_benefit": 0.0
     }
   ],
   "calibration_reliability": [
