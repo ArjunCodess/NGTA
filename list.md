@@ -72,16 +72,16 @@
 
 ## 8. Claims to Weaken or Withdraw
 
-- [ ] **Withdraw the held-out genomic demonstration.** The current TCGA test split does not establish genomic fusion or genomic intervention.
-- [ ] **Restrict extreme-missingness claims.** Describe measured feature-specific missingness until controlled masking experiments establish robustness.
-- [ ] **Qualify confidence-routing claims.** Attribute current differences to the overall inference procedure until aggregation is matched.
-- [ ] **Withdraw universal trace-completeness claims.** Retain them only after every intervention is exported and independently replayable.
-- [ ] **Clarify revision validation.** Describe the existing audit as a consistency check using production arithmetic.
-- [ ] **Qualify trust-signal claims.** Treat the signal as heuristic until its relationship with errors and uncertainty is validated.
-- [ ] **Avoid equivalence claims.** Describe close point estimates on internal splits without claiming formal equivalence or noninferiority.
+- [x] **Withdraw the held-out genomic demonstration.** The current TCGA test split does not establish genomic fusion or genomic intervention.
+- [x] **Restrict extreme-missingness claims.** Describe measured feature-specific missingness until controlled masking experiments establish robustness.
+- [x] **Qualify confidence-routing claims.** Attribute current differences to the overall inference procedure until aggregation is matched.
+- [x] **Withdraw universal trace-completeness claims.** Retain them only after every intervention is exported and independently replayable.
+- [x] **Clarify revision validation.** Describe the existing audit as a consistency check using production arithmetic.
+- [x] **Qualify trust-signal claims.** Treat the signal as heuristic until its relationship with errors and uncertainty is validated.
+- [x] **Avoid equivalence claims.** Describe close point estimates on internal splits without claiming formal equivalence or noninferiority.
 - [x] **Qualify preprocessing claims.** Acknowledge that some feature selection occurs before splitting.
-- [ ] **Limit human-oversight claims.** Describe current instrumentation as inspectable numerical traces until independent replay and user evaluation are complete.
-- [ ] **Separate symbolic effects from inference effects.** Do not attribute baseline-to-NARS prediction changes solely to symbolic intervention.
+- [x] **Limit human-oversight claims.** Describe current instrumentation as inspectable numerical traces until independent replay and user evaluation are complete.
+- [x] **Separate symbolic effects from inference effects.** Do not attribute baseline-to-NARS prediction changes solely to symbolic intervention.
 
 ## 9. Prioritized Experiment Plan
 
@@ -100,7 +100,7 @@
 - [ ] **Second: Match prediction aggregation.** Isolate the actual effect of confidence gating from changes in prediction computation.
 - [ ] **Third: Make traces independently replayable.** Fix audit circularity, export completeness, and rule extraction errors.
 - [ ] **Fourth: Strengthen baselines and validation.** Test APACHE dependence, rule necessity, uncertainty quality, robustness, and external generalization.
-- [ ] **Fifth: Rewrite unsupported claims.** Keep negative findings intact and make every scientific claim match the evidence currently available.
+- [x] **Fifth: Rewrite unsupported claims.** Keep negative findings intact and make every scientific claim match the evidence currently available.
 ## v2 implementation evidence
 
 - Data selection now fits training only. Genomic unknowns retain missing indicators; negative calls require a sourced, verified case/gene assay manifest. The available cohort still has no recorded held-out variants, so verified multimodal evaluation remains open.
@@ -119,3 +119,5 @@
 - APACHE-only logistic and logit recalibration comparators are fitted on training outcomes; the no-APACHE model option is available. Score sentinel documentation and a full paired hospital experiment remain outstanding. Raw missingness evaluation reprocesses 0/10/30/50/70% masks with frozen state; its integration is tested, but population robustness is not yet established.
 
 - Encoder intervention now applies confidence to feature keys inside every attention layer and recomputes contextual representations, while replaying the original dropout RNG states. The readout and encoder variants are saved separately. Identity and context-change checks: `tests/test_matched_inference.py`.
+
+- README and manuscript now distinguish corrected v2 implementation from legacy v1 numerical tables. Legacy aggregation, imputed triggers, circular revision checks, absent held-out genomic measurements, and untested human benefits are stated explicitly. The identified Chudasama bibliography page/author/DOI error was corrected against the authors’ institutional record; a complete citation audit is still open.
