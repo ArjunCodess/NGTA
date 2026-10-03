@@ -32,6 +32,12 @@ def test_equal_risk_quantile_bins_do_not_artificially_separate_ties():
     assert calibration_error([0, 1, 0, 1], [.5]*4, quantile=True) == 0
 
 
+def test_reliability_plot_and_metric_agree_at_bin_boundaries():
+    labels, probabilities = [0, 1], [.09, .1]
+    plotted = _compute_ece(_build_reliability_frame(labels, probabilities))
+    assert plotted == pytest.approx(calibration_error(labels, probabilities))
+
+
 def test_cluster_bootstrap_keeps_entire_hospitals():
     groups = np.repeat(range(5), 4)
     labels = np.tile([0, 1, 0, 1], 5)

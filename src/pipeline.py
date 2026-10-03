@@ -248,7 +248,8 @@ def _build_reliability_frame(y_true: np.ndarray, probabilities: np.ndarray, n_bi
     frame = pd.DataFrame(
         {"probability": np.asarray(probabilities, dtype=np.float64), "label": np.asarray(y_true, dtype=np.float64)}
     ).sort_values("probability", kind="mergesort").reset_index(drop=True)
-    frame["bin"] = pd.cut(frame["probability"], bins=np.linspace(0, 1, n_bins + 1), labels=False, include_lowest=True)
+    frame["bin"] = np.clip(np.searchsorted(np.linspace(0, 1, n_bins + 1),
+                                          frame["probability"], side="right") - 1, 0, n_bins - 1)
     return (
         frame.groupby("bin", observed=True)
         .agg(
