@@ -3,6 +3,9 @@ from types import SimpleNamespace
 import numpy as np
 import pandas as pd
 import torch
+import pytest
+import hashlib
+import json
 from torch.utils.data import DataLoader, TensorDataset
 
 from src.attention_hook import revise_attention_truths
@@ -57,3 +60,23 @@ def test_replay_detects_corrupted_revision_cache(tmp_path):
 def test_independent_hypotension_predicate_rejects_negative_missing_and_boundary():
     observed = pd.Series([-1, None, "Unknown", 90, 91, 89])
     np.testing.assert_array_equal(reference_predicate("rule_hypotension", observed), [0, 0, 0, 1, 0, 1])
+
+
+@pytest.mark.parametrize("field, value", [
+    ("neural_frequency", np.nan), ("attention_before", .9),
+    ("attention_after", .9), ("nars_probability", .99),
+    ("imputed_value", -1), ("expert_review", "reviewed"),
+])
+def test_replay_rejects_invalid_event_fields_even_with_matching_hash(tmp_path, field, value):
+    assert _export(tmp_path)["passed"]
+    path = tmp_path / "intervention_events.csv"
+    events = pd.read_csv(path)
+    events.loc[0, field] = value
+    events.to_csv(path, index=False)
+    hashes_path = tmp_path / "replay_hashes.json"
+    hashes = json.loads(hashes_path.read_text())
+    hashes[path.name] = hashlib.sha256(path.read_bytes()).hexdigest()
+    hashes_path.write_text(json.dumps(hashes))
+    report = replay_bundle(tmp_path)
+    assert report["artifact_integrity"]
+    assert not report["passed"]

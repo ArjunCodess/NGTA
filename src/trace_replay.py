@@ -178,27 +178,47 @@ def replay_bundle(directory: str | Path, tolerance: float = 1e-7) -> dict:
         if variant == "nars_gated":
             residuals["attention_after"] = float(np.max(np.abs(weights.mean(0) - data["attention_after"])))
     # Verify persisted event fields as well as the numerical cache.
+    def check_event(name, actual, expected):
+        difference = abs(float(actual) - float(expected))
+        if not np.isfinite(difference):
+            difference = float("inf")
+        residuals["event_" + name] = max(residuals.get("event_" + name, 0), difference)
+
     for event in events.itertuples():
         rule = spec["rules"].get(event.rule_id, {})
+        if (event.case_index, event.case_id, event.rule_id) not in expected_events:
+            complete = False
+            continue
+        i = int(event.case_index)
         if event.rule_version != rule.get("provenance") or event.source != rule.get("source") or event.was_imputed:
             complete = False
-        j = _feature_position(rule, raw.at[event.case_index, rule["source_column"]], features) if rule else None
+        value = raw.at[i, rule["source_column"]]
+        j = _feature_position(rule, value, features)
         if bool(event.mapped) != (j is not None):
             complete = False
+        if event.source_column != rule["source_column"] or event.expert_review != rule["expert_review"]:
+            complete = False
+        try:
+            raw_matches = np.isclose(float(event.raw_value), float(value), atol=1e-10, rtol=0)
+        except (ValueError, TypeError):
+            raw_matches = str(event.raw_value) == str(value)
+        complete = complete and bool(raw_matches)
+        # Triggered predicates use observed values; imputation must preserve them.
+        try:
+            imputed_matches = np.isclose(float(event.imputed_value), float(value), atol=1e-10, rtol=0)
+        except (ValueError, TypeError):
+            imputed_matches = str(event.imputed_value) == str(value)
+        complete = complete and bool(imputed_matches)
+        for name in ("symbolic_frequency", "symbolic_confidence"):
+            check_event(name, getattr(event, name), rule["truth_value"][name.removeprefix("symbolic_")])
         if j is not None:
-            i = int(event.case_index)
-            if int(event.feature_index) != j or event.source_column != rule["source_column"] or event.expert_review != rule["expert_review"]:
+            if event.feature_index != j:
                 complete = False
-            value = raw.at[i, rule["source_column"]]
-            try:
-                raw_matches = np.isclose(float(event.raw_value), float(value), atol=1e-10)
-            except (ValueError, TypeError):
-                raw_matches = str(event.raw_value) == str(value)
-            complete = complete and bool(raw_matches)
             for name, array in (("neural_frequency", freq), ("neural_confidence", confidence),
                                 ("revised_frequency", revised_f), ("revised_confidence", revised_c),
-                                ("symbolic_frequency", symbolic_f), ("symbolic_confidence", symbolic_c)):
-                residuals["event_" + name] = max(residuals.get("event_" + name, 0), abs(getattr(event, name) - array[i, j]))
+                                ("attention_before", mean), ("attention_after", data["attention_after"])):
+                check_event(name, getattr(event, name), array[i, j])
+            check_event("nars_probability", event.nars_probability, data["probability__nars_gated"][i])
             off_confidence = revised_c[i:i+1].copy()
             off_confidence[0, j] = confidence[i, j]
             off_weights = attention[:, i:i+1].astype(float) * off_confidence[None] ** spec["gamma"]
@@ -206,8 +226,12 @@ def replay_bundle(directory: str | Path, tolerance: float = 1e-7) -> dict:
             off_weights = np.divide(off_weights, denominator, out=attention[:, i:i+1].astype(float).copy(), where=denominator > 0)
             off_logits = data["cls_logit_passes"][:, i:i+1] + (off_weights * data["token_score_passes"][:, i:i+1]).sum(-1)
             off_probability = np.exp(-np.logaddexp(0, -off_logits)).mean()
-            residuals["event_rule_off_probability"] = max(residuals.get("event_rule_off_probability", 0), abs(event.rule_off_probability - off_probability))
-            residuals["event_symbolic_delta"] = max(residuals.get("event_symbolic_delta", 0), abs(event.symbolic_probability_delta - (data["probability__nars_gated"][i] - off_probability)))
+            check_event("rule_off_probability", event.rule_off_probability, off_probability)
+            check_event("symbolic_delta", event.symbolic_probability_delta, data["probability__nars_gated"][i] - off_probability)
+        elif not pd.isna(event.feature_index) or any(not pd.isna(getattr(event, name)) for name in (
+                "neural_frequency", "neural_confidence", "revised_frequency", "revised_confidence",
+                "attention_before", "attention_after", "rule_off_probability", "nars_probability", "symbolic_probability_delta")):
+            complete = False
     finite = all(np.isfinite(value) for value in residuals.values())
     passed = integrity and complete and finite and native_logit_consistency and all(value <= tolerance for value in residuals.values())
     return {"schema_version": 2, "passed": bool(passed), "artifact_integrity": bool(integrity),
