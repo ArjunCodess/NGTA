@@ -68,7 +68,10 @@ class WIDSDataset(Dataset):
 
 
 class WIDSPreprocessor:
-    def __init__(self, include_apache: bool = True) -> None:
+    def __init__(self, include_apache: bool = True, imputation: str = "knn") -> None:
+        if imputation not in {"knn", "median"}:
+            raise ValueError("Imputation must be knn or median")
+        self.imputation = imputation
         self.id_column = WIDS_ID_COLUMN
         self.target_column = WIDS_TARGET_COLUMN
         self.numeric_columns = [c for c in WIDS_CONTINUOUS_COLUMNS if include_apache or c != "apache_4a_hospital_death_prob"]
@@ -108,7 +111,8 @@ class WIDSPreprocessor:
         distance_scaled = self.distance_scaler.transform(numeric_frame)
         self.distance_scaler.mean_ = np.nan_to_num(self.distance_scaler.mean_)
         self.distance_scaler.scale_ = np.nan_to_num(self.distance_scaler.scale_, nan=1.0)
-        self.numeric_imputer = KNNImputer(n_neighbors=5, keep_empty_features=True)
+        self.numeric_imputer = (KNNImputer(n_neighbors=5, keep_empty_features=True)
+                                if self.imputation == "knn" else SimpleImputer(strategy="median", keep_empty_features=True))
         numeric_imputed = self.numeric_imputer.fit_transform(distance_scaled)
         self.scaler = StandardScaler()
         self.scaler.fit(numeric_imputed)
@@ -162,8 +166,15 @@ class WIDSPreprocessor:
             ]
         ).astype(np.float32)
         rule_sources = ["d1_lactate_max", "d1_sysbp_min", "age", "d1_creatinine_max"]
-        observed = numeric_frame[rule_sources].notna().to_numpy()
-        rule_triggers = imputed_rule_triggers * observed
+        # Compare original cleaned measurements in float64. A float32 cast or
+        # inverse scaling can move a just-outside value onto a rule boundary.
+        observed_values = numeric_frame[rule_sources].to_numpy(dtype=float)
+        rule_triggers = np.column_stack([
+            observed_values[:, 0] >= 4.0,
+            (observed_values[:, 1] >= 0) & (observed_values[:, 1] <= 90.0),
+            observed_values[:, 2] >= 75.0,
+            observed_values[:, 3] >= 2.0,
+        ]).astype(np.float32)
         auxiliary_features = np.concatenate([binary_imputed, categorical_encoded], axis=1).astype(np.float32)
         features = np.concatenate([numeric_scaled, auxiliary_features], axis=1).astype(np.float32)
 
@@ -195,6 +206,7 @@ class WIDSPreprocessor:
             "rule_names": self.rule_names,
             "rule_input_policy": "observed_only",
             "knn_distance": "training standardized numeric features",
+            "imputation": getattr(self, "imputation", "knn"),
             "output_feature_names": self.output_feature_names_,
         }
         output_path.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
@@ -230,6 +242,7 @@ def load_wids_data_bundle(
     seed: int = 0,
     split_mode: str = "patient",
     include_apache: bool = True,
+    imputation: str = "knn",
 ) -> DataBundle:
     frame = read_wids_frame(data_dir)
 
@@ -241,7 +254,7 @@ def load_wids_data_bundle(
             raise ValueError(f"Split {split_mode} requires patient_id or hospital_id")
         train_frame, val_frame, test_frame = grouped_split(frame, group_column, seed)
 
-    preprocessor = WIDSPreprocessor(include_apache=include_apache).fit(train_frame)
+    preprocessor = WIDSPreprocessor(include_apache=include_apache, imputation=imputation).fit(train_frame)
     encoded_train = preprocessor.transform_components(train_frame)
     encoded_val = preprocessor.transform_components(val_frame)
     encoded_test = preprocessor.transform_components(test_frame)
