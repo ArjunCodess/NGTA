@@ -21,7 +21,7 @@ def reference_predicate(rule_id: str, values: pd.Series) -> np.ndarray:
         "rule_creatinine": lambda: numeric.ge(2),
         "braf_mutation": lambda: numeric.eq(1),
         "age_ge_55_years": lambda: numeric.ge(55 * 365.25),
-        "pathologic_t_t3_t4": lambda: values.fillna("").astype(str).str.startswith(("T3", "T4")),
+        "pathologic_t_t3_t4": lambda: values.isin(["T3", "T3a", "T3b", "T4", "T4a", "T4b"]),
         "extrathyroid_extension_present": lambda: values.isin(["Minimal (T3)", "Moderate/Advanced (T4a)", "Very Advanced (T4b)"]),
     }
     if rule_id not in predicates:

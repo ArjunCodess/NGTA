@@ -43,6 +43,14 @@ def test_extension_negative_and_unseen_categories_never_revise():
     assert result.mapped_feature_trigger_count == 2
 
 
+def test_unknown_stage_suffix_never_becomes_staging_evidence():
+    column = "diagnoses.ajcc_pathologic_t"
+    values = [None, "Unknown", "T3unknown", "T4-1", "T2", "T3", "T4b"]
+    result = build_symbolic_truth_matrices(pd.DataFrame({column: values}), [f"{column}_{v}" for v in values])
+    np.testing.assert_array_equal(result.patient_any_rule_triggered, [0, 0, 0, 0, 0, 1, 1])
+    assert result.total_trigger_count == result.mapped_feature_trigger_count == 2
+
+
 def test_apache_invalid_scores_become_missing():
     column = "apache_4a_hospital_death_prob"
     result = clean_numeric(pd.DataFrame({column: [-1, 0, 1, 2, np.inf]}))

@@ -47,7 +47,7 @@ SYMBOLIC_RULES: dict[str, dict[str, Any]] = {
         "contradiction_group": "age_at_least_55",
     },
     "pathologic_t_t3_t4": {
-        "condition": "pathologic T category starts with T3 or T4",
+        "condition": "pathologic T category is T3, T3a, T3b, T4, T4a, or T4b",
         "description": "A recorded pathologic T3/T4 category supplies prototype staging evidence.",
         "clinical_interpretation": "The rule increases support for the observed staging feature; it does not establish nodal spread by itself.",
         "source_column": "diagnoses.ajcc_pathologic_t",
@@ -55,7 +55,7 @@ SYMBOLIC_RULES: dict[str, dict[str, Any]] = {
         "target_mode": "categorical_active",
         "truth_value": {"frequency": 0.90, "confidence": 0.85},
         "source": "Prototype staging probe using AJCC pathologic T3/T4 categories. Not a validated nodal-metastasis rule.",
-        "provenance": "ngta.rule.tcga.pathologic_t_t3_t4.v1",
+        "provenance": "ngta.rule.tcga.pathologic_t_t3_t4.v2",
         "expert_review": "not_reviewed",
         "contradiction_group": "pathologic_t_high",
     },
@@ -276,7 +276,7 @@ def build_symbolic_truth_matrices(
 
         elif rule_id == "pathologic_t_t3_t4":
             stage_series = case_frame[source_column].fillna("").astype(str)
-            triggered_patients = stage_series.str.startswith(("T3", "T4")).to_numpy(dtype=bool)
+            triggered_patients = stage_series.isin(("T3", "T3a", "T3b", "T4", "T4a", "T4b")).to_numpy(dtype=bool)
             for patient_index, stage_value in enumerate(stage_series):
                 if not triggered_patients[patient_index]:
                     continue
