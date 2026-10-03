@@ -13,6 +13,20 @@ from src.evaluation import paired_bootstrap_indices
 from src.robustness import selective_risk
 
 
+def weighted_uncertainty_statistics(errors, weights, order, starts):
+    """Exact duplicated-case statistics, retaining complete uncertainty ties."""
+    counts=np.add.reduceat(weights[order],starts)
+    positives=np.add.reduceat((errors*weights)[order],starts)
+    keep=counts>0
+    counts,positives=counts[keep],positives[keep]
+    cumulative=np.cumsum(counts)
+    area=float(np.sum(np.cumsum(positives)/cumulative*counts/cumulative[-1]))
+    negatives=counts-positives
+    positive_total,negative_total=positives.sum(),negatives.sum()
+    auc=float(np.sum(positives*(np.cumsum(negatives)-.5*negatives))/(positive_total*negative_total)) if positive_total and negative_total else None
+    return area,auc
+
+
 def intervals(root, seeds, iterations=1000):
     for seed in seeds:
         source = Path(root) / f"seed_{seed}" / "wids"
@@ -27,11 +41,14 @@ def intervals(root, seeds, iterations=1000):
                 raise ValueError("Persisted masking predictions are not outcome aligned")
             indices = paired_bootstrap_indices(y, iterations, np.random.default_rng(seed), groups)
             errors = (p >= .5) != y
+            order=np.argsort(score,kind="stable")
+            starts=np.r_[0,np.flatnonzero(np.diff(score[order])!=0)+1]
             areas, aucs = [], []
             for index in indices:
-                areas.append(selective_risk(y[index], p[index], score[index])[1])
-                if np.unique(errors[index]).size == 2:
-                    aucs.append(roc_auc_score(errors[index], score[index]))
+                area,auc=weighted_uncertainty_statistics(errors,np.bincount(index,minlength=len(y)),order,starts)
+                areas.append(area)
+                if auc is not None:
+                    aucs.append(auc)
             point_auc = roc_auc_score(errors, score) if np.unique(errors).size == 2 else None
             rows.append(dict(seed=seed, scenario=scenario, mask_rate=rate, variant=variant,
                 selective_risk_area=selective_risk(y,p,score)[1],

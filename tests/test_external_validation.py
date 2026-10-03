@@ -42,3 +42,14 @@ def test_external_mapping_rejects_leaked_outcomes_and_undocumented_inputs():
     del policy["features"]["lactate"]["measurement_window"]
     with pytest.raises(ValueError, match="evidence"):
         harmonize_cohort(frame, policy, processor, [])
+
+
+def test_external_mapping_requires_rule_only_raw_inputs():
+    frame, policy, processor=inputs()
+    with pytest.raises(ValueError,match="every frozen input"):
+        harmonize_cohort(frame,policy,processor,[],rule_source_columns=["stage"])
+    frame["pathology"]=["T3","T2"]
+    policy["features"]["stage"]=dict(column="pathology",source_unit="category",target_unit="category",
+        availability="observed",measurement_window="post pathology",evidence="source dictionary",kind="categorical")
+    mapped,_=harmonize_cohort(frame,policy,processor,[],rule_source_columns=["stage"])
+    assert mapped.stage.tolist()==["T3","T2"]
