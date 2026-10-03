@@ -30,7 +30,7 @@
 - [x] **Test encoder-level intervention.** Compare current readout gating with methods that actually intervene in encoder attention and contextual representations.
 - [x] **Evaluate calibration properly.** Report Brier score, log loss, AUROC, PR-AUC, calibration slope and intercept, multiple ECE definitions, and threshold-specific metrics.
 - [x] **Correct statistical comparisons.** Use paired hospital-clustered bootstrap intervals, control for multiple comparisons, and distinguish observed effect sizes from bootstrap means.
-- [ ] **Preserve negative results.** Report cases where MC-only performs better, gating reduces AUC, or comparisons remain inconclusive.
+- [x] **Preserve negative results.** Report cases where MC-only performs better, gating reduces AUC, or comparisons remain inconclusive.
 
 ## 4. Rule System and Symbolic Intervention
 
@@ -121,3 +121,7 @@
 - Encoder intervention now applies confidence to feature keys inside every attention layer and recomputes contextual representations, while replaying the original dropout RNG states. The readout and encoder variants are saved separately. Identity and context-change checks: `tests/test_matched_inference.py`.
 
 - README and manuscript now distinguish corrected v2 implementation from legacy v1 numerical tables. Legacy aggregation, imputed triggers, circular revision checks, absent held-out genomic measurements, and untested human benefits are stated explicitly. The identified Chudasama bibliography page/author/DOI error was corrected against the authors’ institutional record; a complete citation audit is still open.
+
+- Final validation: 34 tests pass. The integrated real TCGA run independently replays all 74 events, including 24 unmapped events, and preserves standard baselines, two ensemble members, encoder comparisons, masking outputs, and negative permutation results. The synthetic WiDS integration independently replays 65 events across 15 variants and 40 masking comparisons.
+- Five two-epoch TCGA runs use identical split IDs, pass replay for every seed, and export actual seed variability under `results/v2_multiseed_smoke`. These short runs validate reproducibility, not the full clinical confirmation protocol. `results/v2_validation/integration_checks.json` records their scope.
+- Manuscript PDF rebuilding remains blocked by incomplete MiKTeX setup and an inaccessible bundled Tectonic executable. The corrected source is preserved; `results/v2_validation/manuscript_build.json` explicitly records that the existing PDF is stale.
