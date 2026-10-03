@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 import torch
 from sklearn.impute import KNNImputer, SimpleImputer
-from sklearn.model_selection import StratifiedShuffleSplit
+from sklearn.model_selection import GroupShuffleSplit, StratifiedShuffleSplit
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from torch.utils.data import DataLoader, Dataset
 
@@ -50,6 +50,9 @@ class WIDSEncodedFrame(EncodedFrame):
     continuous_features: np.ndarray
     auxiliary_features: np.ndarray
     rule_triggers: np.ndarray
+    imputed_rule_triggers: np.ndarray
+    numeric_imputed: np.ndarray
+    numeric_missing: np.ndarray
 
 
 class WIDSDataset(Dataset):
@@ -65,10 +68,10 @@ class WIDSDataset(Dataset):
 
 
 class WIDSPreprocessor:
-    def __init__(self) -> None:
+    def __init__(self, include_apache: bool = True) -> None:
         self.id_column = WIDS_ID_COLUMN
         self.target_column = WIDS_TARGET_COLUMN
-        self.numeric_columns = list(WIDS_CONTINUOUS_COLUMNS)
+        self.numeric_columns = [c for c in WIDS_CONTINUOUS_COLUMNS if include_apache or c != "apache_4a_hospital_death_prob"]
         self.binary_columns = list(WIDS_BINARY_COLUMNS)
         self.categorical_columns = list(WIDS_CATEGORICAL_COLUMNS)
         self.numeric_imputer: KNNImputer | None = None
@@ -94,12 +97,19 @@ class WIDSPreprocessor:
         if missing_columns:
             raise ValueError(f"Missing required WiDS columns: {missing_columns}")
 
-        numeric_frame = frame[self.numeric_columns].apply(pd.to_numeric, errors="coerce")
+        numeric_frame = clean_numeric(frame[self.numeric_columns])
         binary_frame = frame[self.binary_columns].apply(pd.to_numeric, errors="coerce")
         categorical_frame = frame[self.categorical_columns].astype("object")
 
-        self.numeric_imputer = KNNImputer(n_neighbors=5)
-        numeric_imputed = self.numeric_imputer.fit_transform(numeric_frame)
+        self.distance_scaler = StandardScaler()
+        distance_frame = numeric_frame.copy()
+        distance_frame.loc[:, distance_frame.isna().all()] = 0.0
+        self.distance_scaler.fit(distance_frame)
+        distance_scaled = self.distance_scaler.transform(numeric_frame)
+        self.distance_scaler.mean_ = np.nan_to_num(self.distance_scaler.mean_)
+        self.distance_scaler.scale_ = np.nan_to_num(self.distance_scaler.scale_, nan=1.0)
+        self.numeric_imputer = KNNImputer(n_neighbors=5, keep_empty_features=True)
+        numeric_imputed = self.numeric_imputer.fit_transform(distance_scaled)
         self.scaler = StandardScaler()
         self.scaler.fit(numeric_imputed)
 
@@ -131,18 +141,19 @@ class WIDSPreprocessor:
         metadata = frame[[self.id_column, self.target_column]].reset_index(drop=True).copy()
         target = metadata[self.target_column].astype(np.float32).to_numpy()
 
-        numeric_frame = frame[self.numeric_columns].apply(pd.to_numeric, errors="coerce")
+        numeric_frame = clean_numeric(frame[self.numeric_columns])
         binary_frame = frame[self.binary_columns].apply(pd.to_numeric, errors="coerce")
         categorical_frame = frame[self.categorical_columns].astype("object")
 
-        numeric_imputed = self.numeric_imputer.transform(numeric_frame)
+        distance_imputed = self.numeric_imputer.transform(self.distance_scaler.transform(numeric_frame))
+        numeric_imputed = self.distance_scaler.inverse_transform(distance_imputed)
         numeric_imputed_frame = pd.DataFrame(numeric_imputed, columns=self.numeric_columns, index=frame.index)
         binary_imputed = self.binary_imputer.transform(binary_frame).astype(np.float32)
         categorical_imputed = self.categorical_imputer.transform(categorical_frame)
         categorical_encoded = self.encoder.transform(categorical_imputed).astype(np.float32)
-        numeric_scaled = self.scaler.transform(numeric_imputed).astype(np.float32)
+        numeric_scaled = self.scaler.transform(distance_imputed).astype(np.float32)
 
-        rule_triggers = np.column_stack(
+        imputed_rule_triggers = np.column_stack(
             [
                 numeric_imputed_frame["d1_lactate_max"].to_numpy(dtype=np.float32) >= 4.0,
                 numeric_imputed_frame["d1_sysbp_min"].to_numpy(dtype=np.float32) <= 90.0,
@@ -150,6 +161,9 @@ class WIDSPreprocessor:
                 numeric_imputed_frame["d1_creatinine_max"].to_numpy(dtype=np.float32) >= 2.0,
             ]
         ).astype(np.float32)
+        rule_sources = ["d1_lactate_max", "d1_sysbp_min", "age", "d1_creatinine_max"]
+        observed = numeric_frame[rule_sources].notna().to_numpy()
+        rule_triggers = imputed_rule_triggers * observed
         auxiliary_features = np.concatenate([binary_imputed, categorical_encoded], axis=1).astype(np.float32)
         features = np.concatenate([numeric_scaled, auxiliary_features], axis=1).astype(np.float32)
 
@@ -160,6 +174,9 @@ class WIDSPreprocessor:
             continuous_features=numeric_scaled,
             auxiliary_features=auxiliary_features,
             rule_triggers=rule_triggers,
+            imputed_rule_triggers=imputed_rule_triggers,
+            numeric_imputed=numeric_imputed,
+            numeric_missing=numeric_frame.isna().to_numpy(),
         )
 
     def transform(self, frame: pd.DataFrame) -> EncodedFrame:
@@ -176,6 +193,8 @@ class WIDSPreprocessor:
             "binary_columns": self.binary_columns,
             "categorical_columns": self.categorical_columns,
             "rule_names": self.rule_names,
+            "rule_input_policy": "observed_only",
+            "knn_distance": "training standardized numeric features",
             "output_feature_names": self.output_feature_names_,
         }
         output_path.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
@@ -209,22 +228,20 @@ def load_wids_data_bundle(
     data_dir: str | Path,
     batch_size: int,
     seed: int = 0,
+    split_mode: str = "patient",
+    include_apache: bool = True,
 ) -> DataBundle:
-    csv_path = Path(data_dir) / "wids_icu.csv"
-    if not csv_path.exists():
-        raise FileNotFoundError(f"Missing WiDS CSV: {csv_path}")
+    frame = read_wids_frame(data_dir)
 
-    frame = pd.read_csv(csv_path, na_values=["NA"], usecols=list(WIDS_REQUIRED_COLUMNS))
-    frame = frame.dropna(subset=[WIDS_TARGET_COLUMN]).reset_index(drop=True)
-    frame[WIDS_TARGET_COLUMN] = frame[WIDS_TARGET_COLUMN].astype(np.int64)
+    if split_mode == "row":
+        train_frame, val_frame, test_frame = _stratified_split(frame, WIDS_TARGET_COLUMN, seed)
+    else:
+        group_column = {"patient": "patient_id", "hospital": "hospital_id"}.get(split_mode)
+        if group_column is None or group_column not in frame:
+            raise ValueError(f"Split {split_mode} requires patient_id or hospital_id")
+        train_frame, val_frame, test_frame = grouped_split(frame, group_column, seed)
 
-    train_frame, val_frame, test_frame = _stratified_split(
-        frame,
-        target_column=WIDS_TARGET_COLUMN,
-        seed=seed,
-    )
-
-    preprocessor = WIDSPreprocessor().fit(train_frame)
+    preprocessor = WIDSPreprocessor(include_apache=include_apache).fit(train_frame)
     encoded_train = preprocessor.transform_components(train_frame)
     encoded_val = preprocessor.transform_components(val_frame)
     encoded_test = preprocessor.transform_components(test_frame)
@@ -234,6 +251,9 @@ def load_wids_data_bundle(
     test_loader = DataLoader(WIDSDataset(encoded_test), batch_size=batch_size, shuffle=False)
 
     split_summary: dict[str, Any] = {
+        "split_mode": split_mode,
+        "prediction_landmark": "end of first ICU day; hospital mortality outcome",
+        "rule_input_policy": "observed_only",
         "raw_case_rows": int(len(frame)),
         "labeled_case_rows": int(len(frame)),
         "train_rows": int(len(train_frame)),
@@ -276,3 +296,45 @@ def load_wids_data_bundle(
     setattr(bundle, "encoded_val", encoded_val)
     setattr(bundle, "encoded_test", encoded_test)
     return bundle
+
+
+def clean_numeric(frame: pd.DataFrame) -> pd.DataFrame:
+    numeric = frame.apply(pd.to_numeric, errors="coerce").replace([np.inf, -np.inf], np.nan)
+    for column in ("age", "d1_lactate_max", "d1_sysbp_min", "d1_creatinine_max"):
+        if column in numeric:
+            numeric[column] = numeric[column].where(numeric[column] >= 0)
+    apache = "apache_4a_hospital_death_prob"
+    if apache in numeric:
+        numeric[apache] = numeric[apache].where(numeric[apache].between(0.0, 1.0))
+    return numeric
+
+
+def grouped_split(frame: pd.DataFrame, group_column: str, seed: int):
+    if frame[group_column].isna().any():
+        raise ValueError(f"Missing split group IDs: {group_column}")
+    splitter = GroupShuffleSplit(n_splits=1, test_size=0.30, random_state=seed)
+    train_indices, holdout_indices = next(splitter.split(frame, groups=frame[group_column]))
+    holdout = frame.iloc[holdout_indices]
+    splitter = GroupShuffleSplit(n_splits=1, test_size=0.50, random_state=seed + 1)
+    val_indices, test_indices = next(splitter.split(holdout, groups=holdout[group_column]))
+    parts = (frame.iloc[train_indices], holdout.iloc[val_indices], holdout.iloc[test_indices])
+    if any(part[WIDS_TARGET_COLUMN].nunique() != 2 for part in parts):
+        raise ValueError("Grouped split requires both labels in every partition; change the prespecified seed")
+    return tuple(part.reset_index(drop=True) for part in parts)
+
+
+def read_wids_frame(data_dir: str | Path) -> pd.DataFrame:
+    csv_path = Path(data_dir) / "wids_icu.csv"
+    if not csv_path.exists():
+        raise FileNotFoundError(f"Missing WiDS CSV: {csv_path}")
+
+    columns = pd.read_csv(csv_path, nrows=0).columns
+    optional = [c for c in ("patient_id", "hospital_id", "icu_id") if c in columns]
+    frame = pd.read_csv(csv_path, na_values=["NA"], usecols=list(WIDS_REQUIRED_COLUMNS) + optional)
+    if frame[WIDS_ID_COLUMN].isna().any() or frame[WIDS_ID_COLUMN].duplicated().any():
+        raise ValueError("WiDS encounter IDs must be present and unique")
+    frame["apache_4a_hospital_death_prob"] = clean_numeric(frame[["apache_4a_hospital_death_prob"]]).iloc[:, 0]
+    frame = frame.dropna(subset=[WIDS_TARGET_COLUMN]).reset_index(drop=True)
+    frame[WIDS_TARGET_COLUMN] = frame[WIDS_TARGET_COLUMN].astype(np.int64)
+
+    return frame

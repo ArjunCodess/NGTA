@@ -4,7 +4,7 @@ from typing import Sequence
 
 import numpy as np
 
-from .knowledge_base import SymbolicKnowledgeResult, validate_unique_rule_targets
+from .knowledge_base import SymbolicKnowledgeResult, validate_rule_registry, validate_unique_rule_targets
 from .nars_interface import deduce_truth_values
 
 WIDS_RULE_DEFINITIONS: dict[str, dict[str, object]] = {
@@ -13,28 +13,48 @@ WIDS_RULE_DEFINITIONS: dict[str, dict[str, object]] = {
         "description": "Elevated lactate supplies prototype evidence of metabolic stress.",
         "clinical_interpretation": "The rule increases support for the lactate feature without diagnosing shock or determining mortality.",
         "source_column": "d1_lactate_max",
+        "target_key": "d1_lactate_max",
         "truth_value": {"frequency": 0.85, "confidence": 0.80},
+        "source": "Prototype lactate probe at 4 mmol/L, a historical severe-sepsis screen. Not a Surviving Sepsis treatment instruction.",
+        "provenance": "ngta.rule.wids.lactate.v1",
+        "expert_review": "not_reviewed",
+        "contradiction_group": "lactate_at_least_4",
     },
     "rule_hypotension": {
         "condition": "minimum day-1 systolic blood pressure <= 90 mmHg",
         "description": "Low systolic blood pressure supplies prototype evidence of hemodynamic instability.",
         "clinical_interpretation": "The rule increases support for the blood-pressure feature; it is not a stand-alone mortality decision.",
         "source_column": "d1_sysbp_min",
+        "target_key": "d1_sysbp_min",
         "truth_value": {"frequency": 0.75, "confidence": 0.70},
+        "source": "Prototype hypotension screen at a systolic pressure of 90 mmHg. Not an expert-reviewed NGTA rule.",
+        "provenance": "ngta.rule.wids.hypotension.v1",
+        "expert_review": "not_reviewed",
+        "contradiction_group": "systolic_at_most_90",
     },
     "rule_age": {
         "condition": "age >= 75 years",
         "description": "Age of at least 75 years supplies prototype demographic evidence.",
         "clinical_interpretation": "The rule increases support for the age feature without treating age as sufficient for mortality.",
         "source_column": "age",
+        "target_key": "age",
         "truth_value": {"frequency": 0.65, "confidence": 0.60},
+        "source": "Prototype age stratum at 75 years. Not a treatment threshold.",
+        "provenance": "ngta.rule.wids.age.v1",
+        "expert_review": "not_reviewed",
+        "contradiction_group": "age_at_least_75",
     },
     "rule_creatinine": {
         "condition": "maximum day-1 creatinine >= 2.0 mg/dL",
         "description": "Elevated creatinine supplies prototype evidence of renal dysfunction.",
         "clinical_interpretation": "The rule increases support for the creatinine feature without diagnosing kidney injury or determining mortality.",
         "source_column": "d1_creatinine_max",
+        "target_key": "d1_creatinine_max",
         "truth_value": {"frequency": 0.70, "confidence": 0.65},
+        "source": "Prototype creatinine flag at 2.0 mg/dL. This is not a KDIGO acute-kidney-injury definition.",
+        "provenance": "ngta.rule.wids.creatinine.v1",
+        "expert_review": "not_reviewed",
+        "contradiction_group": "creatinine_at_least_2",
     },
 }
 
@@ -81,8 +101,11 @@ def build_wids_symbolic_truth_matrices(
     rule_triggers: np.ndarray,
     feature_names: Sequence[str],
     rule_names: Sequence[str] | None = None,
+    disabled_rule_ids: set[str] | None = None,
 ) -> SymbolicKnowledgeResult:
+    validate_rule_registry(WIDS_RULE_DEFINITIONS)
     validate_unique_rule_targets(RULE_TO_FEATURE_NAME)
+    disabled = set(disabled_rule_ids or ())
     trigger_array = np.asarray(rule_triggers, dtype=bool)
     active_rule_names = tuple(rule_names or RULE_ORDER)
     feature_name_list = list(feature_names)
@@ -93,16 +116,20 @@ def build_wids_symbolic_truth_matrices(
     symbolic_frequency = np.zeros((n_cases, n_features), dtype=np.float64)
     symbolic_confidence = np.zeros((n_cases, n_features), dtype=np.float64)
     symbolic_trigger_mask = np.zeros((n_cases, n_features), dtype=bool)
-    patient_rule_counts = trigger_array.sum(axis=1, dtype=np.int64)
-    patient_any_rule_triggered = patient_rule_counts > 0
     rule_trigger_counts: dict[str, int] = {}
     mapped_rule_trigger_counts: dict[str, int] = {}
+    rule_case_masks: dict[str, np.ndarray] = {}
 
     if trigger_array.ndim != 2 or trigger_array.shape[1] != len(active_rule_names):
         raise ValueError("Rule trigger array shape does not match the expected rule ordering.")
 
     for column_index, rule_name in enumerate(active_rule_names):
+        if rule_name in disabled:
+            rule_trigger_counts[rule_name] = 0
+            mapped_rule_trigger_counts[rule_name] = 0
+            continue
         triggered_patients = trigger_array[:, column_index]
+        rule_case_masks[rule_name] = triggered_patients.copy()
         trigger_count = int(triggered_patients.sum())
         rule_trigger_counts[rule_name] = trigger_count
 
@@ -120,6 +147,13 @@ def build_wids_symbolic_truth_matrices(
         symbolic_trigger_mask[patient_indices, feature_position] = True
         mapped_rule_trigger_counts[rule_name] = int(len(patient_indices))
 
+    enabled_triggers = np.array(trigger_array, copy=True)
+    for column_index, rule_name in enumerate(active_rule_names):
+        if rule_name in disabled:
+            enabled_triggers[:, column_index] = False
+    patient_rule_counts = enabled_triggers.sum(axis=1, dtype=np.int64)
+    patient_any_rule_triggered = patient_rule_counts > 0
+
     return SymbolicKnowledgeResult(
         symbolic_frequency=symbolic_frequency,
         symbolic_confidence=symbolic_confidence,
@@ -130,4 +164,5 @@ def build_wids_symbolic_truth_matrices(
         patient_any_rule_triggered=patient_any_rule_triggered,
         total_trigger_count=int(sum(rule_trigger_counts.values())),
         mapped_feature_trigger_count=int(symbolic_trigger_mask.sum()),
+        rule_case_masks=rule_case_masks,
     )

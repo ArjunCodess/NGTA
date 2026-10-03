@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import platform
 import random
@@ -13,6 +14,7 @@ from typing import Any
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import joblib
 import sklearn
 import torch
 from sklearn.calibration import CalibratedClassifierCV
@@ -21,12 +23,22 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, brier_score_loss, roc_auc_score, roc_curve
 from torch import nn
 
+from .apache_baselines import apache_baselines
 from .attention_hook import apply_confidence_gate, revise_attention_truths
 from .auditability import compute_operational_audit
+from .evaluation import binary_metrics, calibration_error, paired_bootstrap_indices
+from .data_quality import export_data_quality, source_manifest
 from .data_loader import DEFAULT_ID_COLUMN, DEFAULT_TARGET_COLUMN, load_data_bundle
 from .knowledge_base import SYMBOLIC_RULES, build_symbolic_truth_matrices
+from .matched_inference import score_cached_passes, sigmoid
 from .nars_interface import neural_to_nars
 from .neural_encoder import TabularTransformerClassifier
+from .trace_replay import export_replay_bundle
+from .robustness import evaluate_raw_missingness
+from .shift_eval import evaluate_frozen_shift
+from .subgroups import subgroup_reports
+from .symbolic_ablations import symbolic_hypothesis_tests, build_symbolic_isolation_frame, scale_symbolic_confidence, score_revised_gate
+from .uncertainty import compare_uncertainty_estimators, deep_ensemble_statistics, mc_predictive_entropy
 from .wids_knowledge_base import WIDS_RULE_DEFINITIONS, build_wids_symbolic_truth_matrices
 from .wids_loader import WIDS_ID_COLUMN, WIDS_TARGET_COLUMN, load_wids_data_bundle
 
@@ -108,6 +120,7 @@ class PipelineConfig:
     mc_samples: int = 50
     gamma: float = 2.0
     seed: int = 0
+    split_seed: int = 0
     patience: int = 12
     d_model: int = 64
     num_heads: int = 4
@@ -116,6 +129,12 @@ class PipelineConfig:
     baseline_set: str = "minimal"
     ablation_set: str = "quick"
     export_case_traces: bool = False
+    ensemble_size: int = 0
+    run_shift_eval: bool = False
+    split_mode: str = "patient"
+    include_apache: bool = True
+    evaluation_lock: str | None = None
+    encoder_intervention: bool = False
 
 
 def set_seed(seed: int) -> None:
@@ -229,7 +248,8 @@ def _build_reliability_frame(y_true: np.ndarray, probabilities: np.ndarray, n_bi
     frame = pd.DataFrame(
         {"probability": np.asarray(probabilities, dtype=np.float64), "label": np.asarray(y_true, dtype=np.float64)}
     ).sort_values("probability", kind="mergesort").reset_index(drop=True)
-    frame["bin"] = pd.qcut(frame.index, q=n_bins, labels=False, duplicates="drop")
+    frame["bin"] = np.clip(np.searchsorted(np.linspace(0, 1, n_bins + 1),
+                                          frame["probability"], side="right") - 1, 0, n_bins - 1)
     return (
         frame.groupby("bin", observed=True)
         .agg(
@@ -251,15 +271,7 @@ def _compute_ece(reliability_frame: pd.DataFrame) -> float:
 
 
 def _compute_metrics(y_true: np.ndarray, probabilities: np.ndarray) -> dict[str, float]:
-    clipped_probabilities = np.clip(probabilities, 1e-6, 1.0 - 1e-6)
-    predictions = (clipped_probabilities >= 0.5).astype(int)
-    reliability = _build_reliability_frame(y_true, clipped_probabilities, n_bins=10)
-    return {
-        "auc": float(roc_auc_score(y_true, clipped_probabilities)),
-        "brier": float(brier_score_loss(y_true, clipped_probabilities)),
-        "accuracy": float(accuracy_score(y_true, predictions)),
-        "ece": _compute_ece(reliability),
-    }
+    return binary_metrics(y_true, probabilities)
 
 
 def _bootstrap_metric_intervals(
@@ -267,134 +279,51 @@ def _bootstrap_metric_intervals(
     probability_map: dict[str, np.ndarray],
     iterations: int = 1000,
     seed: int = 0,
+    groups: np.ndarray | None = None,
 ) -> dict[str, Any]:
-    rng = np.random.default_rng(seed)
-    n_samples = len(y_true)
-    bootstrap_indices: list[np.ndarray] = []
-    max_attempts = iterations * 100
-    attempts = 0
-
-    while len(bootstrap_indices) < iterations:
-        if attempts >= max_attempts:
-            raise RuntimeError("Unable to generate enough valid bootstrap samples for metric estimation.")
-        sampled_indices = rng.integers(0, n_samples, size=n_samples)
-        sampled_labels = y_true[sampled_indices]
-        attempts += 1
-        if np.unique(sampled_labels).size < 2:
-            continue
-        bootstrap_indices.append(sampled_indices)
-
-    intervals: dict[str, Any] = {}
-    for variant, probabilities in probability_map.items():
-        clipped_probabilities = np.clip(probabilities, 1e-6, 1.0 - 1e-6)
-        auc_samples = np.asarray(
-            [roc_auc_score(y_true[index_set], clipped_probabilities[index_set]) for index_set in bootstrap_indices],
-            dtype=np.float64,
-        )
-        brier_samples = np.asarray(
-            [brier_score_loss(y_true[index_set], clipped_probabilities[index_set]) for index_set in bootstrap_indices],
-            dtype=np.float64,
-        )
-        ece_samples = np.asarray(
-            [
-                _compute_ece(_build_reliability_frame(y_true[index_set], clipped_probabilities[index_set], n_bins=10))
-                for index_set in bootstrap_indices
-            ],
-            dtype=np.float64,
-        )
-        intervals[variant] = {
-            "iterations": iterations,
-            "auc_samples_mean": float(np.mean(auc_samples)),
-            "auc_ci_95_lower": float(np.percentile(auc_samples, 2.5)),
-            "auc_ci_95_upper": float(np.percentile(auc_samples, 97.5)),
-            "brier_samples_mean": float(np.mean(brier_samples)),
-            "brier_ci_95_lower": float(np.percentile(brier_samples, 2.5)),
-            "brier_ci_95_upper": float(np.percentile(brier_samples, 97.5)),
-            "ece_samples_mean": float(np.mean(ece_samples)),
-            "ece_ci_95_lower": float(np.percentile(ece_samples, 2.5)),
-            "ece_ci_95_upper": float(np.percentile(ece_samples, 97.5)),
-        }
-
-    def _interval_overlap(left: dict[str, float], right: dict[str, float]) -> bool:
-        return not (
-            left["auc_ci_95_upper"] < right["auc_ci_95_lower"]
-            or right["auc_ci_95_upper"] < left["auc_ci_95_lower"]
-        )
-
-    def _metric_samples(metric_name: str, variant: str) -> np.ndarray:
-        probabilities = np.clip(probability_map[variant], 1e-6, 1.0 - 1e-6)
-        if metric_name == "brier":
-            return np.asarray(
-                [brier_score_loss(y_true[index_set], probabilities[index_set]) for index_set in bootstrap_indices],
-                dtype=np.float64,
-            )
-        if metric_name == "ece":
-            return np.asarray(
-                [
-                    _compute_ece(_build_reliability_frame(y_true[index_set], probabilities[index_set], n_bins=10))
-                    for index_set in bootstrap_indices
-                ],
-                dtype=np.float64,
-            )
-        raise ValueError(f"Unsupported bootstrap metric: {metric_name}")
-
-    def _add_delta_intervals(comparisons: dict[str, Any], left_variant: str, right_variant: str) -> None:
-        comparison_key = f"{left_variant}_vs_{right_variant}"
-        for metric_name in ("brier", "ece"):
-            left_samples = _metric_samples(metric_name, left_variant)
-            right_samples = _metric_samples(metric_name, right_variant)
-            delta_samples = left_samples - right_samples
-            comparisons[f"{comparison_key}_{metric_name}_delta_left_minus_right"] = float(np.mean(delta_samples))
-            comparisons[f"{comparison_key}_{metric_name}_delta_ci_95_lower"] = float(np.percentile(delta_samples, 2.5))
-            comparisons[f"{comparison_key}_{metric_name}_delta_ci_95_upper"] = float(np.percentile(delta_samples, 97.5))
-            comparisons[f"{comparison_key}_{metric_name}_interpretation"] = (
-                f"The 95% paired bootstrap interval for the {metric_name} difference excludes zero."
-                if (
-                    comparisons[f"{comparison_key}_{metric_name}_delta_ci_95_lower"] > 0.0
-                    or comparisons[f"{comparison_key}_{metric_name}_delta_ci_95_upper"] < 0.0
-                )
-                else f"The 95% paired bootstrap interval for the {metric_name} difference includes zero."
-            )
-
-    comparisons: dict[str, Any] = {}
-    if "baseline" in intervals and "nars_gated" in intervals:
-        overlap = _interval_overlap(intervals["baseline"], intervals["nars_gated"])
-        comparisons["baseline_vs_nars_gated_ci_overlap"] = overlap
-        comparisons["baseline_vs_nars_gated_interpretation"] = (
-            "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain."
-            if overlap
-            else "The 95% bootstrap AUC confidence intervals do not overlap, so the observed difference is likely real on this test split."
-        )
-        _add_delta_intervals(comparisons, "baseline", "nars_gated")
-    if "flat_confidence" in intervals and "nars_gated" in intervals:
-        overlap = _interval_overlap(intervals["flat_confidence"], intervals["nars_gated"])
-        comparisons["flat_confidence_vs_nars_gated_ci_overlap"] = overlap
-        comparisons["flat_confidence_vs_nars_gated_interpretation"] = (
-            "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain."
-            if overlap
-            else "The 95% bootstrap AUC confidence intervals do not overlap, so the observed difference is likely real on this test split."
-        )
-        _add_delta_intervals(comparisons, "flat_confidence", "nars_gated")
-    if "mc_confidence_only" in intervals and "nars_gated" in intervals:
-        overlap = _interval_overlap(intervals["mc_confidence_only"], intervals["nars_gated"])
-        comparisons["mc_confidence_only_vs_nars_gated_ci_overlap"] = overlap
-        comparisons["mc_confidence_only_vs_nars_gated_interpretation"] = (
-            "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain."
-            if overlap
-            else "The 95% bootstrap AUC confidence intervals do not overlap, so the observed difference is likely real on this test split."
-        )
-        _add_delta_intervals(comparisons, "mc_confidence_only", "nars_gated")
-    if "random_forest" in intervals and "nars_gated" in intervals:
-        overlap = _interval_overlap(intervals["random_forest"], intervals["nars_gated"])
-        comparisons["random_forest_vs_nars_gated_ci_overlap"] = overlap
-        comparisons["random_forest_vs_nars_gated_interpretation"] = (
-            "The 95% bootstrap AUC confidence intervals overlap, so the observed difference should be treated as uncertain."
-            if overlap
-            else "The 95% bootstrap AUC confidence intervals do not overlap, so the observed difference is likely real on this test split."
-        )
-        _add_delta_intervals(comparisons, "random_forest", "nars_gated")
-    if comparisons:
-        intervals["comparison"] = comparisons
+    indices = paired_bootstrap_indices(y_true, iterations, np.random.default_rng(seed), groups)
+    metrics = {
+        "auc": lambda y, p: float(roc_auc_score(y, p)),
+        "brier": lambda y, p: float(np.mean((y-p)**2)),
+        "ece": lambda y, p: calibration_error(y, p),
+        "log_loss": lambda y, p: float(np.mean(-y*np.log(p)-(1-y)*np.log1p(-p))),
+    }
+    samples, observed, intervals = {}, {}, {}
+    for variant, values in probability_map.items():
+        p = np.clip(values, 1e-6, 1-1e-6)
+        samples[variant] = {name: np.array([fn(y_true[i], p[i]) for i in indices]) for name, fn in metrics.items()}
+        observed[variant] = {name: fn(y_true, p) for name, fn in metrics.items()}
+        row = {"sampling_unit": "hospital" if groups is not None else "case", "iterations": iterations}
+        for name, values in samples[variant].items():
+            row.update({f"{name}_observed": observed[variant][name],
+                        f"{name}_samples_mean": float(values.mean()),
+                        f"{name}_ci_95_lower": float(np.percentile(values, 2.5)),
+                        f"{name}_ci_95_upper": float(np.percentile(values, 97.5))})
+        intervals[variant] = row
+    if "nars_gated" not in intervals:
+        return intervals
+    comparisons = {}
+    comparators = [name for name in probability_map if name != "nars_gated"]
+    family_count = len(comparators) * len(metrics)
+    tail = 2.5 / family_count
+    for variant in comparators:
+        key = f"{variant}_vs_nars_gated"
+        left, right = intervals[variant], intervals["nars_gated"]
+        comparisons[key + "_ci_overlap"] = not (left["auc_ci_95_upper"] < right["auc_ci_95_lower"] or right["auc_ci_95_upper"] < left["auc_ci_95_lower"])
+        comparisons[key + "_interpretation"] = "Use the paired, multiplicity-adjusted intervals; marginal AUC overlap is descriptive."
+        for metric in metrics:
+            delta = samples[variant][metric] - samples["nars_gated"][metric]
+            lower, upper = np.percentile(delta, [tail, 100-tail])
+            prefix = f"{key}_{metric}"
+            comparisons.update({prefix + "_delta_left_minus_right": observed[variant][metric] - observed["nars_gated"][metric],
+                                prefix + "_bootstrap_mean_delta": float(delta.mean()),
+                                prefix + "_delta_ci_95_lower": float(np.percentile(delta, 2.5)),
+                                prefix + "_delta_ci_95_upper": float(np.percentile(delta, 97.5)),
+                                prefix + "_delta_family_95_lower": float(lower),
+                                prefix + "_delta_family_95_upper": float(upper),
+                                prefix + "_interpretation": "The Bonferroni paired family interval excludes zero." if lower > 0 or upper < 0 else "The Bonferroni paired family interval includes zero."})
+    comparisons["multiplicity_family_size"] = family_count
+    intervals["comparison"] = comparisons
     return intervals
 
 
@@ -432,6 +361,7 @@ def _fit_best_baseline(
         raise RuntimeError(f"Failed to train baseline: {label}")
 
     return {
+        "model": best_model,
         "label": label,
         "best_config": best_config,
         "val_brier": best_val_brier,
@@ -538,6 +468,8 @@ def _train_classical_baselines(bundle, config: PipelineConfig) -> dict[str, dict
             x_test=x_test,
         )
         baselines[label]["test_labels"] = y_test
+    if config.dataset == "wids":
+        baselines.update(apache_baselines(bundle))
     return baselines
 
 
@@ -745,13 +677,14 @@ def _build_gamma_ablation_frame(
     feature_confidence: np.ndarray,
     cls_logit_mean: np.ndarray,
     token_score_mean: np.ndarray,
+    cached_passes: tuple | None = None,
 ) -> pd.DataFrame:
     baseline_metrics = _compute_metrics(y_true, baseline_probabilities)
     rows: list[dict[str, float]] = []
     for gamma in GAMMA_ABLATION_VALUES:
         gated_attention = apply_confidence_gate(attention_mean, feature_confidence, gamma=gamma)
         gated_logits = cls_logit_mean + np.sum(gated_attention * token_score_mean, axis=1)
-        gated_probabilities = _sigmoid(gated_logits)
+        gated_probabilities = _sigmoid(gated_logits) if cached_passes is None else score_cached_passes(*cached_passes, feature_confidence, gamma)[0]
         gated_metrics = _compute_metrics(y_true, gated_probabilities)
         rows.append(
             {
@@ -774,19 +707,22 @@ def _build_submission_ablation_frame(
     y_true: np.ndarray,
     baseline_probabilities: np.ndarray,
     attention_mean: np.ndarray,
+    attention_var: np.ndarray,
     neural_confidence: np.ndarray,
     revised_confidence: np.ndarray,
+    symbolic_frequency: np.ndarray,
     symbolic_confidence: np.ndarray,
     symbolic_trigger_mask: np.ndarray,
     cls_logit_mean: np.ndarray,
     token_score_mean: np.ndarray,
+    cached_passes: tuple | None = None,
 ) -> pd.DataFrame:
     rows: list[dict[str, float | str]] = []
 
     def _add_row(ablation: str, gamma: float, confidence: np.ndarray) -> None:
         ablated_attention = apply_confidence_gate(attention_mean, confidence, gamma=gamma)
         ablated_logits = cls_logit_mean + np.sum(ablated_attention * token_score_mean, axis=1)
-        ablated_probabilities = _sigmoid(ablated_logits)
+        ablated_probabilities = _sigmoid(ablated_logits) if cached_passes is None else score_cached_passes(*cached_passes, confidence, gamma)[0]
         metrics = _compute_metrics(y_true, ablated_probabilities)
         rows.append(
             {
@@ -807,14 +743,22 @@ def _build_submission_ablation_frame(
         _add_row("symbolic_disabled_mc_confidence_only", float(gamma), neural_confidence)
 
     for scale in (0.5, 0.75, 1.25, 1.5):
-        scaled_symbolic_confidence = np.where(
+        scaled_symbolic_confidence = scale_symbolic_confidence(
+            symbolic_confidence,
             symbolic_trigger_mask,
-            np.clip(symbolic_confidence * scale, 0.0, 1.0),
-            neural_confidence,
+            scale,
         )
-        revised_scaled_confidence = np.where(symbolic_trigger_mask, scaled_symbolic_confidence, neural_confidence)
-        gated_attention = apply_confidence_gate(attention_mean, revised_scaled_confidence, gamma=2.0)
-        probabilities = _sigmoid(cls_logit_mean + np.sum(gated_attention * token_score_mean, axis=1))
+        probabilities, _ = score_revised_gate(
+            attention_mean,
+            attention_var,
+            symbolic_frequency,
+            scaled_symbolic_confidence,
+            symbolic_trigger_mask,
+            cls_logit_mean,
+            token_score_mean,
+            gamma=2.0,
+            cached_passes=cached_passes,
+        )
         metrics = _compute_metrics(y_true, probabilities)
         rows.append(
             {
@@ -967,19 +911,31 @@ def _build_case_trace_frame(
     return pd.DataFrame(rows)
 
 
-def _resolve_symbolic_knowledge(bundle, config: PipelineConfig):
+def _rebuild_symbolic_knowledge(bundle, config: PipelineConfig, disabled_rule_ids: set[str]):
     dataset_metadata = _get_dataset_metadata(config.dataset)
     if dataset_metadata["symbolic_builder"] == "tcga":
-        return build_symbolic_truth_matrices(bundle.test_frame, bundle.preprocessor.feature_names)
+        return build_symbolic_truth_matrices(
+            bundle.test_frame,
+            bundle.preprocessor.feature_names,
+            disabled_rule_ids=disabled_rule_ids,
+        )
     encoded_test = _get_encoded_split(bundle, "test")
-    print("WiDS ICU rule trigger counts on the test set:")
-    for rule_name, count in zip(bundle.preprocessor.rule_names, encoded_test.rule_triggers.sum(axis=0).astype(int)):
-        print(f"  {rule_name}: {int(count)}")
     return build_wids_symbolic_truth_matrices(
         encoded_test.rule_triggers,
         bundle.preprocessor.feature_names,
         rule_names=bundle.preprocessor.rule_names,
+        disabled_rule_ids=disabled_rule_ids,
     )
+
+
+def _resolve_symbolic_knowledge(bundle, config: PipelineConfig):
+    dataset_metadata = _get_dataset_metadata(config.dataset)
+    if dataset_metadata["symbolic_builder"] == "wids":
+        encoded_test = _get_encoded_split(bundle, "test")
+        print("WiDS ICU rule trigger counts on the test set:")
+        for rule_name, count in zip(bundle.preprocessor.rule_names, encoded_test.rule_triggers.sum(axis=0).astype(int)):
+            print(f"  {rule_name}: {int(count)}")
+    return _rebuild_symbolic_knowledge(bundle, config, set())
 
 
 def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
@@ -988,8 +944,24 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
     effective_config = PipelineConfig(**{**asdict(config), "batch_size": effective_batch_size})
 
     set_seed(effective_config.seed)
+    loader_options = {"split_mode": config.split_mode, "include_apache": config.include_apache} if config.dataset == "wids" else {}
+    bundle = dataset_metadata["loader"](data_dir=effective_config.data_dir, batch_size=effective_config.batch_size, seed=effective_config.split_seed, **loader_options)
+    split_ids = pd.concat([getattr(bundle, f"{name}_frame")[[bundle.preprocessor.id_column]].assign(split=name)
+                           for name in ("train", "val", "test")])
+    locked_config = {key: value for key, value in asdict(effective_config).items()
+                     if key not in {"data_dir", "output_dir", "evaluation_lock", "export_case_traces"}}
+    evaluation_spec = {"schema_version": 2, "config": locked_config,
+                       "rules": dataset_metadata["symbolic_rules"], "sources": source_manifest(effective_config.data_dir, effective_config.dataset),
+                       "split_ids_sha256": hashlib.sha256(split_ids.to_csv(index=False).encode("utf-8")).hexdigest(),
+                       "thresholds": [.1, .2, .5], "primary_metric": "brier",
+                       "confirmation_brier_margin": 1e-4, "bootstrap_unit": "hospital" if config.dataset == "wids" else "case"}
+    if config.evaluation_lock is not None:
+        expected_spec = json.loads(Path(config.evaluation_lock.format(seed=config.seed, dataset=config.dataset)).read_text(encoding="utf-8"))
+        if expected_spec != evaluation_spec:
+            raise ValueError("Evaluation configuration, data, split IDs, or rules differ from the supplied lock")
     output_dirs = _ensure_output_directories(effective_config.output_dir, effective_config.dataset)
-    bundle = dataset_metadata["loader"](data_dir=effective_config.data_dir, batch_size=effective_config.batch_size, seed=effective_config.seed)
+    data_quality = export_data_quality(bundle, output_dirs["traces"], effective_config.data_dir, effective_config.dataset)
+    (output_dirs["root"] / "evaluation_spec.json").write_text(json.dumps(evaluation_spec, indent=2), encoding="utf-8")
     bundle.preprocessor.save(output_dirs["traces"] / "preprocessing_metadata.json")
     (output_dirs["traces"] / "split_summary.json").write_text(json.dumps(bundle.split_summary, indent=2), encoding="utf-8")
 
@@ -1019,7 +991,14 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
     history = _train_model(model=model, bundle=bundle, config=effective_config, device=device)
     history.to_csv(output_dirs["metrics"] / "training_history.csv", index=False)
     _save_training_plot(history, output_dirs["charts"] / "training_history.png", dataset_metadata["display_name"])
+    torch.save({"state_dict": model.state_dict(), "config": asdict(effective_config),
+                "input_dim": bundle.preprocessor.input_dim, "feature_names": bundle.preprocessor.feature_names},
+               output_dirs["root"] / "model.pt")
+    joblib.dump(bundle.preprocessor, output_dirs["root"] / "preprocessor.joblib", compress=3)
     classical_baselines = _train_classical_baselines(bundle=bundle, config=effective_config)
+    for name, baseline in classical_baselines.items():
+        if baseline["model"] is not None:
+            joblib.dump(baseline["model"], output_dirs["root"] / f"baseline_{name}.joblib", compress=3)
     tree_baseline = classical_baselines[TREE_BASELINE_LABEL]
 
     summary = model.predict_with_mc_dropout(loader=bundle.test_loader, device=device, mc_samples=effective_config.mc_samples)
@@ -1032,29 +1011,46 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         symbolic_confidence=symbolic_knowledge.symbolic_confidence,
         symbolic_trigger_mask=symbolic_knowledge.symbolic_trigger_mask,
     )
-    gated_attention = apply_confidence_gate(summary.attention_mean, attention_truths.revised_confidence, gamma=effective_config.gamma)
-    mc_attention = apply_confidence_gate(summary.attention_mean, attention_truths.neural_confidence, gamma=effective_config.gamma)
-    flat_attention = apply_confidence_gate(
-        summary.attention_mean,
-        np.full_like(attention_truths.revised_confidence, 0.5, dtype=np.float64),
-        gamma=effective_config.gamma,
-    )
-    flat_logits = summary.cls_logit_mean + np.sum(flat_attention * summary.token_score_mean, axis=1)
-    flat_probabilities = _sigmoid(flat_logits)
-    mc_logits = summary.cls_logit_mean + np.sum(mc_attention * summary.token_score_mean, axis=1)
-    mc_probabilities = _sigmoid(mc_logits)
-    gated_logits = summary.cls_logit_mean + np.sum(gated_attention * summary.token_score_mean, axis=1)
-    gated_probabilities = _sigmoid(gated_logits)
+    cached = (summary.attention_passes, summary.token_score_passes, summary.cls_logit_passes)
+    baseline_probabilities, _ = score_cached_passes(*cached)
+    gated_probabilities, gated_attention = score_cached_passes(*cached, attention_truths.revised_confidence, effective_config.gamma)
+    mc_probabilities, mc_attention = score_cached_passes(*cached, attention_truths.neural_confidence, effective_config.gamma)
+    flat_probabilities, flat_attention = score_cached_passes(*cached, np.full_like(attention_truths.neural_confidence, 0.5), effective_config.gamma)
+    if not np.allclose(baseline_probabilities, flat_probabilities, atol=1e-7, rtol=0):
+        raise RuntimeError("Uniform gate must match the ungated cached-pass prediction")
+    # Preserve per-pass covariance and sigmoid nonlinearity for all gate variants.
+    summary.probabilities_mean = baseline_probabilities
+    deterministic_probabilities = model.predict_proba(_get_encoded_split(bundle, "test").features, device, effective_config.batch_size)
+    mean_logits = (summary.cls_logit_passes + np.sum(summary.attention_passes * summary.token_score_passes, axis=-1)).mean(axis=0)
 
+    torch.save(summary.rng_states, output_dirs["traces"] / "mc_rng.pt")
+    encoder_probabilities = {}
+    if effective_config.encoder_intervention:
+        for name, confidence in (("encoder_mc_confidence", attention_truths.neural_confidence),
+                                  ("encoder_nars_confidence", attention_truths.revised_confidence)):
+            encoder_summary = model.predict_with_mc_dropout(bundle.test_loader, device, effective_config.mc_samples,
+                feature_confidence=confidence, gamma=effective_config.gamma, replay_rng=summary.rng_states)
+            encoder_probabilities[name] = encoder_summary.probabilities_mean
+            np.savez_compressed(output_dirs["traces"] / f"{name}.npz", probability_passes=encoder_summary.probability_passes,
+                                attention_passes=encoder_summary.attention_passes, token_score_passes=encoder_summary.token_score_passes,
+                                cls_logit_passes=encoder_summary.cls_logit_passes)
     y_true = summary.labels.astype(int)
     tree_probabilities = tree_baseline["test_probabilities"]
     probability_map = {
         **{label: baseline["test_probabilities"] for label, baseline in classical_baselines.items()},
+        **encoder_probabilities,
+        "deterministic": deterministic_probabilities,
+        "mean_logit": sigmoid(mean_logits),
         "baseline": summary.probabilities_mean,
         "flat_confidence": flat_probabilities,
         "mc_confidence_only": mc_probabilities,
         "nars_gated": gated_probabilities,
     }
+    replay_report = export_replay_bundle(output_dirs["traces"], bundle=bundle, summary=summary,
+                                         knowledge=symbolic_knowledge, truths=attention_truths,
+                                         rules=dataset_metadata["symbolic_rules"], dataset=config.dataset,
+                                         gamma=effective_config.gamma, probabilities=probability_map,
+                                         attention_after=gated_attention)
     reliability_frame = pd.concat(
         [
             _build_reliability_frame(y_true, probabilities, n_bins=10).assign(variant=variant)
@@ -1067,6 +1063,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         probability_map=probability_map,
         iterations=1000,
         seed=effective_config.seed,
+        groups=bundle.test_frame["hospital_id"].to_numpy() if effective_config.dataset == "wids" and "hospital_id" in bundle.test_frame else None,
     )
     metric_rows: list[dict[str, Any]] = []
     for variant, probabilities in probability_map.items():
@@ -1084,6 +1081,9 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         )
     metrics_frame = pd.DataFrame(metric_rows)
     metrics_frame.to_csv(output_dirs["metrics"] / "metrics.csv", index=False)
+    subgroup_metrics, subgroup_curves = subgroup_reports(bundle.test_frame, y_true, probability_map)
+    subgroup_metrics.to_csv(output_dirs["metrics"] / "subgroup_metrics.csv", index=False)
+    subgroup_curves.to_csv(output_dirs["metrics"] / "subgroup_decision_curves.csv", index=False)
     reliability_frame.to_csv(output_dirs["metrics"] / "calibration_reliability.csv", index=False)
 
     auditability_metrics = compute_operational_audit(
@@ -1103,6 +1103,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         baseline_probabilities=summary.probabilities_mean,
         gated_probabilities=gated_probabilities,
         gamma=effective_config.gamma,
+        attention_passes=summary.attention_passes,
     )
     pd.DataFrame([auditability_metrics]).to_csv(
         output_dirs["metrics"] / "auditability_metrics.csv",
@@ -1159,6 +1160,7 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         feature_confidence=attention_truths.revised_confidence,
         cls_logit_mean=summary.cls_logit_mean,
         token_score_mean=summary.token_score_mean,
+        cached_passes=cached,
     )
     gamma_ablation_frame.to_csv(output_dirs["metrics"] / "gamma_ablation.csv", index=False)
     _save_gamma_ablation_plot(gamma_ablation_frame, output_dirs["charts"] / "gamma_ablation_auc.png", dataset_metadata["positive_class"])
@@ -1168,14 +1170,91 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
             y_true=y_true,
             baseline_probabilities=summary.probabilities_mean,
             attention_mean=summary.attention_mean,
+            attention_var=summary.attention_var,
             neural_confidence=attention_truths.neural_confidence,
             revised_confidence=attention_truths.revised_confidence,
+            symbolic_frequency=symbolic_knowledge.symbolic_frequency,
             symbolic_confidence=symbolic_knowledge.symbolic_confidence,
             symbolic_trigger_mask=symbolic_knowledge.symbolic_trigger_mask,
             cls_logit_mean=summary.cls_logit_mean,
             token_score_mean=summary.token_score_mean,
+            cached_passes=cached,
         )
         submission_ablation_frame.to_csv(output_dirs["metrics"] / "submission_ablation.csv", index=False)
+
+    symbolic_isolation_frame = build_symbolic_isolation_frame(
+        y_true=y_true,
+        attention_mean=summary.attention_mean,
+        attention_var=summary.attention_var,
+        symbolic_frequency=symbolic_knowledge.symbolic_frequency,
+        symbolic_confidence=symbolic_knowledge.symbolic_confidence,
+        symbolic_trigger_mask=symbolic_knowledge.symbolic_trigger_mask,
+        cls_logit_mean=summary.cls_logit_mean,
+        token_score_mean=summary.token_score_mean,
+        gamma=effective_config.gamma,
+        seed=effective_config.seed,
+        rule_ids=list(symbolic_knowledge.rule_trigger_counts),
+        rebuild_without_rules=lambda disabled: _rebuild_symbolic_knowledge(bundle, effective_config, disabled),
+        cached_passes=cached,
+    )
+    symbolic_isolation_frame.to_csv(output_dirs["metrics"] / "symbolic_isolation.csv", index=False)
+    hypothesis_tests = symbolic_hypothesis_tests(symbolic_isolation_frame)
+    (output_dirs["metrics"] / "symbolic_hypothesis_tests.json").write_text(json.dumps(hypothesis_tests, indent=2), encoding="utf-8")
+
+    uncertainty_comparison: dict[str, Any] | None = None
+    if effective_config.ensemble_size >= 2:
+        member_seeds = [effective_config.seed + index for index in range(effective_config.ensemble_size)]
+        member_probabilities: list[np.ndarray] = []
+        encoded_test = _get_encoded_split(bundle, "test")
+        for member_seed in member_seeds:
+            set_seed(member_seed)
+            member = TabularTransformerClassifier(
+                input_dim=bundle.preprocessor.input_dim,
+                d_model=effective_config.d_model,
+                nhead=effective_config.num_heads,
+                num_layers=effective_config.num_layers,
+                dropout=effective_config.dropout,
+            ).to(device)
+            _train_model(model=member, bundle=bundle, config=effective_config, device=device)
+            torch.save({"state_dict": member.state_dict(), "seed": member_seed}, output_dirs["root"] / f"ensemble_{member_seed}.pt")
+            member_probabilities.append(
+                member.predict_proba(
+                    encoded_test.features,
+                    device,
+                    batch_size=effective_config.batch_size,
+                )
+            )
+        np.savez_compressed(output_dirs["traces"] / "ensemble_predictions.npz", probabilities=np.stack(member_probabilities, axis=0), seeds=member_seeds)
+        ensemble_statistics = deep_ensemble_statistics(np.stack(member_probabilities, axis=0))
+        baseline_errors = (
+            (summary.probabilities_mean >= 0.5).astype(int) != y_true
+        ).astype(int)
+        uncertainty_comparison = compare_uncertainty_estimators(
+            {
+                "mc_dropout_variance": summary.probabilities_var,
+                "mc_predictive_entropy": mc_predictive_entropy(summary.probabilities_mean),
+                "deep_ensemble_variance": ensemble_statistics["variance"],
+            },
+            errors=baseline_errors,
+            seeds=member_seeds,
+        )
+        (output_dirs["metrics"] / "uncertainty_comparison.json").write_text(
+            json.dumps(uncertainty_comparison, indent=2, default=_json_default),
+            encoding="utf-8",
+        )
+
+    if uncertainty_comparison is None:
+        uncertainty_comparison = compare_uncertainty_estimators(
+            {"mc_dropout_variance": summary.probabilities_var,
+             "mc_predictive_entropy": mc_predictive_entropy(summary.probability_passes)},
+            errors=(summary.probabilities_mean >= .5) != y_true, seeds=[effective_config.seed])
+        (output_dirs["metrics"] / "uncertainty_comparison.json").write_text(
+            json.dumps(uncertainty_comparison, indent=2, default=_json_default), encoding="utf-8")
+    shift_frame = pd.DataFrame()
+    if effective_config.run_shift_eval:
+        shift_frame = evaluate_raw_missingness(bundle, model, device, effective_config,
+                                              dataset_metadata["symbolic_rules"], output_dirs["metrics"])
+        shift_frame.to_csv(output_dirs["metrics"] / "shift_eval.csv", index=False)
 
     decision_curve_frame = _build_decision_curve_frame(
         y_true=y_true,
@@ -1207,6 +1286,8 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
     )
 
     summary_frame = {
+        "schema_version": 2,
+        "aggregation": "mean of per-pass sigmoid probabilities using identical cached dropout samples",
         "config": asdict(effective_config),
         "environment": _get_environment_info(),
         "task": {
@@ -1254,9 +1335,14 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
         },
         "auc_bootstrap": metric_bootstrap,
         "metric_bootstrap": metric_bootstrap,
+        "persisted_replay": replay_report,
         "auditability": auditability_metrics,
         "gamma_ablation": gamma_ablation_frame.to_dict(orient="records"),
         "submission_ablation": submission_ablation_frame.to_dict(orient="records"),
+        "symbolic_isolation": symbolic_isolation_frame.to_dict(orient="records"),
+        "symbolic_hypothesis_tests": hypothesis_tests,
+        "uncertainty_comparison": uncertainty_comparison,
+        "shift_eval": shift_frame.to_dict(orient="records"),
         "case_traces": case_trace_frame.to_dict(orient="records"),
         "decision_curve": decision_curve_frame.to_dict(orient="records"),
         "calibration_reliability": reliability_frame.to_dict(orient="records"),
@@ -1266,6 +1352,9 @@ def run_pipeline(config: PipelineConfig) -> dict[str, Any]:
             "training_history_csv": str(output_dirs["metrics"] / "training_history.csv"),
             "gamma_ablation_csv": str(output_dirs["metrics"] / "gamma_ablation.csv"),
             "submission_ablation_csv": str(output_dirs["metrics"] / "submission_ablation.csv") if effective_config.ablation_set == "submission" else None,
+            "symbolic_isolation_csv": str(output_dirs["metrics"] / "symbolic_isolation.csv"),
+            "uncertainty_comparison_json": str(output_dirs["metrics"] / "uncertainty_comparison.json") if uncertainty_comparison is not None else None,
+            "shift_eval_csv": str(output_dirs["metrics"] / "shift_eval.csv") if effective_config.run_shift_eval else None,
             "decision_curve_csv": str(output_dirs["metrics"] / "decision_curve.csv"),
             "calibration_reliability_csv": str(output_dirs["metrics"] / "calibration_reliability.csv"),
             "auditability_metrics_csv": str(output_dirs["metrics"] / "auditability_metrics.csv"),

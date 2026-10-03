@@ -338,6 +338,17 @@ def generate_paper_figures(
         "wids": _dataset_result_dir(results_path, "wids", seeds),
     }
 
+    schemas = []
+    for directory in dataset_dirs.values():
+        summary_path = directory / "metrics" / "run_summary.json"
+        if not summary_path.exists():
+            raise ValueError("Figure generation requires source run summaries")
+        summary = json.loads(summary_path.read_text(encoding="utf-8"))
+        schemas.append(summary.get("schema_version", 1))
+        if summary.get("schema_version") == 2 and not summary.get("persisted_replay", {}).get("passed"):
+            raise ValueError("Figure generation requires successful v2 replay")
+    if len(set(schemas)) != 1:
+        raise ValueError("Refusing to mix legacy and v2 result bundles in paper figures")
     _set_style()
     _pipeline_architecture(figures_path)
     _performance_ci(dataset_dirs, figures_path)
