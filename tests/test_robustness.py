@@ -57,7 +57,7 @@ def test_raw_missingness_reprocesses_frozen_rules_and_preserves_model(tmp_path):
     before = {name: value.clone() for name, value in model.state_dict().items()}
     config = PipelineConfig(dataset="wids", mc_samples=2, batch_size=12)
     report = evaluate_raw_missingness(bundle, model, torch.device("cpu"), config, WIDS_RULE_DEFINITIONS, tmp_path)
-    assert len(report) == 40
+    assert len(report) == 60
     assert report.retuned.eq(False).all()
     assert report.loc[report.mask_rate.eq(0), "brier_degradation"].eq(0).all()
     assert set(report.variant) == {"baseline", "mc_confidence_only", "nars_gated", "nars_imputed_rules"}

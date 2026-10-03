@@ -12,6 +12,7 @@ import torch
 from torch.utils.data import DataLoader, TensorDataset
 
 from .attention_hook import revise_attention_truths
+from .acceptance import robustness_acceptance
 from .evaluation import binary_metrics
 from .knowledge_base import build_symbolic_truth_matrices
 from .matched_inference import score_cached_passes
@@ -21,13 +22,18 @@ from .wids_knowledge_base import build_wids_symbolic_truth_matrices
 RATES = (0.0, .1, .3, .5, .7)
 
 
-def mask_observed_values(frame, columns, rate, rng, scenario="random"):
+def mask_observed_values(frame, columns, rate, rng, scenario="random", labels=None):
     if not 0 <= rate <= 1:
         raise ValueError("Mask rate must lie in [0,1]")
-    if scenario not in {"random", "feature_dependent"}:
+    if scenario not in {"random", "feature_dependent", "outcome_dependent_simulation"}:
         raise ValueError("Unknown prespecified masking scenario")
     observed = frame[columns].notna().to_numpy()
     weights = np.ones(len(columns)) if scenario == "random" else np.linspace(.5, 1.5, len(columns))
+    if scenario == "outcome_dependent_simulation":
+        y = np.asarray(labels)
+        if y.shape != (len(frame),) or not np.isin(y, [0,1]).all():
+            raise ValueError("Outcome-dependent simulation requires aligned binary outcomes")
+        weights = np.where(y[:, None] == 1, 1.5, .5)
     mask = (rng.random(observed.shape) < np.clip(rate * weights, 0, 1)) & observed
     shifted = frame.copy()
     shifted[columns] = shifted[columns].mask(mask)
@@ -65,17 +71,31 @@ def evaluate_raw_missingness(bundle, model, device, config, rules, output_dir):
     columns = preprocessor.numeric_columns + preprocessor.binary_columns + preprocessor.categorical_columns
     labels = bundle.test_frame[preprocessor.target_column].to_numpy(dtype=int)
     before = _frozen_digest(model, preprocessor, rules)
-    rows, curves, predictions, masks = [], [], [], {}
-    for scenario in ("random", "feature_dependent"):
+    rows, curves, predictions, masks, acceptance = [], [], [], {}, {}
+    groups = bundle.test_frame["hospital_id"].to_numpy() if "hospital_id" in bundle.test_frame else None
+    transform_cache = Path(config.cache_dir) / "masked" if config.cache_dir else None
+    if transform_cache:
+        transform_cache.mkdir(parents=True, exist_ok=True)
+    processor_hash = joblib.hash(preprocessor)
+    scenarios = ("random", "feature_dependent", "outcome_dependent_simulation")
+    for scenario in scenarios:
+        paired_predictions = {"nars_gated": [], "mc_confidence_only": []}
         # Nested masks use the same draws, making higher-rate observations a subset.
         for rate in RATES:
-            raw, mask = mask_observed_values(bundle.test_frame, columns, rate, np.random.default_rng(config.split_seed), scenario)
+            raw, mask = mask_observed_values(bundle.test_frame, columns, rate, np.random.default_rng(config.split_seed), scenario, labels)
             masks[f"{scenario}_{rate:.1f}"] = mask
+            cache_path = (transform_cache / (joblib.hash((processor_hash, raw, scenario, rate)) + ".joblib")) if transform_cache else None
+            if cache_path and cache_path.exists():
+                encoded = joblib.load(cache_path)
+            else:
+                encoded = preprocessor.transform_components(raw) if config.dataset == "wids" else preprocessor.transform(raw)
+                if cache_path:
+                    temporary = cache_path.with_suffix(".tmp")
+                    joblib.dump(encoded, temporary, compress=3)
+                    temporary.replace(cache_path)
             if config.dataset == "wids":
-                encoded = preprocessor.transform_components(raw)
                 knowledge = build_wids_symbolic_truth_matrices(encoded.rule_triggers, preprocessor.feature_names)
             else:
-                encoded = preprocessor.transform(raw)
                 knowledge = build_symbolic_truth_matrices(raw, preprocessor.feature_names)
             loader = DataLoader(TensorDataset(torch.tensor(encoded.features), torch.tensor(encoded.target)), batch_size=config.batch_size)
             torch.manual_seed(config.seed)
@@ -93,6 +113,8 @@ def evaluate_raw_missingness(bundle, model, device, config, rules, output_dir):
                 variants["nars_imputed_rules"] = imputed_truths.revised_confidence
             for name, confidence in variants.items():
                 probabilities, _ = score_cached_passes(*cached, confidence, config.gamma)
+                if name in paired_predictions:
+                    paired_predictions[name].append(probabilities)
                 curve, area = selective_risk(labels, probabilities, summary.probabilities_var)
                 errors = (probabilities >= .5) != labels
                 from sklearn.metrics import roc_auc_score
@@ -105,6 +127,8 @@ def evaluate_raw_missingness(bundle, model, device, config, rules, output_dir):
                 predictions.append(pd.DataFrame({"case_id": raw[preprocessor.id_column].to_numpy(), "target": labels,
                                                   "probability": probabilities, "uncertainty": summary.probabilities_var})
                                    .assign(scenario=scenario, mask_rate=rate, variant=name))
+        acceptance[scenario] = robustness_acceptance(labels, paired_predictions["nars_gated"],
+            paired_predictions["mc_confidence_only"], RATES, groups=groups, seed=config.seed)
     after = _frozen_digest(model, preprocessor, rules)
     if before != after:
         raise RuntimeError("Missingness evaluation changed frozen model, preprocessing, or rules")
@@ -116,8 +140,10 @@ def evaluate_raw_missingness(bundle, model, device, config, rules, output_dir):
     pd.concat(curves).to_csv(root / "selective_risk.csv", index=False)
     pd.concat(predictions).to_csv(root / "missingness_predictions.csv", index=False)
     np.savez_compressed(root / "raw_masks.npz", **masks)
+    (root / "robustness_acceptance.json").write_text(json.dumps(acceptance, indent=2), encoding="utf-8")
     (root / "missingness_spec.json").write_text(json.dumps({"schema_version": 2, "mask_columns": columns,
-        "rates": RATES, "seed": config.split_seed, "scenarios": ["random", "feature_dependent"],
+        "rates": RATES, "seed": config.split_seed, "scenarios": scenarios,
+        "outcome_dependent_policy": "simulation only: positives weight 1.5, negatives 0.5; never used for model selection",
         "frozen_digest": before, "rule_input_policy": "observed_only",
         "feature_dependent_weights": np.linspace(.5, 1.5, len(columns)).tolist()}, indent=2), encoding="utf-8")
     return metrics
