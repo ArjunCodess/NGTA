@@ -5,7 +5,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from src.gdc_acquisition import pin_thca_manifest, download_pinned_manifest
+from src.gdc_acquisition import pin_thca_manifest, download_pinned_manifest, verify_pinned_sources
 
 
 def test_pinned_query_uses_case_coverage_and_all_pages_instead_of_file_size(tmp_path, monkeypatch):
@@ -43,3 +43,17 @@ def test_reused_pinned_files_require_checksums_and_exact_case_provenance(tmp_pat
     maf.write_text(maf.read_text()+"corruption")
     with pytest.raises(ValueError, match="changed"):
         download_pinned_manifest(path, tmp_path)
+
+
+def test_verified_source_rejects_unpinned_maf(tmp_path):
+    maf=tmp_path/"a.maf"
+    maf.write_text("Hugo_Symbol\tTumor_Sample_Barcode\nBRAF\tTCGA-AA-0001-01\n")
+    record=dict(file_id="1",file_name="a.maf",bytes=maf.stat().st_size,
+                md5=hashlib.md5(maf.read_bytes()).hexdigest(),case_ids=["TCGA-AA-0001"])
+    manifest=tmp_path/"acquisition_manifest.json"
+    manifest.write_text(json.dumps(dict(files=[record],case_ids=record["case_ids"])))
+    download_pinned_manifest(manifest,tmp_path)
+    assert verify_pinned_sources(tmp_path)["variant_case_ids"]==["TCGA-AA-0001"]
+    (tmp_path/"unexpected.maf").write_text(maf.read_text())
+    with pytest.raises(ValueError,match="unpinned"):
+        verify_pinned_sources(tmp_path)

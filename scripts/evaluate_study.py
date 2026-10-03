@@ -30,6 +30,9 @@ def analyze_study(root, seeds, mask_seeds=(), cache_dir=".cache/ngta", iteration
     specs = [json.loads((path / "evaluation_spec.json").read_text()) for path in selected]
     if any(any(spec[key] != specs[0][key] for key in ("sources", "split_ids_sha256", "rules")) for spec in specs[1:]):
         raise ValueError("Study seeds have different data, splits or rules")
+    comparable = lambda spec: {"feature_mode": "all", **{key:value for key,value in spec["config"].items() if key != "seed"}}
+    if any(comparable(spec) != comparable(specs[0]) for spec in specs[1:]):
+        raise ValueError("Study seeds have different training/evaluation settings")
     rows, deterministic, mc_variance, repeats, labels, case_ids = [], [], [], [], None, None
     for seed, path in zip(seeds, selected):
         if not replay_bundle(path / "traces")["passed"]:

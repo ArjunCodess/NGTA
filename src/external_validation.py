@@ -22,9 +22,9 @@ from .trace_replay import export_replay_bundle
 from .wids_knowledge_base import build_wids_symbolic_truth_matrices
 
 
-def harmonize_cohort(frame, policy, processor, development_ids):
+def harmonize_cohort(frame, policy, processor, development_ids, development_patient_ids=None):
     required = ("cohort", "source_version", "prediction_landmark", "outcome_definition",
-                "independence_evidence", "id_column", "target_column", "cluster_column", "features")
+                "independence_evidence", "id_column", "patient_id_column", "target_column", "cluster_column", "features")
     if any(not policy.get(key) for key in required):
         raise ValueError("External mapping requires source, landmark, outcome, independence and cluster documentation")
     id_source, target_source = policy["id_column"], policy["target_column"]
@@ -33,6 +33,11 @@ def harmonize_cohort(frame, policy, processor, development_ids):
         raise ValueError("External case IDs must be observed and unique")
     if set(ids) & set(map(str, development_ids)):
         raise ValueError("External cases overlap the development cohort")
+    patients = frame[policy["patient_id_column"]]
+    if patients.isna().any():
+        raise ValueError("External patient identity must be observed")
+    if development_patient_ids is not None and set(patients.astype(str)) & set(map(str, development_patient_ids)):
+        raise ValueError("External patients overlap the development cohort")
     if frame[policy["cluster_column"]].isna().any():
         raise ValueError("External institutional clusters must be observed")
     y = pd.to_numeric(frame[target_source], errors="coerce")
@@ -52,7 +57,7 @@ def harmonize_cohort(frame, policy, processor, development_ids):
                 raise ValueError(f"Absent input {name} must be explicitly unavailable")
             mapped[name] = np.nan
             continue
-        if source in {target_source, id_source, policy["cluster_column"]}:
+        if source in {target_source, id_source, policy["cluster_column"], policy["patient_id_column"]}:
             raise ValueError("Outcome and identity fields cannot be mapped to predictors")
         values = frame[source]
         if name in processor.numeric_columns:
@@ -81,7 +86,11 @@ def evaluate_external(checkpoint_dir, cohort_csv, mapping_json, output_dir, mc_s
     if policy.get("outcome_definition") != expected_outcome or policy.get("development_dataset") != config["dataset"]:
         raise ValueError("External outcome and frozen development dataset do not match")
     frame = pd.read_csv(cohort_csv)
-    mapped, groups = harmonize_cohort(frame, policy, processor, manifest[processor.id_column])
+    patient_ids = manifest[processor.id_column]
+    if config["dataset"] == "wids":
+        group_manifest = pd.read_csv(checkpoint_dir / "traces" / "development_groups.csv")
+        patient_ids = group_manifest.patient_id
+    mapped, groups = harmonize_cohort(frame, policy, processor, manifest[processor.id_column], patient_ids)
     fingerprint = joblib.hash(processor)
     encoded = processor.transform_components(mapped) if config["dataset"] == "wids" else processor.transform(mapped)
     knowledge = (build_wids_symbolic_truth_matrices(encoded.rule_triggers, processor.feature_names)
@@ -117,5 +126,6 @@ def evaluate_external(checkpoint_dir, cohort_csv, mapping_json, output_dir, mc_s
     report["checkpoint_sha256"] = hashlib.sha256((checkpoint_dir / "model.pt").read_bytes()).hexdigest()
     report["cohort_sha256"] = hashlib.sha256(Path(cohort_csv).read_bytes()).hexdigest()
     report["mc_samples"] = mc_samples
+    report["independence_verification"] = "case and patient identifier overlap checked; independent source identity requires the documented cohort provenance"
     (root / "external_compatibility.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     return report
