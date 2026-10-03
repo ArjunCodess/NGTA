@@ -22,7 +22,7 @@ from .trace_replay import export_replay_bundle
 from .wids_knowledge_base import build_wids_symbolic_truth_matrices
 
 
-def harmonize_cohort(frame, policy, processor, development_ids, development_patient_ids=None):
+def harmonize_cohort(frame, policy, processor, development_ids, development_patient_ids=None, rule_source_columns=()):
     required = ("cohort", "source_version", "prediction_landmark", "outcome_definition",
                 "independence_evidence", "id_column", "patient_id_column", "target_column", "cluster_column", "features")
     if any(not policy.get(key) for key in required):
@@ -43,7 +43,7 @@ def harmonize_cohort(frame, policy, processor, development_ids, development_pati
     y = pd.to_numeric(frame[target_source], errors="coerce")
     if not y.isin([0, 1]).all() or y.nunique() != 2:
         raise ValueError("External outcomes must be complete binary labels with both classes")
-    required_features = processor.numeric_columns + processor.binary_columns + processor.categorical_columns
+    required_features = list(dict.fromkeys(processor.numeric_columns + processor.binary_columns + processor.categorical_columns + list(rule_source_columns)))
     if set(policy["features"]) != set(required_features):
         raise ValueError("Provide an explicit mapping for every frozen input, including unavailable inputs")
     mapped = pd.DataFrame({processor.id_column: ids, processor.target_column: y.astype(int)})
@@ -60,7 +60,10 @@ def harmonize_cohort(frame, policy, processor, development_ids, development_pati
         if source in {target_source, id_source, policy["cluster_column"], policy["patient_id_column"]}:
             raise ValueError("Outcome and identity fields cannot be mapped to predictors")
         values = frame[source]
-        if name in processor.numeric_columns:
+        extra_rule_source=name not in processor.numeric_columns + processor.binary_columns + processor.categorical_columns
+        if extra_rule_source and rule.get("kind") not in ("numeric","categorical"):
+            raise ValueError(f"Raw rule-only input {name} requires an explicit numeric/categorical kind")
+        if name in processor.numeric_columns or (extra_rule_source and rule["kind"]=="numeric"):
             scale, offset = float(rule.get("scale", 1)), float(rule.get("offset", 0))
             if not np.isfinite([scale, offset]).all() or scale <= 0:
                 raise ValueError("Unit conversions require a positive finite scale and finite offset")
@@ -90,7 +93,8 @@ def evaluate_external(checkpoint_dir, cohort_csv, mapping_json, output_dir, mc_s
     if config["dataset"] == "wids":
         group_manifest = pd.read_csv(checkpoint_dir / "traces" / "development_groups.csv")
         patient_ids = group_manifest.patient_id
-    mapped, groups = harmonize_cohort(frame, policy, processor, manifest[processor.id_column], patient_ids)
+    rule_sources=[rule["source_column"] for rule in training_spec["rules"].values()]
+    mapped, groups = harmonize_cohort(frame, policy, processor, manifest[processor.id_column], patient_ids, rule_sources)
     fingerprint = joblib.hash(processor)
     encoded = processor.transform_components(mapped) if config["dataset"] == "wids" else processor.transform(mapped)
     knowledge = (build_wids_symbolic_truth_matrices(encoded.rule_triggers, processor.feature_names)

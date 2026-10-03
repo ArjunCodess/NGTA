@@ -60,7 +60,7 @@ def export_data_quality(bundle, directory: str | Path, data_dir: str | Path, dat
     report = {"schema_version": 2, "dataset": dataset,
               "sources": source_manifest(data_dir, dataset), "group_overlap": overlap,
               "duplicate_feature_rows": int(bundle.labeled_frame[columns].duplicated().sum()),
-              "clinical_missing_fraction": float(bundle.labeled_frame[clinical].isna().to_numpy().mean()),
+              "clinical_missing_fraction": float(bundle.labeled_frame[clinical].isna().to_numpy().mean()) if clinical else None,
               "overall_missing_fraction": float(bundle.labeled_frame[columns].isna().to_numpy().mean()),
               "prediction_landmark": bundle.split_summary.get("prediction_landmark"),
               "genomic_coverage": bundle.split_summary.get("genomic_coverage"),
