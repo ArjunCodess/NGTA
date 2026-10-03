@@ -87,7 +87,8 @@ def evaluate_raw_missingness(bundle, model, device, config, rules, output_dir):
         for rate in RATES:
             raw, mask = mask_observed_values(bundle.test_frame, columns, rate, np.random.default_rng(config.split_seed), scenario, labels)
             masks[f"{scenario}_{rate:.1f}"] = mask
-            cache_path = (transform_cache / (joblib.hash((processor_hash, transform_source_hash, raw, scenario, rate)) + ".joblib")) if transform_cache else None
+            relevant = raw[columns + [preprocessor.id_column, preprocessor.target_column]]
+            cache_path = (transform_cache / (joblib.hash((processor_hash, transform_source_hash, relevant)) + ".joblib")) if transform_cache else None
             if cache_path and cache_path.exists():
                 encoded = joblib.load(cache_path)
             else:
