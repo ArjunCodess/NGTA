@@ -53,3 +53,56 @@ def test_external_mapping_requires_rule_only_raw_inputs():
         availability="observed",measurement_window="post pathology",evidence="source dictionary",kind="categorical")
     mapped,_=harmonize_cohort(frame,policy,processor,[],rule_source_columns=["stage"])
     assert mapped.stage.tolist()==["T3","T2"]
+
+
+def test_frozen_external_fixture_replays_and_rejects_partition_tampering(tmp_path,monkeypatch):
+    import hashlib
+    import json
+    import joblib
+    import torch
+    from src.external_validation import evaluate_external
+    from src.neural_encoder import TabularTransformerClassifier
+    from src.trace_replay import replay_bundle
+    from src.wids_loader import WIDSPreprocessor,WIDS_CONTINUOUS_COLUMNS
+    from src.wids_knowledge_base import WIDS_RULE_DEFINITIONS
+
+    monkeypatch.setattr(torch.cuda,"is_available",lambda:False)
+    n=12
+    train=pd.DataFrame({column:np.linspace(1,10,n) for column in WIDS_CONTINUOUS_COLUMNS})
+    train["encounter_id"]=[f"dev{i}" for i in range(n)]
+    train["hospital_death"]=np.arange(n)%2
+    train["gender"]="M"
+    train["elective_surgery"]=np.arange(n)%2
+    processor=WIDSPreprocessor(imputation="median").fit(train)
+    checkpoint=tmp_path/"checkpoint"
+    (checkpoint/"traces").mkdir(parents=True)
+    manifest=train[["encounter_id"]].assign(split="train")
+    manifest.to_csv(checkpoint/"traces/split_ids.csv",index=False)
+    pd.DataFrame({"patient_id":[f"devpatient{i}" for i in range(n)]}).to_csv(checkpoint/"traces/development_groups.csv",index=False)
+    model=TabularTransformerClassifier(processor.input_dim,8,2,1,.2)
+    config=dict(dataset="wids",d_model=8,num_heads=2,num_layers=1,dropout=.2,batch_size=6,gamma=2.)
+    torch.save(dict(state_dict=model.state_dict(),config=config,input_dim=processor.input_dim,
+        feature_names=processor.feature_names,training_spec=dict(rules=WIDS_RULE_DEFINITIONS,
+        split_ids_sha256=hashlib.sha256(manifest.to_csv(index=False).encode()).hexdigest())),checkpoint/"model.pt")
+    joblib.dump(processor,checkpoint/"preprocessor.joblib")
+    external=train.copy()
+    external["encounter_id"]=[f"external{i}" for i in range(n)]
+    external["patient_id"]=[f"externalpatient{i}" for i in range(n)]
+    external["hospital_id"]=np.arange(n)//4
+    cohort=tmp_path/"external.csv"
+    external.to_csv(cohort,index=False)
+    columns=processor.numeric_columns+processor.binary_columns+processor.categorical_columns
+    policy=dict(cohort="synthetic fixture only",source_version="1",prediction_landmark="first day",
+        outcome_definition="hospital_mortality",development_dataset="wids",independence_evidence="generated fixture IDs",
+        id_column="encounter_id",patient_id_column="patient_id",target_column="hospital_death",cluster_column="hospital_id",
+        features={name:dict(column=name,source_unit="fixture units",target_unit="fixture units",availability="observed",
+        measurement_window="fixture first day",evidence="synthetic values") for name in columns})
+    mapping=tmp_path/"mapping.json"
+    mapping.write_text(json.dumps(policy))
+    output=tmp_path/"output"
+    evaluate_external(checkpoint,cohort,mapping,output,mc_samples=2)
+    assert replay_bundle(output/"traces")["passed"]
+    manifest.loc[0,"split"]="test"
+    manifest.to_csv(checkpoint/"traces/split_ids.csv",index=False)
+    with pytest.raises(ValueError,match="partitions differ"):
+        evaluate_external(checkpoint,cohort,mapping,output,mc_samples=2)
