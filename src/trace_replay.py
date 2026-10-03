@@ -66,6 +66,7 @@ def export_replay_bundle(directory, *, bundle, summary, knowledge, truths, rules
     np.savez_compressed(root / "inference_cache.npz",
                         attention_passes=summary.attention_passes, token_score_passes=summary.token_score_passes,
                         cls_logit_passes=summary.cls_logit_passes, probability_passes=summary.probability_passes,
+                        logit_passes=summary.logit_passes,
                         labels=summary.labels, neural_frequency=truths.neural_frequency,
                         neural_confidence=truths.neural_confidence, revised_frequency=truths.revised_frequency,
                         revised_confidence=truths.revised_confidence, symbolic_frequency=knowledge.symbolic_frequency,
@@ -149,9 +150,11 @@ def replay_bundle(directory: str | Path, tolerance: float = 1e-7) -> dict:
     revised_f = np.where(mask, revised_f, freq)
     revised_c = np.where(mask, revised_c, confidence)
     residuals = {}
-    original_logits = data["cls_logit_passes"] + (attention * data["token_score_passes"]).sum(-1)
+    original_logits = data["logit_passes"].astype(float)
     residuals["original_probability_passes"] = float(np.max(np.abs(
         np.exp(-np.logaddexp(0, -original_logits)) - data["probability_passes"])))
+    components = data["cls_logit_passes"].astype(float) + (attention.astype(float) * data["token_score_passes"]).sum(-1)
+    native_logit_consistency = np.allclose(components, original_logits, atol=1e-7, rtol=1e-6)
     for name, expected in (("trigger_mask", mask), ("symbolic_frequency", symbolic_f), ("symbolic_confidence", symbolic_c),
                            ("neural_frequency", freq), ("neural_confidence", confidence),
                            ("revised_frequency", revised_f), ("revised_confidence", revised_c)):
@@ -206,9 +209,10 @@ def replay_bundle(directory: str | Path, tolerance: float = 1e-7) -> dict:
             residuals["event_rule_off_probability"] = max(residuals.get("event_rule_off_probability", 0), abs(event.rule_off_probability - off_probability))
             residuals["event_symbolic_delta"] = max(residuals.get("event_symbolic_delta", 0), abs(event.symbolic_probability_delta - (data["probability__nars_gated"][i] - off_probability)))
     finite = all(np.isfinite(value) for value in residuals.values())
-    passed = integrity and complete and finite and all(value <= tolerance for value in residuals.values())
+    passed = integrity and complete and finite and native_logit_consistency and all(value <= tolerance for value in residuals.values())
     return {"schema_version": 2, "passed": bool(passed), "artifact_integrity": bool(integrity),
             "event_completeness": bool(complete), "events": len(events), "expected_events": len(expected_events),
+            "native_float32_logit_consistency": bool(native_logit_consistency),
             "tolerance": tolerance, "max_residuals": residuals}
 
 

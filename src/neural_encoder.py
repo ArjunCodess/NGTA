@@ -29,6 +29,7 @@ class MCPredictionSummary:
     attention_passes: np.ndarray
     token_score_passes: np.ndarray
     cls_logit_passes: np.ndarray
+    logit_passes: np.ndarray
     rng_states: list[tuple[torch.Tensor, list[torch.Tensor]]]
 
 
@@ -160,6 +161,7 @@ class TabularTransformerClassifier(nn.Module):
         attention_passes = []
         token_score_passes = []
         cls_logit_passes = []
+        logit_passes = []
         rng_states = []
         initial_cpu = torch.get_rng_state()
         initial_cuda = torch.cuda.get_rng_state_all() if torch.cuda.is_available() else []
@@ -178,6 +180,7 @@ class TabularTransformerClassifier(nn.Module):
                     pass_attention = []
                     pass_token_scores = []
                     pass_cls_logits = []
+                    pass_logits = []
                     pass_labels = []
 
                     case_offset = 0
@@ -191,12 +194,14 @@ class TabularTransformerClassifier(nn.Module):
                         pass_attention.append(output.attention.cpu().numpy())
                         pass_token_scores.append(output.token_scores.cpu().numpy())
                         pass_cls_logits.append(output.cls_logit.cpu().numpy())
+                        pass_logits.append(output.logits.cpu().numpy())
                         pass_labels.append(target.cpu().numpy())
 
                     probability_passes.append(np.concatenate(pass_probabilities, axis=0))
                     attention_passes.append(np.concatenate(pass_attention, axis=0))
                     token_score_passes.append(np.concatenate(pass_token_scores, axis=0))
                     cls_logit_passes.append(np.concatenate(pass_cls_logits, axis=0))
+                    logit_passes.append(np.concatenate(pass_logits, axis=0))
                     if labels is None:
                         labels = np.concatenate(pass_labels, axis=0)
 
@@ -224,6 +229,7 @@ class TabularTransformerClassifier(nn.Module):
             attention_passes=attentions,
             token_score_passes=token_scores,
             cls_logit_passes=cls_logits,
+            logit_passes=np.stack(logit_passes, axis=0),
             rng_states=rng_states,
         )
 
