@@ -1,0 +1,1001 @@
+{
+  "audit_date": "2026-10-03",
+  "branch": "version-2",
+  "scope": "documentation and completion audit; no clinical training or external-source verification performed",
+  "completion_definition": "A checkbox is checked only when the entire named task has the stated implementation/audit evidence; clinical hypotheses remain open without confirmatory evidence.",
+  "counts": {
+    "partial": 31,
+    "completed": 37,
+    "not_started": 4
+  },
+  "checklist_items": [
+    {
+      "id": 1,
+      "section": "1. Core Research and Methodology\r",
+      "task": "Prove the symbolic component matters",
+      "status": "partial",
+      "reason_category": "execution",
+      "finding": "Removal, shuffling, random truth, fixed-prior and 100-permutation controls run in smoke bundles. Symbolic superiority is not established; the TCGA smoke gain over MC is negative and adjusted p=1.",
+      "evidence": [
+        "src/symbolic_ablations.py",
+        "results/v2_smoke/tcga/metrics/symbolic_hypothesis_tests.json"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 2,
+      "section": "1. Core Research and Methodology\r",
+      "task": "Strengthen uncertainty estimation",
+      "status": "partial",
+      "reason_category": "execution",
+      "finding": "MC, entropy, ensemble and error diagnostics exist. Only two ensemble members were exercised in integration; five-model, five-seed clinical evaluation and independent dropout repeats remain undone.",
+      "evidence": [
+        "src/uncertainty.py",
+        "src/robustness.py"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 3,
+      "section": "1. Core Research and Methodology\r",
+      "task": "Improve the rule base",
+      "status": "partial",
+      "reason_category": "external_dependency",
+      "finding": "Registries record prototype sources, versions, review status and contradiction groups. All eight rules are not_reviewed; clinical expert validation and a defensible evidence-generation process are absent.",
+      "evidence": [
+        "src/knowledge_base.py",
+        "src/wids_knowledge_base.py"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 4,
+      "section": "1. Core Research and Methodology\r",
+      "task": "Add external validation",
+      "status": "partial",
+      "reason_category": "external_dependency",
+      "finding": "Frozen synthetic masking exists, but no eligible independent cohort, harmonized feature map or external predictions are supplied. Separate TCGA and WiDS training is not external validation.",
+      "evidence": [
+        "src/robustness.py",
+        "results/v2_validation"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 5,
+      "section": "1. Core Research and Methodology\r",
+      "task": "Tighten the scientific framing",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "README and manuscript restrict the contribution to an inspectable inference interface and preserve unproven clinical claims as limitations.",
+      "evidence": [
+        "paper/main.tex",
+        "README.md"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 6,
+      "section": "2. Data Validity and Preprocessing\r",
+      "task": "Fix TCGA genomic coverage",
+      "status": "partial",
+      "reason_category": "external_dependency",
+      "finding": "Unknown calls retain indicators and negatives require verified assay provenance. Available variants cover two training cases and zero held-out cases; no complete callable panel is verified.",
+      "evidence": [
+        "src/data_loader.py",
+        "results/v2_validation/tcga/traces/data_quality.json"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 7,
+      "section": "2. Data Validity and Preprocessing\r",
+      "task": "Correct feature selection leakage",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "Sparse/constant filtering and genomic-panel selection fit training data only.",
+      "evidence": [
+        "src/data_loader.py",
+        "tests/test_data_validity.py"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 8,
+      "section": "2. Data Validity and Preprocessing\r",
+      "task": "Audit TCGA record merging",
+      "status": "partial",
+      "reason_category": "external_dependency",
+      "finding": "One physical record per source replaces column-wise mixing, and 5,170 conflicting case/field records are exported. Cross-table chronology and measurement availability need source timing metadata.",
+      "evidence": [
+        "src/data_loader.py",
+        "results/v2_validation/tcga/traces/record_conflicts.csv"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 9,
+      "section": "2. Data Validity and Preprocessing\r",
+      "task": "Clarify prediction timing",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "TCGA is explicitly retrospective post-pathology association; WiDS uses end-of-first-day measurements. These landmarks do not verify every source timestamp.",
+      "evidence": [
+        "src/data_loader.py",
+        "src/wids_loader.py",
+        "paper/main.tex"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 10,
+      "section": "2. Data Validity and Preprocessing\r",
+      "task": "Audit WiDS missingness",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "The real-source audit exports feature missingness: 10.3559% overall after cleaning and 74.5761% lactate missingness. No broad extreme-missingness conclusion is drawn.",
+      "evidence": [
+        "results/v2_validation/wids/traces/missingness.csv"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 11,
+      "section": "2. Data Validity and Preprocessing\r",
+      "task": "Check APACHE data",
+      "status": "partial",
+      "reason_category": "external_dependency_and_execution",
+      "finding": "All 2,371 invalid APACHE probabilities are masked and no-APACHE mode exists. Authoritative sentinel/availability documentation and paired full-data no-APACHE experiments remain absent.",
+      "evidence": [
+        "src/wids_loader.py",
+        "src/apache_baselines.py"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 12,
+      "section": "2. Data Validity and Preprocessing\r",
+      "task": "Review imputation",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "Training-standardized KNN distances, separate raw/imputed values and observed-only rules are implemented and regression-tested. Comparative imputer research is still separate work.",
+      "evidence": [
+        "tests/test_data_validity.py",
+        "src/wids_loader.py"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 13,
+      "section": "2. Data Validity and Preprocessing\r",
+      "task": "Verify data integrity",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "Local source hashes, exact case splits, assay status, duplicate checks, overlap counts and conflicts are persisted. This verifies local lineage, not complete assay acquisition.",
+      "evidence": [
+        "src/data_quality.py",
+        "results/v2_validation"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 14,
+      "section": "2. Data Validity and Preprocessing\r",
+      "task": "Use stronger data splits",
+      "status": "partial",
+      "reason_category": "external_dependency_and_execution",
+      "finding": "Patient/hospital split modes exist; the real WiDS hospital audit has zero patient/hospital/ICU overlap. Hospital-confirmation training and TCGA verified genomic coverage are still missing.",
+      "evidence": [
+        "src/wids_loader.py",
+        "results/v2_validation/wids/traces/data_quality.json"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 15,
+      "section": "3. Prediction and Calibration\r",
+      "task": "Fix the aggregation mismatch",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "All readout gates use the same cached dropout passes and mean per-pass probabilities; uniform identity is checked at 1e-7.",
+      "evidence": [
+        "src/matched_inference.py",
+        "tests/test_matched_inference.py"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 16,
+      "section": "3. Prediction and Calibration\r",
+      "task": "Add matched inference baselines",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "Ungated, uniform, MC-only and NARS predictions are matched and saved in all corrected smoke bundles.",
+      "evidence": [
+        "results/v2_multiseed_smoke/seed_0/tcga/traces/inference_cache.npz"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 17,
+      "section": "3. Prediction and Calibration\r",
+      "task": "Add stronger predictive baselines",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "Deterministic, mean-logit, calibrated logistic, validation-selected boosting and APACHE comparators are implemented and exercised in TCGA or synthetic WiDS integration. Full clinical comparison remains item 18.",
+      "evidence": [
+        "src/pipeline.py",
+        "src/apache_baselines.py",
+        "results/v2_validation/integration_checks.json"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 18,
+      "section": "3. Prediction and Calibration\r",
+      "task": "Test APACHE dependence",
+      "status": "partial",
+      "reason_category": "execution",
+      "finding": "APACHE-only and recalibrated baselines ran on synthetic WiDS. Five paired full WiDS runs with and without APACHE have not been executed.",
+      "evidence": [
+        "src/apache_baselines.py",
+        "main.py"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 19,
+      "section": "3. Prediction and Calibration\r",
+      "task": "Clarify the symbolic mechanism",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "The gate uses revised confidence only. Frequency sensitivity and direct confidence-boost controls expose that NAL frequency does not determine predictive direction or establish independent evidence.",
+      "evidence": [
+        "src/symbolic_ablations.py",
+        "paper/main.tex"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 20,
+      "section": "3. Prediction and Calibration\r",
+      "task": "Test encoder-level intervention",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "Encoder intervention biases keys in every attention layer and recomputes contextual scores using replayed RNG. Identity/context changes are tested and integration outputs exist; clinical advantage is untested.",
+      "evidence": [
+        "tests/test_matched_inference.py",
+        "results/v2_smoke/tcga/traces/encoder_nars_confidence.npz"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 21,
+      "section": "3. Prediction and Calibration\r",
+      "task": "Evaluate calibration properly",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "AUROC, PR-AUC, Brier, log loss, fixed/quantile ECE, calibration slope/intercept and threshold metrics are implemented. Invalid inputs and bin boundaries are regression-tested.",
+      "evidence": [
+        "src/evaluation.py",
+        "tests/test_evaluation.py"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 22,
+      "section": "3. Prediction and Calibration\r",
+      "task": "Correct statistical comparisons",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "Paired hospital resampling, observed versus bootstrap deltas and Bonferroni comparator/metric intervals are implemented. These are per-fit intervals, not a full hierarchy of seed/split/MC uncertainty.",
+      "evidence": [
+        "src/pipeline.py",
+        "tests/test_evaluation.py"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 23,
+      "section": "3. Prediction and Calibration\r",
+      "task": "Preserve negative results",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "Legacy null/losing comparisons remain qualified; smoke permutation tests show no symbolic gain. No failed result is relabeled as clinical success.",
+      "evidence": [
+        "paper/main.tex",
+        "results/v2_smoke/tcga/metrics/symbolic_hypothesis_tests.json"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 24,
+      "section": "4. Rule System and Symbolic Intervention\r",
+      "task": "Expand rule validation",
+      "status": "partial",
+      "reason_category": "external_dependency",
+      "finding": "Prototype provenance and target-collision checks exist. Expert source review, correlated-evidence/contradictory clinical reasoning and validated observation confidence are not complete.",
+      "evidence": [
+        "src/knowledge_base.py",
+        "src/wids_knowledge_base.py"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 25,
+      "section": "4. Rule System and Symbolic Intervention\r",
+      "task": "Test rule necessity",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "All-rule/individual-rule removal and prevalence-preserving shuffled predicates are evaluated from matched caches. This tests necessity in integration; it does not prove clinical necessity.",
+      "evidence": [
+        "src/symbolic_ablations.py",
+        "results/v2_smoke/tcga/metrics/symbolic_isolation.csv"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 26,
+      "section": "4. Rule System and Symbolic Intervention\r",
+      "task": "Separate observed and imputed triggers",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "Observed-only WiDS rules suppress imputed-only events; synthetic masking exports an explicitly labeled imputed-rule comparator.",
+      "evidence": [
+        "src/wids_loader.py",
+        "src/robustness.py",
+        "tests/test_data_validity.py"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 27,
+      "section": "4. Rule System and Symbolic Intervention\r",
+      "task": "Test truth-value sensitivity",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "Frequency, confidence, randomized-truth and fixed-prior controls rerun revision rather than replace its output.",
+      "evidence": [
+        "src/symbolic_ablations.py",
+        "src/pipeline.py"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 28,
+      "section": "4. Rule System and Symbolic Intervention\r",
+      "task": "Fix rule extraction",
+      "status": "partial",
+      "reason_category": "implementation",
+      "finding": "Extension-mask and unknown-stage bugs are fixed, and missing/negative/boundary probes pass. The exhaustive per-rule boundary/unknown/conflict matrix requested by the plan is not implemented for every predicate.",
+      "evidence": [
+        "tests/test_data_validity.py",
+        "tests/test_trace_replay.py"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 29,
+      "section": "4. Rule System and Symbolic Intervention\r",
+      "task": "Check multimodal rule behavior",
+      "status": "partial",
+      "reason_category": "external_dependency",
+      "finding": "Synthetic BRAF triggering works, but no real held-out genomic rule event can be demonstrated with the current coverage.",
+      "evidence": [
+        "tests/test_trace_replay.py",
+        "results/v2_validation/tcga/traces/data_quality.json"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 30,
+      "section": "4. Rule System and Symbolic Intervention\r",
+      "task": "Test rule-conditioned confidence boosts",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "The direct confidence-boost comparator is in the symbolic isolation output; frequency-independent confidence equivalence is disclosed.",
+      "evidence": [
+        "src/symbolic_ablations.py",
+        "results/v2_smoke/tcga/metrics/symbolic_isolation.csv"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 31,
+      "section": "5. Auditability and Trace Exports\r",
+      "task": "Make audit checks independent",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "Replay uses separately implemented predicates and closed-form revision, rather than calling production revision or gate code.",
+      "evidence": [
+        "src/trace_replay.py",
+        "src/auditability.py"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 32,
+      "section": "5. Auditability and Trace Exports\r",
+      "task": "Improve trace completeness",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "Every trigger is persisted, including 24 unmapped events among 74 TCGA smoke events; mapping failure is explicit.",
+      "evidence": [
+        "results/v2_smoke/tcga/traces/intervention_events.csv"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 33,
+      "section": "5. Auditability and Trace Exports\r",
+      "task": "Record raw and imputed values",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "Events include raw/imputed values, observed status, source/version, truth values and mapped rule-off effects. Unmapped events carry no fabricated numerical intervention.",
+      "evidence": [
+        "src/trace_replay.py",
+        "tests/test_trace_replay.py"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 34,
+      "section": "5. Auditability and Trace Exports\r",
+      "task": "Fix incomplete exports",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "Complete events are unconditional; optional sampled summaries are supplementary.",
+      "evidence": [
+        "src/pipeline.py",
+        "src/trace_replay.py"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 35,
+      "section": "5. Auditability and Trace Exports\r",
+      "task": "Validate end-to-end replay",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "All six corrected TCGA bundles plus the available synthetic WiDS bundle pass independent replay. Corruption, missing events and nonfinite event fields are tested.",
+      "evidence": [
+        "results/v2_validation/pre_push_checks.json",
+        "tests/test_trace_replay.py"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 36,
+      "section": "5. Auditability and Trace Exports\r",
+      "task": "Evaluate human oversight",
+      "status": "not_started",
+      "reason_category": "external_dependency_and_implementation",
+      "finding": "No reviewer participants, power analysis, seeded-fault study package, randomized assignments or responses exist. Human benefit cannot be inferred from numerical replay.",
+      "evidence": [
+        "plan.md"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 37,
+      "section": "6. Robustness and Generalization\r",
+      "task": "Test missingness robustness",
+      "status": "partial",
+      "reason_category": "implementation_and_execution",
+      "finding": "Raw 0/10/30/50/70% random and feature-dependent masks ran in integration. Outcome-dependent simulations, imputer comparisons and paired degradation acceptance intervals remain absent.",
+      "evidence": [
+        "src/robustness.py",
+        "results/v2_smoke/tcga/metrics/raw_missingness.csv"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 38,
+      "section": "6. Robustness and Generalization\r",
+      "task": "Compare uncertainty methods",
+      "status": "partial",
+      "reason_category": "execution",
+      "finding": "MC/entropy diagnostics and ensemble support exist, but a five-model clinical ensemble and five-seed confidence-error study have not run.",
+      "evidence": [
+        "src/uncertainty.py",
+        "src/robustness.py"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 39,
+      "section": "6. Robustness and Generalization\r",
+      "task": "Measure selective prediction",
+      "status": "partial",
+      "reason_category": "implementation_and_execution",
+      "finding": "Error-detection AUROC, tie-aware risk curves and per-mask Brier outputs exist. Locked clinical results and uncertainty intervals for degradation/selective risk are absent.",
+      "evidence": [
+        "src/robustness.py",
+        "results/v2_smoke/tcga/metrics/selective_risk.csv"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 40,
+      "section": "6. Robustness and Generalization\r",
+      "task": "Test institutional generalization",
+      "status": "partial",
+      "reason_category": "external_dependency_and_execution",
+      "finding": "Internal hospital-disjoint lineage is audited, but full held-out-hospital training has not run and no independent institution cohort is available.",
+      "evidence": [
+        "results/v2_validation/wids/traces/data_quality.json"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 41,
+      "section": "6. Robustness and Generalization\r",
+      "task": "Check external compatibility",
+      "status": "not_started",
+      "reason_category": "external_dependency_and_implementation",
+      "finding": "No external cohort, frozen unit/window mapping or clustered noninferiority analysis is implemented. The proposed Brier/AUROC acceptance margins are not tested.",
+      "evidence": [
+        "plan.md"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 42,
+      "section": "6. Robustness and Generalization\r",
+      "task": "Evaluate subgroups",
+      "status": "partial",
+      "reason_category": "execution",
+      "finding": "Fixed demographic strata and decision curves include MC-only and exist in smoke outputs. Locked hospital clinical subgroup evaluation is undone.",
+      "evidence": [
+        "src/subgroups.py",
+        "results/v2_smoke/tcga/metrics/subgroup_metrics.csv"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 43,
+      "section": "7. Reproducibility and Implementation\r",
+      "task": "Run multiple seeds",
+      "status": "partial",
+      "reason_category": "execution",
+      "finding": "Five TCGA models use identical splits and export actual variability, but each trains only two epochs with three MC passes. Five-seed 50-pass hospital confirmation is absent.",
+      "evidence": [
+        "results/v2_multiseed_smoke/submission/multiseed_metrics.csv"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 44,
+      "section": "7. Reproducibility and Implementation\r",
+      "task": "Fix stale outputs",
+      "status": "partial",
+      "reason_category": "external_tooling_and_implementation",
+      "finding": "New outputs are separated and mixed v1/v2 figures are rejected. Legacy paper figures/tables remain, PDF is stale, and figure selection can prefer unseeded results over newer seed folders.",
+      "evidence": [
+        "src/paper_figures.py",
+        "results/v2_validation/manuscript_build.json"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 45,
+      "section": "7. Reproducibility and Implementation\r",
+      "task": "Correct ablation implementations",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "Confidence sensitivity reruns production revision on matched cached passes.",
+      "evidence": [
+        "src/pipeline.py",
+        "src/symbolic_ablations.py"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 46,
+      "section": "7. Reproducibility and Implementation\r",
+      "task": "Prevent test-set tuning",
+      "status": "partial",
+      "reason_category": "execution_and_design",
+      "finding": "Evaluation-spec comparison occurs before artifact writes and training. A file lock is not preregistration; already inspected labels cannot become unseen, and no prospective locked confirmation has run.",
+      "evidence": [
+        "src/pipeline.py",
+        "tests/test_artifact_exports.py"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 47,
+      "section": "7. Reproducibility and Implementation\r",
+      "task": "Improve artifact preservation",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "Checkpoints, fitted processors/estimators, source hashes, exact splits, per-pass outputs, RNG and dependency versions are saved; six checkpoints reproduced MC predictions exactly on the original GPU.",
+      "evidence": [
+        "results/v2_validation/pre_push_checks.json"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 48,
+      "section": "7. Reproducibility and Implementation\r",
+      "task": "Make data acquisition reproducible",
+      "status": "partial",
+      "reason_category": "implementation_and_external_dependency",
+      "finding": "Local manifests are hashed, but immutable acquisition IDs/version/checksum pinning and complete cohort coverage are not enforced by the downloader. Verified callable genomic records are missing.",
+      "evidence": [
+        "src/gdc_downloader.py",
+        "src/data_quality.py"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 49,
+      "section": "7. Reproducibility and Implementation\r",
+      "task": "Audit references",
+      "status": "partial",
+      "reason_category": "unfinished_audit",
+      "finding": "The identified Chudasama metadata error is fixed; 28 citation keys resolve and no duplicate keys exist. The remaining cited authors/titles/years/venues/pages/DOIs have not been verified individually.",
+      "evidence": [
+        "results/v2_validation/reference_audit.json"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 50,
+      "section": "8. Claims to Weaken or Withdraw\r",
+      "task": "Withdraw the held-out genomic demonstration",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "Held-out genomic feasibility and genomic intervention claims are withdrawn.",
+      "evidence": [
+        "paper/main.tex",
+        "README.md"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 51,
+      "section": "8. Claims to Weaken or Withdraw\r",
+      "task": "Restrict extreme-missingness claims",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "Measured feature-specific missingness is separated from unproven population robustness.",
+      "evidence": [
+        "paper/main.tex",
+        "README.md"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 52,
+      "section": "8. Claims to Weaken or Withdraw\r",
+      "task": "Qualify confidence-routing claims",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "Legacy calibration differences are attributed to confounded inference; corrected matched smoke runs establish identity, not clinical gating benefit.",
+      "evidence": [
+        "paper/main.tex",
+        "README.md"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 53,
+      "section": "8. Claims to Weaken or Withdraw\r",
+      "task": "Withdraw universal trace-completeness claims",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "Universal completeness is withdrawn for legacy artifacts; corrected v2 event completeness is supported by persisted replay.",
+      "evidence": [
+        "paper/main.tex",
+        "src/trace_replay.py"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 54,
+      "section": "8. Claims to Weaken or Withdraw\r",
+      "task": "Clarify revision validation",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "Legacy production reuse is labeled a consistency check; corrected v2 independent arithmetic is described separately.",
+      "evidence": [
+        "paper/main.tex",
+        "src/auditability.py"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 55,
+      "section": "8. Claims to Weaken or Withdraw\r",
+      "task": "Qualify trust-signal claims",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "Confidence remains a heuristic attention-stability signal, not clinically calibrated epistemic trust.",
+      "evidence": [
+        "paper/main.tex",
+        "README.md"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 56,
+      "section": "8. Claims to Weaken or Withdraw\r",
+      "task": "Avoid equivalence claims",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "Close point estimates are not presented as equivalence or noninferiority.",
+      "evidence": [
+        "paper/main.tex",
+        "README.md"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 57,
+      "section": "8. Claims to Weaken or Withdraw\r",
+      "task": "Qualify preprocessing claims",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "Legacy pre-split selection is disclosed; corrected v2 selection is training-only.",
+      "evidence": [
+        "paper/main.tex",
+        "src/data_loader.py"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 58,
+      "section": "8. Claims to Weaken or Withdraw\r",
+      "task": "Limit human-oversight claims",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "Inspectability and numerical replay are separated from unmeasured reviewer benefit.",
+      "evidence": [
+        "paper/main.tex",
+        "README.md"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 59,
+      "section": "8. Claims to Weaken or Withdraw\r",
+      "task": "Separate symbolic effects from inference effects",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "Matched MC-only is the symbolic comparator; baseline-to-NARS changes are not attributed wholly to symbolic evidence.",
+      "evidence": [
+        "paper/main.tex",
+        "src/pipeline.py"
+      ],
+      "formerly_checked": true
+    },
+    {
+      "id": 60,
+      "section": "9. Prioritized Experiment Plan\r",
+      "task": "Experiment 1: Establish valid data coverage and replay",
+      "status": "partial",
+      "reason_category": "external_dependency",
+      "finding": "Local lineage, missingness and replay pass. Verified TCGA callable coverage and source-level clinical timing remain unresolved, so experiment 1 is not fully accepted.",
+      "evidence": [
+        "results/v2_validation"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 61,
+      "section": "9. Prioritized Experiment Plan\r",
+      "task": "Experiment 2: Isolate aggregation from gating",
+      "status": "partial",
+      "reason_category": "execution",
+      "finding": "Uniform identity and matched gates pass across five smoke seeds. The five-seed locked hospital 50-pass study and corrected benefit margin test are missing.",
+      "evidence": [
+        "results/v2_multiseed_smoke"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 62,
+      "section": "9. Prioritized Experiment Plan\r",
+      "task": "Experiment 3: Test clinical rule value",
+      "status": "partial",
+      "reason_category": "execution",
+      "finding": "All principal symbolic controls and 100 permutations run in smoke evaluation. The clinical acceptance margin and adjusted significance are not met or confirmed.",
+      "evidence": [
+        "results/v2_smoke/tcga/metrics/symbolic_hypothesis_tests.json"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 63,
+      "section": "9. Prioritized Experiment Plan\r",
+      "task": "Experiment 4: Validate extraction and trace replay",
+      "status": "partial",
+      "reason_category": "implementation_and_execution",
+      "finding": "Persisted replay and current regression probes pass, but the complete predicate boundary matrix and locked clinical observed/imputed comparison are incomplete.",
+      "evidence": [
+        "tests/test_trace_replay.py",
+        "tests/test_data_validity.py"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 64,
+      "section": "9. Prioritized Experiment Plan\r",
+      "task": "Experiment 5: Challenge APACHE dependence",
+      "status": "partial",
+      "reason_category": "external_dependency_and_execution",
+      "finding": "Stronger baseline code and synthetic APACHE checks exist. Score documentation and ten full transformer fits for five paired with/without-score seeds are absent.",
+      "evidence": [
+        "src/apache_baselines.py",
+        "src/pipeline.py"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 65,
+      "section": "9. Prioritized Experiment Plan\r",
+      "task": "Experiment 6: Test missingness and uncertainty",
+      "status": "partial",
+      "reason_category": "implementation_and_execution",
+      "finding": "Two masking scenarios, risk diagnostics and two-member integration exist. Outcome-dependent masks, imputation controls, five-member clinical ensemble and acceptance intervals remain undone.",
+      "evidence": [
+        "src/robustness.py",
+        "src/uncertainty.py"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 66,
+      "section": "9. Prioritized Experiment Plan\r",
+      "task": "Experiment 7: Test external compatibility",
+      "status": "not_started",
+      "reason_category": "external_dependency_and_implementation",
+      "finding": "External harmonization, frozen evaluation and clustered noninferiority must be built once an eligible independent cohort is identified.",
+      "evidence": [
+        "plan.md"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 67,
+      "section": "9. Prioritized Experiment Plan\r",
+      "task": "Experiment 8: Evaluate auditability",
+      "status": "not_started",
+      "reason_category": "external_dependency_and_implementation",
+      "finding": "The prospective reviewer study, power analysis, fault package and mixed-effects analysis are not built or conducted.",
+      "evidence": [
+        "plan.md"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 68,
+      "section": "10. Immediate Priorities\r",
+      "task": "First: Fix data validity",
+      "status": "partial",
+      "reason_category": "external_dependency",
+      "finding": "Missingness handling and training-only selection are fixed; genomic coverage and cross-source chronology cannot be established from supplied files.",
+      "evidence": [
+        "results/v2_validation/tcga/traces/data_quality.json"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 69,
+      "section": "10. Immediate Priorities\r",
+      "task": "Second: Match prediction aggregation",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "Prediction aggregation and dropout samples are matched; the scientific benefit question remains experiment 2.",
+      "evidence": [
+        "src/matched_inference.py",
+        "tests/test_matched_inference.py"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 70,
+      "section": "10. Immediate Priorities\r",
+      "task": "Third: Make traces independently replayable",
+      "status": "partial",
+      "reason_category": "implementation",
+      "finding": "Circularity and persisted completeness are fixed; exhaustive extraction edge-case coverage is still incomplete under the full combined priority.",
+      "evidence": [
+        "src/trace_replay.py",
+        "tests/test_data_validity.py"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 71,
+      "section": "10. Immediate Priorities\r",
+      "task": "Fourth: Strengthen baselines and validation",
+      "status": "partial",
+      "reason_category": "implementation_and_execution_and_external_dependency",
+      "finding": "Baseline/control/robustness tooling exists, but clinical runs, remaining planned controls and external evaluation remain open.",
+      "evidence": [
+        "src/pipeline.py",
+        "src/robustness.py"
+      ],
+      "formerly_checked": false
+    },
+    {
+      "id": 72,
+      "section": "10. Immediate Priorities\r",
+      "task": "Fifth: Rewrite unsupported claims",
+      "status": "completed",
+      "reason_category": "none",
+      "finding": "The source manuscript and documentation preserve legacy negative evidence and distinguish implemented mechanics from unproven research claims.",
+      "evidence": [
+        "paper/main.tex",
+        "README.md"
+      ],
+      "formerly_checked": true
+    }
+  ],
+  "verification": {
+    "unit_tests_passed": 47,
+    "replay": [
+      {
+        "directory": "results/v2_smoke/tcga/traces",
+        "passed": true,
+        "events": 74
+      },
+      {
+        "directory": "results/v2_multiseed_smoke/seed_0/tcga/traces",
+        "passed": true,
+        "events": 74
+      },
+      {
+        "directory": "results/v2_multiseed_smoke/seed_1/tcga/traces",
+        "passed": true,
+        "events": 74
+      },
+      {
+        "directory": "results/v2_multiseed_smoke/seed_2/tcga/traces",
+        "passed": true,
+        "events": 74
+      },
+      {
+        "directory": "results/v2_multiseed_smoke/seed_3/tcga/traces",
+        "passed": true,
+        "events": 74
+      },
+      {
+        "directory": "results/v2_multiseed_smoke/seed_4/tcga/traces",
+        "passed": true,
+        "events": 74
+      },
+      {
+        "directory": ".test-tmp/wids-output/wids/traces",
+        "passed": true,
+        "events": 65
+      }
+    ],
+    "source_manifests": {
+      "tcga": "matched",
+      "wids": "matched"
+    }
+  },
+  "checkbox_changes": [
+    {
+      "id": 17,
+      "task": "Add stronger predictive baselines",
+      "from_checked": false,
+      "to_checked": true
+    },
+    {
+      "id": 28,
+      "task": "Fix rule extraction",
+      "from_checked": true,
+      "to_checked": false
+    },
+    {
+      "id": 69,
+      "task": "Second: Match prediction aggregation",
+      "from_checked": false,
+      "to_checked": true
+    }
+  ]
+}
