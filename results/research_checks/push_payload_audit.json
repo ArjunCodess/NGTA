@@ -1,0 +1,2599 @@
+{
+  "remote": "https://github.com/ArjunCodess/NGTA.git",
+  "branch": "version-2",
+  "lfs_files": [
+    {
+      "name": "results/hospital_study/knn/analysis/ensemble_predictions.npz",
+      "size": 484696,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "0175a26e5bb0776315f3f372a46d530cb4f56fdd5280fa3f0db5965a18f6df26",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_0/wids/baseline_apache_only_logistic.joblib",
+      "size": 865,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "0396993cc94fca917ef05c6f136dd1bff884bde3d53ab28fea067a96d3218e58",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_0/wids/baseline_apache_recalibrated.joblib",
+      "size": 871,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "244fe37096820047e7a4c55acbc921ae7f44f23234cefe1f55137a543aaf1dd3",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_0/wids/baseline_calibrated_logistic_regression.joblib",
+      "size": 1451,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "0a639151ad9b5a09831b198fd3f6e1a93216044ce02dff214ade3113179dae83",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_0/wids/baseline_extra_trees.joblib",
+      "size": 174247296,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "a9d76e6b3a3112375c5ef1c3d4902fff6cf0571f415cc4be7a316d3b40647fe6",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_0/wids/baseline_hist_gradient_boosting.joblib",
+      "size": 168087,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "ef523043e25c6ff27b6f69435d54ed9af9f3753e7818ca591bf918199c0ee457",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_0/wids/baseline_random_forest.joblib",
+      "size": 72426175,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "0055996251453fbbbcf93db18f9f2ef61fd16d6181197ec07971824bf21eed67",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_0/wids/metrics/missingness/raw_masks.npz",
+      "size": 337688,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "367f5f5ddaa28d6bffd7cc4a75585c4e83a5fea66827567e78f804316489b228",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_0/wids/preprocessor.joblib",
+      "size": 1675411,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "273856b2447c9dbd2e9e7d59bd3bf7fcc96ac7ff6da32ab65d73fc9edce0d8fb",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_0/wids/traces/inference_cache.npz",
+      "size": 98678866,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "5f7782f31d4472be114841445fcd0dcb0b83762086ad960dc5e586f7ab854100",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_0/wids/traces/mc_repeat_0.npz",
+      "size": 2925348,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "4782e6679d4071f8d5899b69bd4c7ed4506d8c8a961086ad4880ae401c329165",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_0/wids/traces/mc_repeat_1.npz",
+      "size": 2870053,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "31604ebf873229d7646f31f0d8d13b9d4ec7f21268ddbd60d483a835accc243b",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_0/wids/traces/mc_repeat_2.npz",
+      "size": 2869813,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "08a02d7afd1108bebb7b183847c37d97205b6e74bf12e90853b3cbcb6cf5b740",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_0/wids/traces/validation_calibration.npz",
+      "size": 44663,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "81bd293a7ad8fa0825f6c21981592cf5c8584fe391d480140472e7ad9528626e",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_0/wids/transformer_recalibrator.joblib",
+      "size": 564,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "09c3fc922ebdc3c6601d0050d6510ff45f19e2e3bf066a76a9346f44d50ae49a",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_1/wids/baseline_apache_only_logistic.joblib",
+      "size": 865,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "0396993cc94fca917ef05c6f136dd1bff884bde3d53ab28fea067a96d3218e58",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_1/wids/baseline_apache_recalibrated.joblib",
+      "size": 871,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "244fe37096820047e7a4c55acbc921ae7f44f23234cefe1f55137a543aaf1dd3",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_1/wids/baseline_calibrated_logistic_regression.joblib",
+      "size": 1451,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "0a639151ad9b5a09831b198fd3f6e1a93216044ce02dff214ade3113179dae83",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_1/wids/baseline_extra_trees.joblib",
+      "size": 174252353,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "fc071a9c31b243b76d325ad09b9344bbf3553dd2d6a2a8c39ae707c67ce7dfce",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_1/wids/baseline_hist_gradient_boosting.joblib",
+      "size": 152428,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "9d7c1102aed73545445f898aab1ace30a0d7249c16e26a24c96c9d58939dc0cc",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_1/wids/baseline_random_forest.joblib",
+      "size": 72407398,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "f545a6be361a9b11a8dc957ce11cc4a3bc4826e11e92a55c853876f8213a1c9e",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_1/wids/metrics/missingness/raw_masks.npz",
+      "size": 337688,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "367f5f5ddaa28d6bffd7cc4a75585c4e83a5fea66827567e78f804316489b228",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_1/wids/preprocessor.joblib",
+      "size": 1675418,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "d617348ab737cc111bef4e7d6e2a8db85b0f576a25c054e90f0653d4478d64f5",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_1/wids/traces/inference_cache.npz",
+      "size": 97990652,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "423b9d7510b3f441c9e911089cd9b1c5ceac0f3e3cb01ab6cd2f53861e161c1d",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_1/wids/traces/mc_repeat_0.npz",
+      "size": 2919136,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "ac6c48729c70308bee083d5da00e70f267cb941d79495571835c89caaaea7191",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_1/wids/traces/mc_repeat_1.npz",
+      "size": 2863642,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "7e196f2fd4b6bf1bfba4adc7126e9168eadc20143be1d2faa03b5d1fc941bd33",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_1/wids/traces/mc_repeat_2.npz",
+      "size": 2863494,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "13eb36b0a0ab549f2cc0d01ada3b1f208163360fd58b26f2fc49e1e9766b38cd",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_1/wids/traces/validation_calibration.npz",
+      "size": 44550,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "55d8d71d319dfef3bc0dd9bc75183b5269b143ebb6cdc7ffb92f8519f96bf9af",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_1/wids/transformer_recalibrator.joblib",
+      "size": 562,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "8dd6c48896e93ae2a8647a2d7aecdffc212c9df1fc1b43ad3a8a3e815c5653bb",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_2/wids/baseline_apache_only_logistic.joblib",
+      "size": 865,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "0396993cc94fca917ef05c6f136dd1bff884bde3d53ab28fea067a96d3218e58",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_2/wids/baseline_apache_recalibrated.joblib",
+      "size": 871,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "244fe37096820047e7a4c55acbc921ae7f44f23234cefe1f55137a543aaf1dd3",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_2/wids/baseline_calibrated_logistic_regression.joblib",
+      "size": 1451,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "0a639151ad9b5a09831b198fd3f6e1a93216044ce02dff214ade3113179dae83",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_2/wids/baseline_extra_trees.joblib",
+      "size": 174221471,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "feb7deafa3d666b3ada58d795c4ed06d61205fd61bbb0174c97bc6af545b26de",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_2/wids/baseline_hist_gradient_boosting.joblib",
+      "size": 204109,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "c8df96f0de4a9c94a73183eea5656ea7209401af0bfd84a68a4c3e1bc01ae5a3",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_2/wids/baseline_random_forest.joblib",
+      "size": 72435515,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "a6e8c109208c403fed8f25645378e3e8355c3b31fa07bac1a3e6d9955088f2a2",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_2/wids/metrics/missingness/raw_masks.npz",
+      "size": 337688,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "367f5f5ddaa28d6bffd7cc4a75585c4e83a5fea66827567e78f804316489b228",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_2/wids/preprocessor.joblib",
+      "size": 1675418,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "d617348ab737cc111bef4e7d6e2a8db85b0f576a25c054e90f0653d4478d64f5",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_2/wids/traces/inference_cache.npz",
+      "size": 98184929,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "defb2d4105aa260b8a4b00eddab5f99f7dd4567be6beee08c3b4033682bf7989",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_2/wids/traces/mc_repeat_0.npz",
+      "size": 2923472,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "657492cdcd391770ca12d8f0c7025cea24416e79f51fa7b726d18d4ee152b0d5",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_2/wids/traces/mc_repeat_1.npz",
+      "size": 2868090,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "9cb91242e1e332b7cb7b2d9d06eb7a58308aab9752e10b0a736bd59ab212510d",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_2/wids/traces/mc_repeat_2.npz",
+      "size": 2867684,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "d6d5cb0b1d0c4d1e451641cfa2b4448f90bebf65c18c2ee3101e14d2360d087a",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_2/wids/traces/validation_calibration.npz",
+      "size": 44609,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "4ac1adefb32a9317006ee9761c59e4186f183fa085712f5891f9e4de00eb7b95",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_2/wids/transformer_recalibrator.joblib",
+      "size": 561,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "cd2f2af4ff114cf64e7eabec901e110acfd942fe514fa3f6276262fbe23dbf4b",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_3/wids/baseline_apache_only_logistic.joblib",
+      "size": 865,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "0396993cc94fca917ef05c6f136dd1bff884bde3d53ab28fea067a96d3218e58",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_3/wids/baseline_apache_recalibrated.joblib",
+      "size": 871,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "244fe37096820047e7a4c55acbc921ae7f44f23234cefe1f55137a543aaf1dd3",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_3/wids/baseline_calibrated_logistic_regression.joblib",
+      "size": 1451,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "0a639151ad9b5a09831b198fd3f6e1a93216044ce02dff214ade3113179dae83",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_3/wids/baseline_extra_trees.joblib",
+      "size": 174236045,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "c2163421d569a5dab094d0765f85d69176ba6b23248eb3f6f37cef1c47b960c8",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_3/wids/baseline_hist_gradient_boosting.joblib",
+      "size": 172844,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "c15df1c4509a850aa9617c0409a0c6b4edeee33caf184d0d31d237c09deaae51",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_3/wids/baseline_random_forest.joblib",
+      "size": 72354588,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "8a268099deb1bfb48d5a99267de83cdba56b733a49a73a4367801c86c66b7202",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_3/wids/metrics/missingness/raw_masks.npz",
+      "size": 337688,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "367f5f5ddaa28d6bffd7cc4a75585c4e83a5fea66827567e78f804316489b228",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_3/wids/preprocessor.joblib",
+      "size": 1675418,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "d617348ab737cc111bef4e7d6e2a8db85b0f576a25c054e90f0653d4478d64f5",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_3/wids/traces/inference_cache.npz",
+      "size": 98138712,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "681bcfbb8d11d3e1768eb6766a182fdada03a24c94c96e0c97ce8b64b8b0c59b",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_3/wids/traces/mc_repeat_0.npz",
+      "size": 2923635,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "373add8278a610ecbf93a4b440566b999c32a475b4ae6a659736a8fbb9e51910",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_3/wids/traces/mc_repeat_1.npz",
+      "size": 2868390,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "ca176201bb02628b694e146eafcfafcf433db7a51fedd9269991a72604742229",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_3/wids/traces/mc_repeat_2.npz",
+      "size": 2868379,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "b871f59ca229ff28a27b547ad847118347e28bdd37d62fbede7ab53533abb284",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_3/wids/traces/validation_calibration.npz",
+      "size": 44624,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "53977b2b06079dcabd7c608042313a9083bef7619812d1071303209f4c231052",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_3/wids/transformer_recalibrator.joblib",
+      "size": 561,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "b171e53af3e204dbf00c1767d99520bfe740abe14a332928e328c4d6b82184ab",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_4/wids/baseline_apache_only_logistic.joblib",
+      "size": 865,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "0396993cc94fca917ef05c6f136dd1bff884bde3d53ab28fea067a96d3218e58",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_4/wids/baseline_apache_recalibrated.joblib",
+      "size": 871,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "244fe37096820047e7a4c55acbc921ae7f44f23234cefe1f55137a543aaf1dd3",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_4/wids/baseline_calibrated_logistic_regression.joblib",
+      "size": 1451,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "0a639151ad9b5a09831b198fd3f6e1a93216044ce02dff214ade3113179dae83",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_4/wids/baseline_extra_trees.joblib",
+      "size": 174168092,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "e3646c4f131c46fa3c17d3cc67de60b173b9b48862f3da620fd7fc3883a17f54",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_4/wids/baseline_hist_gradient_boosting.joblib",
+      "size": 153053,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "649492c780429d04673e37e86db9ac32de0d653123afb87cb7b1c052cb8fb3df",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_4/wids/baseline_random_forest.joblib",
+      "size": 72486611,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "4ebf191a86e936947109b2b181633051c108a373105ad74b8da68a48d76c9a10",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_4/wids/metrics/missingness/raw_masks.npz",
+      "size": 337688,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "367f5f5ddaa28d6bffd7cc4a75585c4e83a5fea66827567e78f804316489b228",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_4/wids/preprocessor.joblib",
+      "size": 1675418,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "d617348ab737cc111bef4e7d6e2a8db85b0f576a25c054e90f0653d4478d64f5",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_4/wids/traces/inference_cache.npz",
+      "size": 98167428,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "e40042238f36921ed9339b15a173bbc8aea598f1f515bbc2ffab1d3bce293d23",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_4/wids/traces/mc_repeat_0.npz",
+      "size": 2924338,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "b9c04f03235cc7bebf6e32ec815d0d8a7d9ff5834ba2d845469cdb1988c4b1fe",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_4/wids/traces/mc_repeat_1.npz",
+      "size": 2869028,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "b4d5cdd99768589f79a5732daa6a25e10405a54f17bd1875822d4db201ffd867",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_4/wids/traces/mc_repeat_2.npz",
+      "size": 2868721,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "d6d6f88eaf443634a533cf91dee9b133b43f93a9a4b036c8906914800160f8cc",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_4/wids/traces/validation_calibration.npz",
+      "size": 44634,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "9fd319e1191300a16bed06dfacd23ccccc5d4cf1b91b33e8341b8fc0a4c30257",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn/seed_4/wids/transformer_recalibrator.joblib",
+      "size": 561,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "aaaead09869de25fb45205ec67855f69bd6c07d8ef537649af84bb4ba2b74830",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/analysis/ensemble_predictions.npz",
+      "size": 483922,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "24b41ec7f562f1c47a5b0b48628e0f01b2f41289c9e7ca0ca359fb23ddc99489",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_0/wids/baseline_apache_only_logistic.joblib",
+      "size": 865,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "0396993cc94fca917ef05c6f136dd1bff884bde3d53ab28fea067a96d3218e58",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_0/wids/baseline_apache_recalibrated.joblib",
+      "size": 871,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "244fe37096820047e7a4c55acbc921ae7f44f23234cefe1f55137a543aaf1dd3",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_0/wids/baseline_calibrated_logistic_regression.joblib",
+      "size": 1419,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "9c1ef211e193a8785724a1fa554f272c3bece10df6e94da8432c1f771ff00fbf",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_0/wids/baseline_extra_trees.joblib",
+      "size": 209899006,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "dd1a2be3849a56fe3f1174971fd4d148fd88b8cb7e6d6e2ed4487befa2a79154",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_0/wids/baseline_hist_gradient_boosting.joblib",
+      "size": 227668,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "fd172f5393f8b657676701bbbe1fa422c240c7babe5d3f53b72294a6962d045f",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_0/wids/baseline_random_forest.joblib",
+      "size": 83435926,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "8b7af068d4e4c9b93c06c154c16d7528140e7ca3c9652b56d966bf68b2ba7435",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_0/wids/preprocessor.joblib",
+      "size": 1588266,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "6e867b1e205270b0b4e378ca24dbc25c6fc1383147bd4db401d786d7cf5abef3",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_0/wids/traces/inference_cache.npz",
+      "size": 92398508,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "15a1d07925486ac6e84db9a124de18e9c542913e3cf2aa5af1552f4cc3e6d2a8",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_0/wids/traces/mc_repeat_0.npz",
+      "size": 2913986,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "cb44b1b89da3f58f470eacadc961017b8560eba9a689a92e9477e697c285e0bc",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_0/wids/traces/mc_repeat_1.npz",
+      "size": 2858052,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "07e278cefe43e7e3074aa178fbfb200b97110865ae2545c88013af3efc0d489c",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_0/wids/traces/mc_repeat_2.npz",
+      "size": 2858429,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "2e3130707779984e6d013db90a451c5efe376bbf4a97ac27f0c9a80c2b0bdb03",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_0/wids/traces/validation_calibration.npz",
+      "size": 44517,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "b11ba5a08cad95004ff522785457548ff8f0de40f79d19eae6efd6c1f2542338",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_0/wids/transformer_recalibrator.joblib",
+      "size": 565,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "e2c3a4612f6b94881524b775c1e0ddcd359ff6e4a9d175778d20d3536dea46f0",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_1/wids/baseline_apache_only_logistic.joblib",
+      "size": 863,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "8ec898cf151ca5cc0eafb486e34c726f56e87a279f073a9180a91073ad74c1fb",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_1/wids/baseline_apache_recalibrated.joblib",
+      "size": 867,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "a9324e55b7cf436f4067c0cd394d00492e74300acdd0059b803e8a9f3ed6d367",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_1/wids/baseline_calibrated_logistic_regression.joblib",
+      "size": 1418,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "6f18a4d14b15c644d9daa3b50f58ac4359e91f89dcebcfd985dac5b1106763af",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_1/wids/baseline_extra_trees.joblib",
+      "size": 210041827,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "75512fe155ec5dd8e4c1ac7873be255c95645d7b1415103492554423b8901a49",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_1/wids/baseline_hist_gradient_boosting.joblib",
+      "size": 240629,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "654843e41973538cf9cc32874b84deb202b453cc79319398082307dbd2377e94",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_1/wids/baseline_random_forest.joblib",
+      "size": 83487441,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "0f26506cb604826045e969ffd0aebf6c79a50d2710a273c4c8b6755cef3024b6",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_1/wids/preprocessor.joblib",
+      "size": 1588275,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "f6859259db4684ab76535919ebfcadf2dfcd2291b227c2473269ed33639d8da2",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_1/wids/traces/inference_cache.npz",
+      "size": 91675956,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "37c69902696fd2f1de959f26c7cc3026a1ecc46348b858c2667afafb31870fc8",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_1/wids/traces/mc_repeat_0.npz",
+      "size": 2910702,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "9b7ade8ff141b91ef256bdb02488580816f679a86dde68d54c62f635b2202fd2",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_1/wids/traces/mc_repeat_1.npz",
+      "size": 2855113,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "c6af2ffdf57d9eb4749734774dc2211492233085a5764a4956688b5d977ea22f",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_1/wids/traces/mc_repeat_2.npz",
+      "size": 2855085,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "644e5b110720aaea9f27790e829b11e6f9fa353cee199e7cf0885cb8cb65157a",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_1/wids/traces/validation_calibration.npz",
+      "size": 44470,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "2baa479a9f1b3070c0b4daa81ddf8eed888d476794ed22a38827e93a7d88f71c",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_1/wids/transformer_recalibrator.joblib",
+      "size": 561,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "a5549e8266fd735c1cd238bb60ab14139bba423b1f165e31cc102761c74886a6",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_2/wids/baseline_apache_only_logistic.joblib",
+      "size": 863,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "8ec898cf151ca5cc0eafb486e34c726f56e87a279f073a9180a91073ad74c1fb",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_2/wids/baseline_apache_recalibrated.joblib",
+      "size": 867,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "a9324e55b7cf436f4067c0cd394d00492e74300acdd0059b803e8a9f3ed6d367",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_2/wids/baseline_calibrated_logistic_regression.joblib",
+      "size": 1418,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "6f18a4d14b15c644d9daa3b50f58ac4359e91f89dcebcfd985dac5b1106763af",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_2/wids/baseline_extra_trees.joblib",
+      "size": 210019879,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "1e9990e41da1376bf7c38bed97b42a48023b65046ce3deebe80b96bff23791ec",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_2/wids/baseline_hist_gradient_boosting.joblib",
+      "size": 241250,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "a08a034bb022c7837e51549283cf40106ad9fda03733cdeea56a8b8327fbf737",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_2/wids/baseline_random_forest.joblib",
+      "size": 83426082,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "2c1dbf644a2dc63aa2e5719b55251ae23014bdd867faf4d7292c148362810e7f",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_2/wids/preprocessor.joblib",
+      "size": 1588275,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "f6859259db4684ab76535919ebfcadf2dfcd2291b227c2473269ed33639d8da2",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_2/wids/traces/inference_cache.npz",
+      "size": 92673470,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "c3c2334756a8e5558bbba6e109da40578ec076f783409c31d0532d53b622b35c",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_2/wids/traces/mc_repeat_0.npz",
+      "size": 2916009,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "e7c5d20c9f4b668eb6072e7c531b8f758db449c5d366858cf2b9baa65b1d5d90",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_2/wids/traces/mc_repeat_1.npz",
+      "size": 2860677,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "f0ea2e398e67f05f47f7a2250d6086d9f5fa96be31f087ae462657a99ec1fbde",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_2/wids/traces/mc_repeat_2.npz",
+      "size": 2860173,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "70c6892d86e39d2f567d327e2e6e0f2731405a5ea8d7882931f18a6723875538",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_2/wids/traces/validation_calibration.npz",
+      "size": 44560,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "0dfbd7c8af2f6e7a43b5ebc2887fedfc44182697548ae86ed93ed3a8275c77b1",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_2/wids/transformer_recalibrator.joblib",
+      "size": 562,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "ead9ca1068efb39b934c2599cabd6bc5b3188d1dc2ba130f2aa295d8e3fb34d5",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_3/wids/baseline_apache_only_logistic.joblib",
+      "size": 863,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "8ec898cf151ca5cc0eafb486e34c726f56e87a279f073a9180a91073ad74c1fb",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_3/wids/baseline_apache_recalibrated.joblib",
+      "size": 867,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "a9324e55b7cf436f4067c0cd394d00492e74300acdd0059b803e8a9f3ed6d367",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_3/wids/baseline_calibrated_logistic_regression.joblib",
+      "size": 1418,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "6f18a4d14b15c644d9daa3b50f58ac4359e91f89dcebcfd985dac5b1106763af",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_3/wids/baseline_extra_trees.joblib",
+      "size": 210005219,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "aa26a28a0a50e1c548cd8a638e27f2b04c0c60de61a404618979425749db21b6",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_3/wids/baseline_hist_gradient_boosting.joblib",
+      "size": 208310,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "551757ca3a9240117bae925b53bced1b07b7d4be6670485a027a8b3cb49976fe",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_3/wids/baseline_random_forest.joblib",
+      "size": 83488811,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "04deee2a5882feade8daaa5e113d86bc04d737752a1205234524391d38a6ff7e",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_3/wids/preprocessor.joblib",
+      "size": 1588275,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "f6859259db4684ab76535919ebfcadf2dfcd2291b227c2473269ed33639d8da2",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_3/wids/traces/inference_cache.npz",
+      "size": 92453740,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "e93dcf0ab7e52a3679e4d8c58cb076c7c04325db9f0c287b382eaba61793b61f",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_3/wids/traces/mc_repeat_0.npz",
+      "size": 2920612,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "a22f4cb4bdcbd166eb139e58577093e72bf04d7a31032bd6247f95173f4857e5",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_3/wids/traces/mc_repeat_1.npz",
+      "size": 2865201,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "1e9f066621b52bd46bcf33704fea34df5ade89655730c740a6abaf80ce497ec1",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_3/wids/traces/mc_repeat_2.npz",
+      "size": 2865255,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "892d2795c229c714345aa33eeabff1568f156444fc1dccd8c7abfa18de2efcad",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_3/wids/traces/validation_calibration.npz",
+      "size": 44614,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "c1fc4308715a627dbf5aeb12183f12d1e9b4c5cf653574befb4edca8942cc6f5",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_3/wids/transformer_recalibrator.joblib",
+      "size": 560,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "bd9d86e54edd80598cc61376de6299b9018b9e9381108969bbc8762abca56608",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_4/wids/baseline_apache_only_logistic.joblib",
+      "size": 863,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "8ec898cf151ca5cc0eafb486e34c726f56e87a279f073a9180a91073ad74c1fb",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_4/wids/baseline_apache_recalibrated.joblib",
+      "size": 867,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "a9324e55b7cf436f4067c0cd394d00492e74300acdd0059b803e8a9f3ed6d367",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_4/wids/baseline_calibrated_logistic_regression.joblib",
+      "size": 1418,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "6f18a4d14b15c644d9daa3b50f58ac4359e91f89dcebcfd985dac5b1106763af",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_4/wids/baseline_extra_trees.joblib",
+      "size": 210031719,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "a280ca6791a8236e37a0a83cd205fc3b2478efd2962db7ab787bafa235922325",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_4/wids/baseline_hist_gradient_boosting.joblib",
+      "size": 153930,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "02ea8059e0d2789fcff026a37454fb8f8c2bf05294223aa8fe2d823dec66d4a9",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_4/wids/baseline_random_forest.joblib",
+      "size": 83456510,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "a618daf37e82c7c49c7391f72d91135e53bdcb4f944b59e7b19bc797e97a4c87",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_4/wids/preprocessor.joblib",
+      "size": 1588275,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "f6859259db4684ab76535919ebfcadf2dfcd2291b227c2473269ed33639d8da2",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_4/wids/traces/inference_cache.npz",
+      "size": 92323217,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "27856a3205a03015a2881cfd8289844ab1d882e26926a32986260373fded49f1",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_4/wids/traces/mc_repeat_0.npz",
+      "size": 2921582,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "afce95c9cf13b908811376d3409e58da61f2880563868401c9f8cce0e4b318ba",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_4/wids/traces/mc_repeat_1.npz",
+      "size": 2866146,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "3aa1b8408cec38fdab6f069c87df79c7db8b12bb78d0c7c992b89118224e529d",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_4/wids/traces/mc_repeat_2.npz",
+      "size": 2866386,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "e7ee107aeefdf009f6dc6c2ea81aca6332acddffdb07dddbfe44aa9e7b1bca7f",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_4/wids/traces/validation_calibration.npz",
+      "size": 44678,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "50413f98f401b83c42c78eb19b115177b0ecfc4a06fd6fee9f338d31fe5df779",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/knn_no_apache/seed_4/wids/transformer_recalibrator.joblib",
+      "size": 561,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "e90edc8dcab59c3c480fbd6c4d4af565e20d464614a0e019f484199c30e47cda",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/analysis/ensemble_predictions.npz",
+      "size": 486050,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "871e3c4e0e5410d512903572b3023b2f144adbd5cc2e0e506f4ccf0cdc673f88",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_0/wids/baseline_apache_only_logistic.joblib",
+      "size": 863,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "8ec898cf151ca5cc0eafb486e34c726f56e87a279f073a9180a91073ad74c1fb",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_0/wids/baseline_apache_recalibrated.joblib",
+      "size": 867,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "a9324e55b7cf436f4067c0cd394d00492e74300acdd0059b803e8a9f3ed6d367",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_0/wids/baseline_calibrated_logistic_regression.joblib",
+      "size": 1442,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "25bd897891a8d48ae3221667445baedc2b116bf204634e1bddf3e13c9916210c",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_0/wids/baseline_extra_trees.joblib",
+      "size": 177273785,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "bc0ce207edb14bb4d6c0c528fe0c66405f023ebd342e2ae1c1c4bb3ffa7cf51a",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_0/wids/baseline_hist_gradient_boosting.joblib",
+      "size": 195554,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "d9fd74a20b44301763b73bddd639e3df45176fe0f1fa2eda2bc77cd76f3dce69",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_0/wids/baseline_random_forest.joblib",
+      "size": 74063119,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "5e4ef1956488b8bdf7bf37bcd9a49f1ccaaaeb5b2f12df1bec030585b4001ca4",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_0/wids/metrics/missingness/raw_masks.npz",
+      "size": 337688,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "367f5f5ddaa28d6bffd7cc4a75585c4e83a5fea66827567e78f804316489b228",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_0/wids/preprocessor.joblib",
+      "size": 2334,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "0446216a94fc0307b2f060cf827bd5a0d6df2c5e4c7de39f119eb430f4cca6fe",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_0/wids/traces/inference_cache.npz",
+      "size": 99101962,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "9423475d0e6b3db02998193ba3bb50f05659410d3fd3c63c81d031242d615c41",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_0/wids/traces/mc_repeat_0.npz",
+      "size": 2930724,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "c42caa9d09953ecc5d2b7a19b01f3103dc0ae758ee731f756c8afc7567611084",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_0/wids/traces/mc_repeat_1.npz",
+      "size": 2875135,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "9e1c794ed5b4bf86a625d727664bd76eda720e5b78f51000bfef027356709bfc",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_0/wids/traces/mc_repeat_2.npz",
+      "size": 2875259,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "147e95084b960fb32b7341d98c963af71fb12e1df6f49bf8b4a2efeb96a694ff",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_0/wids/traces/validation_calibration.npz",
+      "size": 44678,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "a3bce3e7509507a263b9d7e199125031fd41eb06f8c6cb18457732b305c807ba",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_0/wids/transformer_recalibrator.joblib",
+      "size": 561,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "df2a9b0dc619c1656a5fb2100f7d1d79a96c6942edb1d1738256bc3c09b88ae5",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_1/wids/baseline_apache_only_logistic.joblib",
+      "size": 863,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "8ec898cf151ca5cc0eafb486e34c726f56e87a279f073a9180a91073ad74c1fb",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_1/wids/baseline_apache_recalibrated.joblib",
+      "size": 867,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "a9324e55b7cf436f4067c0cd394d00492e74300acdd0059b803e8a9f3ed6d367",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_1/wids/baseline_calibrated_logistic_regression.joblib",
+      "size": 1442,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "25bd897891a8d48ae3221667445baedc2b116bf204634e1bddf3e13c9916210c",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_1/wids/baseline_extra_trees.joblib",
+      "size": 177247346,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "f217a63db740611921331383cedb6f29001d15de0ebbf4c212890b594c6987cf",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_1/wids/baseline_hist_gradient_boosting.joblib",
+      "size": 151238,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "7fb5e260b808f6482de4d1ed84bc5c2e9e37299a6be9513a834948d84b47df42",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_1/wids/baseline_random_forest.joblib",
+      "size": 74037563,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "ccaf8c615532decf5e0f84fe3bb3b88d3be75ce4b29e8f3443eb861bf16e667c",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_1/wids/metrics/missingness/raw_masks.npz",
+      "size": 337688,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "367f5f5ddaa28d6bffd7cc4a75585c4e83a5fea66827567e78f804316489b228",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_1/wids/preprocessor.joblib",
+      "size": 2334,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "0446216a94fc0307b2f060cf827bd5a0d6df2c5e4c7de39f119eb430f4cca6fe",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_1/wids/traces/inference_cache.npz",
+      "size": 98257498,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "2c4a1f5eb6e76452261bca3cd6e4ae9351bd38e99f25fbed4640245d04f9dccb",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_1/wids/traces/mc_repeat_0.npz",
+      "size": 2923138,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "f5e3ad0a32ba9ce3bf0965c330ae3e676c51c5583d478e30a6b4c53c40d09876",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_1/wids/traces/mc_repeat_1.npz",
+      "size": 2868149,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "b9f9fdc52b7fc047c5b693543d9bf108e9d892836018991a4a5e345bb36f5160",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_1/wids/traces/mc_repeat_2.npz",
+      "size": 2867703,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "50787f22fb62f500fbe4c4e067655eaa3dc0bfd9b36ca908118987d8bd103fc6",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_1/wids/traces/validation_calibration.npz",
+      "size": 44621,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "c553388ac10cb094367d872d296ec12ecb93b192fed90d01b0cbfcfb915aa260",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_1/wids/transformer_recalibrator.joblib",
+      "size": 564,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "c826d250ede4391d1188833b9a1fb63e401cbeee9d0210b1b58d71e60a850d84",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_2/wids/baseline_apache_only_logistic.joblib",
+      "size": 863,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "8ec898cf151ca5cc0eafb486e34c726f56e87a279f073a9180a91073ad74c1fb",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_2/wids/baseline_apache_recalibrated.joblib",
+      "size": 867,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "a9324e55b7cf436f4067c0cd394d00492e74300acdd0059b803e8a9f3ed6d367",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_2/wids/baseline_calibrated_logistic_regression.joblib",
+      "size": 1442,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "25bd897891a8d48ae3221667445baedc2b116bf204634e1bddf3e13c9916210c",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_2/wids/baseline_extra_trees.joblib",
+      "size": 177375778,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "21fa26af02e2587b488d232b26a6fd34bffc9df8d07f2bf7c428bc5c18add3e9",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_2/wids/baseline_hist_gradient_boosting.joblib",
+      "size": 185271,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "d06c5d2b6039fd7f7461038144b0f3b31938ef76747bb097e0eea7d341fdde00",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_2/wids/baseline_random_forest.joblib",
+      "size": 74046368,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "8fb959f7d42c145b915eefb399a585655b49eaffa533607a357845fe33a2d05f",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_2/wids/metrics/missingness/raw_masks.npz",
+      "size": 337688,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "367f5f5ddaa28d6bffd7cc4a75585c4e83a5fea66827567e78f804316489b228",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_2/wids/preprocessor.joblib",
+      "size": 2334,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "0446216a94fc0307b2f060cf827bd5a0d6df2c5e4c7de39f119eb430f4cca6fe",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_2/wids/traces/inference_cache.npz",
+      "size": 98149768,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "2a5af416e739e84aad3114cdb85f9a878acf3ed5514152b2680e668611832155",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_2/wids/traces/mc_repeat_0.npz",
+      "size": 2923924,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "26046f38daf1729430dcf160578c4f4098f9089c5b2ab71fdf6ffa033a41671b",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_2/wids/traces/mc_repeat_1.npz",
+      "size": 2868316,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "2e52ed971ce2a1e3890f51a1120e21ed9297d171c5a6c3a2a76e75389df236ff",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_2/wids/traces/mc_repeat_2.npz",
+      "size": 2868229,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "00adf1b32aebab54edd7308c69a9a89fd4e7dd98a981c4c180726c46d62cfd38",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_2/wids/traces/validation_calibration.npz",
+      "size": 44602,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "57f799b7f00b6744976325732bfef4a69df1c2ff40b079648d2344c66ee8f0c4",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_2/wids/transformer_recalibrator.joblib",
+      "size": 566,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "e084b4d99c0ad518407beae9979b714cf0e9648be62c824b818154e36de71883",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_3/wids/baseline_apache_only_logistic.joblib",
+      "size": 863,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "8ec898cf151ca5cc0eafb486e34c726f56e87a279f073a9180a91073ad74c1fb",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_3/wids/baseline_apache_recalibrated.joblib",
+      "size": 867,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "a9324e55b7cf436f4067c0cd394d00492e74300acdd0059b803e8a9f3ed6d367",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_3/wids/baseline_calibrated_logistic_regression.joblib",
+      "size": 1442,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "25bd897891a8d48ae3221667445baedc2b116bf204634e1bddf3e13c9916210c",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_3/wids/baseline_extra_trees.joblib",
+      "size": 177457866,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "a22142c48dfd9317625094194b7cc7a781b02e3b2ad4ffb029b3f04b7ea4b5e5",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_3/wids/baseline_hist_gradient_boosting.joblib",
+      "size": 171891,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "78103607f372ded24bd6ac0054d1c2e0d3ebc22f6ca56e3b55234cadfda7d386",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_3/wids/baseline_random_forest.joblib",
+      "size": 74099698,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "16365af2b674f315022dd844e6ad9f91ea6a2bd0df69ed4a51667afd47034833",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_3/wids/metrics/missingness/raw_masks.npz",
+      "size": 337688,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "367f5f5ddaa28d6bffd7cc4a75585c4e83a5fea66827567e78f804316489b228",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_3/wids/preprocessor.joblib",
+      "size": 2334,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "0446216a94fc0307b2f060cf827bd5a0d6df2c5e4c7de39f119eb430f4cca6fe",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_3/wids/traces/inference_cache.npz",
+      "size": 98645879,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "875a2a8c0517f1533e901cbcde742cc8fbeadf191e73e08a6ddf0f25df53a3bd",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_3/wids/traces/mc_repeat_0.npz",
+      "size": 2933179,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "0d54a1487fd090ef01213b5285296abd21eff1dc120e0250d85c20d04fa94da2",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_3/wids/traces/mc_repeat_1.npz",
+      "size": 2878015,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "188915b1defe53ffb00924a6588e4f95ab3823c48e1187f2e8c9b34f3802fd27",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_3/wids/traces/mc_repeat_2.npz",
+      "size": 2877653,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "24fc22164ad5ab3cb861d6cdb97455122ff97fc62f4d2200a756aa0423c849d7",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_3/wids/traces/validation_calibration.npz",
+      "size": 44723,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "9b84f75b34a096ff0be296c53cabc0ef4c5714d4e6a60dc48e9139b4e6241c2b",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_3/wids/transformer_recalibrator.joblib",
+      "size": 563,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "2f51d84da482c9efbf25904166b43f37abb54b1fbd096ebff0d6c8fd52c4002f",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_4/wids/baseline_apache_only_logistic.joblib",
+      "size": 863,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "8ec898cf151ca5cc0eafb486e34c726f56e87a279f073a9180a91073ad74c1fb",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_4/wids/baseline_apache_recalibrated.joblib",
+      "size": 867,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "a9324e55b7cf436f4067c0cd394d00492e74300acdd0059b803e8a9f3ed6d367",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_4/wids/baseline_calibrated_logistic_regression.joblib",
+      "size": 1442,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "25bd897891a8d48ae3221667445baedc2b116bf204634e1bddf3e13c9916210c",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_4/wids/baseline_extra_trees.joblib",
+      "size": 177452734,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "a0925b7fe3027bf72d2473390e3d37604c91d67e7489e2516b4bd06cfa2c4b0b",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_4/wids/baseline_hist_gradient_boosting.joblib",
+      "size": 181962,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "b4b51594c14b2e00f956525d93c8a5d7169642ebef9d1eb364e2b6a27771a0e1",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_4/wids/baseline_random_forest.joblib",
+      "size": 74097121,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "641c98dd5dead597052d62fd2979031c8cdbf7bd059d2332dfc7d3f2a6248fda",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_4/wids/metrics/missingness/raw_masks.npz",
+      "size": 337688,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "367f5f5ddaa28d6bffd7cc4a75585c4e83a5fea66827567e78f804316489b228",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_4/wids/preprocessor.joblib",
+      "size": 2334,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "0446216a94fc0307b2f060cf827bd5a0d6df2c5e4c7de39f119eb430f4cca6fe",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_4/wids/traces/inference_cache.npz",
+      "size": 98527396,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "3e0f2d2883d9793be1f0a3747838113b93407fccfd61a55ca938847d2278f117",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_4/wids/traces/mc_repeat_0.npz",
+      "size": 2923791,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "f3aece2b323eb439903025273c54b0a4d8357ca6dadd69eab3e85129be2ec9e6",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_4/wids/traces/mc_repeat_1.npz",
+      "size": 2868657,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "d3d5edf3ab94a7707ff2b20de5912386a51ec1904dd56e501470fec993ea6a13",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_4/wids/traces/mc_repeat_2.npz",
+      "size": 2868671,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "5e4a9d2741233be198285136b7823ac298c30caaabe06233674643568cec7b63",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_4/wids/traces/validation_calibration.npz",
+      "size": 44655,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "f9a8dbd2355056cdca1c67cbc2bcdd4ae33bac4d18c45f03ab135ed93c8ba7c5",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median/seed_4/wids/transformer_recalibrator.joblib",
+      "size": 561,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "0c1592997e5dbdde720fbd85d256028db1147007a9c2e9ae7d262f5e5cc7a516",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/analysis/ensemble_predictions.npz",
+      "size": 483682,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "ccee6170dfd35c176e81b534e9e34515aaf53142c9e5f05362f5b4f578d52d8d",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_0/wids/baseline_apache_only_logistic.joblib",
+      "size": 865,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "0396993cc94fca917ef05c6f136dd1bff884bde3d53ab28fea067a96d3218e58",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_0/wids/baseline_apache_recalibrated.joblib",
+      "size": 871,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "244fe37096820047e7a4c55acbc921ae7f44f23234cefe1f55137a543aaf1dd3",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_0/wids/baseline_calibrated_logistic_regression.joblib",
+      "size": 1418,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "0cedfa1e8e4d28660e2059f51231dd6669490c786c88be2dfd4e7898fb92561d",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_0/wids/baseline_extra_trees.joblib",
+      "size": 213354112,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "940eee9078f9c2c18ac0127884ac85e21b7834fc0eff7f0f8464784e2670b000",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_0/wids/baseline_hist_gradient_boosting.joblib",
+      "size": 153328,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "f7e77c5cb11aee716aa66efd9f161e15dc74dd7fc5d5567c007cc080f16feec8",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_0/wids/baseline_random_forest.joblib",
+      "size": 85461458,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "9599388fab5463b80df5ce1a0878e136ed2ca00a9bf6c9433f033544d817342b",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_0/wids/preprocessor.joblib",
+      "size": 2231,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "3e1a9c52b9496a004ad50d904d460334296240fc1079ac2fb0189703ef299bf8",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_0/wids/traces/inference_cache.npz",
+      "size": 92640262,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "4511718137aa195307c1f6d1301bab272720fecab809bc046a17eb7ff346dccd",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_0/wids/traces/mc_repeat_0.npz",
+      "size": 2918124,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "94023f5a80bb35b58ab3393d0f3b1011492fc56cd9be3eb2a45abbc01df0be2b",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_0/wids/traces/mc_repeat_1.npz",
+      "size": 2862537,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "9fa13e5e9dc049f2917344d04dbd2c617ba2be8e72fb2699154ed8262fd8dc38",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_0/wids/traces/mc_repeat_2.npz",
+      "size": 2862669,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "a8eb5229ed1a77aef09e96aabad0e94741ad247ceee57dc1128f301f5491019c",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_0/wids/traces/validation_calibration.npz",
+      "size": 44607,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "629c395738fbcdf05476ea89b6d06bad93d0d36040f9759b47facea8f9725e6f",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_0/wids/transformer_recalibrator.joblib",
+      "size": 559,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "6c2719c58d2f4d97cf34cf090363e4b7bb21894dbae22eb452fd972a44805d6c",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_1/wids/baseline_apache_only_logistic.joblib",
+      "size": 863,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "8ec898cf151ca5cc0eafb486e34c726f56e87a279f073a9180a91073ad74c1fb",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_1/wids/baseline_apache_recalibrated.joblib",
+      "size": 867,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "a9324e55b7cf436f4067c0cd394d00492e74300acdd0059b803e8a9f3ed6d367",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_1/wids/baseline_calibrated_logistic_regression.joblib",
+      "size": 1418,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "f21553336bffc2be06257d89ae9815c0cdc6b094ef6df3e51c00723e0cc4df47",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_1/wids/baseline_extra_trees.joblib",
+      "size": 213206146,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "1a0d75b53b4dec9f31de30117d1bee86244ccd4e9168bbb2ff20ebe9088c8397",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_1/wids/baseline_hist_gradient_boosting.joblib",
+      "size": 153605,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "ee943a1835edef1622abb45b10a27e32b31cf13612adad354bbf4b22fe96a1a5",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_1/wids/baseline_random_forest.joblib",
+      "size": 85473121,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "74988367c5d01d1811aa544ffcfb569d9022ec4b4216229950f86bf9d43f196b",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_1/wids/preprocessor.joblib",
+      "size": 2256,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "25fa6968aae6ee25fc4b65c6d94d4c0bf382c2b3e23635f5c6d4b573a59b2b74",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_1/wids/traces/inference_cache.npz",
+      "size": 92037229,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "58b27be58b981a0195812431d7af0085f89da45a113543f7189906426faf1b1e",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_1/wids/traces/mc_repeat_0.npz",
+      "size": 2914519,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "d311373fb6b82e93565261adfff383d83ffa671beed24568a6bfaaaf3c46684b",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_1/wids/traces/mc_repeat_1.npz",
+      "size": 2858750,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "017ec700e1050afcfc68abbda7c08eee3224d0158bc3b4d17dbf6c3c006700f4",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_1/wids/traces/mc_repeat_2.npz",
+      "size": 2859181,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "dc7d95625680c4d042777f917739a3d052abdc3be4173d3fbf2c18348f2b5d28",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_1/wids/traces/validation_calibration.npz",
+      "size": 44517,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "6b94af1f6cd794f74725b155c20e79e852fbcfd3d172020c59a65932aa8be15f",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_1/wids/transformer_recalibrator.joblib",
+      "size": 562,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "0532fa59d2f45ead9915963c5b9f9bf4573a57c39202a462159df47017a9f5c6",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_2/wids/baseline_apache_only_logistic.joblib",
+      "size": 863,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "8ec898cf151ca5cc0eafb486e34c726f56e87a279f073a9180a91073ad74c1fb",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_2/wids/baseline_apache_recalibrated.joblib",
+      "size": 867,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "a9324e55b7cf436f4067c0cd394d00492e74300acdd0059b803e8a9f3ed6d367",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_2/wids/baseline_calibrated_logistic_regression.joblib",
+      "size": 1418,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "f21553336bffc2be06257d89ae9815c0cdc6b094ef6df3e51c00723e0cc4df47",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_2/wids/baseline_extra_trees.joblib",
+      "size": 213300533,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "d561db7e8c127be5d0dcce6ba38f55e3e44d676cef9c9175679765c534153417",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_2/wids/baseline_hist_gradient_boosting.joblib",
+      "size": 154036,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "dd1e60cd9fefdc11a0402df0c4159c635976e919ca4d70e697bf7c228ff231c0",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_2/wids/baseline_random_forest.joblib",
+      "size": 85393542,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "5b8f14aadd8e990769cac33b72843d2f12887a71ca4945c1f2d7b7d3052e37cc",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_2/wids/preprocessor.joblib",
+      "size": 2256,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "25fa6968aae6ee25fc4b65c6d94d4c0bf382c2b3e23635f5c6d4b573a59b2b74",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_2/wids/traces/inference_cache.npz",
+      "size": 93087593,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "52eb28951da3763f681355a223ea882763d4b74f3df3029fadd5632cc55c1e59",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_2/wids/traces/mc_repeat_0.npz",
+      "size": 2916576,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "f809bcc79be8a56a149ac4f7dadeaa51874fe86372c25f14301a078a1eb6f317",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_2/wids/traces/mc_repeat_1.npz",
+      "size": 2861124,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "4a88aee02dd97e2bc039608b0b6fe925e5041bffeedfd75d74b6f600b68f6153",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_2/wids/traces/mc_repeat_2.npz",
+      "size": 2861131,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "2b73c31779a051b34381de47750c5003a67511842ae003b3de93f0292e404da2",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_2/wids/traces/validation_calibration.npz",
+      "size": 44524,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "ab1a48244f53b7d82759f561deb75ec757d48cc60ba24fcb2160f01a59a44c24",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_2/wids/transformer_recalibrator.joblib",
+      "size": 563,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "5cc6a6358069733617eb1aac6fe12623ab13c0473ac73cbca6548a58d9a489ce",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_3/wids/baseline_apache_only_logistic.joblib",
+      "size": 863,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "8ec898cf151ca5cc0eafb486e34c726f56e87a279f073a9180a91073ad74c1fb",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_3/wids/baseline_apache_recalibrated.joblib",
+      "size": 867,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "a9324e55b7cf436f4067c0cd394d00492e74300acdd0059b803e8a9f3ed6d367",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_3/wids/baseline_calibrated_logistic_regression.joblib",
+      "size": 1418,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "f21553336bffc2be06257d89ae9815c0cdc6b094ef6df3e51c00723e0cc4df47",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_3/wids/baseline_extra_trees.joblib",
+      "size": 213402646,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "5eece4c713d232a289414553ac2a13e75bfd921014c6a937d0835625966f7f46",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_3/wids/baseline_hist_gradient_boosting.joblib",
+      "size": 153563,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "d836c9e3058f04518585614b4b8b1cd73fec9a668b477aa22d8709148a4c909c",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_3/wids/baseline_random_forest.joblib",
+      "size": 85363043,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "33912431c082ac3121f28917403260efa3ed13c01febc29f3a38c83e274f7399",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_3/wids/preprocessor.joblib",
+      "size": 2256,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "25fa6968aae6ee25fc4b65c6d94d4c0bf382c2b3e23635f5c6d4b573a59b2b74",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_3/wids/traces/inference_cache.npz",
+      "size": 92449631,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "7913cf40bd9525e73c8f5a174ea9bc52d45b8b72907b225ce0e0bef0574607a9",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_3/wids/traces/mc_repeat_0.npz",
+      "size": 2922115,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "64c39f06d3e35ffda81f6622ac905970f549c4bea0f013ecc6116eb9768f3020",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_3/wids/traces/mc_repeat_1.npz",
+      "size": 2866619,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "2c2087f1ae48a57773f294e69b6b3aa0309e2c6e3c9fbd6f48b0d21302376c4d",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_3/wids/traces/mc_repeat_2.npz",
+      "size": 2866847,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "09f7e15ab2faec3d039a9f55dd65646bc325d1268056062b92eb0a743cc9fce6",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_3/wids/traces/validation_calibration.npz",
+      "size": 44674,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "aa508a706891fe161910807d14caf6dca469c5db43e04d71bffbb5a2fdf98f89",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_3/wids/transformer_recalibrator.joblib",
+      "size": 562,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "b84f7fb5d10886457a48e0441c40cbfccb95b3ec76d18e32bd0f48346180644f",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_4/wids/baseline_apache_only_logistic.joblib",
+      "size": 863,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "8ec898cf151ca5cc0eafb486e34c726f56e87a279f073a9180a91073ad74c1fb",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_4/wids/baseline_apache_recalibrated.joblib",
+      "size": 867,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "a9324e55b7cf436f4067c0cd394d00492e74300acdd0059b803e8a9f3ed6d367",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_4/wids/baseline_calibrated_logistic_regression.joblib",
+      "size": 1418,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "f21553336bffc2be06257d89ae9815c0cdc6b094ef6df3e51c00723e0cc4df47",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_4/wids/baseline_extra_trees.joblib",
+      "size": 213329167,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "c61315d01eafdb241a5b5b41d961800baa4f317cb9dd9cf7bf61e7d71bb1e466",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_4/wids/baseline_hist_gradient_boosting.joblib",
+      "size": 152992,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "2802833e9946e41f50dd7cc89682e8e7790e1ad6bb37f6814449abce24d1cc0e",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_4/wids/baseline_random_forest.joblib",
+      "size": 85460325,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "7f2df5007e1f4af70ad746a269384bc3e79e754bce95db7c91b74b0ae941f8fe",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_4/wids/preprocessor.joblib",
+      "size": 2256,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "25fa6968aae6ee25fc4b65c6d94d4c0bf382c2b3e23635f5c6d4b573a59b2b74",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_4/wids/traces/inference_cache.npz",
+      "size": 92934835,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "4db216314ed76289b85530b6e41f6b2a9743e22b7945c9861b699f5f710299de",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_4/wids/traces/mc_repeat_0.npz",
+      "size": 2917180,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "1b3bd306b8545fe5ffc040aa9b639ade315f0e3f4255c1ed3b01361493d90e8a",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_4/wids/traces/mc_repeat_1.npz",
+      "size": 2861681,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "c466ef64066b3b09bea66dd9e5e0a79622e2daaf45ca09cf0d5931c13b3ff6e1",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_4/wids/traces/mc_repeat_2.npz",
+      "size": 2861616,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "a7fc91ac1231e777cf2e5ae22f4856e017177a9e9752f2325d48485753ff489a",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_4/wids/traces/validation_calibration.npz",
+      "size": 44575,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "8836294540edbff46b330dc457b98dedf77b3cd1c71605e3e1155bb53f20c789",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/median_no_apache/seed_4/wids/transformer_recalibrator.joblib",
+      "size": 564,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "6db2de40c858970be9e299482834df7576b3022c27bccc42db9d31e002597c3f",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/shuffled_labels/seed_0/wids/baseline_apache_only_logistic.joblib",
+      "size": 863,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "8ec898cf151ca5cc0eafb486e34c726f56e87a279f073a9180a91073ad74c1fb",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/shuffled_labels/seed_0/wids/baseline_apache_recalibrated.joblib",
+      "size": 867,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "a9324e55b7cf436f4067c0cd394d00492e74300acdd0059b803e8a9f3ed6d367",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/shuffled_labels/seed_0/wids/baseline_calibrated_logistic_regression.joblib",
+      "size": 1446,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "0af961f270520df3142b2b9f76da8d34ac2edc3661725a3a13eeff9a588e6761",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/shuffled_labels/seed_0/wids/baseline_extra_trees.joblib",
+      "size": 177273785,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "bc0ce207edb14bb4d6c0c528fe0c66405f023ebd342e2ae1c1c4bb3ffa7cf51a",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/shuffled_labels/seed_0/wids/baseline_hist_gradient_boosting.joblib",
+      "size": 195554,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "f83ea93ce1f64483ab1b4f50c487d928401ccab219d868c33c96d9d50151277a",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/shuffled_labels/seed_0/wids/baseline_random_forest.joblib",
+      "size": 74063119,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "5e4ef1956488b8bdf7bf37bcd9a49f1ccaaaeb5b2f12df1bec030585b4001ca4",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/shuffled_labels/seed_0/wids/preprocessor.joblib",
+      "size": 2334,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "0446216a94fc0307b2f060cf827bd5a0d6df2c5e4c7de39f119eb430f4cca6fe",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/shuffled_labels/seed_0/wids/traces/inference_cache.npz",
+      "size": 95170961,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "e7e4dc3bb1d4b11c786be07720d3fc7f400c533486dc1aed35798a1b9bb666bb",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/shuffled_labels/seed_0/wids/traces/mc_repeat_0.npz",
+      "size": 2674066,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "59b416536a070f6d0d83d49d95fa76623094136b267f7976b9716601bbc9cdc6",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/shuffled_labels/seed_0/wids/traces/mc_repeat_1.npz",
+      "size": 2616826,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "800a71438d3398f7c619042c86afa1b7c7ce84aaee7ea1962cd8efd96a55312e",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/shuffled_labels/seed_0/wids/traces/mc_repeat_2.npz",
+      "size": 2616580,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "4a4a8c9029688ea48691994c2ee1a0c72489e743a22d44fd25df1c0993c862f2",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/shuffled_labels/seed_0/wids/traces/validation_calibration.npz",
+      "size": 39988,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "39f6b3173859f751e257241c633f35f179eacf00ad488c4cbef43b67b3a2bdc8",
+      "version": "https://git-lfs.github.com/spec/v1"
+    },
+    {
+      "name": "results/hospital_study/shuffled_labels/seed_0/wids/transformer_recalibrator.joblib",
+      "size": 563,
+      "checkout": true,
+      "downloaded": true,
+      "oid_type": "sha256",
+      "oid": "20cbef761adca7ad3345dd635d8ba0b2778d3ab5a78f16d32a560a728eae7802",
+      "version": "https://git-lfs.github.com/spec/v1"
+    }
+  ],
+  "source_already_in_remote_branch": "data/wids_icu.csv",
+  "remote_source_git_object": "9a5998eaeb8edc323c25344f2f9e0851d398fcd3",
+  "local_source_git_object": "9a5998eaeb8edc323c25344f2f9e0851d398fcd3",
+  "source_matches_existing_remote": true,
+  "only_hospital_study_artifacts": true,
+  "extensions": [
+    ".joblib",
+    ".npz"
+  ],
+  "scope": "fitted estimators and numerical prediction/masking/ensemble arrays derived from the unchanged WiDS source already in the existing remote branch; no external cohort or participant responses"
+}
