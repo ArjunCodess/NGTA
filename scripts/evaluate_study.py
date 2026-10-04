@@ -20,6 +20,7 @@ from src.pipeline import PipelineConfig, DATASET_METADATA
 from src.robustness import evaluate_raw_missingness, selective_risk
 from src.trace_replay import replay_bundle
 from src.uncertainty import deep_ensemble_statistics, mc_predictive_entropy, compare_uncertainty_estimators
+from scripts.uncertainty_intervals import weighted_uncertainty_statistics
 
 
 def analyze_study(root, seeds, mask_seeds=(), cache_dir=".cache/ngta", iterations=1000, dataset="wids"):
@@ -37,6 +38,7 @@ def analyze_study(root, seeds, mask_seeds=(), cache_dir=".cache/ngta", iteration
     if any(comparable(spec) != comparable(specs[0]) for spec in specs[1:]):
         raise ValueError("Study seeds have different training/evaluation settings")
     rows, deterministic, mc_variance, repeats, labels, case_ids = [], [], [], [], None, None
+    neural_instability,revised_instability=[],[]
     for seed, path in zip(seeds, selected):
         if not replay_bundle(path / "traces")["passed"]:
             raise ValueError(f"Independent seed replay failed: {seed}")
@@ -51,6 +53,9 @@ def analyze_study(root, seeds, mask_seeds=(), cache_dir=".cache/ngta", iteration
                 raise ValueError("Study seed predictions are not case aligned")
             deterministic.append(cache["probability__deterministic"].copy())
             mc_variance.append(cache["probability_passes"].var(axis=0))
+            mean_attention=cache["attention_passes"].mean(axis=0)
+            neural_instability.append(1-np.sum(mean_attention*cache["neural_confidence"],axis=1))
+            revised_instability.append(1-np.sum(mean_attention*cache["revised_confidence"],axis=1))
             draws = [(cache["probability__nars_gated"]-labels)**2 - (cache["probability__mc_confidence_only"]-labels)**2]
         for repeat_path in sorted((path / "traces").glob("mc_repeat_*.npz")):
             if repeat_path.name == "mc_repeat_0.npz":
@@ -75,11 +80,27 @@ def analyze_study(root, seeds, mask_seeds=(), cache_dir=".cache/ngta", iteration
     means.to_csv(destination / "seed_variability.csv")
     ensemble = deep_ensemble_statistics(deterministic)
     estimators = {"deep_ensemble_variance": ensemble["variance"], "mc_dropout_variance_seed_mean": np.mean(mc_variance, axis=0),
-                  "ensemble_predictive_entropy": mc_predictive_entropy(ensemble["mean"])}
+                  "ensemble_predictive_entropy": mc_predictive_entropy(ensemble["mean"]),
+                  "neural_attention_instability_seed_mean":np.mean(neural_instability,axis=0),
+                  "revised_attention_instability_seed_mean":np.mean(revised_instability,axis=0)}
     errors = (ensemble["mean"] >= .5) != labels
     uncertainty = compare_uncertainty_estimators(estimators, errors, seeds)
     uncertainty["error_reference"] = "same ensemble prediction errors for every estimator"
     uncertainty["ensemble_metrics"] = binary_metrics(labels, ensemble["mean"])
+    error_indices=paired_bootstrap_indices(labels,iterations,np.random.default_rng(0),groups)
+    uncertainty["error_detection_intervals"]={}
+    for name,scores in estimators.items():
+        order=np.argsort(scores,kind="stable")
+        starts=np.r_[0,np.flatnonzero(np.diff(scores[order])!=0)+1]
+        aucs=[]
+        for index in error_indices:
+            _,auc=weighted_uncertainty_statistics(errors,np.bincount(index,minlength=len(labels)),order,starts)
+            if auc is not None:
+                aucs.append(auc)
+        uncertainty["error_detection_intervals"][name]=dict(lower_95=float(np.percentile(aucs,2.5)),
+            upper_95=float(np.percentile(aucs,97.5)),valid_replicates=len(aucs),
+            sampling_unit="hospital" if groups is not None else "case",
+            scope="conditional on this fixed five-model ensemble and common errors; excludes refitting variability")
     curves = []
     for name, scores in estimators.items():
         curve, area = selective_risk(labels, ensemble["mean"], scores)
