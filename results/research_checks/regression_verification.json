@@ -1,0 +1,7 @@
+{
+  "passed": 81,
+  "failed": 0,
+  "command": "python -m pytest -q -p no:cacheprovider --basetemp .test-tmp/ceiling-19",
+  "log_sha256": "f8b8e8d51bdf15da5e885606044e1cef70050ebb651d6785f8f612de94f2a21c",
+  "dependency_check": "no broken requirements found"
+}
