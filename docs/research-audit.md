@@ -115,4 +115,6 @@ The owner must supply four kinds of external evidence: callable assays and measu
 
 Branch publication is a separate blocker. The LFS upload completed, but automatic approval review rejected the branch push before execution; the remote remains at `9fee550077aba7401e682d4615863a69b9bca336`. [Push status](push-status.md) records the payload, destination and explicit authorization requested by that review.
 
+The final full Git check found one corrupt compressed selective-risk blob. The working CSV matched its exact committed blob identity, so the object was restored without changing the data or rewriting history; damaged bytes remain in the ignored local recovery folder. Full Git and 297-path LFS integrity checks now pass. [Integrity evidence](../results/research_checks/git_integrity.json) records the repaired object and verification.
+
 The remaining scientific blockage is the negative result itself. Keep it, or formulate a clinically motivated new hypothesis and test it on fresh data. Further software work cannot turn these observed comparisons into favorable confirmation.
