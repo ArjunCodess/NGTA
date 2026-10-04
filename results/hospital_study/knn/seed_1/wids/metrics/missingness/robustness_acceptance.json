@@ -1,0 +1,107 @@
+{
+  "random": {
+    "integrated_degradation_nars_minus_mc": -2.3066349491454556e-08,
+    "integrated_upper_95": 2.122239923515151e-07,
+    "levels": [
+      {
+        "rate": 0.0,
+        "brier_nars_minus_mc": 1.4412193467711234e-07,
+        "upper_family_95": 6.902357397545573e-07
+      },
+      {
+        "rate": 0.1,
+        "brier_nars_minus_mc": 1.242913838901412e-07,
+        "upper_family_95": 4.7510382106451834e-07
+      },
+      {
+        "rate": 0.3,
+        "brier_nars_minus_mc": 1.065492171522396e-07,
+        "upper_family_95": 4.13549460781369e-07
+      },
+      {
+        "rate": 0.5,
+        "brier_nars_minus_mc": 1.6832136421748962e-07,
+        "upper_family_95": 3.618421078279961e-07
+      },
+      {
+        "rate": 0.7,
+        "brier_nars_minus_mc": 3.9149890386378156e-08,
+        "upper_family_95": 2.010908439382466e-07
+      }
+    ],
+    "mask_harm_margin": 0.001,
+    "accepted": false,
+    "sampling_unit": "cluster",
+    "interpretation": "paired degradation versus MC-only; Bonferroni per-level harm intervals; research criterion"
+  },
+  "feature_dependent": {
+    "integrated_degradation_nars_minus_mc": -1.0028815885589108e-07,
+    "integrated_upper_95": 1.3915777865681478e-07,
+    "levels": [
+      {
+        "rate": 0.0,
+        "brier_nars_minus_mc": 1.4412193467711234e-07,
+        "upper_family_95": 6.902357397545573e-07
+      },
+      {
+        "rate": 0.1,
+        "brier_nars_minus_mc": 1.2214413647684427e-07,
+        "upper_family_95": 4.725968567048364e-07
+      },
+      {
+        "rate": 0.3,
+        "brier_nars_minus_mc": -1.9728029795756876e-11,
+        "upper_family_95": 2.900211285134852e-07
+      },
+      {
+        "rate": 0.5,
+        "brier_nars_minus_mc": 3.1922939570935356e-08,
+        "upper_family_95": 3.3632415596270066e-07
+      },
+      {
+        "rate": 0.7,
+        "brier_nars_minus_mc": -1.2247164387552933e-08,
+        "upper_family_95": 1.1741814517246142e-07
+      }
+    ],
+    "mask_harm_margin": 0.001,
+    "accepted": false,
+    "sampling_unit": "cluster",
+    "interpretation": "paired degradation versus MC-only; Bonferroni per-level harm intervals; research criterion"
+  },
+  "outcome_dependent_simulation": {
+    "integrated_degradation_nars_minus_mc": -4.997772795503047e-07,
+    "integrated_upper_95": -2.1557064533636925e-07,
+    "levels": [
+      {
+        "rate": 0.0,
+        "brier_nars_minus_mc": 1.4412193467711234e-07,
+        "upper_family_95": 6.902357397545573e-07
+      },
+      {
+        "rate": 0.1,
+        "brier_nars_minus_mc": -8.623687510942544e-08,
+        "upper_family_95": 3.3024206649211444e-07
+      },
+      {
+        "rate": 0.3,
+        "brier_nars_minus_mc": -4.038721128264725e-07,
+        "upper_family_95": 6.887354584050366e-08
+      },
+      {
+        "rate": 0.5,
+        "brier_nars_minus_mc": -5.572255467398275e-07,
+        "upper_family_95": -1.382784844145429e-07
+      },
+      {
+        "rate": 0.7,
+        "brier_nars_minus_mc": -5.100977496541644e-07,
+        "upper_family_95": -1.8094435959504932e-07
+      }
+    ],
+    "mask_harm_margin": 0.001,
+    "accepted": true,
+    "sampling_unit": "cluster",
+    "interpretation": "paired degradation versus MC-only; Bonferroni per-level harm intervals; research criterion"
+  }
+}
