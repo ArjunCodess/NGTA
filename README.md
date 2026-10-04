@@ -203,7 +203,7 @@ This repository is a research implementation, not a clinical validation package.
 - Following Pei Wang's April 21, 2026 feedback, variance-to-confidence is an application-specific heuristic, not native NARS evidence amount.
 - Matched inference and complete numerical replay establish implementation behavior. Full development comparisons fail the symbolic benefit threshold; masking criteria apply to their stated simulations. Clinical equivalence, external compatibility and reviewer usefulness remain unestablished.
 - Existing outcomes have already been inspected. A file lock preserves configuration but cannot make those outcomes unseen; prospective confirmation needs a defensible fresh evaluation.
-- Verified assay/timing metadata, an eligible independent cohort, expert review and reviewer participants are external dependencies. [docs/research-audit.md](docs/research-audit.md) lists the exact evidence and actions needed for each unfinished task.
+- Verified assay/timing metadata, an eligible independent cohort, expert review and reviewer participants are external dependencies. [docs/research-audit.md](docs/research-audit.md) lists the exact evidence and actions needed for each unfinished task. [Data access instructions](docs/get-needed-data.md) give the official websites and steps; [email drafts](docs/email-templates.md) cover source custodians, clinical reviewers and Pei Wang.
 
 ## Outputs
 
@@ -222,7 +222,7 @@ Top-level orchestration output:
 
 Per-dataset bundles also preserve `model.pt`, fitted `preprocessor.joblib`, classical estimators, `evaluation_spec.json`, source hashes and split IDs. Complete replay uses `raw_test.csv`, `inference_cache.npz`, `replay_spec.json`, `intervention_events.csv`, hashes and saved MC RNG. Optional ensemble/encoder outputs remain separate.
 
-Full studies are under `results/hospital_study/` and `results/tcga_study/`; each condition has five seed directories, aggregate submission exports and `analysis/` seed/ensemble/hierarchical comparisons. Missingness outputs preserve raw masks, matched probabilities, selective-risk curves and paired acceptance reports. Large hospital estimators and arrays use Git LFS, so run `git lfs install` and `git lfs pull` after cloning.
+Full studies are under `results/hospital_study/` and `results/tcga_study/`; each condition has five seed directories, aggregate submission exports and `analysis/` seed/ensemble/hierarchical comparisons. Missingness outputs preserve raw masks, matched probabilities, selective-risk curves and paired acceptance reports. Generated hospital estimators and inference arrays are stored separately from Git. Exact replay after cloning requires restoring the approved artifact archive; the training commands can regenerate these files. See [artifact storage and verification](docs/artifact-storage.md).
 
 To reproduce the main hospital study and its frozen masking analysis:
 
@@ -234,7 +234,7 @@ python scripts/uncertainty_intervals.py --root results/hospital_study/knn
 
 `scripts/tcga_controls.py` runs the clinical/genomic controls. `scripts/evaluate_external.py --help` documents frozen independent-cohort evaluation with explicit units, windows, rule-only inputs and patient overlap checks. `scripts/reviewer_study.py --help` prepares and analyzes a reviewer study; the committed package is a demonstration with public investigator answers, so generate a fresh private package before recruitment. `requirements-lock.windows-py314.txt` records the actual run environment; its CUDA Torch wheel uses the matching PyTorch wheel index.
 
-The open PhysioNet 2012 sensitivity uses 12,000 cases, first-24-hour inputs and the frozen no-APACHE checkpoints. Reproduce acquisition with `python scripts/prepare_physionet2012.py --download` and evaluation with `python scripts/evaluate_cross_source.py`. Source hashes, missing inputs, seed metrics and independently replayable traces are saved under `results/cross_source_sensitivity/physionet2012/`. Its single-center case intervals and unverified source identity/window equivalence do not establish independent clinical validation. [docs/push-status.md](docs/push-status.md) records the separate branch-publication blocker.
+The open PhysioNet 2012 sensitivity uses 12,000 cases, first-24-hour inputs and the frozen no-APACHE checkpoints. Reproduce acquisition with `python scripts/prepare_physionet2012.py --download` and evaluation with `python scripts/evaluate_cross_source.py`. Source hashes, missing inputs, seed metrics and independently replayable traces are saved under `results/cross_source_sensitivity/physionet2012/`. Its single-center case intervals and unverified source identity/window equivalence do not establish independent clinical validation. [docs/artifact-storage.md](docs/artifact-storage.md) explains how to restore the separately stored inference arrays for exact replay.
 
 Per-dataset metrics/traces include:
 
