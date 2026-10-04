@@ -2,6 +2,7 @@ import numpy as np
 from src.acceptance import external_compatibility, robustness_acceptance
 from src.robustness import mask_observed_values
 import pandas as pd
+import pytest
 
 
 def test_compatibility_margin_direction_and_robustness_harm():
@@ -25,3 +26,11 @@ def test_outcome_mask_is_nested_and_cannot_change_existing_missingness():
     assert np.all(~low|high)
     assert not high[0,0] and pd.isna(shifted.iloc[0,0])
     assert high[y==1].sum()>high[y==0].sum()
+
+
+def test_single_hospital_cannot_produce_institutional_confidence_intervals():
+    y = np.tile([0, 1], 10)
+    p = np.where(y, .9, .1)
+    with pytest.raises(ValueError, match="at least two clusters"):
+        external_compatibility(y, p, p, np.repeat("one hospital", len(y)), 40)
+    assert external_compatibility(y, p, p, None, 40)["sampling_unit"] == "case"
