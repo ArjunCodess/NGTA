@@ -102,6 +102,22 @@ def test_frozen_external_fixture_replays_and_rejects_partition_tampering(tmp_pat
     output=tmp_path/"output"
     evaluate_external(checkpoint,cohort,mapping,output,mc_samples=2)
     assert replay_bundle(output/"traces")["passed"]
+    external["hospital_id"] = "one hospital"
+    external.to_csv(cohort, index=False)
+    policy.update(study_scope="cross_source_sensitivity", clinical_claim_eligible=False, independence_verified=False)
+    mapping.write_text(json.dumps(policy))
+    sensitivity = tmp_path / "sensitivity"
+    report = evaluate_external(checkpoint, cohort, mapping, sensitivity, mc_samples=2)
+    assert report["sampling_unit"] == "case" and report["clinical_claim_eligible"] is False
+    assert "accepted" not in report and "numerical_margins_met" in report
+    assert not (sensitivity / "external_compatibility.json").exists()
+    assert replay_bundle(sensitivity / "traces")["passed"]
+    policy["independence_verified"] = True
+    mapping.write_text(json.dumps(policy))
+    with pytest.raises(ValueError, match="disclaim"):
+        evaluate_external(checkpoint, cohort, mapping, sensitivity, mc_samples=2)
+    policy["independence_verified"] = False
+    mapping.write_text(json.dumps(policy))
     manifest.loc[0,"split"]="test"
     manifest.to_csv(checkpoint/"traces/split_ids.csv",index=False)
     with pytest.raises(ValueError,match="partitions differ"):

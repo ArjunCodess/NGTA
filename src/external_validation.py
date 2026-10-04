@@ -93,6 +93,12 @@ def evaluate_external(checkpoint_dir, cohort_csv, mapping_json, output_dir, mc_s
     if training_spec["split_ids_sha256"] not in split_hashes:
         raise ValueError("Development case partitions differ from the frozen checkpoint")
     policy = json.loads(Path(mapping_json).read_text(encoding="utf-8"))
+    study_scope = policy.get("study_scope", "external_validation")
+    if study_scope not in {"external_validation", "cross_source_sensitivity"}:
+        raise ValueError("Unknown frozen study scope")
+    sensitivity = study_scope == "cross_source_sensitivity"
+    if sensitivity and (policy.get("clinical_claim_eligible") is not False or policy.get("independence_verified") is not False):
+        raise ValueError("Cross-source sensitivity must explicitly disclaim clinical eligibility and verified independence")
     # Validate the frozen study definitions before reading any external outcomes.
     expected_outcome = "hospital_mortality" if config["dataset"] == "wids" else "lymph_node_metastasis"
     if policy.get("outcome_definition") != expected_outcome or policy.get("development_dataset") != config["dataset"]:
@@ -129,8 +135,16 @@ def evaluate_external(checkpoint_dir, cohort_csv, mapping_json, output_dir, mc_s
         raise RuntimeError("External evaluation changed frozen preprocessing")
     root = Path(output_dir)
     root.mkdir(parents=True, exist_ok=True)
-    probabilities = {"baseline": summary.probabilities_mean, "flat_confidence":flat,"mc_confidence_only": mc, "nars_gated": nars}
-    report = external_compatibility(encoded.target, nars, mc, groups=groups, seed=seed)
+    # Accumulate the same cached sigmoid passes in float64. A float32 reduction
+    # across 50 draws can exceed the independent 1e-7 replay tolerance.
+    probabilities = {"baseline": summary.probability_passes.astype(np.float64).mean(axis=0), "flat_confidence":flat,"mc_confidence_only": mc, "nars_gated": nars}
+    report = external_compatibility(encoded.target, nars, mc, groups=None if sensitivity else groups, seed=seed)
+    report["study_scope"] = study_scope
+    if sensitivity:
+        report["numerical_margins_met"] = report.pop("accepted")
+        report["clinical_claim_eligible"] = False
+        report["interpretation"] = "Exploratory cross-source sensitivity with conditional case-bootstrap intervals; no independent clinical compatibility claim"
+    pd.DataFrame({processor.id_column: mapped[processor.id_column], "target": encoded.target, **probabilities}).to_csv(root / "predictions.csv", index=False)
     pd.DataFrame([dict(variant=name, **binary_metrics(encoded.target, p)) for name, p in probabilities.items()]).to_csv(root / "metrics.csv", index=False)
     bundle = SimpleNamespace(preprocessor=processor, test_frame=mapped, encoded_test=encoded)
     export_replay_bundle(root / "traces", bundle=bundle, summary=summary, knowledge=knowledge, truths=truths,
@@ -141,6 +155,7 @@ def evaluate_external(checkpoint_dir, cohort_csv, mapping_json, output_dir, mc_s
     report["preprocessor_sha256"] = hashlib.sha256((checkpoint_dir / "preprocessor.joblib").read_bytes()).hexdigest()
     report["cohort_sha256"] = hashlib.sha256(Path(cohort_csv).read_bytes()).hexdigest()
     report["mc_samples"] = mc_samples
-    report["independence_verification"] = "case and patient identifier overlap checked; independent source identity requires the documented cohort provenance"
-    (root / "external_compatibility.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+    report["independence_verification"] = "Identifier-string overlap checked only; different source namespaces cannot establish canonical patient independence"
+    report_name = "cross_source_sensitivity.json" if sensitivity else "external_compatibility.json"
+    (root / report_name).write_text(json.dumps(report, indent=2), encoding="utf-8")
     return report
