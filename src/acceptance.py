@@ -10,6 +10,8 @@ def external_compatibility(labels, nars, mc, groups=None, iterations=1000, seed=
     right=np.asarray(mc,dtype=float)
     if y.ndim != 1 or not np.isin(y, [0,1]).all() or iterations < 1 or left.shape!=y.shape or right.shape!=y.shape or not np.isfinite([left,right]).all() or np.any((np.array([left,right])<0)|(np.array([left,right])>1)):
         raise ValueError("Compatibility requires aligned finite probabilities")
+    if groups is not None and len(np.unique(groups)) < 2:
+        raise ValueError("Institutional compatibility intervals require at least two clusters; use an explicitly labeled case sensitivity for a single institution")
     indices=paired_bootstrap_indices(y,iterations,np.random.default_rng(seed),groups)
     brier=(left-y)**2-(right-y)**2
     observed_auc=float(roc_auc_score(y,left)-roc_auc_score(y,right))
