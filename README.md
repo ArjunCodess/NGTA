@@ -177,6 +177,8 @@ WiDS expects:
 
 An optional `assay_manifest.csv` contains `case_submitter_id,gene,source,verified`, with unique case/gene pairs and sourced callable coverage for verified negatives. A missing mutation record is unknown, not a negative. The acquired source is isolated under `data/acquired_tcga/`: its immutable manifest pins 498 GDC files, publisher checksums, exact extracted-byte hashes and coverage. Sixteen expected clinical cases lack file-associated coverage; coverage is not gene-level callability. Original sparse source files remain historical. Cross-table timing is unverified; pathology features support retrospective association, not preoperative prediction.
 
+`python scripts/audit_tcga_timing.py` checks dates on the selected physical records and all frozen model/rule inputs. Diagnosis dates exist, but all 507 pathology records lack pathology dates. [docs/source-evidence.md](docs/source-evidence.md) records those counts, the public APACHE evidence and the exact metadata still required.
+
 ```powershell
 python main.py --run-all --audit-data --split-mode hospital --output-dir results/source_audit
 python -m src.trace_replay results/v2_smoke/tcga/traces
@@ -231,6 +233,8 @@ python scripts/uncertainty_intervals.py --root results/hospital_study/knn
 ```
 
 `scripts/tcga_controls.py` runs the clinical/genomic controls. `scripts/evaluate_external.py --help` documents frozen independent-cohort evaluation with explicit units, windows, rule-only inputs and patient overlap checks. `scripts/reviewer_study.py --help` prepares and analyzes a reviewer study; the committed package is a demonstration with public investigator answers, so generate a fresh private package before recruitment. `requirements-lock.windows-py314.txt` records the actual run environment; its CUDA Torch wheel uses the matching PyTorch wheel index.
+
+The open PhysioNet 2012 sensitivity uses 12,000 cases, first-24-hour inputs and the frozen no-APACHE checkpoints. Reproduce acquisition with `python scripts/prepare_physionet2012.py --download` and evaluation with `python scripts/evaluate_cross_source.py`. Source hashes, missing inputs, seed metrics and independently replayable traces are saved under `results/cross_source_sensitivity/physionet2012/`. Its single-center case intervals and unverified source identity/window equivalence do not establish independent clinical validation. [docs/push-status.md](docs/push-status.md) records the separate branch-publication blocker.
 
 Per-dataset metrics/traces include:
 

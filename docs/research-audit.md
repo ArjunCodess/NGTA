@@ -32,6 +32,8 @@ The acquired TCGA source is isolated under `data/acquired_tcga/`. Its immutable 
 
 Selecting one physical record per source avoids column-wise synthetic records, and 5,170 case/field conflicts remain exported. TCGA is retrospective post-pathology association; cross-table chronology remains unverified.
 
+The selected-record timing audit now checks all five tables and 68 distinct model/rule inputs. All 507 selected diagnosis records have day zero, and 378 selected follow-up records have numeric follow-up dates, but none of the 507 pathology records has a pathology day or timepoint. Molecular-test dates are absent. [Source evidence](source-evidence.md) links the exact coverage export and distinguishes entity dates from feature availability.
+
 Required input: sourced callable case/gene assay records, TCGA measurement/encounter dates, and the authoritative WiDS/eICU APACHE dictionary plus calculation timestamps. Obtain restricted source documentation through its account/data-use process when necessary; the current CSV and positive-variant files cannot supply these facts.
 
 ## 3. Prediction and calibration
@@ -70,7 +72,11 @@ The paired degradation/harm criterion passes in 12/15 median and 1/15 KNN seed/s
 
 The fixed WiDS KNN ensemble's mean MC variance detects common ensemble errors with AUROC 0.842276, hospital-bootstrap interval [0.833229, 0.857306]. Neural attention instability gives 0.514950 [0.493533, 0.531916], and revised attention instability gives 0.500647 [0.477047, 0.515520]. The attention-confidence intervals span chance, so a useful predictive uncertainty estimator does not validate the routing trust signal. These intervals condition on the fitted ensemble and exclude model-refitting variability.
 
-Frozen external evaluation implements documented target/landmark, units/windows/availability for every input and rule-only source, unit conversion, canonical identities, case/patient overlap checks, frozen preprocessing and complete replay. Clustered compatibility requires Brier upper bound <0.001 and AUROC lower bound >-0.01.
+Frozen external evaluation requires documented target/landmark, units/windows/availability for every input and rule-only source, unit conversion and canonical identity provenance. It checks supplied case/patient identifier overlap, freezes preprocessing and exports complete replay. Clustered compatibility requires Brier upper bound <0.001 and AUROC lower bound >-0.01. Identifier strings from different namespaces cannot establish patient independence.
+
+The open PhysioNet 2012 source now provides an explicitly exploratory 12,000-case sensitivity using elapsed first-24-hour inputs and ten frozen no-APACHE fits. Its original >=48-hour stay eligibility, unavailable SpO2/surgery inputs, single source institution and unresolved WiDS identity/window equivalence prevent an independent clinical claim. Mapping, source hashes, conditional case intervals, seed summaries and replay checks are preserved under `results/cross_source_sensitivity/physionet2012/`; numerical noninferiority is kept separate from clinical eligibility.
+
+All ten fits pass replay and the conditional numerical noninferiority margins. Five-seed mean ungated AUROC/Brier is 0.708135/0.118159 for KNN and 0.710732/0.115743 for median. NARS-minus-MC Brier is positive in every fit, ranging from 2.81e-7 to 1.18e-5, so this sensitivity does not supply symbolic benefit. These figures describe the mapped public cohort; they cannot isolate a population effect from its missing inputs, selection policy and source differences.
 
 Required input: an authorized independent institution/time cohort with verified feature/target provenance and canonical patient identities. No eligible independent cohort was supplied. Internal benchmark hospitals and separate TCGA/WiDS models do not provide external validation. For confirmation, preregister the entire procedure on genuinely untouched outcomes; inspected labels cannot become unseen.
 
@@ -80,7 +86,7 @@ Caches verify source hashes, partitions, options and preprocessing code identity
 
 Hospital model/NPZ binaries use Git LFS. Run `git lfs install` and `git lfs pull` after cloning; pointers cannot restore models. This checkout's local LFS cache uses G: to avoid duplicating large files on constrained C:; other clones need no such drive configuration.
 
-The regression suite passes 76 tests, including exact weighted-bootstrap equivalence with duplicated-case/tie reconstruction, independent replay corruption checks, predicate edges and external patient/unit/rule-only mappings. Current figure sources explicitly select five TCGA fused and five WiDS KNN seeds and reject source/split/rule/configuration mismatches. The compiled 13-page PDF was rendered and inspected, with no undefined references or overfull boxes. NeurIPS formatting files are inside `paper/` only; the former top-level directory is absent.
+The regression suite passes 81 tests, including exact weighted-bootstrap equivalence with duplicated-case/tie reconstruction, independent replay corruption checks, predicate edges, external patient/unit/rule-only mappings, selected-record timing and public-cohort timestamp/sentinel/identity boundaries. Exploratory evaluation explicitly rejects a clinical eligibility claim. Current figure sources explicitly select five TCGA fused and five WiDS KNN seeds and reject source/split/rule/configuration mismatches. The compiled 13-page PDF was rendered and inspected, with no undefined references or overfull boxes. NeurIPS formatting files are inside `paper/` only; the former top-level directory is absent.
 
 All 36 full-study checkpoints were restored with their fitted processors and saved dropout RNG. Every saved 50-pass probability matrix reproduced exactly, with maximum residual zero. [checkpoint_verification.json](../results/research_checks/checkpoint_verification.json) records source/split/feature checks, independent event replay and fitted-estimator hashes; this is numerical reproducibility, not clinical confirmation.
 
@@ -106,5 +112,7 @@ Historical unmatched-aggregation numbers remain labeled historical. The unsuppor
 ## 10. Immediate priorities and exact blockers
 
 The owner must supply four kinds of external evidence: callable assays and measurement/score timing; qualified expert review; an authorized independent untouched cohort with verified units/windows/targets/identities; and real reviewer responses from a freshly blinded package. The checklist names the required input for every unfinished task.
+
+Branch publication is a separate blocker. The LFS upload completed, but automatic approval review rejected the branch push before execution; the remote remains at `9fee550077aba7401e682d4615863a69b9bca336`. [Push status](push-status.md) records the payload, destination and explicit authorization requested by that review.
 
 The remaining scientific blockage is the negative result itself. Keep it, or formulate a clinically motivated new hypothesis and test it on fresh data. Further software work cannot turn these observed comparisons into favorable confirmation.
