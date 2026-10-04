@@ -1,0 +1,10 @@
+{
+  "compiler": "texlive",
+  "exit_code": 0,
+  "pdf_exists": true,
+  "pdf": "paper/main.pdf",
+  "pages": 13,
+  "rendered_and_reviewed": true,
+  "undefined_references": false,
+  "overfull_boxes": false
+}

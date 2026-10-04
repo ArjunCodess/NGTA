@@ -97,8 +97,8 @@ def analyze_study(root, seeds, mask_seeds=(), cache_dir=".cache/ngta", iteration
             _,auc=weighted_uncertainty_statistics(errors,np.bincount(index,minlength=len(labels)),order,starts)
             if auc is not None:
                 aucs.append(auc)
-        uncertainty["error_detection_intervals"][name]=dict(lower_95=float(np.percentile(aucs,2.5)),
-            upper_95=float(np.percentile(aucs,97.5)),valid_replicates=len(aucs),
+        uncertainty["error_detection_intervals"][name]=dict(lower_95=float(np.percentile(aucs,2.5)) if aucs else None,
+            upper_95=float(np.percentile(aucs,97.5)) if aucs else None,valid_replicates=len(aucs),
             sampling_unit="hospital" if groups is not None else "case",
             scope="conditional on this fixed five-model ensemble and common errors; excludes refitting variability")
     curves = []

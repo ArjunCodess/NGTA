@@ -1,0 +1,132 @@
+{
+  "left": "results/hospital_study/knn",
+  "right": "results/hospital_study/median",
+  "dataset": "wids",
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "comparisons": [
+    {
+      "variant": "apache_only_logistic",
+      "brier_left_minus_right": 0.0,
+      "lower_95": 0.0,
+      "upper_95": 0.0,
+      "lower_family_95": 0.0,
+      "upper_family_95": 0.0
+    },
+    {
+      "variant": "apache_raw",
+      "brier_left_minus_right": 0.0,
+      "lower_95": 0.0,
+      "upper_95": 0.0,
+      "lower_family_95": 0.0,
+      "upper_family_95": 0.0
+    },
+    {
+      "variant": "apache_recalibrated",
+      "brier_left_minus_right": 0.0,
+      "lower_95": 0.0,
+      "upper_95": 0.0,
+      "lower_family_95": 0.0,
+      "upper_family_95": 0.0
+    },
+    {
+      "variant": "baseline",
+      "brier_left_minus_right": -0.00032761206801998295,
+      "lower_95": -0.0009167285606839145,
+      "upper_95": 0.0002703762884970003,
+      "lower_family_95": -0.0013818064784430935,
+      "upper_family_95": 0.0007191242057111584
+    },
+    {
+      "variant": "calibrated_logistic_regression",
+      "brier_left_minus_right": -0.0005569455995594008,
+      "lower_95": -0.0008587077727449852,
+      "upper_95": -0.00020409628708782312,
+      "lower_family_95": -0.000983323970670697,
+      "upper_family_95": -7.450215253737635e-05
+    },
+    {
+      "variant": "deterministic",
+      "brier_left_minus_right": -0.0003580062766559422,
+      "lower_95": -0.0010972500313073397,
+      "upper_95": 0.00038874620804563165,
+      "lower_family_95": -0.0014560356503352523,
+      "upper_family_95": 0.0007924864185042679
+    },
+    {
+      "variant": "extra_trees",
+      "brier_left_minus_right": 3.892899824253071e-05,
+      "lower_95": -0.0004895008911483566,
+      "upper_95": 0.000648715107806821,
+      "lower_family_95": -0.0006961865129813548,
+      "upper_family_95": 0.0011236571754182417
+    },
+    {
+      "variant": "flat_confidence",
+      "brier_left_minus_right": -0.00032761206929937534,
+      "lower_95": -0.0009369765469955471,
+      "upper_95": 0.0003091947030878072,
+      "lower_family_95": -0.0013599063481613044,
+      "upper_family_95": 0.0005697757334745853
+    },
+    {
+      "variant": "hist_gradient_boosting",
+      "brier_left_minus_right": 0.00011196446072912938,
+      "lower_95": -0.0008880713054613077,
+      "upper_95": 0.0008944947243014332,
+      "lower_family_95": -0.00121052837734827,
+      "upper_family_95": 0.0011703218783787293
+    },
+    {
+      "variant": "mc_confidence_only",
+      "brier_left_minus_right": -0.00032978365453737937,
+      "lower_95": -0.0009149080314868216,
+      "upper_95": 0.0002997480119433913,
+      "lower_family_95": -0.0013230434653737266,
+      "upper_family_95": 0.0006886752177159481
+    },
+    {
+      "variant": "mean_logit",
+      "brier_left_minus_right": -0.0003248128099715798,
+      "lower_95": -0.0009484957334962178,
+      "upper_95": 0.0003050188003100874,
+      "lower_family_95": -0.0012192608588316607,
+      "upper_family_95": 0.0005804103271905875
+    },
+    {
+      "variant": "nars_gated",
+      "brier_left_minus_right": -0.00032959911173459236,
+      "lower_95": -0.0009148380486155565,
+      "upper_95": 0.00029526339856430475,
+      "lower_family_95": -0.0012374449872913148,
+      "upper_family_95": 0.0007141427135697077
+    },
+    {
+      "variant": "random_forest",
+      "brier_left_minus_right": 0.00026053646748681907,
+      "lower_95": -0.0003982710785716342,
+      "upper_95": 0.0008776474098093714,
+      "lower_family_95": -0.0006224228257424676,
+      "upper_family_95": 0.00116980863204017
+    },
+    {
+      "variant": "transformer_recalibrated",
+      "brier_left_minus_right": -0.0003235911776149867,
+      "lower_95": -0.0009284912418945917,
+      "upper_95": 0.00021978907550054193,
+      "lower_family_95": -0.0012608311560230383,
+      "upper_family_95": 0.0005330809307271229
+    }
+  ],
+  "bootstrap_units": [
+    "training_seed",
+    "hospital"
+  ],
+  "bootstrap_iterations": 1000,
+  "scope": "paired development conditions on one fixed split; not prospective confirmation"
+}
