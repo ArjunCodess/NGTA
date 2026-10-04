@@ -1,0 +1,108 @@
+{
+  "left": "results/tcga_study/fused",
+  "right": "results/tcga_study/clinical",
+  "dataset": "tcga",
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "comparisons": [
+    {
+      "variant": "baseline",
+      "brier_left_minus_right": 0.016826043985130726,
+      "lower_95": -0.002619553085377692,
+      "upper_95": 0.04341928916994544,
+      "lower_family_95": -0.011130084531930096,
+      "upper_family_95": 0.056318042943680355
+    },
+    {
+      "variant": "calibrated_logistic_regression",
+      "brier_left_minus_right": -0.0026450535969022126,
+      "lower_95": -0.013467275938646965,
+      "upper_95": 0.007065976370309624,
+      "lower_family_95": -0.016529259418828962,
+      "upper_family_95": 0.011348976920742772
+    },
+    {
+      "variant": "deterministic",
+      "brier_left_minus_right": 0.01623012125492096,
+      "lower_95": -0.005196675658226013,
+      "upper_95": 0.045175764709711075,
+      "lower_family_95": -0.011387133970856667,
+      "upper_family_95": 0.05884737893939018
+    },
+    {
+      "variant": "extra_trees",
+      "brier_left_minus_right": -0.010029700489546463,
+      "lower_95": -0.02606253506697038,
+      "upper_95": 0.005897430923190264,
+      "lower_family_95": -0.033088009062936706,
+      "upper_family_95": 0.010854043898298079
+    },
+    {
+      "variant": "flat_confidence",
+      "brier_left_minus_right": 0.016826043934428894,
+      "lower_95": -0.0018757856609824557,
+      "upper_95": 0.04357684754251781,
+      "lower_family_95": -0.008649069356892778,
+      "upper_family_95": 0.05336639742624587
+    },
+    {
+      "variant": "hist_gradient_boosting",
+      "brier_left_minus_right": -0.0064519105407628615,
+      "lower_95": -0.02294906895290615,
+      "upper_95": 0.011384190797322733,
+      "lower_family_95": -0.030017376519836794,
+      "upper_family_95": 0.015963968304314013
+    },
+    {
+      "variant": "mc_confidence_only",
+      "brier_left_minus_right": 0.016797461780584277,
+      "lower_95": -0.0018379489573214815,
+      "upper_95": 0.04260231403132044,
+      "lower_family_95": -0.011863023119343386,
+      "upper_family_95": 0.057063305350919004
+    },
+    {
+      "variant": "mean_logit",
+      "brier_left_minus_right": 0.01657712118040394,
+      "lower_95": -0.0013103616393720105,
+      "upper_95": 0.04201601380094976,
+      "lower_family_95": -0.008596881918851143,
+      "upper_family_95": 0.05752799311324708
+    },
+    {
+      "variant": "nars_gated",
+      "brier_left_minus_right": 0.016778720848199386,
+      "lower_95": -0.002527496813496472,
+      "upper_95": 0.04134208381001232,
+      "lower_family_95": -0.009397941063287805,
+      "upper_family_95": 0.04728448961072992
+    },
+    {
+      "variant": "random_forest",
+      "brier_left_minus_right": -0.001167522866996196,
+      "lower_95": -0.01545659416490068,
+      "upper_95": 0.013646101860456821,
+      "lower_family_95": -0.021056861385534136,
+      "upper_family_95": 0.021156960006381773
+    },
+    {
+      "variant": "transformer_recalibrated",
+      "brier_left_minus_right": 0.01708050143855683,
+      "lower_95": -0.0004045507241889548,
+      "upper_95": 0.03925723695140282,
+      "lower_family_95": -0.006940984150692105,
+      "upper_family_95": 0.05345997551074074
+    }
+  ],
+  "bootstrap_units": [
+    "training_seed",
+    "case"
+  ],
+  "bootstrap_iterations": 1000,
+  "scope": "paired development conditions on one fixed split; not prospective confirmation"
+}

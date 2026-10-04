@@ -1,0 +1,662 @@
+{
+  "passed": true,
+  "bundles": 36,
+  "checkpoint_replay": false,
+  "records": [
+    {
+      "directory": "results\\hospital_study\\knn\\seed_0\\wids",
+      "independent_replay": true,
+      "events": 11457,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_apache_only_logistic.joblib": "0396993cc94fca917ef05c6f136dd1bff884bde3d53ab28fea067a96d3218e58",
+        "baseline_apache_recalibrated.joblib": "244fe37096820047e7a4c55acbc921ae7f44f23234cefe1f55137a543aaf1dd3",
+        "baseline_calibrated_logistic_regression.joblib": "0a639151ad9b5a09831b198fd3f6e1a93216044ce02dff214ade3113179dae83",
+        "baseline_extra_trees.joblib": "a9d76e6b3a3112375c5ef1c3d4902fff6cf0571f415cc4be7a316d3b40647fe6",
+        "baseline_hist_gradient_boosting.joblib": "ef523043e25c6ff27b6f69435d54ed9af9f3753e7818ca591bf918199c0ee457",
+        "baseline_random_forest.joblib": "0055996251453fbbbcf93db18f9f2ef61fd16d6181197ec07971824bf21eed67",
+        "preprocessor.joblib": "273856b2447c9dbd2e9e7d59bd3bf7fcc96ac7ff6da32ab65d73fc9edce0d8fb",
+        "transformer_recalibrator.joblib": "09c3fc922ebdc3c6601d0050d6510ff45f19e2e3bf066a76a9346f44d50ae49a"
+      }
+    },
+    {
+      "directory": "results\\hospital_study\\knn\\seed_1\\wids",
+      "independent_replay": true,
+      "events": 11457,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_apache_only_logistic.joblib": "0396993cc94fca917ef05c6f136dd1bff884bde3d53ab28fea067a96d3218e58",
+        "baseline_apache_recalibrated.joblib": "244fe37096820047e7a4c55acbc921ae7f44f23234cefe1f55137a543aaf1dd3",
+        "baseline_calibrated_logistic_regression.joblib": "0a639151ad9b5a09831b198fd3f6e1a93216044ce02dff214ade3113179dae83",
+        "baseline_extra_trees.joblib": "fc071a9c31b243b76d325ad09b9344bbf3553dd2d6a2a8c39ae707c67ce7dfce",
+        "baseline_hist_gradient_boosting.joblib": "9d7c1102aed73545445f898aab1ace30a0d7249c16e26a24c96c9d58939dc0cc",
+        "baseline_random_forest.joblib": "f545a6be361a9b11a8dc957ce11cc4a3bc4826e11e92a55c853876f8213a1c9e",
+        "preprocessor.joblib": "d617348ab737cc111bef4e7d6e2a8db85b0f576a25c054e90f0653d4478d64f5",
+        "transformer_recalibrator.joblib": "8dd6c48896e93ae2a8647a2d7aecdffc212c9df1fc1b43ad3a8a3e815c5653bb"
+      }
+    },
+    {
+      "directory": "results\\hospital_study\\knn\\seed_2\\wids",
+      "independent_replay": true,
+      "events": 11457,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_apache_only_logistic.joblib": "0396993cc94fca917ef05c6f136dd1bff884bde3d53ab28fea067a96d3218e58",
+        "baseline_apache_recalibrated.joblib": "244fe37096820047e7a4c55acbc921ae7f44f23234cefe1f55137a543aaf1dd3",
+        "baseline_calibrated_logistic_regression.joblib": "0a639151ad9b5a09831b198fd3f6e1a93216044ce02dff214ade3113179dae83",
+        "baseline_extra_trees.joblib": "feb7deafa3d666b3ada58d795c4ed06d61205fd61bbb0174c97bc6af545b26de",
+        "baseline_hist_gradient_boosting.joblib": "c8df96f0de4a9c94a73183eea5656ea7209401af0bfd84a68a4c3e1bc01ae5a3",
+        "baseline_random_forest.joblib": "a6e8c109208c403fed8f25645378e3e8355c3b31fa07bac1a3e6d9955088f2a2",
+        "preprocessor.joblib": "d617348ab737cc111bef4e7d6e2a8db85b0f576a25c054e90f0653d4478d64f5",
+        "transformer_recalibrator.joblib": "cd2f2af4ff114cf64e7eabec901e110acfd942fe514fa3f6276262fbe23dbf4b"
+      }
+    },
+    {
+      "directory": "results\\hospital_study\\knn\\seed_3\\wids",
+      "independent_replay": true,
+      "events": 11457,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_apache_only_logistic.joblib": "0396993cc94fca917ef05c6f136dd1bff884bde3d53ab28fea067a96d3218e58",
+        "baseline_apache_recalibrated.joblib": "244fe37096820047e7a4c55acbc921ae7f44f23234cefe1f55137a543aaf1dd3",
+        "baseline_calibrated_logistic_regression.joblib": "0a639151ad9b5a09831b198fd3f6e1a93216044ce02dff214ade3113179dae83",
+        "baseline_extra_trees.joblib": "c2163421d569a5dab094d0765f85d69176ba6b23248eb3f6f37cef1c47b960c8",
+        "baseline_hist_gradient_boosting.joblib": "c15df1c4509a850aa9617c0409a0c6b4edeee33caf184d0d31d237c09deaae51",
+        "baseline_random_forest.joblib": "8a268099deb1bfb48d5a99267de83cdba56b733a49a73a4367801c86c66b7202",
+        "preprocessor.joblib": "d617348ab737cc111bef4e7d6e2a8db85b0f576a25c054e90f0653d4478d64f5",
+        "transformer_recalibrator.joblib": "b171e53af3e204dbf00c1767d99520bfe740abe14a332928e328c4d6b82184ab"
+      }
+    },
+    {
+      "directory": "results\\hospital_study\\knn\\seed_4\\wids",
+      "independent_replay": true,
+      "events": 11457,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_apache_only_logistic.joblib": "0396993cc94fca917ef05c6f136dd1bff884bde3d53ab28fea067a96d3218e58",
+        "baseline_apache_recalibrated.joblib": "244fe37096820047e7a4c55acbc921ae7f44f23234cefe1f55137a543aaf1dd3",
+        "baseline_calibrated_logistic_regression.joblib": "0a639151ad9b5a09831b198fd3f6e1a93216044ce02dff214ade3113179dae83",
+        "baseline_extra_trees.joblib": "e3646c4f131c46fa3c17d3cc67de60b173b9b48862f3da620fd7fc3883a17f54",
+        "baseline_hist_gradient_boosting.joblib": "649492c780429d04673e37e86db9ac32de0d653123afb87cb7b1c052cb8fb3df",
+        "baseline_random_forest.joblib": "4ebf191a86e936947109b2b181633051c108a373105ad74b8da68a48d76c9a10",
+        "preprocessor.joblib": "d617348ab737cc111bef4e7d6e2a8db85b0f576a25c054e90f0653d4478d64f5",
+        "transformer_recalibrator.joblib": "aaaead09869de25fb45205ec67855f69bd6c07d8ef537649af84bb4ba2b74830"
+      }
+    },
+    {
+      "directory": "results\\hospital_study\\median\\seed_0\\wids",
+      "independent_replay": true,
+      "events": 11457,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_apache_only_logistic.joblib": "8ec898cf151ca5cc0eafb486e34c726f56e87a279f073a9180a91073ad74c1fb",
+        "baseline_apache_recalibrated.joblib": "a9324e55b7cf436f4067c0cd394d00492e74300acdd0059b803e8a9f3ed6d367",
+        "baseline_calibrated_logistic_regression.joblib": "25bd897891a8d48ae3221667445baedc2b116bf204634e1bddf3e13c9916210c",
+        "baseline_extra_trees.joblib": "bc0ce207edb14bb4d6c0c528fe0c66405f023ebd342e2ae1c1c4bb3ffa7cf51a",
+        "baseline_hist_gradient_boosting.joblib": "d9fd74a20b44301763b73bddd639e3df45176fe0f1fa2eda2bc77cd76f3dce69",
+        "baseline_random_forest.joblib": "5e4ef1956488b8bdf7bf37bcd9a49f1ccaaaeb5b2f12df1bec030585b4001ca4",
+        "preprocessor.joblib": "0446216a94fc0307b2f060cf827bd5a0d6df2c5e4c7de39f119eb430f4cca6fe",
+        "transformer_recalibrator.joblib": "df2a9b0dc619c1656a5fb2100f7d1d79a96c6942edb1d1738256bc3c09b88ae5"
+      }
+    },
+    {
+      "directory": "results\\hospital_study\\median\\seed_1\\wids",
+      "independent_replay": true,
+      "events": 11457,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_apache_only_logistic.joblib": "8ec898cf151ca5cc0eafb486e34c726f56e87a279f073a9180a91073ad74c1fb",
+        "baseline_apache_recalibrated.joblib": "a9324e55b7cf436f4067c0cd394d00492e74300acdd0059b803e8a9f3ed6d367",
+        "baseline_calibrated_logistic_regression.joblib": "25bd897891a8d48ae3221667445baedc2b116bf204634e1bddf3e13c9916210c",
+        "baseline_extra_trees.joblib": "f217a63db740611921331383cedb6f29001d15de0ebbf4c212890b594c6987cf",
+        "baseline_hist_gradient_boosting.joblib": "7fb5e260b808f6482de4d1ed84bc5c2e9e37299a6be9513a834948d84b47df42",
+        "baseline_random_forest.joblib": "ccaf8c615532decf5e0f84fe3bb3b88d3be75ce4b29e8f3443eb861bf16e667c",
+        "preprocessor.joblib": "0446216a94fc0307b2f060cf827bd5a0d6df2c5e4c7de39f119eb430f4cca6fe",
+        "transformer_recalibrator.joblib": "c826d250ede4391d1188833b9a1fb63e401cbeee9d0210b1b58d71e60a850d84"
+      }
+    },
+    {
+      "directory": "results\\hospital_study\\median\\seed_2\\wids",
+      "independent_replay": true,
+      "events": 11457,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_apache_only_logistic.joblib": "8ec898cf151ca5cc0eafb486e34c726f56e87a279f073a9180a91073ad74c1fb",
+        "baseline_apache_recalibrated.joblib": "a9324e55b7cf436f4067c0cd394d00492e74300acdd0059b803e8a9f3ed6d367",
+        "baseline_calibrated_logistic_regression.joblib": "25bd897891a8d48ae3221667445baedc2b116bf204634e1bddf3e13c9916210c",
+        "baseline_extra_trees.joblib": "21fa26af02e2587b488d232b26a6fd34bffc9df8d07f2bf7c428bc5c18add3e9",
+        "baseline_hist_gradient_boosting.joblib": "d06c5d2b6039fd7f7461038144b0f3b31938ef76747bb097e0eea7d341fdde00",
+        "baseline_random_forest.joblib": "8fb959f7d42c145b915eefb399a585655b49eaffa533607a357845fe33a2d05f",
+        "preprocessor.joblib": "0446216a94fc0307b2f060cf827bd5a0d6df2c5e4c7de39f119eb430f4cca6fe",
+        "transformer_recalibrator.joblib": "e084b4d99c0ad518407beae9979b714cf0e9648be62c824b818154e36de71883"
+      }
+    },
+    {
+      "directory": "results\\hospital_study\\median\\seed_3\\wids",
+      "independent_replay": true,
+      "events": 11457,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_apache_only_logistic.joblib": "8ec898cf151ca5cc0eafb486e34c726f56e87a279f073a9180a91073ad74c1fb",
+        "baseline_apache_recalibrated.joblib": "a9324e55b7cf436f4067c0cd394d00492e74300acdd0059b803e8a9f3ed6d367",
+        "baseline_calibrated_logistic_regression.joblib": "25bd897891a8d48ae3221667445baedc2b116bf204634e1bddf3e13c9916210c",
+        "baseline_extra_trees.joblib": "a22142c48dfd9317625094194b7cc7a781b02e3b2ad4ffb029b3f04b7ea4b5e5",
+        "baseline_hist_gradient_boosting.joblib": "78103607f372ded24bd6ac0054d1c2e0d3ebc22f6ca56e3b55234cadfda7d386",
+        "baseline_random_forest.joblib": "16365af2b674f315022dd844e6ad9f91ea6a2bd0df69ed4a51667afd47034833",
+        "preprocessor.joblib": "0446216a94fc0307b2f060cf827bd5a0d6df2c5e4c7de39f119eb430f4cca6fe",
+        "transformer_recalibrator.joblib": "2f51d84da482c9efbf25904166b43f37abb54b1fbd096ebff0d6c8fd52c4002f"
+      }
+    },
+    {
+      "directory": "results\\hospital_study\\median\\seed_4\\wids",
+      "independent_replay": true,
+      "events": 11457,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_apache_only_logistic.joblib": "8ec898cf151ca5cc0eafb486e34c726f56e87a279f073a9180a91073ad74c1fb",
+        "baseline_apache_recalibrated.joblib": "a9324e55b7cf436f4067c0cd394d00492e74300acdd0059b803e8a9f3ed6d367",
+        "baseline_calibrated_logistic_regression.joblib": "25bd897891a8d48ae3221667445baedc2b116bf204634e1bddf3e13c9916210c",
+        "baseline_extra_trees.joblib": "a0925b7fe3027bf72d2473390e3d37604c91d67e7489e2516b4bd06cfa2c4b0b",
+        "baseline_hist_gradient_boosting.joblib": "b4b51594c14b2e00f956525d93c8a5d7169642ebef9d1eb364e2b6a27771a0e1",
+        "baseline_random_forest.joblib": "641c98dd5dead597052d62fd2979031c8cdbf7bd059d2332dfc7d3f2a6248fda",
+        "preprocessor.joblib": "0446216a94fc0307b2f060cf827bd5a0d6df2c5e4c7de39f119eb430f4cca6fe",
+        "transformer_recalibrator.joblib": "0c1592997e5dbdde720fbd85d256028db1147007a9c2e9ae7d262f5e5cc7a516"
+      }
+    },
+    {
+      "directory": "results\\hospital_study\\knn_no_apache\\seed_0\\wids",
+      "independent_replay": true,
+      "events": 11457,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_apache_only_logistic.joblib": "0396993cc94fca917ef05c6f136dd1bff884bde3d53ab28fea067a96d3218e58",
+        "baseline_apache_recalibrated.joblib": "244fe37096820047e7a4c55acbc921ae7f44f23234cefe1f55137a543aaf1dd3",
+        "baseline_calibrated_logistic_regression.joblib": "9c1ef211e193a8785724a1fa554f272c3bece10df6e94da8432c1f771ff00fbf",
+        "baseline_extra_trees.joblib": "dd1a2be3849a56fe3f1174971fd4d148fd88b8cb7e6d6e2ed4487befa2a79154",
+        "baseline_hist_gradient_boosting.joblib": "fd172f5393f8b657676701bbbe1fa422c240c7babe5d3f53b72294a6962d045f",
+        "baseline_random_forest.joblib": "8b7af068d4e4c9b93c06c154c16d7528140e7ca3c9652b56d966bf68b2ba7435",
+        "preprocessor.joblib": "6e867b1e205270b0b4e378ca24dbc25c6fc1383147bd4db401d786d7cf5abef3",
+        "transformer_recalibrator.joblib": "e2c3a4612f6b94881524b775c1e0ddcd359ff6e4a9d175778d20d3536dea46f0"
+      }
+    },
+    {
+      "directory": "results\\hospital_study\\knn_no_apache\\seed_1\\wids",
+      "independent_replay": true,
+      "events": 11457,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_apache_only_logistic.joblib": "8ec898cf151ca5cc0eafb486e34c726f56e87a279f073a9180a91073ad74c1fb",
+        "baseline_apache_recalibrated.joblib": "a9324e55b7cf436f4067c0cd394d00492e74300acdd0059b803e8a9f3ed6d367",
+        "baseline_calibrated_logistic_regression.joblib": "6f18a4d14b15c644d9daa3b50f58ac4359e91f89dcebcfd985dac5b1106763af",
+        "baseline_extra_trees.joblib": "75512fe155ec5dd8e4c1ac7873be255c95645d7b1415103492554423b8901a49",
+        "baseline_hist_gradient_boosting.joblib": "654843e41973538cf9cc32874b84deb202b453cc79319398082307dbd2377e94",
+        "baseline_random_forest.joblib": "0f26506cb604826045e969ffd0aebf6c79a50d2710a273c4c8b6755cef3024b6",
+        "preprocessor.joblib": "f6859259db4684ab76535919ebfcadf2dfcd2291b227c2473269ed33639d8da2",
+        "transformer_recalibrator.joblib": "a5549e8266fd735c1cd238bb60ab14139bba423b1f165e31cc102761c74886a6"
+      }
+    },
+    {
+      "directory": "results\\hospital_study\\knn_no_apache\\seed_2\\wids",
+      "independent_replay": true,
+      "events": 11457,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_apache_only_logistic.joblib": "8ec898cf151ca5cc0eafb486e34c726f56e87a279f073a9180a91073ad74c1fb",
+        "baseline_apache_recalibrated.joblib": "a9324e55b7cf436f4067c0cd394d00492e74300acdd0059b803e8a9f3ed6d367",
+        "baseline_calibrated_logistic_regression.joblib": "6f18a4d14b15c644d9daa3b50f58ac4359e91f89dcebcfd985dac5b1106763af",
+        "baseline_extra_trees.joblib": "1e9990e41da1376bf7c38bed97b42a48023b65046ce3deebe80b96bff23791ec",
+        "baseline_hist_gradient_boosting.joblib": "a08a034bb022c7837e51549283cf40106ad9fda03733cdeea56a8b8327fbf737",
+        "baseline_random_forest.joblib": "2c1dbf644a2dc63aa2e5719b55251ae23014bdd867faf4d7292c148362810e7f",
+        "preprocessor.joblib": "f6859259db4684ab76535919ebfcadf2dfcd2291b227c2473269ed33639d8da2",
+        "transformer_recalibrator.joblib": "ead9ca1068efb39b934c2599cabd6bc5b3188d1dc2ba130f2aa295d8e3fb34d5"
+      }
+    },
+    {
+      "directory": "results\\hospital_study\\knn_no_apache\\seed_3\\wids",
+      "independent_replay": true,
+      "events": 11457,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_apache_only_logistic.joblib": "8ec898cf151ca5cc0eafb486e34c726f56e87a279f073a9180a91073ad74c1fb",
+        "baseline_apache_recalibrated.joblib": "a9324e55b7cf436f4067c0cd394d00492e74300acdd0059b803e8a9f3ed6d367",
+        "baseline_calibrated_logistic_regression.joblib": "6f18a4d14b15c644d9daa3b50f58ac4359e91f89dcebcfd985dac5b1106763af",
+        "baseline_extra_trees.joblib": "aa26a28a0a50e1c548cd8a638e27f2b04c0c60de61a404618979425749db21b6",
+        "baseline_hist_gradient_boosting.joblib": "551757ca3a9240117bae925b53bced1b07b7d4be6670485a027a8b3cb49976fe",
+        "baseline_random_forest.joblib": "04deee2a5882feade8daaa5e113d86bc04d737752a1205234524391d38a6ff7e",
+        "preprocessor.joblib": "f6859259db4684ab76535919ebfcadf2dfcd2291b227c2473269ed33639d8da2",
+        "transformer_recalibrator.joblib": "bd9d86e54edd80598cc61376de6299b9018b9e9381108969bbc8762abca56608"
+      }
+    },
+    {
+      "directory": "results\\hospital_study\\knn_no_apache\\seed_4\\wids",
+      "independent_replay": true,
+      "events": 11457,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_apache_only_logistic.joblib": "8ec898cf151ca5cc0eafb486e34c726f56e87a279f073a9180a91073ad74c1fb",
+        "baseline_apache_recalibrated.joblib": "a9324e55b7cf436f4067c0cd394d00492e74300acdd0059b803e8a9f3ed6d367",
+        "baseline_calibrated_logistic_regression.joblib": "6f18a4d14b15c644d9daa3b50f58ac4359e91f89dcebcfd985dac5b1106763af",
+        "baseline_extra_trees.joblib": "a280ca6791a8236e37a0a83cd205fc3b2478efd2962db7ab787bafa235922325",
+        "baseline_hist_gradient_boosting.joblib": "02ea8059e0d2789fcff026a37454fb8f8c2bf05294223aa8fe2d823dec66d4a9",
+        "baseline_random_forest.joblib": "a618daf37e82c7c49c7391f72d91135e53bdcb4f944b59e7b19bc797e97a4c87",
+        "preprocessor.joblib": "f6859259db4684ab76535919ebfcadf2dfcd2291b227c2473269ed33639d8da2",
+        "transformer_recalibrator.joblib": "e90edc8dcab59c3c480fbd6c4d4af565e20d464614a0e019f484199c30e47cda"
+      }
+    },
+    {
+      "directory": "results\\hospital_study\\median_no_apache\\seed_0\\wids",
+      "independent_replay": true,
+      "events": 11457,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_apache_only_logistic.joblib": "0396993cc94fca917ef05c6f136dd1bff884bde3d53ab28fea067a96d3218e58",
+        "baseline_apache_recalibrated.joblib": "244fe37096820047e7a4c55acbc921ae7f44f23234cefe1f55137a543aaf1dd3",
+        "baseline_calibrated_logistic_regression.joblib": "0cedfa1e8e4d28660e2059f51231dd6669490c786c88be2dfd4e7898fb92561d",
+        "baseline_extra_trees.joblib": "940eee9078f9c2c18ac0127884ac85e21b7834fc0eff7f0f8464784e2670b000",
+        "baseline_hist_gradient_boosting.joblib": "f7e77c5cb11aee716aa66efd9f161e15dc74dd7fc5d5567c007cc080f16feec8",
+        "baseline_random_forest.joblib": "9599388fab5463b80df5ce1a0878e136ed2ca00a9bf6c9433f033544d817342b",
+        "preprocessor.joblib": "3e1a9c52b9496a004ad50d904d460334296240fc1079ac2fb0189703ef299bf8",
+        "transformer_recalibrator.joblib": "6c2719c58d2f4d97cf34cf090363e4b7bb21894dbae22eb452fd972a44805d6c"
+      }
+    },
+    {
+      "directory": "results\\hospital_study\\median_no_apache\\seed_1\\wids",
+      "independent_replay": true,
+      "events": 11457,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_apache_only_logistic.joblib": "8ec898cf151ca5cc0eafb486e34c726f56e87a279f073a9180a91073ad74c1fb",
+        "baseline_apache_recalibrated.joblib": "a9324e55b7cf436f4067c0cd394d00492e74300acdd0059b803e8a9f3ed6d367",
+        "baseline_calibrated_logistic_regression.joblib": "f21553336bffc2be06257d89ae9815c0cdc6b094ef6df3e51c00723e0cc4df47",
+        "baseline_extra_trees.joblib": "1a0d75b53b4dec9f31de30117d1bee86244ccd4e9168bbb2ff20ebe9088c8397",
+        "baseline_hist_gradient_boosting.joblib": "ee943a1835edef1622abb45b10a27e32b31cf13612adad354bbf4b22fe96a1a5",
+        "baseline_random_forest.joblib": "74988367c5d01d1811aa544ffcfb569d9022ec4b4216229950f86bf9d43f196b",
+        "preprocessor.joblib": "25fa6968aae6ee25fc4b65c6d94d4c0bf382c2b3e23635f5c6d4b573a59b2b74",
+        "transformer_recalibrator.joblib": "0532fa59d2f45ead9915963c5b9f9bf4573a57c39202a462159df47017a9f5c6"
+      }
+    },
+    {
+      "directory": "results\\hospital_study\\median_no_apache\\seed_2\\wids",
+      "independent_replay": true,
+      "events": 11457,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_apache_only_logistic.joblib": "8ec898cf151ca5cc0eafb486e34c726f56e87a279f073a9180a91073ad74c1fb",
+        "baseline_apache_recalibrated.joblib": "a9324e55b7cf436f4067c0cd394d00492e74300acdd0059b803e8a9f3ed6d367",
+        "baseline_calibrated_logistic_regression.joblib": "f21553336bffc2be06257d89ae9815c0cdc6b094ef6df3e51c00723e0cc4df47",
+        "baseline_extra_trees.joblib": "d561db7e8c127be5d0dcce6ba38f55e3e44d676cef9c9175679765c534153417",
+        "baseline_hist_gradient_boosting.joblib": "dd1e60cd9fefdc11a0402df0c4159c635976e919ca4d70e697bf7c228ff231c0",
+        "baseline_random_forest.joblib": "5b8f14aadd8e990769cac33b72843d2f12887a71ca4945c1f2d7b7d3052e37cc",
+        "preprocessor.joblib": "25fa6968aae6ee25fc4b65c6d94d4c0bf382c2b3e23635f5c6d4b573a59b2b74",
+        "transformer_recalibrator.joblib": "5cc6a6358069733617eb1aac6fe12623ab13c0473ac73cbca6548a58d9a489ce"
+      }
+    },
+    {
+      "directory": "results\\hospital_study\\median_no_apache\\seed_3\\wids",
+      "independent_replay": true,
+      "events": 11457,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_apache_only_logistic.joblib": "8ec898cf151ca5cc0eafb486e34c726f56e87a279f073a9180a91073ad74c1fb",
+        "baseline_apache_recalibrated.joblib": "a9324e55b7cf436f4067c0cd394d00492e74300acdd0059b803e8a9f3ed6d367",
+        "baseline_calibrated_logistic_regression.joblib": "f21553336bffc2be06257d89ae9815c0cdc6b094ef6df3e51c00723e0cc4df47",
+        "baseline_extra_trees.joblib": "5eece4c713d232a289414553ac2a13e75bfd921014c6a937d0835625966f7f46",
+        "baseline_hist_gradient_boosting.joblib": "d836c9e3058f04518585614b4b8b1cd73fec9a668b477aa22d8709148a4c909c",
+        "baseline_random_forest.joblib": "33912431c082ac3121f28917403260efa3ed13c01febc29f3a38c83e274f7399",
+        "preprocessor.joblib": "25fa6968aae6ee25fc4b65c6d94d4c0bf382c2b3e23635f5c6d4b573a59b2b74",
+        "transformer_recalibrator.joblib": "b84f7fb5d10886457a48e0441c40cbfccb95b3ec76d18e32bd0f48346180644f"
+      }
+    },
+    {
+      "directory": "results\\hospital_study\\median_no_apache\\seed_4\\wids",
+      "independent_replay": true,
+      "events": 11457,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_apache_only_logistic.joblib": "8ec898cf151ca5cc0eafb486e34c726f56e87a279f073a9180a91073ad74c1fb",
+        "baseline_apache_recalibrated.joblib": "a9324e55b7cf436f4067c0cd394d00492e74300acdd0059b803e8a9f3ed6d367",
+        "baseline_calibrated_logistic_regression.joblib": "f21553336bffc2be06257d89ae9815c0cdc6b094ef6df3e51c00723e0cc4df47",
+        "baseline_extra_trees.joblib": "c61315d01eafdb241a5b5b41d961800baa4f317cb9dd9cf7bf61e7d71bb1e466",
+        "baseline_hist_gradient_boosting.joblib": "2802833e9946e41f50dd7cc89682e8e7790e1ad6bb37f6814449abce24d1cc0e",
+        "baseline_random_forest.joblib": "7f2df5007e1f4af70ad746a269384bc3e79e754bce95db7c91b74b0ae941f8fe",
+        "preprocessor.joblib": "25fa6968aae6ee25fc4b65c6d94d4c0bf382c2b3e23635f5c6d4b573a59b2b74",
+        "transformer_recalibrator.joblib": "6db2de40c858970be9e299482834df7576b3022c27bccc42db9d31e002597c3f"
+      }
+    },
+    {
+      "directory": "results\\hospital_study\\shuffled_labels\\seed_0\\wids",
+      "independent_replay": true,
+      "events": 11457,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_apache_only_logistic.joblib": "8ec898cf151ca5cc0eafb486e34c726f56e87a279f073a9180a91073ad74c1fb",
+        "baseline_apache_recalibrated.joblib": "a9324e55b7cf436f4067c0cd394d00492e74300acdd0059b803e8a9f3ed6d367",
+        "baseline_calibrated_logistic_regression.joblib": "0af961f270520df3142b2b9f76da8d34ac2edc3661725a3a13eeff9a588e6761",
+        "baseline_extra_trees.joblib": "bc0ce207edb14bb4d6c0c528fe0c66405f023ebd342e2ae1c1c4bb3ffa7cf51a",
+        "baseline_hist_gradient_boosting.joblib": "f83ea93ce1f64483ab1b4f50c487d928401ccab219d868c33c96d9d50151277a",
+        "baseline_random_forest.joblib": "5e4ef1956488b8bdf7bf37bcd9a49f1ccaaaeb5b2f12df1bec030585b4001ca4",
+        "preprocessor.joblib": "0446216a94fc0307b2f060cf827bd5a0d6df2c5e4c7de39f119eb430f4cca6fe",
+        "transformer_recalibrator.joblib": "20cbef761adca7ad3345dd635d8ba0b2778d3ab5a78f16d32a560a728eae7802"
+      }
+    },
+    {
+      "directory": "results\\tcga_study\\fused\\seed_0\\tcga",
+      "independent_replay": true,
+      "events": 113,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_calibrated_logistic_regression.joblib": "5f3ed454e3560ce1cb9521bd8b5b57e9a457a7e521869846b0e5ca5224198591",
+        "baseline_extra_trees.joblib": "78a2288215b6c9c25320ccb10518fbc35257faa865773df8b63525f60cc583ff",
+        "baseline_hist_gradient_boosting.joblib": "ef3a9cb39cb04f78e41294f38d7d6c9078ef2391e753f635a479b6eab3726ad5",
+        "baseline_random_forest.joblib": "b35c2346a4d2c89c9670efc25789868e7be56eaf09aac43c1c5191147266ed31",
+        "preprocessor.joblib": "aec2ce06933299a53dd24fbb4bfee92a707633fe896928faedd4a5fdafadbde9",
+        "transformer_recalibrator.joblib": "623c4e37accf08980fd208b1d68d8c17ad961a632303c33410804451919ef2c2"
+      }
+    },
+    {
+      "directory": "results\\tcga_study\\fused\\seed_1\\tcga",
+      "independent_replay": true,
+      "events": 113,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_calibrated_logistic_regression.joblib": "5f3ed454e3560ce1cb9521bd8b5b57e9a457a7e521869846b0e5ca5224198591",
+        "baseline_extra_trees.joblib": "d38db6dd4a051303fd2c6471925a4e47f829c2dcd5eb127e6a0203fb5055dff7",
+        "baseline_hist_gradient_boosting.joblib": "0985a531c7eb48801705417c9611e0ed5df90d5a50eb4559329cdc7ae883a1e0",
+        "baseline_random_forest.joblib": "aa70ba542b35d18eaf1f00b41a14aec9b7c79c92d7595c0c8bff33de8a1ab92f",
+        "preprocessor.joblib": "2725a8cf290bc9e4de239933708a0691823311af2e6d6be4850e16d205d5ac6f",
+        "transformer_recalibrator.joblib": "9422508b452a8b918f1d7313948cb2337eb3dec0db61b5cf505d7aa7dd4e29ef"
+      }
+    },
+    {
+      "directory": "results\\tcga_study\\fused\\seed_2\\tcga",
+      "independent_replay": true,
+      "events": 113,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_calibrated_logistic_regression.joblib": "5f3ed454e3560ce1cb9521bd8b5b57e9a457a7e521869846b0e5ca5224198591",
+        "baseline_extra_trees.joblib": "1f51929087aaa34d3b2a9f7edcd3efdbcc599d3f10ee89861a59ac351d33ca8f",
+        "baseline_hist_gradient_boosting.joblib": "1c88b5a1846bf1078b4d446e8a1df431df84a4ff08ee2a3333d91f126af19f3d",
+        "baseline_random_forest.joblib": "1cb9be09002d323f9faebf403382aefa34d51c12ae339d3228ccc1c0be8f4122",
+        "preprocessor.joblib": "2725a8cf290bc9e4de239933708a0691823311af2e6d6be4850e16d205d5ac6f",
+        "transformer_recalibrator.joblib": "d41097f4386adb678574d46f194bc76e46e1af4aefcc6c07744f564b1998aa63"
+      }
+    },
+    {
+      "directory": "results\\tcga_study\\fused\\seed_3\\tcga",
+      "independent_replay": true,
+      "events": 113,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_calibrated_logistic_regression.joblib": "5f3ed454e3560ce1cb9521bd8b5b57e9a457a7e521869846b0e5ca5224198591",
+        "baseline_extra_trees.joblib": "82dd8ac365edecbd7d581693d06ff42ec78f90d2104d6508326f9ffcd753b200",
+        "baseline_hist_gradient_boosting.joblib": "8aafd59d8978c65525b665483dac022f5278b1f29ef897c8d26dadf955eeba1f",
+        "baseline_random_forest.joblib": "ef44a01dc6908628299363d3d99a02f1786915e36c3d6ab627d95dbdf2e91642",
+        "preprocessor.joblib": "2725a8cf290bc9e4de239933708a0691823311af2e6d6be4850e16d205d5ac6f",
+        "transformer_recalibrator.joblib": "2217b761315083a0130be69f01b9f7328e051fc79fa68dd0dc3d70d4ea486c5b"
+      }
+    },
+    {
+      "directory": "results\\tcga_study\\fused\\seed_4\\tcga",
+      "independent_replay": true,
+      "events": 113,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_calibrated_logistic_regression.joblib": "5f3ed454e3560ce1cb9521bd8b5b57e9a457a7e521869846b0e5ca5224198591",
+        "baseline_extra_trees.joblib": "a8d88b2a824f7012f7b54fb05f76afffa11e759dd897bf8f5139f0c8b0411f27",
+        "baseline_hist_gradient_boosting.joblib": "6dcdecb008cce5aaacb838123b5de2c8389098b0c5b9bf4dc8ffb752babccfed",
+        "baseline_random_forest.joblib": "545fd8a851bb0d6c7cdedc7a61bb69ed28f8b412133f48a192a024e47fcbf1d7",
+        "preprocessor.joblib": "2725a8cf290bc9e4de239933708a0691823311af2e6d6be4850e16d205d5ac6f",
+        "transformer_recalibrator.joblib": "0533ecd29ba8621f3dc07c3e59494648b518840d5ef179137ab9e30bed98e497"
+      }
+    },
+    {
+      "directory": "results\\tcga_study\\clinical\\seed_0\\tcga",
+      "independent_replay": true,
+      "events": 113,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_calibrated_logistic_regression.joblib": "df67b3a53944a53aea6c94a6f1841fd18eb64b0b9f3bbfc13d2b056b3e3b0e65",
+        "baseline_extra_trees.joblib": "2a279549d186ce66b904f42e0a9420df94ea2d4b6076907baaa58d6e4581d971",
+        "baseline_hist_gradient_boosting.joblib": "8abc0495d7dfbcd913c7a52c53e57627d777ba0670c56d694619d2ab722b4013",
+        "baseline_random_forest.joblib": "28349e4c6734216b37a0fba3b4397388429d7acb5f568a3df61e077f2e9b2584",
+        "preprocessor.joblib": "a7ad7b39f2663c8eb005e37cf8e0ffcaf002510f3350895cce56b649f9044475",
+        "transformer_recalibrator.joblib": "6962db2828f82632ea643293f1f8b158ce334e3909ae286801ddbf4c43df32b2"
+      }
+    },
+    {
+      "directory": "results\\tcga_study\\clinical\\seed_1\\tcga",
+      "independent_replay": true,
+      "events": 113,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_calibrated_logistic_regression.joblib": "df67b3a53944a53aea6c94a6f1841fd18eb64b0b9f3bbfc13d2b056b3e3b0e65",
+        "baseline_extra_trees.joblib": "5d56dda6cc48c0daa63933b0ad9288ba8e6c3db3fcc4ab17cf8414a06b47867a",
+        "baseline_hist_gradient_boosting.joblib": "e57089138ae3a7e92fef0d59de968fea58cad40231d06dbb9620d2d2fbfd8877",
+        "baseline_random_forest.joblib": "655cc269d565ada50c67005fac9fb897184a618d726bc6218809db046d584cf7",
+        "preprocessor.joblib": "a7ad7b39f2663c8eb005e37cf8e0ffcaf002510f3350895cce56b649f9044475",
+        "transformer_recalibrator.joblib": "94208fe7c8931a2378ef8902b28d577b741581ae71991f7c1e424171d005a325"
+      }
+    },
+    {
+      "directory": "results\\tcga_study\\clinical\\seed_2\\tcga",
+      "independent_replay": true,
+      "events": 113,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_calibrated_logistic_regression.joblib": "df67b3a53944a53aea6c94a6f1841fd18eb64b0b9f3bbfc13d2b056b3e3b0e65",
+        "baseline_extra_trees.joblib": "629feed5e77bf380b08fc3eb2f67caef9378bfe5df35b1dd1fe6eddf215c77b4",
+        "baseline_hist_gradient_boosting.joblib": "6bb685a59b5030b93b12b46895c664af81d6ab3d57a7c4f0b4481de03bbb3f4f",
+        "baseline_random_forest.joblib": "d3cc91aa215a24b72a4a77dd2c8298f2540d25a4fcf048505a498e2afef01859",
+        "preprocessor.joblib": "a7ad7b39f2663c8eb005e37cf8e0ffcaf002510f3350895cce56b649f9044475",
+        "transformer_recalibrator.joblib": "a0d632790d26548c6b2599edb41a42dc40ae8b4920b5dcbd6f27dd5ee7724673"
+      }
+    },
+    {
+      "directory": "results\\tcga_study\\clinical\\seed_3\\tcga",
+      "independent_replay": true,
+      "events": 113,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_calibrated_logistic_regression.joblib": "df67b3a53944a53aea6c94a6f1841fd18eb64b0b9f3bbfc13d2b056b3e3b0e65",
+        "baseline_extra_trees.joblib": "37c1eaf5d5dace7e64352993ba4eae72a4daa00ee1281118503e5fbeadb84bc9",
+        "baseline_hist_gradient_boosting.joblib": "3982723b3e815321aab7d96bbeb38ccbffff76237c30b3984a0b284348cdaaaa",
+        "baseline_random_forest.joblib": "6e902f5642c32fc0f99dfaeb494aa760cccb17d251de978484b3e4fc9116be66",
+        "preprocessor.joblib": "a7ad7b39f2663c8eb005e37cf8e0ffcaf002510f3350895cce56b649f9044475",
+        "transformer_recalibrator.joblib": "9f1903552622b02b43503c9c6961e40dad1751e1b2582a53a282435bc094e84d"
+      }
+    },
+    {
+      "directory": "results\\tcga_study\\clinical\\seed_4\\tcga",
+      "independent_replay": true,
+      "events": 113,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_calibrated_logistic_regression.joblib": "df67b3a53944a53aea6c94a6f1841fd18eb64b0b9f3bbfc13d2b056b3e3b0e65",
+        "baseline_extra_trees.joblib": "9ca72403467e37e73407fd2de470e40e8e94ba17d81ed12d46ac6c78c161dde2",
+        "baseline_hist_gradient_boosting.joblib": "4fec7140e013dea32ddd51a09b9efc060deaf9a48217a4cf37cb11428feb9b40",
+        "baseline_random_forest.joblib": "1333f4506c681fc4e6db8526f7d9c2906f3bbb9777cdea50b7c4be1b24006637",
+        "preprocessor.joblib": "a7ad7b39f2663c8eb005e37cf8e0ffcaf002510f3350895cce56b649f9044475",
+        "transformer_recalibrator.joblib": "485f2630ddec494044e41377ff60f2f74b7ed9a6c5ea3f8f0cd36fc68532a28b"
+      }
+    },
+    {
+      "directory": "results\\tcga_study\\genomic\\seed_0\\tcga",
+      "independent_replay": true,
+      "events": 113,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_calibrated_logistic_regression.joblib": "1d0595ffe551a48f257f9d39f6b1e65261f3945ff421674dc6631d39936c2a04",
+        "baseline_extra_trees.joblib": "d52bb2d42eec056ef5ef3cf2482dbc5c7d09600585e7cd74db07785f89c99b50",
+        "baseline_hist_gradient_boosting.joblib": "2be299713f822fa014d9cada05cd017cd3e660cfc8b1e164e6edf2037fd444b6",
+        "baseline_random_forest.joblib": "f17d7dc1cf02d536bca3f411b65f479e77dd7001b97c73af5c461f15e655d359",
+        "preprocessor.joblib": "d2d2dcfde1a90ece6f0a431c4815081f606578c04a4097eadb8b6e88125e49be",
+        "transformer_recalibrator.joblib": "a7b58c9bcce1d4d9f4be643fdf5c10fd724f0b26a39cc1fd7f2762cc39cf3302"
+      }
+    },
+    {
+      "directory": "results\\tcga_study\\genomic\\seed_1\\tcga",
+      "independent_replay": true,
+      "events": 113,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_calibrated_logistic_regression.joblib": "1d0595ffe551a48f257f9d39f6b1e65261f3945ff421674dc6631d39936c2a04",
+        "baseline_extra_trees.joblib": "c09ca436a3b98abda697f2b1ac30cff7e430ba9ed3abe0691f74597d92239d10",
+        "baseline_hist_gradient_boosting.joblib": "2d77a65453d39b3871a3fc29049e949049884160012c0ef850875fdc16789c18",
+        "baseline_random_forest.joblib": "219a984b128a259d61191e55019314b3dbd80ffce59f65b013d9b70017b5828b",
+        "preprocessor.joblib": "d2d2dcfde1a90ece6f0a431c4815081f606578c04a4097eadb8b6e88125e49be",
+        "transformer_recalibrator.joblib": "b0678a0346a76be72eac7072740cb509e9d8be16b5e44f232486ae1232b55246"
+      }
+    },
+    {
+      "directory": "results\\tcga_study\\genomic\\seed_2\\tcga",
+      "independent_replay": true,
+      "events": 113,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_calibrated_logistic_regression.joblib": "1d0595ffe551a48f257f9d39f6b1e65261f3945ff421674dc6631d39936c2a04",
+        "baseline_extra_trees.joblib": "9a850fe7162cc45d394838fe6c2c0f917410593480259bfac2bc53caaa61a0ad",
+        "baseline_hist_gradient_boosting.joblib": "cb095efe913f03e471ed95fab165a0a0b22f40788ba05ac71eee927b9ea92f7a",
+        "baseline_random_forest.joblib": "1cd0e8dad64e8e5f3afbcd4a863895f10b4e5ca3c67bdb6a8a86ed7fc18e361c",
+        "preprocessor.joblib": "d2d2dcfde1a90ece6f0a431c4815081f606578c04a4097eadb8b6e88125e49be",
+        "transformer_recalibrator.joblib": "ba978e2948563fcb89bbabe91fd22a0cd477131a722172b50fbf8253938a2a7c"
+      }
+    },
+    {
+      "directory": "results\\tcga_study\\genomic\\seed_3\\tcga",
+      "independent_replay": true,
+      "events": 113,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_calibrated_logistic_regression.joblib": "1d0595ffe551a48f257f9d39f6b1e65261f3945ff421674dc6631d39936c2a04",
+        "baseline_extra_trees.joblib": "d4d0c3581c3bd165bd42f79c05823a738b90abe3c78273cae04f39f77cc11405",
+        "baseline_hist_gradient_boosting.joblib": "a5cf536049a0648ee1499e22280378c83a22559ccd594d9eb6106ed5d5d2dad9",
+        "baseline_random_forest.joblib": "9fdfd9ccc5d85dc79efb395f99f7d0d9d8389bbafc978092b3aef3105e062405",
+        "preprocessor.joblib": "d2d2dcfde1a90ece6f0a431c4815081f606578c04a4097eadb8b6e88125e49be",
+        "transformer_recalibrator.joblib": "991cfad234a53cb8dabe1c349f32d744c27112cde91105e9ad4894d3fd88b2fa"
+      }
+    },
+    {
+      "directory": "results\\tcga_study\\genomic\\seed_4\\tcga",
+      "independent_replay": true,
+      "events": 113,
+      "source_identity": true,
+      "feature_identity": true,
+      "mc_samples": 50,
+      "checkpoint_restored": false,
+      "fitted_artifact_sha256": {
+        "baseline_calibrated_logistic_regression.joblib": "1d0595ffe551a48f257f9d39f6b1e65261f3945ff421674dc6631d39936c2a04",
+        "baseline_extra_trees.joblib": "573815ca7ee1ea3a94631da1e12cc57d1b6bcc2cdb8458592cb0b087b3c81f96",
+        "baseline_hist_gradient_boosting.joblib": "cbad50b726ed6c5f1115e7bc4e1cfb5b852b7251986530dad02b76d38344a207",
+        "baseline_random_forest.joblib": "c468243d5c6ee5a4960c079fecffca8b04686c03a8bc6583ab26325844d94a40",
+        "preprocessor.joblib": "d2d2dcfde1a90ece6f0a431c4815081f606578c04a4097eadb8b6e88125e49be",
+        "transformer_recalibrator.joblib": "4b61ee819a8bf854edc143b8759246f06f9d9a9bbddbf6eef21912ae794e84ed"
+      }
+    }
+  ],
+  "scope": "full development studies; synthetic external integration is tested separately"
+}
