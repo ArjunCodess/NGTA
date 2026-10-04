@@ -221,3 +221,8 @@ __marimo__/
 *.synctex.gz
 # Local regression-test temporary directories
 .test-tmp/
+
+# Generated fitted estimators and inference caches stay in a separate archive.
+results/hospital_study/**/*.joblib
+results/hospital_study/**/*.npz
+results/cross_source_sensitivity/**/*.npz
