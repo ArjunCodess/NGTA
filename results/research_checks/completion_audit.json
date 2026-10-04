@@ -442,5 +442,8 @@
   "cross_source_sensitivity_complete": true,
   "selected_record_timing_audit_complete": true,
   "historical_audit": "results/v2_validation/documentation_audit.json",
+  "artifact_storage_manifest": "results/research_checks/artifact_archive_manifest.json",
+  "data_access_instructions": "docs/get-needed-data.md",
+  "outreach_templates": "docs/email-templates.md",
   "evidence_scope": "full development evaluation on inspected fixed cohorts; no prospective confirmation"
 }

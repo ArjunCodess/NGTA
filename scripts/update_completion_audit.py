@@ -88,7 +88,7 @@ def update():
 - Full evaluation includes 35 five-seed condition fits plus a shuffled-neural-label control, with 50 matched dropout passes, three repeats, frozen fitted artifacts and recorded dependency versions. Current figures and tables explicitly identify their source seeds; the 13-page PDF compiles without undefined references or overfull boxes.
 - `results/research_checks/completion_audit.json` records every task and its exact evidence or required input. Historical `results/v2_validation/` files retain earlier snapshots and are superseded for current completion counts.
 - Unchecked items remain because their scientific criterion failed or they require verified assay/timing metadata, qualified expert review, an eligible independent untouched cohort, or real reviewer responses. Those inputs cannot be fabricated by code.
-- Public cross-source sensitivity and selected-record timing audits are additional evidence, not substitutes for source chronology or independent clinical eligibility. Source evidence and the separate automatic-review push blocker are documented in `docs/source-evidence.md` and `docs/push-status.md`.
+- Public cross-source sensitivity and selected-record timing audits are additional evidence, not substitutes for source chronology or independent clinical eligibility. Source evidence and current publication/storage status are documented in `docs/source-evidence.md` and `docs/push-status.md`. Official data-access steps, request forms and unsent outreach drafts are in `docs/get-needed-data.md` and `docs/email-templates.md`.
 '''
     content=content[:content.index('## Verification evidence')]+verification
     (ROOT/'list.md').write_text(content)
@@ -97,6 +97,8 @@ def update():
         masking_complete=masking_complete,uncertainty_intervals_complete=intervals_complete,
         cross_source_sensitivity_complete=sensitivity_complete,selected_record_timing_audit_complete=timing_audit_complete,
         historical_audit='results/v2_validation/documentation_audit.json',
+        artifact_storage_manifest='results/research_checks/artifact_archive_manifest.json',
+        data_access_instructions='docs/get-needed-data.md',outreach_templates='docs/email-templates.md',
         evidence_scope='full development evaluation on inspected fixed cohorts; no prospective confirmation')
     target=ROOT/'results/research_checks/completion_audit.json'
     target.write_text(json.dumps(report,indent=2))
