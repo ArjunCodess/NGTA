@@ -1,0 +1,42 @@
+{
+  "schema_version": 2,
+  "dataset": "wids",
+  "sources": [
+    {
+      "file": "wids_icu.csv",
+      "bytes": 64747327,
+      "sha256": "27861c711f8c196c2a5c858005075fff61df4fb48f6d350c5120cdf45317adeb"
+    }
+  ],
+  "group_overlap": {
+    "patient_id": {
+      "train_val": 0,
+      "train_test": 0,
+      "val_test": 0
+    },
+    "hospital_id": {
+      "train_val": 0,
+      "train_test": 0,
+      "val_test": 0
+    },
+    "icu_id": {
+      "train_val": 0,
+      "train_test": 0,
+      "val_test": 0
+    }
+  },
+  "duplicate_feature_rows": 0,
+  "clinical_missing_fraction": 0.10355856494353763,
+  "overall_missing_fraction": 0.10355856494353763,
+  "prediction_landmark": "end of first ICU day; hospital mortality outcome",
+  "genomic_coverage": null,
+  "clinical_timing_verified": false,
+  "apache_invalid_probability_count": 2371,
+  "apache_policy": "values outside [0,1] are unavailable; source sentinel semantics unverified",
+  "imputed_only_rule_triggers_suppressed": {
+    "rule_lactate": 1171,
+    "rule_hypotension": 10,
+    "rule_age": 11,
+    "rule_creatinine": 245
+  }
+}

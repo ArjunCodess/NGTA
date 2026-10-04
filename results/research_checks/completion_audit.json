@@ -1,0 +1,449 @@
+{
+  "audit_date": "2026-10-04",
+  "branch": "version-2",
+  "tasks": [
+    {
+      "task": "Prove the symbolic component matters",
+      "completed": false,
+      "status": "criterion not met",
+      "evidence_or_action": "Full matched clinical comparisons, direct boosts, rule removal, randomized truth, fixed priors and 100 predicate permutations are saved. Every hierarchical symbolic Brier interval spans zero and the 0.0001 minimum gain is not met. A favorable finding cannot be manufactured; a new clinically justified hypothesis needs fresh confirmation data."
+    },
+    {
+      "task": "Strengthen uncertainty estimation",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Every full condition has five fitted ensemble members, MC variance, predictive entropy, common-reference error diagnostics and three independent dropout repeats. Hierarchical intervals distinguish hospitals/cases, training seeds and dropout draws."
+    },
+    {
+      "task": "Improve the rule base",
+      "completed": false,
+      "status": "external review required",
+      "evidence_or_action": "All eight rules have source/version/prototype status and sensitivity controls, but remain not_reviewed. A thyroid oncology and critical-care expert must review predicate definitions, truth weights, shared evidence and clinically defensible contradiction policies; record signed review evidence before expanding the registry."
+    },
+    {
+      "task": "Add external validation",
+      "completed": false,
+      "status": "external cohort required",
+      "evidence_or_action": "Frozen raw-masking studies and independent-cohort tooling exist. Provide an authorized independent cohort, canonical patient IDs, binary target definition, institutional clusters and verified input units/windows; freeze the mapping before accessing labels. No eligible independent cohort was supplied."
+    },
+    {
+      "task": "Tighten the scientific framing",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "README and manuscript restrict the contribution to an inspectable inference interface and preserve unproven clinical claims as limitations."
+    },
+    {
+      "task": "Fix TCGA genomic coverage",
+      "completed": false,
+      "status": "assay evidence required",
+      "evidence_or_action": "498 UUID/checksum-pinned public MAF files were acquired; selected-panel positives cover 254/50/50 train/validation/test cases. Sixteen expected clinical cases lack file-associated coverage. Complete callable panels and verified negatives remain absent; supply sourced case/gene assay callability rather than treating missing variant rows as negative."
+    },
+    {
+      "task": "Correct feature selection leakage",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Sparse/constant filtering and genomic-panel selection fit training data only."
+    },
+    {
+      "task": "Audit TCGA record merging",
+      "completed": false,
+      "status": "timing evidence required",
+      "evidence_or_action": "The physical-record audit covers all five tables and 68 model/rule inputs. All 507 selected diagnosis records have day zero; none of the 507 pathology records has a pathology date/timepoint. Molecular-test dates are absent. Source-level measurement availability and encounter links are still required; diagnosis offsets cannot certify cross-table chronology."
+    },
+    {
+      "task": "Clarify prediction timing",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "TCGA is explicitly retrospective post-pathology association; WiDS uses end-of-first-day measurements. These landmarks do not verify every source timestamp."
+    },
+    {
+      "task": "Audit WiDS missingness",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "The real-source audit exports feature missingness: 10.3559% overall after cleaning and 74.5761% lactate missingness. No broad extreme-missingness conclusion is drawn."
+    },
+    {
+      "task": "Check APACHE data",
+      "completed": false,
+      "status": "source dictionary required",
+      "evidence_or_action": "2,371 invalid probabilities are masked and twenty full with/without-score fits are saved. Official eICU prediction/APS documentation was reviewed, but does not resolve this WiDS column's negative sentinel or score timestamp. The authoritative WiDS dictionary requires registered source access; provide its versioned definition and calculation/availability provenance."
+    },
+    {
+      "task": "Review imputation",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Training-standardized KNN distances, separate raw/imputed values and observed-only predicates are tested. Full KNN/median, with/without-APACHE paired fits and both five-seed masking studies now evaluate the imputer choices."
+    },
+    {
+      "task": "Verify data integrity",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Local source hashes, exact case splits, assay status, duplicate checks, overlap counts and conflicts are persisted. This verifies local lineage, not complete assay acquisition."
+    },
+    {
+      "task": "Use stronger data splits",
+      "completed": false,
+      "status": "partially completed",
+      "evidence_or_action": "All 20 WiDS fits use patient/hospital/ICU-disjoint held-out hospitals. TCGA partitions and positive coverage are verified, but the task also requires sourced callable genomic coverage, which remains unavailable."
+    },
+    {
+      "task": "Fix the aggregation mismatch",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "All readout gates use the same cached dropout passes and mean per-pass probabilities; uniform identity is checked at 1e-7."
+    },
+    {
+      "task": "Add matched inference baselines",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Ungated, uniform, MC-only and NARS gates use identical cached passes in all 35 full study fits, with independent numerical replay."
+    },
+    {
+      "task": "Add stronger predictive baselines",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Full studies include deterministic/mean-logit inference, validation recalibration, calibrated logistic regression, ExtraTrees, validation-selected boosting and WiDS score-only comparators."
+    },
+    {
+      "task": "Test APACHE dependence",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Five paired with/without-APACHE seeds under each imputer, score-only/recalibrated comparators and paired hospital/seed intervals are saved. Removing APACHE lowers KNN mean ungated AUROC from 0.875721 to 0.841118. Execution establishes dependence, not superiority over the best comparator."
+    },
+    {
+      "task": "Clarify the symbolic mechanism",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "The gate uses revised confidence only. Frequency sensitivity and direct confidence-boost controls expose that NAL frequency does not determine predictive direction or establish independent evidence."
+    },
+    {
+      "task": "Test encoder-level intervention",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Acquired TCGA fused runs compare genuine encoder key bias with readout gating under replayed RNG. Identity and contextual changes are tested; clinical advantage is not established."
+    },
+    {
+      "task": "Evaluate calibration properly",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "AUROC, PR-AUC, Brier, log loss, fixed/quantile ECE, calibration slope/intercept and threshold metrics are implemented. Invalid inputs and bin boundaries are regression-tested."
+    },
+    {
+      "task": "Correct statistical comparisons",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Observed paired deltas, hospital-cluster bootstrap and multiplicity controls are supplemented by fixed-split training-seed and three-dropout-repeat hierarchical intervals; no cohort-selection uncertainty is claimed."
+    },
+    {
+      "task": "Preserve negative results",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Full hierarchical symbolic intervals span zero and fail the benefit margin; masking accepts only 12/15 median and 1/15 KNN conditions. Attention-confidence error intervals span chance. These failed findings remain explicit in the README, audit and manuscript."
+    },
+    {
+      "task": "Expand rule validation",
+      "completed": false,
+      "status": "external review required",
+      "evidence_or_action": "Extraction edges, provenance, collision handling, frequency/confidence sensitivity and randomized controls pass. Clinical correlated-evidence semantics, truth weights and rule correctness still require expert review; software tests cannot certify them."
+    },
+    {
+      "task": "Test rule necessity",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "All-rule and individual removal, 100 prevalence-preserving predicate permutations, shuffled confidence assignments and matched irrelevant predicates are evaluated on full saved clinical caches. These negative controls do not prove clinical necessity."
+    },
+    {
+      "task": "Separate observed and imputed triggers",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Full raw-masking studies export observed-only rules alongside an explicitly labeled imputed-rule comparator; raw/imputed measurements remain distinguishable."
+    },
+    {
+      "task": "Test truth-value sensitivity",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Frequency, confidence, randomized-truth and fixed-prior controls rerun revision rather than replace its output."
+    },
+    {
+      "task": "Fix rule extraction",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "The per-predicate missing, unknown, invalid, threshold and category suite covers all eight rules; extension/unknown-stage errors are fixed. Observed float64 predicate values preserve exact boundaries independently of float32 model inputs."
+    },
+    {
+      "task": "Check multimodal rule behavior",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Each acquired TCGA held-out seed exports 39 real BRAF-positive events, with documented variant bytes and independent replay. All 113 clinical/genomic events are exported; 89 map and 24 are explicitly unmapped. Verified negatives remain a separate unresolved task."
+    },
+    {
+      "task": "Test rule-conditioned confidence boosts",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "The direct confidence-boost comparator is in the symbolic isolation output; frequency-independent confidence equivalence is disclosed."
+    },
+    {
+      "task": "Make audit checks independent",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Replay uses separately implemented predicates and closed-form revision, rather than calling production revision or gate code."
+    },
+    {
+      "task": "Improve trace completeness",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Every trigger is exported. Each acquired TCGA fit has 113 events including 24 unmapped; WiDS has 11,457 mapped observed-only events per fit. Numeric completeness applies only to mapped events."
+    },
+    {
+      "task": "Record raw and imputed values",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Events include raw/imputed values, observed status, source/version, truth values and mapped rule-off effects. Unmapped events carry no fabricated numerical intervention."
+    },
+    {
+      "task": "Fix incomplete exports",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Complete events are unconditional; optional sampled summaries are supplementary."
+    },
+    {
+      "task": "Validate end-to-end replay",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Independent persisted replay validates all full condition seeds; corrupt events, hashes, missing records and nonfinite fields are rejected in regression tests."
+    },
+    {
+      "task": "Evaluate human oversight",
+      "completed": false,
+      "status": "participants required",
+      "evidence_or_action": "A balanced 24-reviewer/80-case crossover demonstration, separate practice cases, seeded faults, power sensitivity and crossed reviewer/case analysis are built. Recruit qualified reviewers under an approved protocol, generate a fresh private answer key, collect independent responses and grade corrections; no participant results exist."
+    },
+    {
+      "task": "Test missingness robustness",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Both imputers are evaluated at 0/10/30/50/70% random, feature-dependent and outcome-dependent simulated raw masking with fixed models/rules, paired degradation intervals and 0.001 mask-harm bounds. Acceptance is reported per fit/scenario; this does not establish population robustness."
+    },
+    {
+      "task": "Compare uncertainty methods",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Five-model ensembles, MC-dropout variance and predictive entropy are compared for each full condition using the same ensemble error reference; error-detection AUROC and tie-aware selective risk are saved."
+    },
+    {
+      "task": "Measure selective prediction",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Persisted full masking predictions supply error-detection AUROC, tie-aware selective-risk area, Brier degradation and 1,000 hospital-bootstrap intervals. These are per-fit descriptive intervals, not adjusted clinical superiority evidence."
+    },
+    {
+      "task": "Test institutional generalization",
+      "completed": false,
+      "status": "independent institution required",
+      "evidence_or_action": "Twenty full WiDS models are evaluated on internal held-out hospitals without refitting preprocessing or rules. An independent source institution/time cohort is still required; internal benchmark hospitals cannot establish that broader claim."
+    },
+    {
+      "task": "Check external compatibility",
+      "completed": false,
+      "status": "external cohort required",
+      "evidence_or_action": "Frozen mapping, overlap checks, replay and noninferiority tooling exist. A public 12,000-case PhysioNet sensitivity evaluates ten no-APACHE fits with conditional case intervals and explicit clinical_claim_eligible=false. Source identity/window equivalence, original >=48-hour selection and unavailable inputs prevent it from meeting independent clinical eligibility; supply a qualified untouched cohort."
+    },
+    {
+      "task": "Evaluate subgroups",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Every full hospital seed exports fixed demographic subgroup metrics and decision curves including matched MC-only. These development strata do not establish protected-group safety or prospective clinical utility."
+    },
+    {
+      "task": "Run multiple seeds",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Twenty hospital fits and 15 acquired TCGA modality fits use five training seeds per condition, 50 dropout passes and three independent repeats. Actual seed means/SDs, seed-mean intervals and hierarchical paired effects are persisted."
+    },
+    {
+      "task": "Fix stale outputs",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "All-seed submission exports and MC decision curves are refreshed from saved predictions. Paper tables and figures explicitly select five verified current sources, record manifests, distinguish mapped/all events and seed/case intervals, and the current 13-page PDF compiles."
+    },
+    {
+      "task": "Correct ablation implementations",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Confidence sensitivity reruns production revision on matched cached passes."
+    },
+    {
+      "task": "Prevent test-set tuning",
+      "completed": false,
+      "status": "fresh confirmation required",
+      "evidence_or_action": "Training/validation fit selection, immutable checkpoint provenance and source/split/rule locks are enforced. Already inspected outcomes cannot become unseen; acquire or reserve a genuinely untouched cohort and preregister the final procedure before labels are accessed."
+    },
+    {
+      "task": "Improve artifact preservation",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "All fitted artifacts, exact sources/splits, pass arrays, RNG and dependency versions are preserved. Restoring all 36 full-study model/preprocessor/RNG combinations reproduces every 50-pass probability matrix exactly, with maximum residual zero."
+    },
+    {
+      "task": "Make data acquisition reproducible",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "An immutable 498-file GDC manifest pins publisher IDs, workflow, MD5/size, extracted SHA256 and associated cases. Verification rejects altered or unpinned MAFs and explicitly reports 16 unavailable expected cases; file coverage is never equated with gene callability."
+    },
+    {
+      "task": "Audit references",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "All 28 cited entries have verified primary bibliographic metadata and corrections, with links and explicit source conflicts recorded in results/research_checks/reference_metadata.json. This verifies identity, not every scientific claim attributed to each reference."
+    },
+    {
+      "task": "Withdraw the held-out genomic demonstration",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "The unsupported sparse-source historical claim remains withdrawn. Newly acquired sources now demonstrate recorded positive held-out BRAF events; they still do not establish verified negatives or clinical multimodal benefit."
+    },
+    {
+      "task": "Restrict extreme-missingness claims",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Measured feature-specific missingness is separated from unproven population robustness."
+    },
+    {
+      "task": "Qualify confidence-routing claims",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Historical aggregation-confounded results remain qualified; current matched full studies and hierarchical intervals do not meet the planned benefit threshold."
+    },
+    {
+      "task": "Withdraw universal trace-completeness claims",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Universal completeness is withdrawn for legacy artifacts; current event completeness is supported by persisted replay."
+    },
+    {
+      "task": "Clarify revision validation",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Legacy production reuse is labeled a consistency check; current independent arithmetic is described separately."
+    },
+    {
+      "task": "Qualify trust-signal claims",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Confidence remains a heuristic attention-stability signal, not clinically calibrated epistemic trust."
+    },
+    {
+      "task": "Avoid equivalence claims",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Close point estimates are not presented as equivalence or noninferiority."
+    },
+    {
+      "task": "Qualify preprocessing claims",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Legacy pre-split selection is disclosed; current selection is training-only."
+    },
+    {
+      "task": "Limit human-oversight claims",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Inspectability and numerical replay are separated from unmeasured reviewer benefit."
+    },
+    {
+      "task": "Separate symbolic effects from inference effects",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Matched MC-only is the symbolic comparator; baseline-to-NARS changes are not attributed wholly to symbolic evidence."
+    },
+    {
+      "task": "Experiment 1: Establish valid data coverage and replay",
+      "completed": false,
+      "status": "assay and timing evidence required",
+      "evidence_or_action": "Source pinning, missingness, training-only selection, split disjointness and independent full-study replay pass. Complete callable panels and source-level prediction-time availability remain external evidence requirements."
+    },
+    {
+      "task": "Experiment 2: Isolate aggregation from gating",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Full five-seed hospital conditions use identical cached passes; uniform and ungated predictions agree within 1e-7. Hierarchical matched comparisons are saved. The additional gating-benefit criterion is not met, so no clinical benefit is claimed."
+    },
+    {
+      "task": "Experiment 3: Test clinical rule value",
+      "completed": false,
+      "status": "criterion not met",
+      "evidence_or_action": "Full rule-content controls and hierarchical comparisons are executed, but no symbolic effect meets the 0.0001 benefit margin with favorable adjusted evidence. A negative study is complete as an experiment; its requested positive scientific goal remains unestablished."
+    },
+    {
+      "task": "Experiment 4: Validate extraction and trace replay",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "All eight predicates have edge/unknown/missing tests; full observed-only exports independently replay including unmapped triggers, closed-form revision, gates, probabilities and rule-off effects. Masking retains a separately labeled imputed-rule control."
+    },
+    {
+      "task": "Experiment 5: Challenge APACHE dependence",
+      "completed": false,
+      "status": "source dictionary and benefit required",
+      "evidence_or_action": "Twenty full hospital fits, APACHE/recalibrated/logistic/boosting comparisons and paired intervals are saved. Authoritative score availability remains unverified, and a clinically significant gain over the strongest locked comparator is not established."
+    },
+    {
+      "task": "Experiment 6: Test missingness and uncertainty",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Five-seed/imputer raw-masking studies, five-member ensembles and hospital-bootstrap uncertainty/degradation intervals execute the planned evaluation. Report the per-scenario acceptance results and failure cases; no claim of general clinical robustness follows."
+    },
+    {
+      "task": "Experiment 7: Test external compatibility",
+      "completed": false,
+      "status": "external cohort required",
+      "evidence_or_action": "The public cross-source sensitivity executes frozen predictions and numerical margins, but explicitly cannot establish independent clinical compatibility. A qualified untouched cohort with canonical source identities and reviewed measurement/outcome harmonization remains required."
+    },
+    {
+      "task": "Experiment 8: Evaluate auditability",
+      "completed": false,
+      "status": "participants required",
+      "evidence_or_action": "Protocol, randomized assignments, prospective power sensitivity, fault package and crossed reviewer/case analysis are implemented. The public demo key must be replaced with a private fresh key, and real qualified participant responses are needed to test the 10-point localization and 5-point false-reassurance margins."
+    },
+    {
+      "task": "First: Fix data validity",
+      "completed": false,
+      "status": "assay and timing evidence required",
+      "evidence_or_action": "Train-only selection, observed predicates, missingness handling, acquisition and positive genomic coverage are fixed. Full callability and clinical chronology cannot be inferred from current public variant and clinical records."
+    },
+    {
+      "task": "Second: Match prediction aggregation",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Prediction aggregation and dropout samples are matched; the scientific benefit question remains experiment 2."
+    },
+    {
+      "task": "Third: Make traces independently replayable",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "Independent predicates/revision/gating, complete mapped and unmapped events, integrity hashes and full predicate edge coverage pass on current studies."
+    },
+    {
+      "task": "Fourth: Strengthen baselines and validation",
+      "completed": false,
+      "status": "external evidence required",
+      "evidence_or_action": "Full internal baselines, APACHE dependence, rule controls, ensembles and masking are executed. Independent cohorts, score timing, clinical expert review and favorable research acceptance remain unresolved; the audit specifies the required inputs."
+    },
+    {
+      "task": "Fifth: Rewrite unsupported claims",
+      "completed": true,
+      "status": "completed",
+      "evidence_or_action": "The source manuscript and documentation preserve legacy negative evidence and distinguish implemented mechanics from unproven research claims."
+    }
+  ],
+  "completed": 53,
+  "total": 72,
+  "masking_complete": true,
+  "uncertainty_intervals_complete": true,
+  "cross_source_sensitivity_complete": true,
+  "selected_record_timing_audit_complete": true,
+  "historical_audit": "results/v2_validation/documentation_audit.json",
+  "artifact_storage_manifest": "results/research_checks/artifact_archive_manifest.json",
+  "data_access_instructions": "docs/get-needed-data.md",
+  "outreach_templates": "docs/email-templates.md",
+  "evidence_scope": "full development evaluation on inspected fixed cohorts; no prospective confirmation"
+}

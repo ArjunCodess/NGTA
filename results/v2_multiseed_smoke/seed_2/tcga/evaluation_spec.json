@@ -1,0 +1,138 @@
+{
+  "schema_version": 2,
+  "config": {
+    "dataset": "tcga",
+    "epochs": 2,
+    "batch_size": 32,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "mc_samples": 3,
+    "gamma": 2.0,
+    "seed": 2,
+    "split_seed": 0,
+    "patience": 12,
+    "d_model": 8,
+    "num_heads": 2,
+    "num_layers": 1,
+    "dropout": 0.2,
+    "baseline_set": "standard",
+    "ablation_set": "submission",
+    "ensemble_size": 0,
+    "run_shift_eval": false,
+    "split_mode": "patient",
+    "include_apache": true,
+    "encoder_intervention": false
+  },
+  "rules": {
+    "braf_mutation": {
+      "condition": "BRAF mutation indicator = 1",
+      "description": "A recorded BRAF mutation supplies prototype evidence toward lymph node metastasis.",
+      "clinical_interpretation": "The rule increases support for the BRAF feature when the mutation is recorded; it is not a validated risk probability.",
+      "source_column": "genomic_mutation__BRAF",
+      "target_key": "genomic_mutation__BRAF",
+      "target_mode": "direct",
+      "truth_value": {
+        "frequency": 0.85,
+        "confidence": 0.75
+      },
+      "source": "Prototype genomic probe. BRAF alteration is common in papillary thyroid carcinoma; this rule is not a metastasis probability.",
+      "provenance": "ngta.rule.tcga.braf_mutation.v1",
+      "expert_review": "not_reviewed",
+      "contradiction_group": "braf_recorded"
+    },
+    "age_ge_55_years": {
+      "condition": "age at diagnosis >= 55 years",
+      "description": "Age at diagnosis of at least 55 years supplies prototype demographic evidence.",
+      "clinical_interpretation": "The rule raises evidential support for the age feature without asserting that age alone determines metastasis.",
+      "source_column": "diagnoses.age_at_diagnosis",
+      "target_key": "diagnoses.age_at_diagnosis",
+      "target_mode": "direct",
+      "truth_value": {
+        "frequency": 0.7,
+        "confidence": 0.6
+      },
+      "source": "Prototype demographic probe motivated by the AJCC 8th-edition thyroid age cutoff of 55 years. Not an NGTA risk model.",
+      "provenance": "ngta.rule.tcga.age_ge_55_years.v1",
+      "expert_review": "not_reviewed",
+      "contradiction_group": "age_at_least_55"
+    },
+    "pathologic_t_t3_t4": {
+      "condition": "pathologic T category is T3, T3a, T3b, T4, T4a, or T4b",
+      "description": "A recorded pathologic T3/T4 category supplies prototype staging evidence.",
+      "clinical_interpretation": "The rule increases support for the observed staging feature; it does not establish nodal spread by itself.",
+      "source_column": "diagnoses.ajcc_pathologic_t",
+      "target_key": "diagnoses.ajcc_pathologic_t",
+      "target_mode": "categorical_active",
+      "truth_value": {
+        "frequency": 0.9,
+        "confidence": 0.85
+      },
+      "source": "Prototype staging probe using AJCC pathologic T3/T4 categories. Not a validated nodal-metastasis rule.",
+      "provenance": "ngta.rule.tcga.pathologic_t_t3_t4.v2",
+      "expert_review": "not_reviewed",
+      "contradiction_group": "pathologic_t_high"
+    },
+    "extrathyroid_extension_present": {
+      "condition": "extrathyroid extension is Minimal (T3), Moderate/Advanced (T4a), or Very Advanced (T4b)",
+      "description": "A recognized extrathyroid-extension category supplies prototype pathology evidence.",
+      "clinical_interpretation": "The rule raises support only for an explicitly recorded extension category; missing, placeholder, and unknown values do not fire.",
+      "source_column": "pathology_details.extrathyroid_extension",
+      "target_key": "pathology_details.extrathyroid_extension",
+      "target_mode": "categorical_active",
+      "truth_value": {
+        "frequency": 0.85,
+        "confidence": 0.8
+      },
+      "source": "Prototype pathology probe using recognized extrathyroid-extension categories. Missing and unknown values are not evidence.",
+      "provenance": "ngta.rule.tcga.extrathyroid_extension_present.v1",
+      "expert_review": "not_reviewed",
+      "contradiction_group": "extrathyroid_extension_present"
+    }
+  },
+  "sources": [
+    {
+      "file": "1feaf21d-8259-4c70-bcb7-7e3fb0887ea4.wxs.aliquot_ensemble_masked.maf",
+      "bytes": 12745,
+      "sha256": "7577f42c06cbe3173e5e088d3b669505ca39633b9fa563e0925df16c9915c3b4"
+    },
+    {
+      "file": "c2e3ad0c-d449-449d-b3a3-793b90bdc793.wxs.aliquot_ensemble_masked.maf",
+      "bytes": 164373,
+      "sha256": "11aef91532e7ca2edfc9c9f709d872d04e343be33d2ecf8ae68ab9b0db386d61"
+    },
+    {
+      "file": "clinical.tsv",
+      "bytes": 2826598,
+      "sha256": "b93441500485aed507291296867f6bd897e7a366743f7572d2bf61adeea5464c"
+    },
+    {
+      "file": "exposure.tsv",
+      "bytes": 4559,
+      "sha256": "68f0b0cca5fc3a6e9a9d312657becdddf7e0f7ac53877a50f7b07b535d6b52a3"
+    },
+    {
+      "file": "family_history.tsv",
+      "bytes": 6201,
+      "sha256": "e5589bda35fe7891ce4eb21980ee064ba19dee5ffc3d7fe1ef6fe94b0e02d580"
+    },
+    {
+      "file": "follow_up.tsv",
+      "bytes": 2184682,
+      "sha256": "da1810be81be24be46a32da8b318d5849f802bac92baef8bc4f4a16475f6fee1"
+    },
+    {
+      "file": "pathology_detail.tsv",
+      "bytes": 265560,
+      "sha256": "8790212382cfd4e347c5bf3975015596323734190458ce8ea54a4ca64da6a0c2"
+    }
+  ],
+  "split_ids_sha256": "96be81746b992fef6390fc651d7c1bd16a52b6d942212fa4d22ebabaa12e0763",
+  "thresholds": [
+    0.1,
+    0.2,
+    0.5
+  ],
+  "primary_metric": "brier",
+  "confirmation_brier_margin": 0.0001,
+  "bootstrap_unit": "case"
+}

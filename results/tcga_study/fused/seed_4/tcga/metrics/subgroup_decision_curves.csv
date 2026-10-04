@@ -1,0 +1,521 @@
+group,stratum,variant,threshold,net_benefit,treat_all,treat_none
+age,65_or_older,random_forest,0.05,0.26315789473684215,0.2631578947368421,0
+age,65_or_older,random_forest,0.1,0.22222222222222224,0.2222222222222222,0
+age,65_or_older,random_forest,0.2,0.14999999999999997,0.12500000000000003,0
+age,65_or_older,random_forest,0.3,0.12857142857142856,0.0,0
+age,65_or_older,random_forest,0.5,0.1,-0.39999999999999997,0
+age,65_or_older,extra_trees,0.05,0.26315789473684215,0.2631578947368421,0
+age,65_or_older,extra_trees,0.1,0.2333333333333333,0.2222222222222222,0
+age,65_or_older,extra_trees,0.2,0.175,0.12500000000000003,0
+age,65_or_older,extra_trees,0.3,0.12857142857142856,0.0,0
+age,65_or_older,extra_trees,0.5,-0.1,-0.39999999999999997,0
+age,65_or_older,hist_gradient_boosting,0.05,0.26315789473684215,0.2631578947368421,0
+age,65_or_older,hist_gradient_boosting,0.1,0.24444444444444446,0.2222222222222222,0
+age,65_or_older,hist_gradient_boosting,0.2,0.2,0.12500000000000003,0
+age,65_or_older,hist_gradient_boosting,0.3,0.21428571428571427,0.0,0
+age,65_or_older,hist_gradient_boosting,0.5,-0.1,-0.39999999999999997,0
+age,65_or_older,calibrated_logistic_regression,0.05,0.26315789473684215,0.2631578947368421,0
+age,65_or_older,calibrated_logistic_regression,0.1,0.22222222222222224,0.2222222222222222,0
+age,65_or_older,calibrated_logistic_regression,0.2,0.175,0.12500000000000003,0
+age,65_or_older,calibrated_logistic_regression,0.3,0.08571428571428572,0.0,0
+age,65_or_older,calibrated_logistic_regression,0.5,0.0,-0.39999999999999997,0
+age,65_or_older,encoder_mc_confidence,0.05,0.26315789473684215,0.2631578947368421,0
+age,65_or_older,encoder_mc_confidence,0.1,0.22222222222222224,0.2222222222222222,0
+age,65_or_older,encoder_mc_confidence,0.2,0.2,0.12500000000000003,0
+age,65_or_older,encoder_mc_confidence,0.3,0.12857142857142856,0.0,0
+age,65_or_older,encoder_mc_confidence,0.5,0.0,-0.39999999999999997,0
+age,65_or_older,encoder_nars_confidence,0.05,0.26315789473684215,0.2631578947368421,0
+age,65_or_older,encoder_nars_confidence,0.1,0.22222222222222224,0.2222222222222222,0
+age,65_or_older,encoder_nars_confidence,0.2,0.2,0.12500000000000003,0
+age,65_or_older,encoder_nars_confidence,0.3,0.12857142857142856,0.0,0
+age,65_or_older,encoder_nars_confidence,0.5,0.0,-0.39999999999999997,0
+age,65_or_older,deterministic,0.05,0.26315789473684215,0.2631578947368421,0
+age,65_or_older,deterministic,0.1,0.25555555555555554,0.2222222222222222,0
+age,65_or_older,deterministic,0.2,0.2,0.12500000000000003,0
+age,65_or_older,deterministic,0.3,0.02857142857142856,0.0,0
+age,65_or_older,deterministic,0.5,0.0,-0.39999999999999997,0
+age,65_or_older,mean_logit,0.05,0.26315789473684215,0.2631578947368421,0
+age,65_or_older,mean_logit,0.1,0.22222222222222224,0.2222222222222222,0
+age,65_or_older,mean_logit,0.2,0.2,0.12500000000000003,0
+age,65_or_older,mean_logit,0.3,0.12857142857142856,0.0,0
+age,65_or_older,mean_logit,0.5,0.0,-0.39999999999999997,0
+age,65_or_older,baseline,0.05,0.26315789473684215,0.2631578947368421,0
+age,65_or_older,baseline,0.1,0.22222222222222224,0.2222222222222222,0
+age,65_or_older,baseline,0.2,0.2,0.12500000000000003,0
+age,65_or_older,baseline,0.3,0.12857142857142856,0.0,0
+age,65_or_older,baseline,0.5,0.0,-0.39999999999999997,0
+age,65_or_older,flat_confidence,0.05,0.26315789473684215,0.2631578947368421,0
+age,65_or_older,flat_confidence,0.1,0.22222222222222224,0.2222222222222222,0
+age,65_or_older,flat_confidence,0.2,0.2,0.12500000000000003,0
+age,65_or_older,flat_confidence,0.3,0.12857142857142856,0.0,0
+age,65_or_older,flat_confidence,0.5,0.0,-0.39999999999999997,0
+age,65_or_older,mc_confidence_only,0.05,0.26315789473684215,0.2631578947368421,0
+age,65_or_older,mc_confidence_only,0.1,0.22222222222222224,0.2222222222222222,0
+age,65_or_older,mc_confidence_only,0.2,0.2,0.12500000000000003,0
+age,65_or_older,mc_confidence_only,0.3,0.12857142857142856,0.0,0
+age,65_or_older,mc_confidence_only,0.5,0.0,-0.39999999999999997,0
+age,65_or_older,nars_gated,0.05,0.26315789473684215,0.2631578947368421,0
+age,65_or_older,nars_gated,0.1,0.22222222222222224,0.2222222222222222,0
+age,65_or_older,nars_gated,0.2,0.2,0.12500000000000003,0
+age,65_or_older,nars_gated,0.3,0.12857142857142856,0.0,0
+age,65_or_older,nars_gated,0.5,0.0,-0.39999999999999997,0
+age,65_or_older,transformer_recalibrated,0.05,0.26315789473684215,0.2631578947368421,0
+age,65_or_older,transformer_recalibrated,0.1,0.22222222222222224,0.2222222222222222,0
+age,65_or_older,transformer_recalibrated,0.2,0.2,0.12500000000000003,0
+age,65_or_older,transformer_recalibrated,0.3,0.12857142857142856,0.0,0
+age,65_or_older,transformer_recalibrated,0.5,-0.1,-0.39999999999999997,0
+age,under_65,random_forest,0.05,0.5004460303300624,0.5004460303300625,0
+age,under_65,random_forest,0.1,0.4726930320150659,0.47269303201506596,0
+age,under_65,random_forest,0.2,0.3983050847457627,0.4067796610169492,0
+age,under_65,random_forest,0.3,0.3389830508474576,0.3220338983050848,0
+age,under_65,random_forest,0.5,0.22033898305084745,0.05084745762711873,0
+age,under_65,extra_trees,0.05,0.5004460303300624,0.5004460303300625,0
+age,under_65,extra_trees,0.1,0.4745762711864407,0.47269303201506596,0
+age,under_65,extra_trees,0.2,0.4067796610169492,0.4067796610169492,0
+age,under_65,extra_trees,0.3,0.3220338983050847,0.3220338983050848,0
+age,under_65,extra_trees,0.5,0.1694915254237288,0.05084745762711873,0
+age,under_65,hist_gradient_boosting,0.05,0.5004460303300624,0.5004460303300625,0
+age,under_65,hist_gradient_boosting,0.1,0.4406779661016949,0.47269303201506596,0
+age,under_65,hist_gradient_boosting,0.2,0.3389830508474576,0.4067796610169492,0
+age,under_65,hist_gradient_boosting,0.3,0.2566585956416465,0.3220338983050848,0
+age,under_65,hist_gradient_boosting,0.5,0.15254237288135594,0.05084745762711873,0
+age,under_65,calibrated_logistic_regression,0.05,0.5004460303300624,0.5004460303300625,0
+age,under_65,calibrated_logistic_regression,0.1,0.4726930320150659,0.47269303201506596,0
+age,under_65,calibrated_logistic_regression,0.2,0.3983050847457627,0.4067796610169492,0
+age,under_65,calibrated_logistic_regression,0.3,0.3317191283292978,0.3220338983050848,0
+age,under_65,calibrated_logistic_regression,0.5,0.1694915254237288,0.05084745762711873,0
+age,under_65,encoder_mc_confidence,0.05,0.5004460303300624,0.5004460303300625,0
+age,under_65,encoder_mc_confidence,0.1,0.4726930320150659,0.47269303201506596,0
+age,under_65,encoder_mc_confidence,0.2,0.4025423728813559,0.4067796610169492,0
+age,under_65,encoder_mc_confidence,0.3,0.3292978208232446,0.3220338983050848,0
+age,under_65,encoder_mc_confidence,0.5,0.11864406779661017,0.05084745762711873,0
+age,under_65,encoder_nars_confidence,0.05,0.5004460303300624,0.5004460303300625,0
+age,under_65,encoder_nars_confidence,0.1,0.4726930320150659,0.47269303201506596,0
+age,under_65,encoder_nars_confidence,0.2,0.4025423728813559,0.4067796610169492,0
+age,under_65,encoder_nars_confidence,0.3,0.3292978208232446,0.3220338983050848,0
+age,under_65,encoder_nars_confidence,0.5,0.11864406779661017,0.05084745762711873,0
+age,under_65,deterministic,0.05,0.5004460303300624,0.5004460303300625,0
+age,under_65,deterministic,0.1,0.4500941619585688,0.47269303201506596,0
+age,under_65,deterministic,0.2,0.4025423728813559,0.4067796610169492,0
+age,under_65,deterministic,0.3,0.35108958837772397,0.3220338983050848,0
+age,under_65,deterministic,0.5,0.11864406779661017,0.05084745762711873,0
+age,under_65,mean_logit,0.05,0.5004460303300624,0.5004460303300625,0
+age,under_65,mean_logit,0.1,0.4726930320150659,0.47269303201506596,0
+age,under_65,mean_logit,0.2,0.4025423728813559,0.4067796610169492,0
+age,under_65,mean_logit,0.3,0.3365617433414043,0.3220338983050848,0
+age,under_65,mean_logit,0.5,0.11864406779661017,0.05084745762711873,0
+age,under_65,baseline,0.05,0.5004460303300624,0.5004460303300625,0
+age,under_65,baseline,0.1,0.4726930320150659,0.47269303201506596,0
+age,under_65,baseline,0.2,0.4025423728813559,0.4067796610169492,0
+age,under_65,baseline,0.3,0.3365617433414043,0.3220338983050848,0
+age,under_65,baseline,0.5,0.11864406779661017,0.05084745762711873,0
+age,under_65,flat_confidence,0.05,0.5004460303300624,0.5004460303300625,0
+age,under_65,flat_confidence,0.1,0.4726930320150659,0.47269303201506596,0
+age,under_65,flat_confidence,0.2,0.4025423728813559,0.4067796610169492,0
+age,under_65,flat_confidence,0.3,0.3365617433414043,0.3220338983050848,0
+age,under_65,flat_confidence,0.5,0.11864406779661017,0.05084745762711873,0
+age,under_65,mc_confidence_only,0.05,0.5004460303300624,0.5004460303300625,0
+age,under_65,mc_confidence_only,0.1,0.4726930320150659,0.47269303201506596,0
+age,under_65,mc_confidence_only,0.2,0.4025423728813559,0.4067796610169492,0
+age,under_65,mc_confidence_only,0.3,0.3292978208232446,0.3220338983050848,0
+age,under_65,mc_confidence_only,0.5,0.11864406779661017,0.05084745762711873,0
+age,under_65,nars_gated,0.05,0.5004460303300624,0.5004460303300625,0
+age,under_65,nars_gated,0.1,0.4726930320150659,0.47269303201506596,0
+age,under_65,nars_gated,0.2,0.4025423728813559,0.4067796610169492,0
+age,under_65,nars_gated,0.3,0.3292978208232446,0.3220338983050848,0
+age,under_65,nars_gated,0.5,0.11864406779661017,0.05084745762711873,0
+age,under_65,transformer_recalibrated,0.05,0.5004460303300624,0.5004460303300625,0
+age,under_65,transformer_recalibrated,0.1,0.4726930320150659,0.47269303201506596,0
+age,under_65,transformer_recalibrated,0.2,0.4025423728813559,0.4067796610169492,0
+age,under_65,transformer_recalibrated,0.3,0.3292978208232446,0.3220338983050848,0
+age,under_65,transformer_recalibrated,0.5,0.2033898305084746,0.05084745762711873,0
+demographic.gender,female,random_forest,0.05,0.45344129554655865,0.4534412955465587,0
+demographic.gender,female,random_forest,0.1,0.4230769230769231,0.4230769230769231,0
+demographic.gender,female,random_forest,0.2,0.34134615384615385,0.3509615384615385,0
+demographic.gender,female,random_forest,0.3,0.2692307692307692,0.25824175824175827,0
+demographic.gender,female,random_forest,0.5,0.15384615384615385,-0.03846153846153838,0
+demographic.gender,female,extra_trees,0.05,0.45344129554655865,0.4534412955465587,0
+demographic.gender,female,extra_trees,0.1,0.4252136752136752,0.4230769230769231,0
+demographic.gender,female,extra_trees,0.2,0.34615384615384615,0.3509615384615385,0
+demographic.gender,female,extra_trees,0.3,0.25,0.25824175824175827,0
+demographic.gender,female,extra_trees,0.5,0.09615384615384616,-0.03846153846153838,0
+demographic.gender,female,hist_gradient_boosting,0.05,0.45344129554655865,0.4534412955465587,0
+demographic.gender,female,hist_gradient_boosting,0.1,0.38675213675213677,0.4230769230769231,0
+demographic.gender,female,hist_gradient_boosting,0.2,0.27403846153846156,0.3509615384615385,0
+demographic.gender,female,hist_gradient_boosting,0.3,0.2032967032967033,0.25824175824175827,0
+demographic.gender,female,hist_gradient_boosting,0.5,0.057692307692307696,-0.03846153846153838,0
+demographic.gender,female,calibrated_logistic_regression,0.05,0.45344129554655865,0.4534412955465587,0
+demographic.gender,female,calibrated_logistic_regression,0.1,0.4230769230769231,0.4230769230769231,0
+demographic.gender,female,calibrated_logistic_regression,0.2,0.34134615384615385,0.3509615384615385,0
+demographic.gender,female,calibrated_logistic_regression,0.3,0.260989010989011,0.25824175824175827,0
+demographic.gender,female,calibrated_logistic_regression,0.5,0.09615384615384616,-0.03846153846153838,0
+demographic.gender,female,encoder_mc_confidence,0.05,0.45344129554655865,0.4534412955465587,0
+demographic.gender,female,encoder_mc_confidence,0.1,0.4230769230769231,0.4230769230769231,0
+demographic.gender,female,encoder_mc_confidence,0.2,0.34134615384615385,0.3509615384615385,0
+demographic.gender,female,encoder_mc_confidence,0.3,0.25824175824175827,0.25824175824175827,0
+demographic.gender,female,encoder_mc_confidence,0.5,0.057692307692307696,-0.03846153846153838,0
+demographic.gender,female,encoder_nars_confidence,0.05,0.45344129554655865,0.4534412955465587,0
+demographic.gender,female,encoder_nars_confidence,0.1,0.4230769230769231,0.4230769230769231,0
+demographic.gender,female,encoder_nars_confidence,0.2,0.34134615384615385,0.3509615384615385,0
+demographic.gender,female,encoder_nars_confidence,0.3,0.25824175824175827,0.25824175824175827,0
+demographic.gender,female,encoder_nars_confidence,0.5,0.057692307692307696,-0.03846153846153838,0
+demographic.gender,female,deterministic,0.05,0.45344129554655865,0.4534412955465587,0
+demographic.gender,female,deterministic,0.1,0.39743589743589747,0.4230769230769231,0
+demographic.gender,female,deterministic,0.2,0.34134615384615385,0.3509615384615385,0
+demographic.gender,female,deterministic,0.3,0.26373626373626374,0.25824175824175827,0
+demographic.gender,female,deterministic,0.5,0.038461538461538464,-0.03846153846153838,0
+demographic.gender,female,mean_logit,0.05,0.45344129554655865,0.4534412955465587,0
+demographic.gender,female,mean_logit,0.1,0.4230769230769231,0.4230769230769231,0
+demographic.gender,female,mean_logit,0.2,0.34134615384615385,0.3509615384615385,0
+demographic.gender,female,mean_logit,0.3,0.2664835164835165,0.25824175824175827,0
+demographic.gender,female,mean_logit,0.5,0.057692307692307696,-0.03846153846153838,0
+demographic.gender,female,baseline,0.05,0.45344129554655865,0.4534412955465587,0
+demographic.gender,female,baseline,0.1,0.4230769230769231,0.4230769230769231,0
+demographic.gender,female,baseline,0.2,0.34134615384615385,0.3509615384615385,0
+demographic.gender,female,baseline,0.3,0.2664835164835165,0.25824175824175827,0
+demographic.gender,female,baseline,0.5,0.057692307692307696,-0.03846153846153838,0
+demographic.gender,female,flat_confidence,0.05,0.45344129554655865,0.4534412955465587,0
+demographic.gender,female,flat_confidence,0.1,0.4230769230769231,0.4230769230769231,0
+demographic.gender,female,flat_confidence,0.2,0.34134615384615385,0.3509615384615385,0
+demographic.gender,female,flat_confidence,0.3,0.2664835164835165,0.25824175824175827,0
+demographic.gender,female,flat_confidence,0.5,0.057692307692307696,-0.03846153846153838,0
+demographic.gender,female,mc_confidence_only,0.05,0.45344129554655865,0.4534412955465587,0
+demographic.gender,female,mc_confidence_only,0.1,0.4230769230769231,0.4230769230769231,0
+demographic.gender,female,mc_confidence_only,0.2,0.34134615384615385,0.3509615384615385,0
+demographic.gender,female,mc_confidence_only,0.3,0.25824175824175827,0.25824175824175827,0
+demographic.gender,female,mc_confidence_only,0.5,0.057692307692307696,-0.03846153846153838,0
+demographic.gender,female,nars_gated,0.05,0.45344129554655865,0.4534412955465587,0
+demographic.gender,female,nars_gated,0.1,0.4230769230769231,0.4230769230769231,0
+demographic.gender,female,nars_gated,0.2,0.34134615384615385,0.3509615384615385,0
+demographic.gender,female,nars_gated,0.3,0.25824175824175827,0.25824175824175827,0
+demographic.gender,female,nars_gated,0.5,0.057692307692307696,-0.03846153846153838,0
+demographic.gender,female,transformer_recalibrated,0.05,0.45344129554655865,0.4534412955465587,0
+demographic.gender,female,transformer_recalibrated,0.1,0.4230769230769231,0.4230769230769231,0
+demographic.gender,female,transformer_recalibrated,0.2,0.34134615384615385,0.3509615384615385,0
+demographic.gender,female,transformer_recalibrated,0.3,0.25824175824175827,0.25824175824175827,0
+demographic.gender,female,transformer_recalibrated,0.5,0.11538461538461539,-0.03846153846153838,0
+demographic.gender,male,random_forest,0.05,0.5046439628482973,0.5046439628482973,0
+demographic.gender,male,random_forest,0.1,0.4771241830065359,0.477124183006536,0
+demographic.gender,male,random_forest,0.2,0.4264705882352941,0.4117647058823529,0
+demographic.gender,male,random_forest,0.3,0.42857142857142855,0.3277310924369748,0
+demographic.gender,male,random_forest,0.5,0.35294117647058826,0.05882352941176472,0
+demographic.gender,male,extra_trees,0.05,0.5046439628482973,0.5046439628482973,0
+demographic.gender,male,extra_trees,0.1,0.4836601307189542,0.477124183006536,0
+demographic.gender,male,extra_trees,0.2,0.45588235294117646,0.4117647058823529,0
+demographic.gender,male,extra_trees,0.3,0.42857142857142855,0.3277310924369748,0
+demographic.gender,male,extra_trees,0.5,0.23529411764705882,0.05882352941176472,0
+demographic.gender,male,hist_gradient_boosting,0.05,0.5046439628482973,0.5046439628482973,0
+demographic.gender,male,hist_gradient_boosting,0.1,0.4901960784313726,0.477124183006536,0
+demographic.gender,male,hist_gradient_boosting,0.2,0.45588235294117646,0.4117647058823529,0
+demographic.gender,male,hist_gradient_boosting,0.3,0.3949579831932773,0.3277310924369748,0
+demographic.gender,male,hist_gradient_boosting,0.5,0.29411764705882354,0.05882352941176472,0
+demographic.gender,male,calibrated_logistic_regression,0.05,0.5046439628482973,0.5046439628482973,0
+demographic.gender,male,calibrated_logistic_regression,0.1,0.4771241830065359,0.477124183006536,0
+demographic.gender,male,calibrated_logistic_regression,0.2,0.4411764705882353,0.4117647058823529,0
+demographic.gender,male,calibrated_logistic_regression,0.3,0.40336134453781514,0.3277310924369748,0
+demographic.gender,male,calibrated_logistic_regression,0.5,0.29411764705882354,0.05882352941176472,0
+demographic.gender,male,encoder_mc_confidence,0.05,0.5046439628482973,0.5046439628482973,0
+demographic.gender,male,encoder_mc_confidence,0.1,0.4771241830065359,0.477124183006536,0
+demographic.gender,male,encoder_mc_confidence,0.2,0.47058823529411764,0.4117647058823529,0
+demographic.gender,male,encoder_mc_confidence,0.3,0.42857142857142855,0.3277310924369748,0
+demographic.gender,male,encoder_mc_confidence,0.5,0.23529411764705882,0.05882352941176472,0
+demographic.gender,male,encoder_nars_confidence,0.05,0.5046439628482973,0.5046439628482973,0
+demographic.gender,male,encoder_nars_confidence,0.1,0.4771241830065359,0.477124183006536,0
+demographic.gender,male,encoder_nars_confidence,0.2,0.47058823529411764,0.4117647058823529,0
+demographic.gender,male,encoder_nars_confidence,0.3,0.42857142857142855,0.3277310924369748,0
+demographic.gender,male,encoder_nars_confidence,0.5,0.23529411764705882,0.05882352941176472,0
+demographic.gender,male,deterministic,0.05,0.5046439628482973,0.5046439628482973,0
+demographic.gender,male,deterministic,0.1,0.49673202614379086,0.477124183006536,0
+demographic.gender,male,deterministic,0.2,0.47058823529411764,0.4117647058823529,0
+demographic.gender,male,deterministic,0.3,0.42857142857142855,0.3277310924369748,0
+demographic.gender,male,deterministic,0.5,0.29411764705882354,0.05882352941176472,0
+demographic.gender,male,mean_logit,0.05,0.5046439628482973,0.5046439628482973,0
+demographic.gender,male,mean_logit,0.1,0.4771241830065359,0.477124183006536,0
+demographic.gender,male,mean_logit,0.2,0.47058823529411764,0.4117647058823529,0
+demographic.gender,male,mean_logit,0.3,0.42857142857142855,0.3277310924369748,0
+demographic.gender,male,mean_logit,0.5,0.23529411764705882,0.05882352941176472,0
+demographic.gender,male,baseline,0.05,0.5046439628482973,0.5046439628482973,0
+demographic.gender,male,baseline,0.1,0.4771241830065359,0.477124183006536,0
+demographic.gender,male,baseline,0.2,0.47058823529411764,0.4117647058823529,0
+demographic.gender,male,baseline,0.3,0.42857142857142855,0.3277310924369748,0
+demographic.gender,male,baseline,0.5,0.23529411764705882,0.05882352941176472,0
+demographic.gender,male,flat_confidence,0.05,0.5046439628482973,0.5046439628482973,0
+demographic.gender,male,flat_confidence,0.1,0.4771241830065359,0.477124183006536,0
+demographic.gender,male,flat_confidence,0.2,0.47058823529411764,0.4117647058823529,0
+demographic.gender,male,flat_confidence,0.3,0.42857142857142855,0.3277310924369748,0
+demographic.gender,male,flat_confidence,0.5,0.23529411764705882,0.05882352941176472,0
+demographic.gender,male,mc_confidence_only,0.05,0.5046439628482973,0.5046439628482973,0
+demographic.gender,male,mc_confidence_only,0.1,0.4771241830065359,0.477124183006536,0
+demographic.gender,male,mc_confidence_only,0.2,0.47058823529411764,0.4117647058823529,0
+demographic.gender,male,mc_confidence_only,0.3,0.42857142857142855,0.3277310924369748,0
+demographic.gender,male,mc_confidence_only,0.5,0.23529411764705882,0.05882352941176472,0
+demographic.gender,male,nars_gated,0.05,0.5046439628482973,0.5046439628482973,0
+demographic.gender,male,nars_gated,0.1,0.4771241830065359,0.477124183006536,0
+demographic.gender,male,nars_gated,0.2,0.47058823529411764,0.4117647058823529,0
+demographic.gender,male,nars_gated,0.3,0.42857142857142855,0.3277310924369748,0
+demographic.gender,male,nars_gated,0.5,0.23529411764705882,0.05882352941176472,0
+demographic.gender,male,transformer_recalibrated,0.05,0.5046439628482973,0.5046439628482973,0
+demographic.gender,male,transformer_recalibrated,0.1,0.4771241830065359,0.477124183006536,0
+demographic.gender,male,transformer_recalibrated,0.2,0.47058823529411764,0.4117647058823529,0
+demographic.gender,male,transformer_recalibrated,0.3,0.42857142857142855,0.3277310924369748,0
+demographic.gender,male,transformer_recalibrated,0.5,0.29411764705882354,0.05882352941176472,0
+demographic.race,asian,random_forest,0.05,0.5488721804511278,0.5488721804511277,0
+demographic.race,asian,random_forest,0.1,0.5238095238095238,0.5238095238095237,0
+demographic.race,asian,random_forest,0.2,0.32142857142857145,0.46428571428571425,0
+demographic.race,asian,random_forest,0.3,0.2448979591836735,0.38775510204081626,0
+demographic.race,asian,random_forest,0.5,0.0,0.1428571428571428,0
+demographic.race,asian,extra_trees,0.05,0.5488721804511278,0.5488721804511277,0
+demographic.race,asian,extra_trees,0.1,0.5238095238095238,0.5238095238095237,0
+demographic.race,asian,extra_trees,0.2,0.32142857142857145,0.46428571428571425,0
+demographic.race,asian,extra_trees,0.3,0.2448979591836735,0.38775510204081626,0
+demographic.race,asian,extra_trees,0.5,0.0,0.1428571428571428,0
+demographic.race,asian,hist_gradient_boosting,0.05,0.5488721804511278,0.5488721804511277,0
+demographic.race,asian,hist_gradient_boosting,0.1,0.38095238095238093,0.5238095238095237,0
+demographic.race,asian,hist_gradient_boosting,0.2,0.17857142857142858,0.46428571428571425,0
+demographic.race,asian,hist_gradient_boosting,0.3,0.16326530612244897,0.38775510204081626,0
+demographic.race,asian,hist_gradient_boosting,0.5,-0.14285714285714285,0.1428571428571428,0
+demographic.race,asian,calibrated_logistic_regression,0.05,0.5488721804511278,0.5488721804511277,0
+demographic.race,asian,calibrated_logistic_regression,0.1,0.5238095238095238,0.5238095238095237,0
+demographic.race,asian,calibrated_logistic_regression,0.2,0.32142857142857145,0.46428571428571425,0
+demographic.race,asian,calibrated_logistic_regression,0.3,0.2448979591836735,0.38775510204081626,0
+demographic.race,asian,calibrated_logistic_regression,0.5,0.0,0.1428571428571428,0
+demographic.race,asian,encoder_mc_confidence,0.05,0.5488721804511278,0.5488721804511277,0
+demographic.race,asian,encoder_mc_confidence,0.1,0.5238095238095238,0.5238095238095237,0
+demographic.race,asian,encoder_mc_confidence,0.2,0.32142857142857145,0.46428571428571425,0
+demographic.race,asian,encoder_mc_confidence,0.3,0.2448979591836735,0.38775510204081626,0
+demographic.race,asian,encoder_mc_confidence,0.5,0.0,0.1428571428571428,0
+demographic.race,asian,encoder_nars_confidence,0.05,0.5488721804511278,0.5488721804511277,0
+demographic.race,asian,encoder_nars_confidence,0.1,0.5238095238095238,0.5238095238095237,0
+demographic.race,asian,encoder_nars_confidence,0.2,0.32142857142857145,0.46428571428571425,0
+demographic.race,asian,encoder_nars_confidence,0.3,0.2448979591836735,0.38775510204081626,0
+demographic.race,asian,encoder_nars_confidence,0.5,0.0,0.1428571428571428,0
+demographic.race,asian,deterministic,0.05,0.5488721804511278,0.5488721804511277,0
+demographic.race,asian,deterministic,0.1,0.38095238095238093,0.5238095238095237,0
+demographic.race,asian,deterministic,0.2,0.32142857142857145,0.46428571428571425,0
+demographic.race,asian,deterministic,0.3,0.2448979591836735,0.38775510204081626,0
+demographic.race,asian,deterministic,0.5,0.14285714285714285,0.1428571428571428,0
+demographic.race,asian,mean_logit,0.05,0.5488721804511278,0.5488721804511277,0
+demographic.race,asian,mean_logit,0.1,0.5238095238095238,0.5238095238095237,0
+demographic.race,asian,mean_logit,0.2,0.32142857142857145,0.46428571428571425,0
+demographic.race,asian,mean_logit,0.3,0.2448979591836735,0.38775510204081626,0
+demographic.race,asian,mean_logit,0.5,0.0,0.1428571428571428,0
+demographic.race,asian,baseline,0.05,0.5488721804511278,0.5488721804511277,0
+demographic.race,asian,baseline,0.1,0.5238095238095238,0.5238095238095237,0
+demographic.race,asian,baseline,0.2,0.32142857142857145,0.46428571428571425,0
+demographic.race,asian,baseline,0.3,0.2448979591836735,0.38775510204081626,0
+demographic.race,asian,baseline,0.5,0.0,0.1428571428571428,0
+demographic.race,asian,flat_confidence,0.05,0.5488721804511278,0.5488721804511277,0
+demographic.race,asian,flat_confidence,0.1,0.5238095238095238,0.5238095238095237,0
+demographic.race,asian,flat_confidence,0.2,0.32142857142857145,0.46428571428571425,0
+demographic.race,asian,flat_confidence,0.3,0.2448979591836735,0.38775510204081626,0
+demographic.race,asian,flat_confidence,0.5,0.0,0.1428571428571428,0
+demographic.race,asian,mc_confidence_only,0.05,0.5488721804511278,0.5488721804511277,0
+demographic.race,asian,mc_confidence_only,0.1,0.5238095238095238,0.5238095238095237,0
+demographic.race,asian,mc_confidence_only,0.2,0.32142857142857145,0.46428571428571425,0
+demographic.race,asian,mc_confidence_only,0.3,0.2448979591836735,0.38775510204081626,0
+demographic.race,asian,mc_confidence_only,0.5,0.0,0.1428571428571428,0
+demographic.race,asian,nars_gated,0.05,0.5488721804511278,0.5488721804511277,0
+demographic.race,asian,nars_gated,0.1,0.5238095238095238,0.5238095238095237,0
+demographic.race,asian,nars_gated,0.2,0.32142857142857145,0.46428571428571425,0
+demographic.race,asian,nars_gated,0.3,0.2448979591836735,0.38775510204081626,0
+demographic.race,asian,nars_gated,0.5,0.0,0.1428571428571428,0
+demographic.race,asian,transformer_recalibrated,0.05,0.5488721804511278,0.5488721804511277,0
+demographic.race,asian,transformer_recalibrated,0.1,0.5238095238095238,0.5238095238095237,0
+demographic.race,asian,transformer_recalibrated,0.2,0.32142857142857145,0.46428571428571425,0
+demographic.race,asian,transformer_recalibrated,0.3,0.2448979591836735,0.38775510204081626,0
+demographic.race,asian,transformer_recalibrated,0.5,0.0,0.1428571428571428,0
+demographic.race,black or african american,random_forest,0.05,0.47368421052631576,0.47368421052631576,0
+demographic.race,black or african american,random_forest,0.1,0.4444444444444444,0.4444444444444444,0
+demographic.race,black or african american,random_forest,0.2,0.375,0.375,0
+demographic.race,black or african american,random_forest,0.3,-0.2142857142857143,0.2857142857142857,0
+demographic.race,black or african american,random_forest,0.5,-0.5,0.0,0
+demographic.race,black or african american,extra_trees,0.05,0.47368421052631576,0.47368421052631576,0
+demographic.race,black or african american,extra_trees,0.1,0.4444444444444444,0.4444444444444444,0
+demographic.race,black or african american,extra_trees,0.2,0.375,0.375,0
+demographic.race,black or african american,extra_trees,0.3,-0.2142857142857143,0.2857142857142857,0
+demographic.race,black or african american,extra_trees,0.5,-0.5,0.0,0
+demographic.race,black or african american,hist_gradient_boosting,0.05,0.47368421052631576,0.47368421052631576,0
+demographic.race,black or african american,hist_gradient_boosting,0.1,0.4444444444444444,0.4444444444444444,0
+demographic.race,black or african american,hist_gradient_boosting,0.2,0.375,0.375,0
+demographic.race,black or african american,hist_gradient_boosting,0.3,-0.2142857142857143,0.2857142857142857,0
+demographic.race,black or african american,hist_gradient_boosting,0.5,-0.5,0.0,0
+demographic.race,black or african american,calibrated_logistic_regression,0.05,0.47368421052631576,0.47368421052631576,0
+demographic.race,black or african american,calibrated_logistic_regression,0.1,0.4444444444444444,0.4444444444444444,0
+demographic.race,black or african american,calibrated_logistic_regression,0.2,0.375,0.375,0
+demographic.race,black or african american,calibrated_logistic_regression,0.3,-0.2142857142857143,0.2857142857142857,0
+demographic.race,black or african american,calibrated_logistic_regression,0.5,-0.5,0.0,0
+demographic.race,black or african american,encoder_mc_confidence,0.05,0.47368421052631576,0.47368421052631576,0
+demographic.race,black or african american,encoder_mc_confidence,0.1,0.4444444444444444,0.4444444444444444,0
+demographic.race,black or african american,encoder_mc_confidence,0.2,-0.125,0.375,0
+demographic.race,black or african american,encoder_mc_confidence,0.3,-0.2142857142857143,0.2857142857142857,0
+demographic.race,black or african american,encoder_mc_confidence,0.5,-0.5,0.0,0
+demographic.race,black or african american,encoder_nars_confidence,0.05,0.47368421052631576,0.47368421052631576,0
+demographic.race,black or african american,encoder_nars_confidence,0.1,0.4444444444444444,0.4444444444444444,0
+demographic.race,black or african american,encoder_nars_confidence,0.2,-0.125,0.375,0
+demographic.race,black or african american,encoder_nars_confidence,0.3,-0.2142857142857143,0.2857142857142857,0
+demographic.race,black or african american,encoder_nars_confidence,0.5,-0.5,0.0,0
+demographic.race,black or african american,deterministic,0.05,0.47368421052631576,0.47368421052631576,0
+demographic.race,black or african american,deterministic,0.1,-0.05555555555555556,0.4444444444444444,0
+demographic.race,black or african american,deterministic,0.2,-0.125,0.375,0
+demographic.race,black or african american,deterministic,0.3,-0.2142857142857143,0.2857142857142857,0
+demographic.race,black or african american,deterministic,0.5,-0.5,0.0,0
+demographic.race,black or african american,mean_logit,0.05,0.47368421052631576,0.47368421052631576,0
+demographic.race,black or african american,mean_logit,0.1,0.4444444444444444,0.4444444444444444,0
+demographic.race,black or african american,mean_logit,0.2,-0.125,0.375,0
+demographic.race,black or african american,mean_logit,0.3,-0.2142857142857143,0.2857142857142857,0
+demographic.race,black or african american,mean_logit,0.5,-0.5,0.0,0
+demographic.race,black or african american,baseline,0.05,0.47368421052631576,0.47368421052631576,0
+demographic.race,black or african american,baseline,0.1,0.4444444444444444,0.4444444444444444,0
+demographic.race,black or african american,baseline,0.2,-0.125,0.375,0
+demographic.race,black or african american,baseline,0.3,-0.2142857142857143,0.2857142857142857,0
+demographic.race,black or african american,baseline,0.5,-0.5,0.0,0
+demographic.race,black or african american,flat_confidence,0.05,0.47368421052631576,0.47368421052631576,0
+demographic.race,black or african american,flat_confidence,0.1,0.4444444444444444,0.4444444444444444,0
+demographic.race,black or african american,flat_confidence,0.2,-0.125,0.375,0
+demographic.race,black or african american,flat_confidence,0.3,-0.2142857142857143,0.2857142857142857,0
+demographic.race,black or african american,flat_confidence,0.5,-0.5,0.0,0
+demographic.race,black or african american,mc_confidence_only,0.05,0.47368421052631576,0.47368421052631576,0
+demographic.race,black or african american,mc_confidence_only,0.1,0.4444444444444444,0.4444444444444444,0
+demographic.race,black or african american,mc_confidence_only,0.2,-0.125,0.375,0
+demographic.race,black or african american,mc_confidence_only,0.3,-0.2142857142857143,0.2857142857142857,0
+demographic.race,black or african american,mc_confidence_only,0.5,-0.5,0.0,0
+demographic.race,black or african american,nars_gated,0.05,0.47368421052631576,0.47368421052631576,0
+demographic.race,black or african american,nars_gated,0.1,0.4444444444444444,0.4444444444444444,0
+demographic.race,black or african american,nars_gated,0.2,-0.125,0.375,0
+demographic.race,black or african american,nars_gated,0.3,-0.2142857142857143,0.2857142857142857,0
+demographic.race,black or african american,nars_gated,0.5,-0.5,0.0,0
+demographic.race,black or african american,transformer_recalibrated,0.05,0.47368421052631576,0.47368421052631576,0
+demographic.race,black or african american,transformer_recalibrated,0.1,0.4444444444444444,0.4444444444444444,0
+demographic.race,black or african american,transformer_recalibrated,0.2,-0.125,0.375,0
+demographic.race,black or african american,transformer_recalibrated,0.3,-0.2142857142857143,0.2857142857142857,0
+demographic.race,black or african american,transformer_recalibrated,0.5,-0.5,0.0,0
+demographic.race,unavailable,random_forest,0.05,0.43319838056680166,0.43319838056680166,0
+demographic.race,unavailable,random_forest,0.1,0.4017094017094017,0.4017094017094017,0
+demographic.race,unavailable,random_forest,0.2,0.34615384615384615,0.326923076923077,0
+demographic.race,unavailable,random_forest,0.3,0.42857142857142855,0.2307692307692308,0
+demographic.race,unavailable,random_forest,0.5,0.38461538461538464,-0.07692307692307687,0
+demographic.race,unavailable,extra_trees,0.05,0.43319838056680166,0.43319838056680166,0
+demographic.race,unavailable,extra_trees,0.1,0.41025641025641024,0.4017094017094017,0
+demographic.race,unavailable,extra_trees,0.2,0.38461538461538464,0.326923076923077,0
+demographic.race,unavailable,extra_trees,0.3,0.3516483516483516,0.2307692307692308,0
+demographic.race,unavailable,extra_trees,0.5,0.38461538461538464,-0.07692307692307687,0
+demographic.race,unavailable,hist_gradient_boosting,0.05,0.43319838056680166,0.43319838056680166,0
+demographic.race,unavailable,hist_gradient_boosting,0.1,0.3418803418803419,0.4017094017094017,0
+demographic.race,unavailable,hist_gradient_boosting,0.2,0.3076923076923077,0.326923076923077,0
+demographic.race,unavailable,hist_gradient_boosting,0.3,0.38461538461538464,0.2307692307692308,0
+demographic.race,unavailable,hist_gradient_boosting,0.5,0.38461538461538464,-0.07692307692307687,0
+demographic.race,unavailable,calibrated_logistic_regression,0.05,0.43319838056680166,0.43319838056680166,0
+demographic.race,unavailable,calibrated_logistic_regression,0.1,0.4017094017094017,0.4017094017094017,0
+demographic.race,unavailable,calibrated_logistic_regression,0.2,0.36538461538461536,0.326923076923077,0
+demographic.race,unavailable,calibrated_logistic_regression,0.3,0.3626373626373626,0.2307692307692308,0
+demographic.race,unavailable,calibrated_logistic_regression,0.5,0.3076923076923077,-0.07692307692307687,0
+demographic.race,unavailable,encoder_mc_confidence,0.05,0.43319838056680166,0.43319838056680166,0
+demographic.race,unavailable,encoder_mc_confidence,0.1,0.4017094017094017,0.4017094017094017,0
+demographic.race,unavailable,encoder_mc_confidence,0.2,0.4423076923076923,0.326923076923077,0
+demographic.race,unavailable,encoder_mc_confidence,0.3,0.3516483516483516,0.2307692307692308,0
+demographic.race,unavailable,encoder_mc_confidence,0.5,0.3076923076923077,-0.07692307692307687,0
+demographic.race,unavailable,encoder_nars_confidence,0.05,0.43319838056680166,0.43319838056680166,0
+demographic.race,unavailable,encoder_nars_confidence,0.1,0.4017094017094017,0.4017094017094017,0
+demographic.race,unavailable,encoder_nars_confidence,0.2,0.4423076923076923,0.326923076923077,0
+demographic.race,unavailable,encoder_nars_confidence,0.3,0.3516483516483516,0.2307692307692308,0
+demographic.race,unavailable,encoder_nars_confidence,0.5,0.3076923076923077,-0.07692307692307687,0
+demographic.race,unavailable,deterministic,0.05,0.43319838056680166,0.43319838056680166,0
+demographic.race,unavailable,deterministic,0.1,0.4444444444444444,0.4017094017094017,0
+demographic.race,unavailable,deterministic,0.2,0.4423076923076923,0.326923076923077,0
+demographic.race,unavailable,deterministic,0.3,0.38461538461538464,0.2307692307692308,0
+demographic.race,unavailable,deterministic,0.5,0.3076923076923077,-0.07692307692307687,0
+demographic.race,unavailable,mean_logit,0.05,0.43319838056680166,0.43319838056680166,0
+demographic.race,unavailable,mean_logit,0.1,0.4017094017094017,0.4017094017094017,0
+demographic.race,unavailable,mean_logit,0.2,0.4423076923076923,0.326923076923077,0
+demographic.race,unavailable,mean_logit,0.3,0.3516483516483516,0.2307692307692308,0
+demographic.race,unavailable,mean_logit,0.5,0.3076923076923077,-0.07692307692307687,0
+demographic.race,unavailable,baseline,0.05,0.43319838056680166,0.43319838056680166,0
+demographic.race,unavailable,baseline,0.1,0.4017094017094017,0.4017094017094017,0
+demographic.race,unavailable,baseline,0.2,0.4423076923076923,0.326923076923077,0
+demographic.race,unavailable,baseline,0.3,0.3516483516483516,0.2307692307692308,0
+demographic.race,unavailable,baseline,0.5,0.3076923076923077,-0.07692307692307687,0
+demographic.race,unavailable,flat_confidence,0.05,0.43319838056680166,0.43319838056680166,0
+demographic.race,unavailable,flat_confidence,0.1,0.4017094017094017,0.4017094017094017,0
+demographic.race,unavailable,flat_confidence,0.2,0.4423076923076923,0.326923076923077,0
+demographic.race,unavailable,flat_confidence,0.3,0.3516483516483516,0.2307692307692308,0
+demographic.race,unavailable,flat_confidence,0.5,0.3076923076923077,-0.07692307692307687,0
+demographic.race,unavailable,mc_confidence_only,0.05,0.43319838056680166,0.43319838056680166,0
+demographic.race,unavailable,mc_confidence_only,0.1,0.4017094017094017,0.4017094017094017,0
+demographic.race,unavailable,mc_confidence_only,0.2,0.4423076923076923,0.326923076923077,0
+demographic.race,unavailable,mc_confidence_only,0.3,0.3516483516483516,0.2307692307692308,0
+demographic.race,unavailable,mc_confidence_only,0.5,0.3076923076923077,-0.07692307692307687,0
+demographic.race,unavailable,nars_gated,0.05,0.43319838056680166,0.43319838056680166,0
+demographic.race,unavailable,nars_gated,0.1,0.4017094017094017,0.4017094017094017,0
+demographic.race,unavailable,nars_gated,0.2,0.4423076923076923,0.326923076923077,0
+demographic.race,unavailable,nars_gated,0.3,0.3516483516483516,0.2307692307692308,0
+demographic.race,unavailable,nars_gated,0.5,0.3076923076923077,-0.07692307692307687,0
+demographic.race,unavailable,transformer_recalibrated,0.05,0.43319838056680166,0.43319838056680166,0
+demographic.race,unavailable,transformer_recalibrated,0.1,0.4017094017094017,0.4017094017094017,0
+demographic.race,unavailable,transformer_recalibrated,0.2,0.4423076923076923,0.326923076923077,0
+demographic.race,unavailable,transformer_recalibrated,0.3,0.3516483516483516,0.2307692307692308,0
+demographic.race,unavailable,transformer_recalibrated,0.5,0.38461538461538464,-0.07692307692307687,0
+demographic.race,white,random_forest,0.05,0.46248600223964165,0.46248600223964165,0
+demographic.race,white,random_forest,0.1,0.43262411347517726,0.43262411347517726,0
+demographic.race,white,random_forest,0.2,0.3723404255319149,0.36170212765957444,0
+demographic.race,white,random_forest,0.3,0.3069908814589666,0.27051671732522786,0
+demographic.race,white,random_forest,0.5,0.2127659574468085,-0.021276595744680937,0
+demographic.race,white,extra_trees,0.05,0.46248600223964165,0.46248600223964165,0
+demographic.race,white,extra_trees,0.1,0.4349881796690307,0.43262411347517726,0
+demographic.race,white,extra_trees,0.2,0.3776595744680851,0.36170212765957444,0
+demographic.race,white,extra_trees,0.3,0.3069908814589666,0.27051671732522786,0
+demographic.race,white,extra_trees,0.5,0.10638297872340426,-0.021276595744680937,0
+demographic.race,white,hist_gradient_boosting,0.05,0.46248600223964165,0.46248600223964165,0
+demographic.race,white,hist_gradient_boosting,0.1,0.4349881796690307,0.43262411347517726,0
+demographic.race,white,hist_gradient_boosting,0.2,0.3404255319148936,0.36170212765957444,0
+demographic.race,white,hist_gradient_boosting,0.3,0.24620060790273557,0.27051671732522786,0
+demographic.race,white,hist_gradient_boosting,0.5,0.10638297872340426,-0.021276595744680937,0
+demographic.race,white,calibrated_logistic_regression,0.05,0.46248600223964165,0.46248600223964165,0
+demographic.race,white,calibrated_logistic_regression,0.1,0.43262411347517726,0.43262411347517726,0
+demographic.race,white,calibrated_logistic_regression,0.2,0.3723404255319149,0.36170212765957444,0
+demographic.race,white,calibrated_logistic_regression,0.3,0.3069908814589666,0.27051671732522786,0
+demographic.race,white,calibrated_logistic_regression,0.5,0.14893617021276595,-0.021276595744680937,0
+demographic.race,white,encoder_mc_confidence,0.05,0.46248600223964165,0.46248600223964165,0
+demographic.race,white,encoder_mc_confidence,0.1,0.43262411347517726,0.43262411347517726,0
+demographic.race,white,encoder_mc_confidence,0.2,0.3829787234042553,0.36170212765957444,0
+demographic.race,white,encoder_mc_confidence,0.3,0.3161094224924012,0.27051671732522786,0
+demographic.race,white,encoder_mc_confidence,0.5,0.0851063829787234,-0.021276595744680937,0
+demographic.race,white,encoder_nars_confidence,0.05,0.46248600223964165,0.46248600223964165,0
+demographic.race,white,encoder_nars_confidence,0.1,0.43262411347517726,0.43262411347517726,0
+demographic.race,white,encoder_nars_confidence,0.2,0.3829787234042553,0.36170212765957444,0
+demographic.race,white,encoder_nars_confidence,0.3,0.3161094224924012,0.27051671732522786,0
+demographic.race,white,encoder_nars_confidence,0.5,0.0851063829787234,-0.021276595744680937,0
+demographic.race,white,deterministic,0.05,0.46248600223964165,0.46248600223964165,0
+demographic.race,white,deterministic,0.1,0.44208037825059104,0.43262411347517726,0
+demographic.race,white,deterministic,0.2,0.3829787234042553,0.36170212765957444,0
+demographic.race,white,deterministic,0.3,0.3130699088145897,0.27051671732522786,0
+demographic.race,white,deterministic,0.5,0.06382978723404255,-0.021276595744680937,0
+demographic.race,white,mean_logit,0.05,0.46248600223964165,0.46248600223964165,0
+demographic.race,white,mean_logit,0.1,0.43262411347517726,0.43262411347517726,0
+demographic.race,white,mean_logit,0.2,0.3829787234042553,0.36170212765957444,0
+demographic.race,white,mean_logit,0.3,0.32522796352583583,0.27051671732522786,0
+demographic.race,white,mean_logit,0.5,0.0851063829787234,-0.021276595744680937,0
+demographic.race,white,baseline,0.05,0.46248600223964165,0.46248600223964165,0
+demographic.race,white,baseline,0.1,0.43262411347517726,0.43262411347517726,0
+demographic.race,white,baseline,0.2,0.3829787234042553,0.36170212765957444,0
+demographic.race,white,baseline,0.3,0.32522796352583583,0.27051671732522786,0
+demographic.race,white,baseline,0.5,0.0851063829787234,-0.021276595744680937,0
+demographic.race,white,flat_confidence,0.05,0.46248600223964165,0.46248600223964165,0
+demographic.race,white,flat_confidence,0.1,0.43262411347517726,0.43262411347517726,0
+demographic.race,white,flat_confidence,0.2,0.3829787234042553,0.36170212765957444,0
+demographic.race,white,flat_confidence,0.3,0.32522796352583583,0.27051671732522786,0
+demographic.race,white,flat_confidence,0.5,0.0851063829787234,-0.021276595744680937,0
+demographic.race,white,mc_confidence_only,0.05,0.46248600223964165,0.46248600223964165,0
+demographic.race,white,mc_confidence_only,0.1,0.43262411347517726,0.43262411347517726,0
+demographic.race,white,mc_confidence_only,0.2,0.3829787234042553,0.36170212765957444,0
+demographic.race,white,mc_confidence_only,0.3,0.3161094224924012,0.27051671732522786,0
+demographic.race,white,mc_confidence_only,0.5,0.0851063829787234,-0.021276595744680937,0
+demographic.race,white,nars_gated,0.05,0.46248600223964165,0.46248600223964165,0
+demographic.race,white,nars_gated,0.1,0.43262411347517726,0.43262411347517726,0
+demographic.race,white,nars_gated,0.2,0.3829787234042553,0.36170212765957444,0
+demographic.race,white,nars_gated,0.3,0.3161094224924012,0.27051671732522786,0
+demographic.race,white,nars_gated,0.5,0.0851063829787234,-0.021276595744680937,0
+demographic.race,white,transformer_recalibrated,0.05,0.46248600223964165,0.46248600223964165,0
+demographic.race,white,transformer_recalibrated,0.1,0.43262411347517726,0.43262411347517726,0
+demographic.race,white,transformer_recalibrated,0.2,0.3829787234042553,0.36170212765957444,0
+demographic.race,white,transformer_recalibrated,0.3,0.3161094224924012,0.27051671732522786,0
+demographic.race,white,transformer_recalibrated,0.5,0.14893617021276595,-0.021276595744680937,0

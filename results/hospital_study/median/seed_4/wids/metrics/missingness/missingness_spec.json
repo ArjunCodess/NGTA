@@ -1,0 +1,53 @@
+{
+  "schema_version": 2,
+  "mask_columns": [
+    "age",
+    "bmi",
+    "d1_heartrate_max",
+    "d1_sysbp_min",
+    "d1_temp_max",
+    "d1_lactate_max",
+    "d1_bun_max",
+    "d1_creatinine_max",
+    "d1_glucose_max",
+    "d1_wbc_max",
+    "d1_spo2_min",
+    "d1_platelets_min",
+    "apache_4a_hospital_death_prob",
+    "elective_surgery",
+    "gender"
+  ],
+  "rates": [
+    0.0,
+    0.1,
+    0.3,
+    0.5,
+    0.7
+  ],
+  "seed": 0,
+  "scenarios": [
+    "random",
+    "feature_dependent",
+    "outcome_dependent_simulation"
+  ],
+  "outcome_dependent_policy": "simulation only: positives weight 1.5, negatives 0.5; never used for model selection",
+  "frozen_digest": "a2696346168651c172fdb019d9ac2438e1ee39678260cb0da99f9f0077f8177e",
+  "rule_input_policy": "observed_only",
+  "feature_dependent_weights": [
+    0.5,
+    0.5714285714285714,
+    0.6428571428571428,
+    0.7142857142857143,
+    0.7857142857142857,
+    0.8571428571428571,
+    0.9285714285714286,
+    1.0,
+    1.0714285714285714,
+    1.1428571428571428,
+    1.2142857142857142,
+    1.2857142857142856,
+    1.3571428571428572,
+    1.4285714285714284,
+    1.5
+  ]
+}

@@ -1,15 +1,15 @@
 # NGTA
 
-**NARS-Guided Transformer Attention for clinical transformers under extreme missingness**
+**NARS-Guided Transformer Attention for clinical transformers with incomplete inputs**
 
-**TL;DR:** NGTA is a clinical transformer that does not just rank patients; it tries to tell the truth about its own uncertainty. It estimates epistemic uncertainty with MC Dropout, heuristically converts that uncertainty into initial NARS-style truth values, injects explicit human-written medical rules at inference time, and feeds the revised confidence back into attention so brittle evidence is downweighted before the final prediction is made.
+NGTA is an auditable inference-time interface for uncertainty-conditioned symbolic intervention. MC dropout initializes heuristic truth values; explicit prototype rules revise confidence and change the transformer readout or encoder attention. Matched dropout controls, complete event exports and independent replay make the computation inspectable. Clinical improvement and reviewer benefit require further evidence.
 
-NGTA is a neurosymbolic clinical prediction architecture that maps neural uncertainty into NARS truth values and feeds revised confidence back into Transformer attention during inference. The repository now supports two benchmarks in parallel:
+NGTA is a neurosymbolic clinical prediction architecture that maps neural uncertainty into NARS truth values and feeds revised confidence back into Transformer attention during inference. The repository supports two benchmark tasks:
 
 - `tcga`: TCGA-THCA lymph node metastasis prediction from merged clinical tables plus a mutation-derived binary gene panel
-- `wids`: WiDS Datathon 2020 ICU hospital mortality prediction from a high-missingness ICU tabular cohort
+- `wids`: WiDS Datathon 2020 ICU hospital mortality prediction from first-day ICU measurements with feature-specific missingness
 
-The anonymous NeurIPS 2026 workshop manuscript is [`paper/main.tex`](paper/main.tex), with the compiled submission at [`paper/main.pdf`](paper/main.pdf).
+The anonymous NeurIPS 2026 workshop manuscript is [`paper/main.tex`](paper/main.tex), with its compiled PDF at [`paper/main.pdf`](paper/main.pdf). NeurIPS formatting files are local to `paper/`.
 
 ## April 21, 2026 Feedback Update
 
@@ -26,61 +26,52 @@ Repository updates made from that feedback:
 
 ## Key Achievements
 
-- **Inference-Time Logic Injection:** Fuses MC-Dropout epistemic uncertainty with NARS symbolic logic and pushes the revised confidence signal directly into Transformer attention during inference.
-- **Scale & Calibration:** Benchmarked on `91,713` ICU stays. The baseline has the highest AUC point estimate (`0.88034`), while MC-confidence-only has the lowest Brier (`0.056468`) and ECE (`0.005808`) point estimates. NARS-gated is nearly identical to MC-confidence-only. Its paired Brier and ECE improvements over the ungated baseline exclude zero, but its comparisons with flat-confidence and MC-confidence-only include zero, so the run supports confidence gating without isolating a symbolic-revision advantage.
-- **Glass-Box Activity:** On held-out WiDS ICU data, explicit symbolic rules fired in `8551` of `13757` stays for `13031` total feature-level revisions, showing that the logic layer is active rather than decorative.
-- **Multi-Modal Ready:** Demonstrated on fused clinical tabular features and genomic mutation matrices on TCGA-THCA, where the same interface remains operational as a clinical-plus-genomic proof of concept. The TCGA transformer variants are not statistically separated from one another on the 69-case held-out split.
+- **Matched inference:** Ungated, uniform, MC-only and NARS readout gates use identical cached dropout passes and mean per-pass probabilities. Uniform gating reproduces ungated inference within 1e-7.
+- **Valid data handling:** Training-only feature selection, standardized KNN distances, explicit unknown genomic calls, disjoint WiDS split options and observed-only rule triggers prevent the identified preprocessing errors.
+- **Independent auditability:** Every rule trigger is exported, including unmapped triggers. Independent replay reconstructs predicates, revisions, gates, predictions and rule-off effects and checks file integrity.
+- **Research controls:** Standard tabular/APACHE baselines, rule removal and random controls, encoder intervention, multi-seed exports, ensemble uncertainty and raw missingness experiments are supported. These are implemented controls, not demonstrated clinical superiority.
 
 ## Overview
 
 ### What it does
 
-NGTA is a medical prediction system for messy hospital-style tables where many values are missing. It uses a Transformer to make predictions, but it does not stop at producing a single risk score. It estimates epistemic uncertainty, checks a set of human-written medical rules, and then uses both pieces of information to adjust how the model pays attention to the input features before the final output is emitted.
+NGTA processes incomplete clinical tables with a tabular transformer, estimates attention and predictive stability across dropout passes, and applies explicit prototype rules at inference. It saves the full intervention path alongside risk predictions so a reader can reconstruct what changed.
 
 ### Why it matters
 
-Many clinical AI systems can give a strong prediction even when the data are incomplete or unreliable. That is dangerous in real settings because missing hospital data can produce overconfident probabilities that look trustworthy when they are not. NGTA is designed to separate "high score" from "high confidence" and to expose a human-readable revision path when symbolic rules intervene. The current experiments measure calibration and trace fidelity under high missingness; they do not establish clinical safety.
-
-In standard clinical prediction, models optimize for point-estimate accuracy but lack native mechanisms to express epistemic doubt, leading to overconfident extrapolation when faced with missing features. NGTA is built around the opposite design goal: instead of a black-box predictor that guesses blindly across data gaps, it calculates feature-level uncertainty and can route attention toward explicit medical heuristics when uncertainty is high. In that sense, the repository's core contrast is simple: standard transformers behave like black boxes, while NGTA is designed to behave like a glass box.
+The interface makes uncertainty-conditioned interventions explicit and inspectable. It is intended to help investigate how rules change inference on incomplete measurements. Neither clinical safety nor improved human oversight follows from numerical replay; those outcomes require their own studies.
 
 ### What is novel here
 
-The main novelty is not just "Transformer + rules." The key idea is that NGTA turns neural uncertainty into explicit symbolic truth values in a NARS-compatible evidential space, revises those values with domain rules, and then feeds the revised confidence back into Transformer attention. In simple terms: the model can use both learned patterns and symbolic evidence to decide how much trust to place in each feature at inference time, while also leaving behind an auditable evidential trace.
+The interface grounds triggered symbolic rules with selected NAL deduction/revision functions and feeds revised confidence into the inference computation. The default changes the final attention-weighted token-score readout; `--encoder-intervention` biases feature keys inside every attention layer and recomputes contextual representations with replayed dropout RNG.
 
-This repository is not a full NARS cognitive architecture. It operationalizes selected NAL truth-value functions as an interface layer for a clinical transformer: heuristic neural truth initialization, explicit symbolic deduction from triggered observations, and revision-based fusion before attention reweighting.
-
-The end result is not just another tabular model with a rules layer attached to the side. It is a prototype auditable reasoning interface: instead of emitting only a scalar score, the system exposes uncertainty and provides a direct insertion point for human-authored physiological rules in the inference path. We refer to this uncertainty-conditioned attention update as Dynamic Evidential Routing. Calibration measurement, rule-based intervention, and operational auditability appear in the same implemented inference loop; clinician steerability and usability remain to be evaluated.
+This is not a complete NARS cognitive architecture. Neural feature frequency is an attention weight, whereas symbolic frequency describes a proposition. Revised frequency is logged but does not drive the confidence gate, and the neural/rule pathways share clinical inputs. Direct confidence-boost and frequency-sensitivity controls test those limitations.
 
 ### How it works
 
-1. The Transformer reads the patient features and predicts risk.
-2. Monte Carlo dropout is used to measure how stable that prediction is across repeated passes.
-3. That uncertainty is heuristically converted into initial NARS-style truth values: frequency and confidence.
-4. If a symbolic rule fires, the rule is first grounded by explicit NAL deduction from an empirical observation and then combined with the neural truth value using NARS revision.
-5. The revised confidence is used to reweight attention, so uncertain or weakly supported features matter less.
-6. The pipeline then evaluates discrimination, calibration, decision curves, symbolic trigger activity, and baseline comparisons.
+1. Fit feature selection, preprocessing and the transformer using training data; use validation data for model selection.
+2. Cache every MC-dropout pass's native logits, probabilities, attention, token scores, CLS logits and RNG state.
+3. Initialize feature truth values heuristically from attention mean and variance.
+4. Extract rules from observed measurements, ground their prototype truth values and revise the corresponding neural values.
+5. Score ungated, uniform, MC-only, NARS and ablation gates on the same passes; average probabilities after sigmoid. Save encoder interventions separately.
+6. Export calibration/discrimination, paired comparisons, subgroup/decision curves and complete events; independently replay the persisted inference.
 
 ### Why there are two datasets
 
-The two benchmarks test different strengths of the architecture:
-
-- `tcga` is the multi-modal proof of concept. It shows that NGTA can fuse clinical variables with a genomic mutation matrix without breaking the mathematical interface.
-- `wids` is the primary empirical validation. It shows that the same architecture scales to a much larger ICU dataset with heavy missingness and gives the clearest large-scale view of calibration, uncertainty routing, and symbolic activity.
+- `tcga` exercises the clinical/genomic input interface for retrospective post-pathology lymph-node association. The acquired cohort now has recorded mutation positives in 50 of 69 held-out cases and 39 BRAF rule events; complete callable assay panels and measurement chronology remain unverified.
+- `wids` supplies a larger first-day ICU mortality task. Patient- and hospital-disjoint splitting is supported. Training separate models on these two tasks is not independent-cohort validation.
 
 ### What we found
 
-The main result is that NGTA works as intended on both a small multi-modal cancer dataset and a much larger high-missingness ICU dataset, but the two datasets support different claims.
+The current development studies contain 20 hospital-held-out WiDS fits across KNN/median imputation, APACHE inclusion/exclusion and five seeds, plus 15 TCGA clinical-only/genomic-only/fused fits. Each uses up to 60 epochs with validation early stopping, 50 matched dropout passes and three independent dropout repeats. Five-model ensembles, validation recalibration, symbolic controls, subgroup metrics and decision curves are exported alongside complete intervention replay.
 
-- On `tcga`, the Transformer-based models still beat the random-forest baseline numerically. The current best default AUC is `0.73277` for `flat_confidence`, versus `0.66134` for random forest. `nars_gated` reports AUC `0.73109` and Brier score `0.21094`. This supports the claim that the interface can learn useful signal from combined clinical and genomic inputs, but it does not support a claim that NARS gating is statistically better than the other Transformer variants.
-- The flat-confidence control is the strongest TCGA Transformer variant by point estimate in the current default run because it has the highest AUC (`0.73277`), the lowest Brier score (`0.21091`), and the lowest ECE (`0.11779`). TCGA should therefore still be treated as a multi-modal interface proof of concept rather than evidence that dynamic NARS gating dominates simpler confidence gates on very small cohorts.
-- On `wids`, all Transformer variants are extremely close on AUC around `0.8802--0.8803`. The baseline leads AUC (`0.88034`), while MC-confidence-only has the lowest Brier (`0.056468`) and ECE (`0.005808`) point estimates. NARS-gated differs only in the sixth Brier decimal and fifth ECE decimal (`0.056469`, `0.005833`).
-- Paired bootstrap comparisons show lower Brier and ECE for NARS-gated than for the ungated baseline, with both intervals excluding zero. However, comparisons against flat-confidence and MC-confidence-only include zero. The evidence therefore supports confidence-based routing relative to the ungated model, but it does not identify symbolic revision as the source of that improvement.
-- The WiDS result still matters because NARS-gated has a lower Brier score than the random forest with a paired interval excluding zero, the transformer family has higher AUC point estimates, and the symbolic path is physically active during inference. AUC intervals overlap, and the random-forest ECE comparison includes zero, so these are not broad superiority claims.
-- The symbolic rules were not just decorative. On the held-out WiDS test set, ICU rules fired in `8551` of `13757` cases for `13031` total feature-level revisions, which means the neurosymbolic revision path was active at scale rather than sitting unused.
-- Operational audit checks were complete: every TCGA and WiDS trigger mapped to a feature, every trigger trace was finite, every triggered rule changed confidence and attention, and independently recomputed revision and gating residuals were `0`. Routing changed the baseline threshold decision in `0` triggered TCGA cases and `10` triggered WiDS cases. These are implementation-fidelity results, not clinician-usability or clinical-correctness evidence.
-- Taken together, the results support a narrower and more defensible claim than "always better accuracy": NGTA is competitive on discrimination, operational as a human-auditable instrumentation layer under heavy missingness, and strongest as a framework for explicit uncertainty routing rather than as a proved winner over every control.
+The planned symbolic Brier benefit of 0.0001 is not established. For WiDS KNN, mean NARS-minus-MC Brier is -0.000000243 with hierarchical 95% interval [-0.000000691, 0.000000164]. Removing APACHE reduces mean ungated AUROC from 0.875721 to 0.841118. These are development results on already inspected cohorts; internal held-out hospitals do not establish external compatibility. The original numerical tables below remain historical evidence with their aggregation and audit limitations disclosed.
 
-Put differently: the main architectural achievement here is auditability-oriented behavior, not just ranking performance. NGTA turns the transformer's attention update into an inspectable inference path where uncertainty is explicit, rule interventions are traceable, and probability reliability can be measured rather than simply assumed.
+The full masking study passes its paired degradation/harm criteria in 12 of 15 median seed/scenario combinations and 1 of 15 KNN combinations. None of the five KNN random or feature-dependent scenarios passes, so the results do not support a general routing-robustness claim. Individual acceptance reports and uncertainty intervals remain available for inspection.
+
+For the fixed WiDS KNN ensemble, predictive variance detects threshold errors above chance (AUROC 0.842276), while neural and revised attention-confidence scores yield 0.514950 and 0.500647 with hospital-bootstrap intervals spanning 0.5. The routing confidence therefore remains an unvalidated trust signal even when predictive uncertainty is informative.
+
+[list.md](list.md) tracks genuinely completed work. The detailed research audit is in [docs/research-audit.md](docs/research-audit.md), leaving this README focused on the project and its use.
 
 ## Running
 
@@ -112,14 +103,27 @@ Useful flags:
 - `--data-dir`: directory containing the TCGA tables / MAF files and `wids_icu.csv`
 - `--output-dir`: base directory for per-dataset outputs
 - `--epochs`, `--batch-size`, `--learning-rate`, `--weight-decay`
-- `--mc-samples`, `--gamma`, `--seed`
+- `--mc-samples`, `--gamma`, `--seed`; `--split-seed` holds partitions fixed across training seeds
 - `--d-model`, `--num-heads`, `--num-layers`, `--dropout`, `--patience`
 - `--seeds 0 1 2 3 4`: run multiple seeds and aggregate submission-ready metrics
 - `--baseline-set standard`: add calibrated logistic regression, ExtraTrees, and histogram gradient boosting baselines
 - `--ablation-set submission`: add symbolic-disabled and rule-truth sensitivity summaries
 - `--export-case-traces`: write curated glass-box case traces for representative held-out patients
 - `--paper-tables`: export aggregate CSV and LaTeX tables under `results/submission`
-- `--skip-paper-figures`: skip automatic regeneration of the paper figures under `paper/figures`
+- `--skip-paper-figures`: skip automatic generation under `<output-dir>/paper_figures`
+- `--ensemble-size 5`: train five seeded models and compare MC-dropout variance, predictive entropy, and deep-ensemble variance
+- `--shift-eval`: mask originally observed raw values and rerun frozen preprocessing, rules and matched inference
+- `--audit-data`: export source hashes, missingness, coverage, conflicts and exact case partitions without training
+- `--split-mode hospital`: use hospital-disjoint WiDS partitions; patient-disjoint is the default
+- `--without-apache`: remove APACHE from feature-based predictors while preserving score-only comparators
+- `--encoder-intervention`: compare intervention inside every encoder attention layer with readout gating
+- `--evaluation-lock PATH`: reject changed configuration, sources, splits or rules before training/exports; this is not prospective preregistration
+- `--imputation knn|median`: select the training-fitted imputer
+- `--mc-repeats 3`: save independent dropout repetitions in addition to training-seed variation
+- `--cache-dir .cache/ngta`: reuse preprocessing only when source hashes, splits, options and preprocessing code match
+- `--resume`: reuse a compatible saved checkpoint; reject changed training provenance before writing artifacts
+- `--feature-mode all|clinical|genomic`: compare TCGA modalities on identical case partitions with training-only preprocessing
+- `--shuffle-training-labels`: run a labeled neural negative control without changing classical baseline targets
 
 Notes:
 
@@ -134,7 +138,7 @@ Submission-oriented run:
 python main.py --run-all --seeds 0 1 2 3 4 --baseline-set standard --ablation-set submission --export-case-traces --paper-tables
 ```
 
-This writes:
+This writes submission artifacts under the selected output directory:
 
 - `results/submission/multiseed_metrics.csv`
 - `results/submission/baseline_comparison.csv`
@@ -143,12 +147,13 @@ This writes:
 - `results/submission/auditability_metrics.csv`
 - `results/submission/paired_metric_deltas.csv`
 - `results/submission/paper_tables.tex`
-- refreshed paper figures under `paper/figures`
+- run-specific figures under `<output-dir>/paper_figures`
 
-Paper figures are regenerated automatically at the end of a complete run when both TCGA and WiDS result directories are available under the selected `--output-dir`. The LaTeX paper references stable figure paths, so recompiling `paper/main.tex` picks up the updated images and generated tables. The same step can be run directly:
+Paper figures require matching result schemas and independently replayed sources. The manuscript's existing figure paths now contain explicitly selected five-seed TCGA fused and WiDS KNN results. Current tables record their sources in `paper/figures/current_results_manifest.json`; seed-mean intervals are distinct from case-bootstrap intervals. Regenerate them with:
 
 ```bash
-python -c "from src.paper_figures import generate_paper_figures; generate_paper_figures('results')"
+python -c "from src.paper_figures import generate_paper_figures; generate_paper_figures(seeds=[0,1,2,3,4], dataset_roots={'tcga':'results/tcga_study/fused','wids':'results/hospital_study/knn'})"
+python scripts/refresh_paper_results.py
 ```
 
 The submission artifacts support an auditability-first framing: NGTA is a glass-box evidential routing interface for clinical transformers, with performance treated as compatibility evidence rather than as a claim of universal superiority. `auditability_metrics.csv/json` reports held-out rule coverage, trace completeness, arithmetic residuals, attention effects, probability changes, and threshold flips. These are operational checks, not a clinician usability evaluation.
@@ -168,41 +173,37 @@ TCGA expects the following in [`data/`](data):
 
 WiDS expects:
 
-- `wids_icu.csv`
+- `wids_icu.csv` with patient/hospital IDs for the corresponding grouped split
+
+An optional `assay_manifest.csv` contains `case_submitter_id,gene,source,verified`, with unique case/gene pairs and sourced callable coverage for verified negatives. A missing mutation record is unknown, not a negative. The acquired source is isolated under `data/acquired_tcga/`: its immutable manifest pins 498 GDC files, publisher checksums, exact extracted-byte hashes and coverage. Sixteen expected clinical cases lack file-associated coverage; coverage is not gene-level callability. Original sparse source files remain historical. Cross-table timing is unverified; pathology features support retrospective association, not preoperative prediction.
+
+`python scripts/audit_tcga_timing.py` checks dates on the selected physical records and all frozen model/rule inputs. Diagnosis dates exist, but all 507 pathology records lack pathology dates. [docs/source-evidence.md](docs/source-evidence.md) records those counts, the public APACHE evidence and the exact metadata still required.
+
+```powershell
+python main.py --run-all --audit-data --split-mode hospital --output-dir results/source_audit
+python -m src.trace_replay results/v2_smoke/tcga/traces
+```
 
 ## WiDS Configuration
 
-The WiDS branch uses exactly these 15 core features:
+The default feature set contains 13 numeric measurements (`age`, `bmi`, day-one vital/laboratory extrema and `apache_4a_hospital_death_prob`), binary `elective_surgery` and categorical `gender`. `--without-apache` removes the score from feature-based models.
 
-- Continuous numeric: `age`, `bmi`, `d1_heartrate_max`, `d1_sysbp_min`, `d1_temp_max`, `d1_lactate_max`, `d1_bun_max`, `d1_creatinine_max`, `d1_glucose_max`, `d1_wbc_max`, `d1_spo2_min`, `d1_platelets_min`, `apache_4a_hospital_death_prob`
-- Binary pass-through: `elective_surgery`
-- Categorical: `gender`
+Preprocessing fits training data only: clean invalid values, standardize numeric KNN distances, impute, scale final numeric features and one-hot encode gender. Patient-disjoint splitting is the default; hospital-disjoint evaluation is selected explicitly. The source audit has zero patient/hospital/ICU overlap under the hospital split.
 
-Preprocessing rules:
+APACHE values outside [0,1] are unavailable: 2,371 such values occur locally. Selected-feature missingness after cleaning is 10.3559%, while lactate is 74.5761% missing. Authoritative sentinel semantics and score availability remain to be verified.
 
-- `pd.read_csv(..., na_values=['NA'])`
-- drop rows where `hospital_death` is missing
-- stratified `70/15/15` split with the run seed
-- `KNNImputer(n_neighbors=5)` on the 13 continuous features, fit on train only
-- `SimpleImputer(strategy='most_frequent')` + one-hot encoding for `gender`
-- `StandardScaler` on the 13 continuous features only, fit on train only
-
-WiDS symbolic ICU rules are evaluated after KNN imputation and before scaling:
-
-- `d1_lactate_max >= 4.0`
-- `d1_sysbp_min <= 90.0`
-- `age >= 75.0`
-- `d1_creatinine_max >= 2.0`
+Rules require observed values: lactate >=4 mmol/L, systolic pressure in [0,90] mmHg, age >=75 years and creatinine >=2 mg/dL. Imputed values and suppressed imputed-only triggers are separate diagnostics; the masking study names its imputed-rule comparator explicitly.
 
 ## Interpretation Caveats
 
-This repository is a first methods implementation, not a clinical validation package.
+This repository is a research implementation, not a clinical validation package.
 
-- The TCGA held-out split has only `69` cases. The transformer variants are close and should not be described as statistically separated from one another.
-- The symbolic rule bases are deliberately thin: four thyroid rules and four ICU rules. They demonstrate that the NARS revision path is active, but they are not independently curated clinical ontologies.
-- Following feedback from Pei Wang on April 21, 2026, the repository treats the variance-to-confidence map as an application-specific heuristic initializer, not as a claim that model variance directly measures NARS evidence amount.
-- The current results do not establish that these exact hand-selected rules are sufficient or optimal. A stronger study would lock a broader expert-curated rule base before evaluation and report sensitivity to rule inclusion and truth-value assignments.
-- There is no external validation cohort in this snapshot. Clinical claims would require temporally or institutionally independent test cohorts with locked preprocessing, model settings, and rule definitions.
+- The acquired TCGA held-out split has 69 cases with recorded positives and replayed genomic interventions, but complete callable panels and verified negatives remain unavailable. The earlier sparse source did not demonstrate held-out genomic intervention.
+- The four thyroid and four ICU rules are prototype probes with version/source metadata; all require clinical expert review. Shared inputs do not establish independent evidence, and same-target collision checks do not resolve correlated propositions.
+- Following Pei Wang's April 21, 2026 feedback, variance-to-confidence is an application-specific heuristic, not native NARS evidence amount.
+- Matched inference and complete numerical replay establish implementation behavior. Full development comparisons fail the symbolic benefit threshold; masking criteria apply to their stated simulations. Clinical equivalence, external compatibility and reviewer usefulness remain unestablished.
+- Existing outcomes have already been inspected. A file lock preserves configuration but cannot make those outcomes unseen; prospective confirmation needs a defensible fresh evaluation.
+- Verified assay/timing metadata, an eligible independent cohort, expert review and reviewer participants are external dependencies. [docs/research-audit.md](docs/research-audit.md) lists the exact evidence and actions needed for each unfinished task. [Data access instructions](docs/get-needed-data.md) give the official websites and steps; [email drafts](docs/email-templates.md) cover source custodians, clinical reviewers and Pei Wang.
 
 ## Outputs
 
@@ -219,6 +220,22 @@ Top-level orchestration output:
 
 - `<output-dir>/run_all_summary.json`
 
+Per-dataset bundles also preserve `model.pt`, fitted `preprocessor.joblib`, classical estimators, `evaluation_spec.json`, source hashes and split IDs. Complete replay uses `raw_test.csv`, `inference_cache.npz`, `replay_spec.json`, `intervention_events.csv`, hashes and saved MC RNG. Optional ensemble/encoder outputs remain separate.
+
+Full studies are under `results/hospital_study/` and `results/tcga_study/`; each condition has five seed directories, aggregate submission exports and `analysis/` seed/ensemble/hierarchical comparisons. Missingness outputs preserve raw masks, matched probabilities, selective-risk curves and paired acceptance reports. Generated hospital estimators and inference arrays are stored separately from Git. Exact replay after cloning requires restoring the approved artifact archive; the training commands can regenerate these files. See [artifact storage and verification](docs/artifact-storage.md).
+
+To reproduce the main hospital study and its frozen masking analysis:
+
+```bash
+python main.py --dataset wids --split-mode hospital --imputation knn --seeds 0 1 2 3 4 --split-seed 0 --epochs 60 --mc-samples 50 --mc-repeats 3 --cache-dir .cache/ngta --baseline-set standard --ablation-set submission --skip-paper-figures --output-dir results/hospital_study/knn
+python scripts/evaluate_study.py --root results/hospital_study/knn --mask-seeds 0 1 2 3 4
+python scripts/uncertainty_intervals.py --root results/hospital_study/knn
+```
+
+`scripts/tcga_controls.py` runs the clinical/genomic controls. `scripts/evaluate_external.py --help` documents frozen independent-cohort evaluation with explicit units, windows, rule-only inputs and patient overlap checks. `scripts/reviewer_study.py --help` prepares and analyzes a reviewer study; the committed package is a demonstration with public investigator answers, so generate a fresh private package before recruitment. `requirements-lock.windows-py314.txt` records the actual run environment; its CUDA Torch wheel uses the matching PyTorch wheel index.
+
+The open PhysioNet 2012 sensitivity uses 12,000 cases, first-24-hour inputs and the frozen no-APACHE checkpoints. Reproduce acquisition with `python scripts/prepare_physionet2012.py --download` and evaluation with `python scripts/evaluate_cross_source.py`. Source hashes, missing inputs, seed metrics and independently replayable traces are saved under `results/cross_source_sensitivity/physionet2012/`. Its single-center case intervals and unverified source identity/window equivalence do not establish independent clinical validation. [docs/artifact-storage.md](docs/artifact-storage.md) explains how to restore the separately stored inference arrays for exact replay.
+
 Per-dataset metrics/traces include:
 
 - `metrics.csv`
@@ -231,11 +248,13 @@ Per-dataset metrics/traces include:
 - `auditability_metrics.csv` and `auditability_metrics.json`
 - ROC, calibration, training-history, gamma-ablation, and decision-curve plots
 
-`metrics.csv` reports 95% bootstrap confidence intervals for AUC, Brier score, and ECE across the random forest, baseline transformer, flat-confidence transformer, MC-confidence-only ablation, and NARS-gated transformer. Run summaries and `results/submission/paired_metric_deltas.csv` include paired Brier/ECE differences between NARS-gated routing and each transformer control.
+`metrics.csv` reports 95% bootstrap confidence intervals for AUC, Brier score, and ECE across the random forest, baseline transformer, flat-confidence transformer, MC-confidence-only ablation, and NARS-gated transformer. Run summaries and paired-comparison exports include observed AUROC/Brier/ECE/log-loss deltas separately from bootstrap means and multiplicity-adjusted intervals against every saved comparator. WiDS resamples hospitals. Subgroup metrics and threshold decision curves include MC-only.
 
 ## Latest Full Run
 
-The current default full run was produced with:
+The numbers in this section are the archived earlier implementation, not results from the corrected main implementation. Different aggregation confounds baseline/gated comparisons, rules could trigger after imputation, and revision audits reused production arithmetic. Preserve the numerical record without interpreting it as a clinical or symbolic benefit. Current run status and replay evidence are linked in [docs/research-audit.md](docs/research-audit.md).
+
+The archived default full run was produced with:
 
 ```bash
 python main.py --run-all
@@ -253,7 +272,7 @@ The numerical summary below is sourced from these per-dataset artifacts. The exi
 
 TCGA-THCA full-run summary:
 
-Role in the paper: multi-modal proof of concept for clinical-plus-genomic fusion
+Historical role: clinical/genomic input demonstration; its sparse held-out source did not establish genomic fusion.
 
 - Split: `319 / 69 / 69` train/validation/test from `457` labeled cases
 - Best default AUC: `0.73277` for `flat_confidence` with 95% CI `[0.60282, 0.84794]`
@@ -264,7 +283,7 @@ Role in the paper: multi-modal proof of concept for clinical-plus-genomic fusion
 - NARS-gated: AUC `0.73109`, Brier `0.21094`, ECE `0.11837`, accuracy `0.68116`
 - Symbolic activity: `42 / 69` held-out cases with any trigger, `79` total feature-level revisions
 - Operational auditability: `100%` trigger mapping and finite traces; all `79` rule events changed confidence and attention; mean/median/maximum absolute probability changes among triggered cases were `0.00205 / 0.00185 / 0.00600`; no triggered case crossed the `0.5` threshold; revision and gate residuals were `0`.
-- Interpretation: the flat-confidence control is strongest by TCGA point estimates, but all paired Brier/ECE comparisons between NARS-gated and the Transformer controls include zero. The 69-case split supports multimodal feasibility, not model-ranking or symbolic-gating superiority.
+- Interpretation: the flat-confidence control is strongest by these historical point estimates, but all paired Brier/ECE comparisons between NARS-gated and the transformer controls include zero. This sparse held-out source did not establish multimodal feasibility or symbolic benefit.
 
 WiDS ICU full-run summary:
 
@@ -289,7 +308,7 @@ Role in the paper: primary scale test for missingness, calibration, and operatio
 - `random_forest -> nars_gated` Brier `0.058169 -> 0.056469`; paired delta CI `[0.0009628, 0.0023993]`
 - `random_forest -> nars_gated` ECE `0.007372 -> 0.005833`; paired delta CI `[-0.0038679, 0.0079440]`
 - AUC confidence intervals overlap across all WiDS variants.
-- Interpretation: the paired baseline comparison supports a small calibration benefit from confidence-gated inference, while the flat-confidence and MC-confidence comparisons do not isolate an additional benefit from symbolic revision. The `10` baseline-to-NARS threshold flips likewise measure the entire routing path; the updated prediction export has no threshold flips between MC-confidence-only and NARS-gated predictions.
+- Interpretation: unmatched dropout aggregation confounds the historical baseline comparison, so its small calibration difference cannot establish a gating benefit. The `10` baseline-to-NARS threshold flips measure the entire inference change; MC-confidence-only and NARS-gated predictions had no different threshold decisions in that archived run.
 - Per-rule test triggers:
   - `rule_lactate: 1936`
   - `rule_hypotension: 5338`

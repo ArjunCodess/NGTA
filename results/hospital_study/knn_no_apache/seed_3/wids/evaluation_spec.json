@@ -1,0 +1,108 @@
+{
+  "schema_version": 2,
+  "config": {
+    "dataset": "wids",
+    "epochs": 60,
+    "batch_size": 512,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "mc_samples": 50,
+    "gamma": 2.0,
+    "seed": 3,
+    "split_seed": 0,
+    "patience": 12,
+    "d_model": 64,
+    "num_heads": 4,
+    "num_layers": 2,
+    "dropout": 0.2,
+    "baseline_set": "standard",
+    "ablation_set": "submission",
+    "ensemble_size": 0,
+    "run_shift_eval": false,
+    "split_mode": "hospital",
+    "include_apache": false,
+    "encoder_intervention": false,
+    "imputation": "knn",
+    "shuffle_training_labels": false,
+    "mc_repeats": 3,
+    "feature_mode": "all"
+  },
+  "rules": {
+    "rule_lactate": {
+      "condition": "maximum day-1 lactate >= 4.0 mmol/L",
+      "description": "Elevated lactate supplies prototype evidence of metabolic stress.",
+      "clinical_interpretation": "The rule increases support for the lactate feature without diagnosing shock or determining mortality.",
+      "source_column": "d1_lactate_max",
+      "target_key": "d1_lactate_max",
+      "truth_value": {
+        "frequency": 0.85,
+        "confidence": 0.8
+      },
+      "source": "Prototype lactate probe at 4 mmol/L, a historical severe-sepsis screen. Not a Surviving Sepsis treatment instruction.",
+      "provenance": "ngta.rule.wids.lactate.v1",
+      "expert_review": "not_reviewed",
+      "contradiction_group": "lactate_at_least_4"
+    },
+    "rule_hypotension": {
+      "condition": "minimum day-1 systolic blood pressure <= 90 mmHg",
+      "description": "Low systolic blood pressure supplies prototype evidence of hemodynamic instability.",
+      "clinical_interpretation": "The rule increases support for the blood-pressure feature; it is not a stand-alone mortality decision.",
+      "source_column": "d1_sysbp_min",
+      "target_key": "d1_sysbp_min",
+      "truth_value": {
+        "frequency": 0.75,
+        "confidence": 0.7
+      },
+      "source": "Prototype hypotension screen at a systolic pressure of 90 mmHg. Not an expert-reviewed NGTA rule.",
+      "provenance": "ngta.rule.wids.hypotension.v1",
+      "expert_review": "not_reviewed",
+      "contradiction_group": "systolic_at_most_90"
+    },
+    "rule_age": {
+      "condition": "age >= 75 years",
+      "description": "Age of at least 75 years supplies prototype demographic evidence.",
+      "clinical_interpretation": "The rule increases support for the age feature without treating age as sufficient for mortality.",
+      "source_column": "age",
+      "target_key": "age",
+      "truth_value": {
+        "frequency": 0.65,
+        "confidence": 0.6
+      },
+      "source": "Prototype age stratum at 75 years. Not a treatment threshold.",
+      "provenance": "ngta.rule.wids.age.v1",
+      "expert_review": "not_reviewed",
+      "contradiction_group": "age_at_least_75"
+    },
+    "rule_creatinine": {
+      "condition": "maximum day-1 creatinine >= 2.0 mg/dL",
+      "description": "Elevated creatinine supplies prototype evidence of renal dysfunction.",
+      "clinical_interpretation": "The rule increases support for the creatinine feature without diagnosing kidney injury or determining mortality.",
+      "source_column": "d1_creatinine_max",
+      "target_key": "d1_creatinine_max",
+      "truth_value": {
+        "frequency": 0.7,
+        "confidence": 0.65
+      },
+      "source": "Prototype creatinine flag at 2.0 mg/dL. This is not a KDIGO acute-kidney-injury definition.",
+      "provenance": "ngta.rule.wids.creatinine.v1",
+      "expert_review": "not_reviewed",
+      "contradiction_group": "creatinine_at_least_2"
+    }
+  },
+  "sources": [
+    {
+      "file": "wids_icu.csv",
+      "bytes": 64747327,
+      "sha256": "27861c711f8c196c2a5c858005075fff61df4fb48f6d350c5120cdf45317adeb"
+    }
+  ],
+  "split_ids_sha256": "8962f8240182b80e8a5ded54c5adec47e3fd6e617185e4dacafb4f6b96564226",
+  "thresholds": [
+    0.1,
+    0.2,
+    0.5
+  ],
+  "primary_metric": "brier",
+  "confirmation_brier_margin": 0.0001,
+  "bootstrap_unit": "hospital"
+}

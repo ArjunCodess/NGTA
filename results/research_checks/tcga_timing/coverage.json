@@ -1,0 +1,992 @@
+{
+  "schema_version": 1,
+  "record_policy": "loader-selected most-complete physical row per table; clinical primary preference",
+  "prediction_landmark": "retrospective post-pathology association; no numeric pathology landmark is available",
+  "tables": {
+    "clinical.tsv": {
+      "sha256": "b93441500485aed507291296867f6bd897e7a366743f7572d2bf61adeea5464c",
+      "raw_rows": 2344,
+      "selected_cases": 507,
+      "fields": [
+        {
+          "field": "cases.days_to_consent",
+          "raw_nonmissing": 2281,
+          "selected_nonmissing": 494,
+          "selected_numeric_days": 494,
+          "selected_min_days": -256.0,
+          "selected_max_days": 3999.0,
+          "selected_categories": null
+        },
+        {
+          "field": "cases.days_to_lost_to_followup",
+          "raw_nonmissing": 0,
+          "selected_nonmissing": 0,
+          "selected_numeric_days": 0,
+          "selected_min_days": null,
+          "selected_max_days": null,
+          "selected_categories": null
+        },
+        {
+          "field": "cases.index_date",
+          "raw_nonmissing": 2344,
+          "selected_nonmissing": 507,
+          "selected_numeric_days": null,
+          "selected_min_days": null,
+          "selected_max_days": null,
+          "selected_categories": [
+            "Diagnosis"
+          ]
+        },
+        {
+          "field": "demographic.days_to_birth",
+          "raw_nonmissing": 2344,
+          "selected_nonmissing": 507,
+          "selected_numeric_days": 507,
+          "selected_min_days": -32682.0,
+          "selected_max_days": -5612.0,
+          "selected_categories": null
+        },
+        {
+          "field": "demographic.days_to_death",
+          "raw_nonmissing": 77,
+          "selected_nonmissing": 16,
+          "selected_numeric_days": 16,
+          "selected_min_days": 174.0,
+          "selected_max_days": 1854.0,
+          "selected_categories": null
+        },
+        {
+          "field": "diagnoses.days_to_best_overall_response",
+          "raw_nonmissing": 0,
+          "selected_nonmissing": 0,
+          "selected_numeric_days": 0,
+          "selected_min_days": null,
+          "selected_max_days": null,
+          "selected_categories": null
+        },
+        {
+          "field": "diagnoses.days_to_diagnosis",
+          "raw_nonmissing": 2277,
+          "selected_nonmissing": 507,
+          "selected_numeric_days": 507,
+          "selected_min_days": 0.0,
+          "selected_max_days": 0.0,
+          "selected_categories": null
+        },
+        {
+          "field": "diagnoses.days_to_last_follow_up",
+          "raw_nonmissing": 2079,
+          "selected_nonmissing": 507,
+          "selected_numeric_days": 507,
+          "selected_min_days": 0.0,
+          "selected_max_days": 5423.0,
+          "selected_categories": null
+        },
+        {
+          "field": "diagnoses.days_to_last_known_disease_status",
+          "raw_nonmissing": 0,
+          "selected_nonmissing": 0,
+          "selected_numeric_days": 0,
+          "selected_min_days": null,
+          "selected_max_days": null,
+          "selected_categories": null
+        },
+        {
+          "field": "diagnoses.days_to_recurrence",
+          "raw_nonmissing": 0,
+          "selected_nonmissing": 0,
+          "selected_numeric_days": 0,
+          "selected_min_days": null,
+          "selected_max_days": null,
+          "selected_categories": null
+        },
+        {
+          "field": "treatments.days_to_treatment_end",
+          "raw_nonmissing": 298,
+          "selected_nonmissing": 255,
+          "selected_numeric_days": 255,
+          "selected_min_days": 1.0,
+          "selected_max_days": 3490.0,
+          "selected_categories": null
+        },
+        {
+          "field": "treatments.days_to_treatment_start",
+          "raw_nonmissing": 399,
+          "selected_nonmissing": 266,
+          "selected_numeric_days": 266,
+          "selected_min_days": 1.0,
+          "selected_max_days": 3470.0,
+          "selected_categories": null
+        },
+        {
+          "field": "treatments.timepoint_category",
+          "raw_nonmissing": 264,
+          "selected_nonmissing": 41,
+          "selected_numeric_days": null,
+          "selected_min_days": null,
+          "selected_max_days": null,
+          "selected_categories": [
+            "First Treatment"
+          ]
+        }
+      ]
+    },
+    "exposure.tsv": {
+      "sha256": "68f0b0cca5fc3a6e9a9d312657becdddf7e0f7ac53877a50f7b07b535d6b52a3",
+      "raw_rows": 18,
+      "selected_cases": 18,
+      "fields": []
+    },
+    "family_history.tsv": {
+      "sha256": "e5589bda35fe7891ce4eb21980ee064ba19dee5ffc3d7fe1ef6fe94b0e02d580",
+      "raw_rows": 47,
+      "selected_cases": 46,
+      "fields": []
+    },
+    "follow_up.tsv": {
+      "sha256": "da1810be81be24be46a32da8b318d5849f802bac92baef8bc4f4a16475f6fee1",
+      "raw_rows": 2966,
+      "selected_cases": 507,
+      "fields": [
+        {
+          "field": "follow_ups.days_to_adverse_event",
+          "raw_nonmissing": 0,
+          "selected_nonmissing": 0,
+          "selected_numeric_days": 0,
+          "selected_min_days": null,
+          "selected_max_days": null,
+          "selected_categories": null
+        },
+        {
+          "field": "follow_ups.days_to_first_event",
+          "raw_nonmissing": 0,
+          "selected_nonmissing": 0,
+          "selected_numeric_days": 0,
+          "selected_min_days": null,
+          "selected_max_days": null,
+          "selected_categories": null
+        },
+        {
+          "field": "follow_ups.days_to_follow_up",
+          "raw_nonmissing": 1681,
+          "selected_nonmissing": 378,
+          "selected_numeric_days": 378,
+          "selected_min_days": 0.0,
+          "selected_max_days": 5423.0,
+          "selected_categories": null
+        },
+        {
+          "field": "follow_ups.days_to_imaging",
+          "raw_nonmissing": 0,
+          "selected_nonmissing": 0,
+          "selected_numeric_days": 0,
+          "selected_min_days": null,
+          "selected_max_days": null,
+          "selected_categories": null
+        },
+        {
+          "field": "follow_ups.days_to_progression",
+          "raw_nonmissing": 16,
+          "selected_nonmissing": 15,
+          "selected_numeric_days": 15,
+          "selected_min_days": 30.0,
+          "selected_max_days": 2072.0,
+          "selected_categories": null
+        },
+        {
+          "field": "follow_ups.days_to_progression_free",
+          "raw_nonmissing": 0,
+          "selected_nonmissing": 0,
+          "selected_numeric_days": 0,
+          "selected_min_days": null,
+          "selected_max_days": null,
+          "selected_categories": null
+        },
+        {
+          "field": "follow_ups.days_to_recurrence",
+          "raw_nonmissing": 39,
+          "selected_nonmissing": 25,
+          "selected_numeric_days": 25,
+          "selected_min_days": 6.0,
+          "selected_max_days": 1855.0,
+          "selected_categories": null
+        },
+        {
+          "field": "follow_ups.timepoint_category",
+          "raw_nonmissing": 2542,
+          "selected_nonmissing": 474,
+          "selected_numeric_days": null,
+          "selected_min_days": null,
+          "selected_max_days": null,
+          "selected_categories": [
+            "Follow-up",
+            "Initial Diagnosis",
+            "Last Contact",
+            "Post Initial Treatment",
+            "Preoperative"
+          ]
+        },
+        {
+          "field": "molecular_tests.days_to_test",
+          "raw_nonmissing": 0,
+          "selected_nonmissing": 0,
+          "selected_numeric_days": 0,
+          "selected_min_days": null,
+          "selected_max_days": null,
+          "selected_categories": null
+        },
+        {
+          "field": "molecular_tests.timepoint_category",
+          "raw_nonmissing": 0,
+          "selected_nonmissing": 0,
+          "selected_numeric_days": null,
+          "selected_min_days": null,
+          "selected_max_days": null,
+          "selected_categories": []
+        },
+        {
+          "field": "other_clinical_attributes.days_to_comorbidity",
+          "raw_nonmissing": 0,
+          "selected_nonmissing": 0,
+          "selected_numeric_days": 0,
+          "selected_min_days": null,
+          "selected_max_days": null,
+          "selected_categories": null
+        },
+        {
+          "field": "other_clinical_attributes.days_to_risk_factor",
+          "raw_nonmissing": 0,
+          "selected_nonmissing": 0,
+          "selected_numeric_days": 0,
+          "selected_min_days": null,
+          "selected_max_days": null,
+          "selected_categories": null
+        },
+        {
+          "field": "other_clinical_attributes.timepoint_category",
+          "raw_nonmissing": 169,
+          "selected_nonmissing": 0,
+          "selected_numeric_days": null,
+          "selected_min_days": null,
+          "selected_max_days": null,
+          "selected_categories": []
+        }
+      ]
+    },
+    "pathology_detail.tsv": {
+      "sha256": "8790212382cfd4e347c5bf3975015596323734190458ce8ea54a4ca64da6a0c2",
+      "raw_rows": 507,
+      "selected_cases": 507,
+      "fields": [
+        {
+          "field": "pathology_details.days_to_pathology_detail",
+          "raw_nonmissing": 0,
+          "selected_nonmissing": 0,
+          "selected_numeric_days": 0,
+          "selected_min_days": null,
+          "selected_max_days": null,
+          "selected_categories": null
+        },
+        {
+          "field": "pathology_details.timepoint_category",
+          "raw_nonmissing": 0,
+          "selected_nonmissing": 0,
+          "selected_numeric_days": null,
+          "selected_min_days": null,
+          "selected_max_days": null,
+          "selected_categories": []
+        }
+      ]
+    }
+  },
+  "inputs": [
+    {
+      "input": "diagnoses.age_at_diagnosis",
+      "role": "model_input",
+      "source_table": "clinical.tsv",
+      "observed_selected_cases": 507,
+      "source_entity_date": "diagnoses.days_to_diagnosis",
+      "observed_cases_with_entity_date": 507,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "diagnoses.year_of_diagnosis",
+      "role": "model_input",
+      "source_table": "clinical.tsv",
+      "observed_selected_cases": 507,
+      "source_entity_date": "diagnoses.days_to_diagnosis",
+      "observed_cases_with_entity_date": 507,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "pathology_details.tumor_length_measurement",
+      "role": "model_input",
+      "source_table": "pathology_detail.tsv",
+      "observed_selected_cases": 478,
+      "source_entity_date": "pathology_details.days_to_pathology_detail",
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "pathology_details.tumor_width_measurement",
+      "role": "model_input",
+      "source_table": "pathology_detail.tsv",
+      "observed_selected_cases": 429,
+      "source_entity_date": "pathology_details.days_to_pathology_detail",
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "pathology_details.tumor_depth_measurement",
+      "role": "model_input",
+      "source_table": "pathology_detail.tsv",
+      "observed_selected_cases": 407,
+      "source_entity_date": "pathology_details.days_to_pathology_detail",
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "demographic.gender",
+      "role": "model_input",
+      "source_table": "clinical.tsv",
+      "observed_selected_cases": 507,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "demographic.race",
+      "role": "model_input",
+      "source_table": "clinical.tsv",
+      "observed_selected_cases": 414,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "demographic.ethnicity",
+      "role": "model_input",
+      "source_table": "clinical.tsv",
+      "observed_selected_cases": 403,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "diagnoses.ajcc_pathologic_t",
+      "role": "model_input",
+      "source_table": "clinical.tsv",
+      "observed_selected_cases": 507,
+      "source_entity_date": "diagnoses.days_to_diagnosis",
+      "observed_cases_with_entity_date": 507,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "diagnoses.prior_malignancy",
+      "role": "model_input",
+      "source_table": "clinical.tsv",
+      "observed_selected_cases": 504,
+      "source_entity_date": "diagnoses.days_to_diagnosis",
+      "observed_cases_with_entity_date": 504,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "diagnoses.synchronous_malignancy",
+      "role": "model_input",
+      "source_table": "clinical.tsv",
+      "observed_selected_cases": 504,
+      "source_entity_date": "diagnoses.days_to_diagnosis",
+      "observed_cases_with_entity_date": 504,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "diagnoses.prior_treatment",
+      "role": "model_input",
+      "source_table": "clinical.tsv",
+      "observed_selected_cases": 507,
+      "source_entity_date": "diagnoses.days_to_diagnosis",
+      "observed_cases_with_entity_date": 507,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "diagnoses.primary_diagnosis",
+      "role": "model_input",
+      "source_table": "clinical.tsv",
+      "observed_selected_cases": 507,
+      "source_entity_date": "diagnoses.days_to_diagnosis",
+      "observed_cases_with_entity_date": 507,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "diagnoses.morphology",
+      "role": "model_input",
+      "source_table": "clinical.tsv",
+      "observed_selected_cases": 507,
+      "source_entity_date": "diagnoses.days_to_diagnosis",
+      "observed_cases_with_entity_date": 507,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "diagnoses.laterality",
+      "role": "model_input",
+      "source_table": "clinical.tsv",
+      "observed_selected_cases": 501,
+      "source_entity_date": "diagnoses.days_to_diagnosis",
+      "observed_cases_with_entity_date": 501,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "diagnoses.tumor_focality",
+      "role": "model_input",
+      "source_table": "clinical.tsv",
+      "observed_selected_cases": 497,
+      "source_entity_date": "diagnoses.days_to_diagnosis",
+      "observed_cases_with_entity_date": 497,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "diagnoses.residual_disease",
+      "role": "model_input",
+      "source_table": "clinical.tsv",
+      "observed_selected_cases": 475,
+      "source_entity_date": "diagnoses.days_to_diagnosis",
+      "observed_cases_with_entity_date": 475,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__BRAF",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__NRAS",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__HRAS",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__TG",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__TTN",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__MUC16",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__ATM",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__BDP1",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__ABCB11",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__ARID2",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__CHEK2",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__EIF1AX",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__KMT2C",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__KRAS",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__MACF1",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__PDZD2",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__PIK3R5",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__PTPRZ1",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__SPTA1",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__USP9X",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__ZFHX3",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__AKT1",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__ARFGEF2",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__BPTF",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__C11orf87",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__DNAH3",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__DOCK7",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__GNPAT",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__GPRIN2",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__JMJD1C",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__KDM2A",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__KMT2A",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__LRP10",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__MAP3K3",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__MTMR12",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__NSD1",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__PCDH11X",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__PKHD1",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__STAB2",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__WNK2",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__ABCD1",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__ABHD4",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__ABO",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__ADAMTS19",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__ADAMTS9",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__ADGRB3",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__AFM",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__AL645922.1",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__ANKLE1",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "genomic_mutation__ANKMY1",
+      "role": "model_input",
+      "source_table": null,
+      "observed_selected_cases": null,
+      "source_entity_date": null,
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    },
+    {
+      "input": "pathology_details.extrathyroid_extension",
+      "role": "rule_only",
+      "source_table": "pathology_detail.tsv",
+      "observed_selected_cases": 153,
+      "source_entity_date": "pathology_details.days_to_pathology_detail",
+      "observed_cases_with_entity_date": 0,
+      "measurement_time_verified": false,
+      "reason": "Diagnosis dates are entity-level proxies; pathology, demographic and genomic measurement availability is not established."
+    }
+  ],
+  "cross_table_chronology_verified": false,
+  "missing_evidence": [
+    "Pathology acquisition/report availability dates relative to each case's diagnosis",
+    "Genomic specimen collection, assay/report availability and callable case/gene panels",
+    "Encounter links tying diagnosis, pathology and genomic specimens to the same disease episode"
+  ],
+  "interpretation": "Existing dates are audited, not promoted to feature availability or preoperative validation.",
+  "preprocessor_sha256": "aec2ce06933299a53dd24fbb4bfee92a707633fe896928faedd4a5fdafadbde9"
+}

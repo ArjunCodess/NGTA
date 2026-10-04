@@ -1,0 +1,10 @@
+{
+  "repaired_object": "f0993d9494298afff4d3987bed8177604b315a0e",
+  "artifact": "results/hospital_study/knn/seed_1/wids/metrics/missingness/selective_risk.csv",
+  "recovery": "Working artifact independently matches the exact committed Git blob hash; damaged compressed bytes preserved in ignored local recovery folder",
+  "committed_contents_changed": false,
+  "restored_blob_sha1": "f0993d9494298afff4d3987bed8177604b315a0e",
+  "lfs_fsck": "passed for all 297 tracked paths",
+  "full_git_fsck": "passed",
+  "history_rewritten": false
+}

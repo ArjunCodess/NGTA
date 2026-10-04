@@ -1,0 +1,15 @@
+{
+  "schema_version": 2,
+  "persisted_replay": {
+    "passed": true
+  },
+  "source_bundles": [
+    "results\\tcga_study\\fused\\seed_0\\tcga",
+    "results\\tcga_study\\fused\\seed_1\\tcga",
+    "results\\tcga_study\\fused\\seed_2\\tcga",
+    "results\\tcga_study\\fused\\seed_3\\tcga",
+    "results\\tcga_study\\fused\\seed_4\\tcga"
+  ],
+  "interval_scope": "training_seed_variability_fixed_cohort",
+  "seed_count": 5
+}

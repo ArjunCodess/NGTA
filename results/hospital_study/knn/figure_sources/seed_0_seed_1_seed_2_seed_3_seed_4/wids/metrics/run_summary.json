@@ -1,0 +1,15 @@
+{
+  "schema_version": 2,
+  "persisted_replay": {
+    "passed": true
+  },
+  "source_bundles": [
+    "results\\hospital_study\\knn\\seed_0\\wids",
+    "results\\hospital_study\\knn\\seed_1\\wids",
+    "results\\hospital_study\\knn\\seed_2\\wids",
+    "results\\hospital_study\\knn\\seed_3\\wids",
+    "results\\hospital_study\\knn\\seed_4\\wids"
+  ],
+  "interval_scope": "training_seed_variability_fixed_cohort",
+  "seed_count": 5
+}

@@ -1,9 +1,6 @@
 \documentclass{article}
 
 % Anonymous double-blind workshop submission using the supplied NeurIPS 2026 style.
-\makeatletter
-\def\input@path{{../Formatting_Instructions_For_NeurIPS_2026/}}
-\makeatother
 \usepackage[dblblindworkshop]{neurips_2026}
 \workshoptitle{The Third Workshop on GenAI for Health: Agentic Systems, Clinical Trust, and Future Potential}
 
@@ -30,7 +27,7 @@
 
  % *** Make sure there's no spurious space before \nametag ***
 
-\title{Dynamic Evidential Routing: An Auditable Neurosymbolic Interface for Clinical Transformers Under Extreme Missingness}
+\title{Dynamic Evidential Routing: An Auditable Neurosymbolic Interface for Clinical Transformers with Incomplete Inputs}
 
  % Two authors with the same address
 \author{Anonymous Authors}
@@ -40,7 +37,7 @@
 \maketitle
 
 \begin{abstract}
-Dynamic evidential routing adds an auditable expert-intervention channel to transformer inference while preserving comparable held-out predictive behavior. The interface maps Monte Carlo dropout uncertainty into Non-Axiomatic Logic (NAL) truth values, revises those values with explicit clinical rules, and uses revised confidence to gate attention. Every intervention exports its trigger, neural and symbolic truth values, revision, and attention effect. We evaluate TCGA-THCA lymph node metastasis prediction as a clinical-genomic feasibility check and WiDS ICU hospital-mortality prediction as the primary high-missingness scale test. The symbolic path is active at scale, firing 13,031 times across 8,551 of 13,757 held-out ICU stays. On WiDS, paired Brier and ECE differences favor NARS-gated routing over the ungated transformer, but comparisons with flat-confidence and MC-confidence-only gating include zero. The results therefore support confidence-gated, auditable intervention without isolating symbolic revision as the cause of the calibration difference. The implementation is a NAL truth-value interface, not a full Non-Axiomatic Reasoning System (NARS) cognitive architecture or a clinically validated decision device.
+Dynamic evidential routing is an inference-time interface for uncertainty-conditioned symbolic intervention. Prototype rules revise a heuristic confidence signal used by a transformer readout. We evaluate 20 hospital-held-out WiDS fits across two imputers, APACHE inclusion/exclusion, and five training seeds, plus 15 clinical-only, genomic-only, and fused TCGA fits using checksum-pinned public mutation files. Every fit uses matched 50-pass dropout inference with three independent repeats and independently replayable intervention exports. The acquired TCGA test cases include 39 recorded BRAF-positive rule events, while absent variants remain unknown without callable assay evidence. Hierarchical comparisons do not meet the prespecified symbolic Brier benefit of $10^{-4}$; APACHE removal substantially reduces discrimination. Frozen masking and ensemble diagnostics test implementation behavior on development cohorts. External compatibility, clinical rule validity, and reviewer benefit remain unestablished.
 \end{abstract}
 
 \section{Introduction}
@@ -50,9 +47,9 @@ Clinical AI systems, including emerging generative and agentic systems, need an 
 
 The challenge is that current model components expose different pieces of the problem but do not connect them cleanly. Transformers are flexible function approximators for clinical prediction \citep{rasmy2021,azizi2021,li2019}, but attention weights are not themselves evidential confidences. Uncertainty estimators can summarize prediction instability, but they usually do not provide a symbolic intervention point. Rule-based explanations can be readable, but post-hoc rules often describe a prediction without changing the computation. What is missing is an inference-time interface in which neural uncertainty, symbolic evidence, and attention control share an auditable representation.
 
-We propose dynamic evidential routing as that interface. A neural predictive distribution is first mapped into a two-dimensional truth value $(f,c)$, where frequency $f$ describes the balance of evidence and confidence $c$ describes evidential support \citep{wang1995,wang2006,wang2013}. Explicit clinical rules then revise feature-level truths in the same NAL truth-value space, and the revised confidence values control a normalized attention gate. This design separates what the model predicts from how strongly the available evidence supports that prediction and exposes a trust signal that a clinical model, copilot, or agent can inspect before acting.
+We propose dynamic evidential routing as that interface. A neural predictive distribution is first mapped into a two-dimensional truth value $(f,c)$, where frequency $f$ describes the balance of evidence and confidence $c$ describes evidential support \citep{wang1995,wang2006,wang2013}. Explicit clinical rules then revise feature-level truths in the same NAL truth-value space, and the revised confidence values control a normalized attention gate. The signal is a heuristic interface variable; its relationship with errors and evidential support must be measured before it can serve as a trust signal.
 
-We evaluate the interface on two complementary clinical benchmarks. TCGA-THCA tests the mechanism under clinical-genomic feature fusion; WiDS ICU hospital-mortality prediction tests scale and extreme missingness. The contribution is an operational neurosymbolic intervention path with arithmetic traces, quantitative coverage and fidelity checks, and comparable held-out predictive behavior. The controls also delimit the claim: they do not isolate symbolic revision as a source of improved calibration.
+We evaluate the interface on two complementary clinical benchmarks. Acquired TCGA-THCA mutation files supply recorded held-out positives, but absence of variants is still unknown without verified callable assays. WiDS exercises scale on held-out hospitals with feature-specific missingness; selected-feature missingness is 10.36\% after invalid APACHE probabilities are masked. The contribution is an auditable inference-time interface: neural uncertainty and explicit rules share a truth-value representation, revised confidence can change attention, and the arithmetic is exported. The experiments do not establish a clinical performance improvement, and they do not isolate symbolic revision as the source of any calibration difference.
 
 Figure~\ref{fig:pipeline} summarizes the inference-time data flow from sparse clinical inputs through uncertainty estimation, NAL-style truth initialization, rule-triggered revision, confidence-gated attention, and trace export.
 
@@ -67,7 +64,7 @@ Figure~\ref{fig:pipeline} summarizes the inference-time data flow from sparse cl
 \label{sec:related}
 
 \paragraph{Neurosymbolic integration.}
-Neurosymbolic AI combines neural pattern recognition with symbolic reasoning, knowledge injection, or interpretable rule systems \citep{garcez2020,marra2021,bhuyan2024,colelough2025}. Prior surveys distinguish loose coupling, tight coupling, and unified architectures \citep{hilario2013,nawaz2025}. Dynamic evidential routing is a tight inference-time interface: the neural model supplies probabilities, uncertainty estimates, and attention weights, while the symbolic layer revises evidential confidence before attention is updated. Its contribution is the interface contract between these components. Neural uncertainty is converted into an explicit truth-value representation, symbolic rules revise that representation, and the revised confidence is fed back into attention with a trace of the intervention.
+Neurosymbolic AI combines neural pattern recognition with symbolic reasoning, knowledge injection, or interpretable rule systems \citep{garcez2020,marra2021,bhuyan2024,colelough2025}. Prior surveys distinguish loose coupling, tight coupling, and unified architectures \citep{hilario1997,nawaz2025}. Dynamic evidential routing is a tight inference-time interface: the neural model supplies probabilities, uncertainty estimates, and attention weights, while the symbolic layer revises evidential confidence before attention is updated. Its contribution is the interface contract between these components. Neural uncertainty is converted into an explicit truth-value representation, symbolic rules revise that representation, and the revised confidence is fed back into attention with a trace of the intervention.
 
 \paragraph{Clinical transformers and uncertainty.}
 Clinical transformers have been used for structured EHRs, clinical text, and medical prediction tasks \citep{rasmy2021,li2019,dai2025}. Attention can help interpretability, but medical attention mechanisms rarely represent uncertainty as a first-class control signal \citep{goncalves2022}. In parallel, uncertainty quantification methods such as Bayesian neural networks, MC dropout, and ensembles provide useful but imperfect epistemic uncertainty estimates \citep{blundell2015,gal2016,lakshminarayanan2017,abad2025}. MC dropout is attractive because it is cheap, but it can be miscalibrated under dataset shift \citep{ovadia2019}. Our use of uncertainty is therefore not a standalone calibration method. The uncertainty estimate initializes evidential confidence, which becomes available for symbolic revision and case-level audit.
@@ -106,14 +103,14 @@ f=\frac{\omega_1 f_1+\omega_2 f_2}{\omega_1+\omega_2},\qquad
 c=\frac{\omega_1+\omega_2}{\omega_1+\omega_2+1}.
 \label{eq:revision}
 \end{equation}
-Standard NAL revision assumes disjoint evidential bases \citep{wang2024draft}. The implementation treats neural and symbolic sources as distinct when revision is invoked, but it does not store evidential bases as runtime objects.
+Standard NAL revision assumes disjoint evidential bases \citep{wang2025}. The two software paths share clinical observations, so disjoint evidential bases are not established. Neural feature frequency is attention whereas symbolic frequency describes a clinical proposition; their semantic compatibility is unvalidated. Revised frequency is exported but does not affect the confidence-only gate.
 
 \subsection{Neural-to-Symbolic Initialization}
 
 For a neural probability $p$ and MC-dropout predictive variance $\sigma^2$, the initial truth value is
 \begin{equation}
 f_{\text{neural}}=p,\qquad
-c_{\text{neural}}=\frac{p(1-p)}{p(1-p)+\sigma^2+\varepsilon}.
+c_{\text{neural}}=\frac{p(1-p)+\varepsilon}{p(1-p)+\sigma^2+\varepsilon}.
 \label{eq:neural_to_nars}
 \end{equation}
 This is an application-specific initializer, not a canonical NARS measurement of evidential support. It parallels a variance-controlled evidence mass, then lets symbolic rules revise the confidence in NAL space. If the variance estimator underestimates uncertainty, $c$ can be inflated. This limitation is inherited from the neural uncertainty method.
@@ -136,7 +133,7 @@ where $\gamma$ controls the strength of confidence gating. The update preserves 
 
 \subsection{Inference-Time Data Flow}
 
-The inference path has six stages. First, the trained transformer produces a point prediction, feature attention, and token scores. Second, repeated MC-dropout passes estimate predictive and attention variance. Third, the variance-to-confidence initializer in Eq.~\eqref{eq:neural_to_nars} creates feature-level neural truths. Fourth, the symbolic extractor emits every proposition whose condition is true. Fifth, neural and symbolic truths are revised in the shared $(f,c)$ space. Sixth, revised confidence gates attention by Eq.~\eqref{eq:attention_update}; the model recomputes the final logit once and exports a trace. There is no recurrent feedback or convergence loop.
+The inference path has six stages. First, the trained transformer produces a point prediction, feature attention, and token scores. Second, repeated MC-dropout passes estimate predictive and attention variance. Third, the variance-to-confidence initializer in Eq.~\eqref{eq:neural_to_nars} creates feature-level neural truths. Fourth, the symbolic extractor emits every proposition whose condition is true. Fifth, neural and symbolic truths are revised in the shared $(f,c)$ space. Sixth, revised confidence gates attention by Eq.~\eqref{eq:attention_update}; current implementation recomputes each cached pass's final logit and averages sigmoid probabilities identically across gate variants, then exports all events. The default intervention changes the token readout, not encoder representations; a separate encoder intervention experiment recomputes those representations. There is no recurrent feedback or convergence loop.
 
 This staged design keeps the symbolic mechanism outside model training. With $N$ cases, $R$ rule predicates, and $F$ features, predicate evaluation and gating cost $O(NR+NF)$ in the present vectorized implementation. The prototype assigns at most one rule to a logical feature and rejects collisions, so rule ordering cannot silently change a truth value. Larger bases need provenance-aware conflict policies, coverage analysis, and explicit aggregation of compatible or contradictory evidence before same-feature multi-rule revision can be supported.
 
@@ -153,17 +150,25 @@ For a neural estimate $p=0.8$, $\sigma^2=0.05$, and a fired prototype rule $(f_{
 \section{Experimental Setup}
 \label{sec:experiments}
 
-We evaluate two benchmarks with different roles. TCGA-THCA predicts lymph-node metastasis from clinical and somatic-mutation features and tests whether the interface remains operational under clinical-genomic fusion. The labeled cohort contains 457 cases split into 319 training, 69 validation, and 69 held-out test cases. The processed input has 105 dimensions: 5 scaled clinical numeric features, 50 binary mutation indicators, and 50 one-hot clinical categorical features.
+The current development evaluation fixes source hashes, partitions, rules, and training settings before each fit. WiDS contains 91,713 labeled stays with 65,737 training, 11,751 validation, and 14,225 held-out cases; patient, hospital, and ICU identifiers are disjoint across partitions. Five training seeds are evaluated under each combination of KNN or median imputation and APACHE included or excluded, yielding 20 fits. Removing APACHE leaves 15 encoded features instead of 16; score-only comparators remain available as controls.
 
-WiDS Datathon 2020 predicts in-hospital mortality for ICU encounters and is the primary validation under scale and extreme missingness. The run uses 91,713 labeled stays split into 64,199 training, 13,757 validation, and 13,757 held-out test stays, with 16 model input features after preprocessing.
+TCGA contains 457 labeled cases with 319 training, 69 validation, and 69 held-out cases. An immutable GDC manifest pins 498 mutation files by publisher UUID, checksum, and case coverage; 16 expected clinical cases lack file-associated coverage. The fused input has 55 clinical and 100 genomic/unknown-indicator dimensions. Clinical-only, genomic-only, and fused inputs each receive five training seeds with identical partitions. Unknown mutation calls are not converted to negatives; no complete callable panel is verified. This is retrospective post-pathology association, and source-level measurement chronology is unresolved.
 
-All transformer variants use the same trained base architecture: $d_{\text{model}}=64$, four attention heads, two encoder layers, and 50 MC-dropout passes for uncertainty estimation. We compare a random forest, a baseline transformer, flat-confidence gating with $c=0.5$, MC-confidence-only gating, and NARS-gated symbolic revision. Metrics are AUC, Brier score, expected calibration error (ECE), and accuracy. Bootstrap confidence intervals are reported for AUC, Brier, and ECE.
+All fits use $d_{\mathrm{model}}=64$, four heads, two encoder layers, at most 60 epochs, and validation early stopping with patience 12. Each fit has 50 matched MC-dropout passes and three independent inference repeats. Calibration and classical-model selection use validation data only. These already inspected cohorts constitute development evaluation, not prospective confirmation or independent-cohort validation.
 
 \subsection{Baselines and Controls}
 
-The baseline transformer tests whether the underlying neural architecture is competitive before confidence gating is introduced. The flat-confidence control assigns the same confidence to every feature and therefore isolates the architectural effect of adding a gate without using uncertainty. The MC-confidence-only ablation uses the neural variance-derived confidence but does not apply symbolic revision. The NARS-gated model adds the symbolic rule path on top of the MC-confidence initializer. This ordering is important: a difference from the baseline alone is not enough to show that symbolic reasoning helped, because confidence gating or regularization may explain the change.
+The baseline transformer tests whether the underlying neural architecture is competitive before confidence gating is introduced. A uniform normalized readout gate cancels mathematically. Under matched current implementation aggregation it must reproduce ungated predictions within $10^{-7}$. The legacy flat-control differences arise from aggregation, not from adding a gate. The MC-confidence-only ablation uses the neural variance-derived confidence but does not apply symbolic revision. The NARS-gated model adds the symbolic rule path on top of the MC-confidence initializer. This ordering is important: a difference from the baseline alone is not enough to show that symbolic reasoning helped, because confidence gating or regularization may explain the change.
 
 The random forest baseline addresses the common tabular-learning concern that tree ensembles can be strong competitors on structured clinical features. It is trained on the same split and post-preprocessing design matrix, so differences cannot be attributed to a different data representation.
+
+\subsection{Symbolic Isolation, Uncertainty, and Shift}
+
+Tables~\ref{tab:tcga_results} and \ref{tab:wids_results} do not isolate symbolic revision. The evaluation contract now rescores NAL revision after four changes to the symbolic input: removing every rule, removing one rule at a time, permuting rule assignments across patients, replacing symbolic truth values with random draws, and substituting fixed symbolic priors. Rule removal must reproduce MC-confidence-only gating. Sensitivity scales symbolic confidence and recomputes revision; it does not retune the transformer on test labels. A claim that the symbolic component improves prediction would require the stated rules to separate from MC-confidence-only gating and from these controls. That separation is not a result of the saved runs.
+
+Each condition now has a five-model ensemble, MC-dropout variance, predictive entropy, confidence-error diagnostics, and tie-aware selective-risk curves. Common ensemble prediction errors provide the same reference for comparing uncertainty estimators. Hospital, training-seed, and dropout-repeat resampling distinguish these sources of variability; the fixed split does not estimate variability across cohort selections.
+
+Each rule now carries a source note, a provenance identifier, an expert-review status, and a contradiction group. The current predicates are prototype probes and are marked not reviewed. Two rules that share a contradiction group and a target feature are rejected rather than overwritten. No independent cohort is evaluated here. The distribution-shift study masks originally observed raw values at 0, 10, 30, 50, and 70 percent before frozen preprocessing, rule extraction, and matched inference. Random, feature-dependent, and explicitly labeled outcome-dependent simulations share masks across methods. That check is a compatibility test under shift, not external clinical validation.
 
 \subsection{Rule Bases}
 
@@ -183,14 +188,41 @@ The paper therefore separates three evidential claims. First, whether the archit
 
 The public repository exposes a single entrypoint for running both dataset branches and producing dataset-scoped metrics, traces, plots, and an aggregate run summary. The paper text reports the split sizes, input dimensions, architecture, MC-dropout count, and baselines needed to interpret the results. The code is still necessary for exact reproduction because preprocessing, imputation, categorical encoding, and rule extraction are implementation-sensitive.
 
-The most important reproducibility constraint is that preprocessing must be fitted on the training split before being applied to validation and test examples. This prevents leakage from held-out data into imputation or encoding. The rule extractor is also run only at inference time, so symbolic rules do not alter the supervised training objective.
+In current implementation, imputation, standardization, categorical encoding, sparse-column filtering, and mutation-panel selection fit training data only. Legacy sparse filtering and panel selection occurred before splitting. Unknown gene calls now have explicit missing indicators; confirmed negative calls require sourced case/gene assay coverage. TCGA selects one physical record per source table and exports conflicts, but cross-table chronology is unverified; its landmark is retrospective post-pathology association, not preoperative prediction. The rule extractor is also run only at inference time, so symbolic rules do not alter the supervised training objective.
 
-\section{Results}
+
+\section{Current Development Results}
+\label{sec:current_results}
+
+\input{figures/current_results.tex}
+
+The seven conditions in Table~\ref{tab:current_symbolic} do not establish the planned symbolic benefit. WiDS KNN NARS-minus-MC Brier is $-2.43\times10^{-7}$ with hierarchical 95\% interval $[-6.91\times10^{-7},1.64\times10^{-7}]$. TCGA fused routing has a positive mean difference of $1.26\times10^{-5}$, with an interval spanning zero. Direct confidence boosts, frequency sensitivity, individual/all-rule removal, 100 predicate permutations, shuffled confidence assignments, and matched irrelevant predicates are retained as symbolic controls. Revised frequency does not determine the confidence gate, and shared input measurements do not establish independent evidence.
+
+Mean WiDS ungated AUROC is 0.875721 with KNN and APACHE, versus 0.841118 without APACHE; median yields 0.874062 versus 0.842176. Paired hospital-and-seed contrasts preserve common test cases and report multiplicity-adjusted intervals. Boosting beats the median transformer in mean Brier, and validation recalibration can exceed the small routing effects. These results expose dependence on an existing mortality score rather than establish added clinical value over the strongest comparator. Authoritative APACHE sentinel semantics and timestamp availability remain unverified.
+
+The acquired TCGA held-out panel has recorded positives in 50 of 69 cases and produces 39 BRAF, 29 T-stage, 24 extension, and 21 age events per seed. All 113 events are exported; 89 map to fitted features and 24 are explicitly unmapped. WiDS observed-only rules produce 11,457 mapped events in 8,152 of 14,225 cases per seed. Numerical replay validates predicates, truth revision, gates, probabilities, and rule-off effects; it does not certify the clinical predicates. Seed rows reuse the same cases and must not be combined as independent patient counts.
+
+\input{figures/generated_auditability_table.tex}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/figure-2-performance-ci.png}
+\caption{Current five-seed mean Brier scores with 95\% Student-$t$ intervals over training seeds on fixed held-out cases. These are seed-mean intervals, not case-bootstrap intervals or external confirmation.}
+\label{fig:performance_ci}
+\end{figure}
+
+Controlled missingness outputs preserve frozen preprocessing, rules, model weights, and matched dropout inference. Per-fit paired intervals test integrated degradation and the 0.001 per-mask harm margin; uncertainty diagnostics include error-detection AUROC and selective-risk area with hospital-clustered intervals. The criterion passes in 12 of 15 median seed/scenario combinations and 1 of 15 KNN combinations; no KNN random or feature-dependent scenario passes. This does not establish general routing robustness. Outcome-dependent masks are simulations, not observed missingness mechanisms, and numerical acceptance under a particular simulation does not establish population robustness.
+
+For the fixed five-model WiDS KNN ensemble, mean predictive MC variance detects common threshold errors with AUROC 0.842276 and hospital-bootstrap interval [0.833229, 0.857306]. Neural and revised attention-instability scores give 0.514950 [0.493533, 0.531916] and 0.500647 [0.477047, 0.515520], respectively. Their intervals span chance: informative predictive uncertainty does not establish the attention confidence as a useful trust signal. These conditional intervals exclude model-refitting variability.
+
+The reviewer protocol, balanced format assignments, investigator fault key, power sensitivity, and crossed reviewer/case analysis are implemented as a demonstration package. No participants were recruited and no human benefit is claimed. Its public fault key requires regeneration into a private study package before real recruitment. External evaluation similarly requires a documented independent cohort with matched units, windows, outcomes, and patient identities; no such cohort was supplied.
+
+\section{Legacy Results and Validity Audit}
 \label{sec:results}
 
-The central positive result is operational: symbolic interventions execute on both modalities, expose their arithmetic, and retain predictive behavior close to the ungated transformer and confidence-only controls. Performance tables are reported to establish compatibility, not superiority.
+The two numerical tables in this legacy section describe the archived implementation; current performance figures and generated auditability tables are reported separately above. They use unmatched prediction aggregation and an internal row split. Only two TCGA training cases have recorded mutation inputs; validation and test contain none. No genomic held-out intervention was demonstrated. Close point estimates establish neither equivalence nor noninferiority. The short integration artifacts remain software checks; the full development studies above replace the historical runs as current numerical evidence without turning them into prospective confirmation.
 
-On TCGA-THCA, the transformer variants remain tightly clustered. Flat-confidence has the highest AUC at 0.7328 and the lowest Brier point estimate at the displayed precision; the 69-case test split does not statistically separate variants. TCGA is therefore a multimodal feasibility test rather than evidence of symbolic-gating superiority.
+On TCGA-THCA, the transformer variants remain tightly clustered. Flat-confidence has the highest AUC at 0.7328 and the lowest Brier point estimate at the displayed precision; the 69-case test split does not statistically separate variants. TCGA therefore provides a limited clinical interface exercise; it does not establish held-out multimodal feasibility or symbolic-gating superiority.
 
 \begin{table}[t]
 \caption{Held-out TCGA-THCA performance for lymph node metastasis prediction. Point estimates are followed by 95\% bootstrap confidence intervals where shown.}
@@ -211,11 +243,11 @@ NARS-gated & 0.7311 [0.6008, 0.8453] & 0.2109 [0.1820, 0.2417] & 0.1184 [0.1042,
 \end{tabular}
 \end{table}
 
-The TCGA symbolic rules were active under clinical-genomic fusion. Counts and coverage below use only recognized extrathyroid-extension categories; placeholder and unknown values cannot fire.
+The legacy TCGA clinical rules were active, but the BRAF rule never fired on test. Counts and coverage below use only recognized extrathyroid-extension categories; placeholder and unknown values cannot fire.
 
 WiDS provides the clearer scale test. All transformer variants have higher AUC point estimates than the random forest in this run, although their AUC confidence intervals overlap. Within the transformer family, the baseline has the highest AUC, while MC-confidence-only has the numerically lowest Brier and ECE point estimates. NARS-gated is nearly identical to MC-confidence-only and ties it and flat-confidence on accuracy at the reported precision.
 
-Figure~\ref{fig:performance_ci} visualizes the Brier-score intervals for both benchmarks. The overlap among transformer variants is large, especially on TCGA, reinforcing the interpretation that the current evidence supports operational compatibility rather than a separated performance claim.
+The archived intervals below describe the earlier calculation. Figure~\ref{fig:performance_ci} instead uses the explicitly selected current five-seed sources, so its values must not be compared to these legacy intervals as a controlled experiment.
 
 \begin{table}[t]
 \caption{Held-out WiDS ICU performance for hospital mortality prediction. Point estimates are followed by 95\% bootstrap confidence intervals where shown.}
@@ -236,37 +268,27 @@ NARS-gated & 0.8802 [0.8698, 0.8901] & 0.05647 [0.05365, 0.05962] & 0.00583 [0.0
 \end{tabular}
 \end{table}
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=\linewidth]{figures/figure-2-performance-ci.png}
-\caption{Held-out Brier scores with 95\% bootstrap confidence intervals. Lower values are better. The transformer variants are close, so small point-estimate differences should be interpreted as descriptive unless corroborated by additional comparisons.}
-\label{fig:performance_ci}
-\end{figure}
 
-The symbolic pathway operated at scale: ICU rules fired on 8,551 of 13,757 held-out stays, with 13,031 feature-level revisions. The per-rule counts were 1,936 for lactate, 5,338 for hypotension, 3,443 for age, and 2,314 for creatinine. Every fired rule mapped to a feature, produced a finite trace, and changed confidence and attention. The corresponding TCGA rates were also 100\% across 79 events in 42 of 69 cases. Independently recomputed revision and normalized-gating residuals were zero for both datasets.
 
-\IfFileExists{figures/generated_auditability_table.tex}{
-\input{figures/generated_auditability_table.tex}
-Table~\ref{tab:auditability} evaluates operational auditability over every held-out rule event. Mapping coverage asks whether a fired proposition reached a model feature; completeness asks whether all values needed for inspection are finite; and residuals independently recompute NAL revision and normalized gating. Among triggered cases, the mean absolute baseline-to-NARS probability change was 0.00205 on TCGA and 0.00214 on WiDS, with maxima of 0.00600 and 0.03102. No triggered TCGA case crossed the 0.5 threshold, while 10 triggered WiDS cases did. These are system-fidelity checks, not evidence that clinicians find the traces useful or that a changed decision is clinically correct.
-}{}
+The symbolic pathway operated at scale: ICU rules fired on 8,551 of 13,757 held-out stays, with 13,031 feature-level revisions. The per-rule counts were 1,936 for lactate, 5,338 for hypotension, 3,443 for age, and 2,314 for creatinine. Every fired rule mapped to a feature, produced a finite trace, and changed confidence and attention. The corresponding TCGA rates were also 100\% across 79 events in 42 of 69 cases. The legacy zero revision residual reused production arithmetic and was a consistency check. Its finite in-memory values did not establish complete persisted event export. WiDS counts included imputed-value triggers; current implementation suppresses these and independently replays every exported event.
 
 \subsection{Case-Level Rule Trace}
 
-The refreshed prediction export provides a concrete held-out example. For WiDS encounter 8205 (target 0), the ungated probability was 0.5006, flat-confidence gating produced 0.4995, MC-confidence-only gating produced 0.4961, and NARS-gated routing produced 0.4968. Three rules fired: hypotension, lactate, and creatinine. Their attention weights changed from 0.2564 to 0.2526, 0.0231 to 0.0248, and 0.0347 to 0.0372, respectively. The trace therefore exposes a real threshold change and the rule-level arithmetic, but it also shows why attribution requires controls: MC-confidence-only had already crossed the threshold before symbolic revision. Across the complete WiDS export, MC-confidence-only and NARS-gated produced no different threshold decisions. This is operational auditability, not clinical validation.
+The legacy prediction export provides a concrete held-out example. For WiDS encounter 8205 (target 0), the ungated probability was 0.5006, flat-confidence gating produced 0.4995, MC-confidence-only gating produced 0.4961, and NARS-gated routing produced 0.4968. Three rules fired: hypotension, lactate, and creatinine. Their attention weights changed from 0.2564 to 0.2526, 0.0231 to 0.0248, and 0.0347 to 0.0372, respectively. The trace therefore exposes a real threshold change and the rule-level arithmetic, but it also shows why attribution requires controls: MC-confidence-only had already crossed the threshold before symbolic revision. Across the complete WiDS export, MC-confidence-only and NARS-gated produced no different threshold decisions. These legacy decision changes describe the entire inference procedure, not an isolated symbolic effect or clinical validation.
 
 \subsection{Calibration Interpretation}
 
-The WiDS calibration results support a two-part interpretation. Relative to the ungated transformer, NARS-gated routing lowers Brier by 0.0000587 with a paired 95\% interval of [0.0000249, 0.0000911], and lowers ECE by 0.00120 with an interval of [0.0000282, 0.00202]. Both intervals exclude zero. Relative to flat-confidence and MC-confidence-only gating, however, the paired Brier and ECE intervals include zero; MC-confidence-only also has the slightly better Brier and ECE point estimates. Thus the run supports a small benefit from confidence gating, but does not identify symbolic revision as its cause.
+The legacy WiDS calibration differences are descriptive and confounded by aggregation. Relative to the ungated transformer, NARS-gated routing lowers Brier by 0.0000587 with a paired 95\% interval of [0.0000249, 0.0000911], and lowers ECE by 0.00120 with an interval of [0.0000282, 0.00202]. Both intervals exclude zero. Relative to flat-confidence and MC-confidence-only gating, however, the paired Brier and ECE intervals include zero; MC-confidence-only also has the slightly better Brier and ECE point estimates. The baseline and gated predictions use different aggregation, so even a confidence-gating benefit cannot be isolated from this run. The legacy reported deltas are bootstrap means rather than the required observed effect sizes; the current implementation exporter distinguishes them.
 
-That restraint keeps the contribution aligned with what the experiment actually supports. Dynamic evidential routing should not be described as a universal calibration booster. The supported claim is that a symbolic evidential channel can be made active, traceable, and compatible with competitive calibrated prediction on a large high-missingness ICU benchmark.
+That restraint keeps the contribution aligned with what the experiment actually supports. Dynamic evidential routing should not be described as a universal calibration booster. The supported implementation claim is that explicit rules can change a heuristic confidence readout. Robustness, predictive compatibility, and useful auditability require corrected experiments.
 
 \section{Discussion and Ablation}
 \label{sec:analysis}
 
-The flat-confidence and MC-confidence-only controls are essential for interpreting the result. If NARS-gated attention were compared only with the baseline transformer, its paired Brier and ECE differences could be over-interpreted as a symbolic reasoning effect. The controls show a more precise picture: those differences are not separated from confidence gating before symbolic revision is added. The NARS rule path is therefore best interpreted as an instrumentation layer whose demonstrated value is auditability, modifiability, and compatibility with symbolic intervention, not yet a statistically isolated source of within-family calibration change.
+The flat-confidence and MC-confidence-only controls are essential for interpreting the result. If NARS-gated attention were compared only with the baseline transformer, its paired Brier and ECE differences could be over-interpreted as a symbolic reasoning effect. Those controls neither isolate symbolic revision nor establish a gating effect while aggregation differs. The NARS rule path is therefore best interpreted as an instrumentation layer with inspectable numerical activity and editable prototype rules, not yet a statistically isolated source of within-family calibration change.
 
 \IfFileExists{figures/figure-3-ablation.png}{
-Figure~\ref{fig:ablation} reports the gamma sweeps and decision curves rather than treating them as future experiments. Across $\gamma\in\{0.25,0.5,1,2,4\}$, Brier deltas remain small. On WiDS, stronger gating monotonically lowers the Brier point estimate relative to baseline, reaching a delta of $-6.85\times10^{-5}$ at $\gamma=4$, while AUC deltas remain slightly negative. On TCGA, all five Brier deltas are negative but the small split gives no separated superiority regime. Decision curves likewise show closely overlapping transformer variants with modest threshold-dependent differences.
+Figure~\ref{fig:ablation} uses the current five-seed TCGA fused and WiDS KNN sources. Gamma sweeps and decision curves are descriptive development diagnostics; no gamma is selected using test outcomes, and overlapping net-benefit curves do not establish clinical utility.
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{figures/figure-3-ablation.png}
@@ -276,23 +298,25 @@ Figure~\ref{fig:ablation} reports the gamma sweeps and decision curves rather th
 
 \subsection{Failure Modes and Deployment Boundary}
 
-The interface can fail when MC dropout underestimates uncertainty, proposition extraction misaligns encoded features with clinical concepts, or rule truth values are weak or disputed. The trace localizes these failures: a reviewer can verify the extracted condition, inspect the rule and revised truth values, and rerun a case after editing or disabling the rule. This supports human oversight, but it is not a clinical safety mechanism.
+The interface can fail when MC dropout underestimates uncertainty, proposition extraction misaligns encoded features with clinical concepts, or rule truth values are weak or disputed. The trace localizes these failures: a reviewer can verify the extracted condition, inspect the rule and revised truth values, and rerun a case after editing or disabling the rule. The numerical instrumentation is inspectable, but whether it helps human oversight has not been evaluated.
 
 The current system remains a methods prototype rather than a clinical decision device. Deployment would require a rule base curated independently by domain experts, external validation without retuning, shift monitoring, rule governance, human-factors evaluation, and clinician override. Stronger evidence for symbolic revision would also require separation from baseline, flat-confidence, and uncertainty-only controls across external cohorts.
 
 \section{Limitations}
 \label{sec:limitations}
 
-The current evidence is a methods evaluation, not a clinical validation study. TCGA has only 69 held-out cases, WiDS uses an internal split rather than an external cohort, and both rule bases are prototype probes. The neural-to-NAL initializer can also over-trust a prediction when MC dropout underestimates uncertainty under shift; future work should compare ensembles and shift-aware estimators on temporally or institutionally independent cohorts.
+The evidence comes from inspected development cohorts. TCGA has 69 held-out cases; held-out WiDS hospitals remain within one benchmark. Both rule bases lack expert review. Ensemble and masking studies omit cohort-selection and prospective-confirmation uncertainty, and MC dropout may understate uncertainty under shift. These results do not establish clinical validation.
+
+An exploratory sensitivity evaluates ten frozen no-APACHE checkpoints on 12,000 PhysioNet/CinC 2012 records\footnote{Source release: \url{https://physionet.org/content/challenge-2012/1.0.0/}.}, using first-24-hour inputs and complete replay. Missing SpO2/surgery inputs, original $\geq48$-hour stay selection, and unverified identity/window equivalence prevent independent clinical claims; intervals resample cases within one institution. Separately, none of 507 selected TCGA pathology records has a pathology date/timepoint, leaving cross-table chronology unresolved.
 
 Finally, the repository implements NAL truth-value functions and feature-level rule revision, but not the complete NARS architecture. It does not maintain concept priority dynamics, task scheduling, or explicit evidential-base records. The claims should therefore be read as interface-level claims about truth-value-guided fusion and attention control.
 
 \section{Conclusion}
 \label{sec:conclusion}
 
-Dynamic evidential routing makes uncertainty-conditioned clinical inference inspectable: explicit rules revise confidence, change attention, and leave arithmetic traces while preserving competitive held-out behavior. The controls support confidence routing but do not isolate symbolic revision as the source of improved calibration. External cohorts, expert-curated rules, stronger uncertainty estimators, and human evaluation are needed before clinical use.
+Dynamic evidential routing is an auditable inference-time interface for uncertainty-conditioned symbolic intervention. Explicit rules can revise confidence and change attention, and the run leaves arithmetic traces. The saved comparisons do not show that symbolic revision improves clinical prediction. External cohorts, expert-curated rules, reported ensemble comparisons, and human evaluation are needed before clinical use.
 
-\paragraph{Ethics and reproducibility.} This study uses public, de-identified benchmarks and collected no new patient data. An anonymized implementation accompanies the submission. Large language models assisted with drafting, formulation, and code generation; the authors checked the derivations, implementation, references, and results and take responsibility for the work.
+\paragraph{Ethics and reproducibility.} This study uses existing de-identified benchmarks and collected no new patient data. The WiDS publisher requires registered access and a data-use agreement. An anonymized implementation accompanies the submission. Large language models assisted with drafting, formulation, and code generation; the authors checked the derivations, implementation, references, and results and take responsibility for the work.
 
 \bibliographystyle{plainnat}
 \bibliography{references}
