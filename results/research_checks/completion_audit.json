@@ -48,7 +48,7 @@
       "task": "Audit TCGA record merging",
       "completed": false,
       "status": "timing evidence required",
-      "evidence_or_action": "One physical record per source avoids column-wise synthetic records, and 5,170 conflicting case/field records are preserved. Supply source-level measurement dates and encounter provenance to verify cross-table chronology at the stated post-pathology landmark."
+      "evidence_or_action": "The physical-record audit covers all five tables and 68 model/rule inputs. All 507 selected diagnosis records have day zero; none of the 507 pathology records has a pathology date/timepoint. Molecular-test dates are absent. Source-level measurement availability and encounter links are still required; diagnosis offsets cannot certify cross-table chronology."
     },
     {
       "task": "Clarify prediction timing",
@@ -66,7 +66,7 @@
       "task": "Check APACHE data",
       "completed": false,
       "status": "source dictionary required",
-      "evidence_or_action": "2,371 invalid probabilities are masked. Twenty full hospital fits cover both imputers and five paired with/without-score seeds. Obtain the authoritative WiDS/eICU dictionary and score-calculation/timestamp provenance through the source access process; negative sentinel semantics and end-of-day availability are not established by the CSV."
+      "evidence_or_action": "2,371 invalid probabilities are masked and twenty full with/without-score fits are saved. Official eICU prediction/APS documentation was reviewed, but does not resolve this WiDS column's negative sentinel or score timestamp. The authoritative WiDS dictionary requires registered source access; provide its versioned definition and calculation/availability provenance."
     },
     {
       "task": "Review imputation",
@@ -246,7 +246,7 @@
       "task": "Check external compatibility",
       "completed": false,
       "status": "external cohort required",
-      "evidence_or_action": "Frozen checkpoint/preprocessor evaluation, explicit unit/window and rule-only mappings, case/patient overlap rejection, complete replay and clustered Brier/AUROC noninferiority criteria are implemented. Supply an eligible independent cohort to execute the clinical study."
+      "evidence_or_action": "Frozen mapping, overlap checks, replay and noninferiority tooling exist. A public 12,000-case PhysioNet sensitivity evaluates ten no-APACHE fits with conditional case intervals and explicit clinical_claim_eligible=false. Source identity/window equivalence, original >=48-hour selection and unavailable inputs prevent it from meeting independent clinical eligibility; supply a qualified untouched cohort."
     },
     {
       "task": "Evaluate subgroups",
@@ -396,7 +396,7 @@
       "task": "Experiment 7: Test external compatibility",
       "completed": false,
       "status": "external cohort required",
-      "evidence_or_action": "The frozen evaluation and compatibility-margin tooling is implemented. No eligible independent cohort or authoritative harmonization evidence was supplied; provide those inputs before the clinical criterion can be tested."
+      "evidence_or_action": "The public cross-source sensitivity executes frozen predictions and numerical margins, but explicitly cannot establish independent clinical compatibility. A qualified untouched cohort with canonical source identities and reviewed measurement/outcome harmonization remains required."
     },
     {
       "task": "Experiment 8: Evaluate auditability",
@@ -439,6 +439,8 @@
   "total": 72,
   "masking_complete": true,
   "uncertainty_intervals_complete": true,
+  "cross_source_sensitivity_complete": true,
+  "selected_record_timing_audit_complete": true,
   "historical_audit": "results/v2_validation/documentation_audit.json",
   "evidence_scope": "full development evaluation on inspected fixed cohorts; no prospective confirmation"
 }
