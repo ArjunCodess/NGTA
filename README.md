@@ -67,6 +67,10 @@ The current development studies contain 20 hospital-held-out WiDS fits across KN
 
 The planned symbolic Brier benefit of 0.0001 is not established. For WiDS KNN, mean NARS-minus-MC Brier is -0.000000243 with hierarchical 95% interval [-0.000000691, 0.000000164]. Removing APACHE reduces mean ungated AUROC from 0.875721 to 0.841118. These are development results on already inspected cohorts; internal held-out hospitals do not establish external compatibility. The original numerical tables below remain historical evidence with their aggregation and audit limitations disclosed.
 
+The full masking study passes its paired degradation/harm criteria in 12 of 15 median seed/scenario combinations and 1 of 15 KNN combinations. None of the five KNN random or feature-dependent scenarios passes, so the results do not support a general routing-robustness claim. Individual acceptance reports and uncertainty intervals remain available for inspection.
+
+For the fixed WiDS KNN ensemble, predictive variance detects threshold errors above chance (AUROC 0.842276), while neural and revised attention-confidence scores yield 0.514950 and 0.500647 with hospital-bootstrap intervals spanning 0.5. The routing confidence therefore remains an unvalidated trust signal even when predictive uncertainty is informative.
+
 [list.md](list.md) tracks genuinely completed work. The detailed research audit is in [docs/research-audit.md](docs/research-audit.md), leaving this README focused on the project and its use.
 
 ## Running

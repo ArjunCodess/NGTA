@@ -72,7 +72,7 @@
       "task": "Review imputation",
       "completed": true,
       "status": "completed",
-      "evidence_or_action": "Training-standardized KNN distances, separate raw/imputed values and observed-only rules are implemented and regression-tested. Comparative imputer research is still separate work."
+      "evidence_or_action": "Training-standardized KNN distances, separate raw/imputed values and observed-only predicates are tested. Full KNN/median, with/without-APACHE paired fits and both five-seed masking studies now evaluate the imputer choices."
     },
     {
       "task": "Verify data integrity",
@@ -138,7 +138,7 @@
       "task": "Preserve negative results",
       "completed": true,
       "status": "completed",
-      "evidence_or_action": "Legacy null/losing comparisons remain qualified; smoke permutation tests show no symbolic gain. No failed result is relabeled as clinical success."
+      "evidence_or_action": "Full hierarchical symbolic intervals span zero and fail the benefit margin; masking accepts only 12/15 median and 1/15 KNN conditions. Attention-confidence error intervals span chance. These failed findings remain explicit in the README, audit and manuscript."
     },
     {
       "task": "Expand rule validation",
@@ -220,8 +220,8 @@
     },
     {
       "task": "Test missingness robustness",
-      "completed": false,
-      "status": "running",
+      "completed": true,
+      "status": "completed",
       "evidence_or_action": "Both imputers are evaluated at 0/10/30/50/70% random, feature-dependent and outcome-dependent simulated raw masking with fixed models/rules, paired degradation intervals and 0.001 mask-harm bounds. Acceptance is reported per fit/scenario; this does not establish population robustness."
     },
     {
@@ -232,8 +232,8 @@
     },
     {
       "task": "Measure selective prediction",
-      "completed": false,
-      "status": "running",
+      "completed": true,
+      "status": "completed",
       "evidence_or_action": "Persisted full masking predictions supply error-detection AUROC, tie-aware selective-risk area, Brier degradation and 1,000 hospital-bootstrap intervals. These are per-fit descriptive intervals, not adjusted clinical superiority evidence."
     },
     {
@@ -282,7 +282,7 @@
       "task": "Improve artifact preservation",
       "completed": true,
       "status": "completed",
-      "evidence_or_action": "Checkpoints, fitted processors/estimators, source hashes, exact splits, per-pass outputs, RNG and dependency versions are saved; six checkpoints reproduced MC predictions exactly on the original GPU."
+      "evidence_or_action": "All fitted artifacts, exact sources/splits, pass arrays, RNG and dependency versions are preserved. Restoring all 36 full-study model/preprocessor/RNG combinations reproduces every 50-pass probability matrix exactly, with maximum residual zero."
     },
     {
       "task": "Make data acquisition reproducible",
@@ -388,8 +388,8 @@
     },
     {
       "task": "Experiment 6: Test missingness and uncertainty",
-      "completed": false,
-      "status": "running",
+      "completed": true,
+      "status": "completed",
       "evidence_or_action": "Five-seed/imputer raw-masking studies, five-member ensembles and hospital-bootstrap uncertainty/degradation intervals execute the planned evaluation. Report the per-scenario acceptance results and failure cases; no claim of general clinical robustness follows."
     },
     {
@@ -435,10 +435,10 @@
       "evidence_or_action": "The source manuscript and documentation preserve legacy negative evidence and distinguish implemented mechanics from unproven research claims."
     }
   ],
-  "completed": 50,
+  "completed": 53,
   "total": 72,
-  "masking_complete": false,
-  "uncertainty_intervals_complete": false,
+  "masking_complete": true,
+  "uncertainty_intervals_complete": true,
   "historical_audit": "results/v2_validation/documentation_audit.json",
   "evidence_scope": "full development evaluation on inspected fixed cohorts; no prospective confirmation"
 }
