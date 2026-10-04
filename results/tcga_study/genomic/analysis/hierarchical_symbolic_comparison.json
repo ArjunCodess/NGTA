@@ -1,0 +1,28 @@
+{
+  "brier_nars_minus_mc": -1.0392216712435028e-05,
+  "lower_95": -4.353153992507689e-05,
+  "upper_95": 8.058438006642642e-06,
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "mc_repeats": [
+    3,
+    3,
+    3,
+    3,
+    3
+  ],
+  "bootstrap_iterations": 1000,
+  "sampling_units": [
+    "case",
+    "training_seed",
+    "dropout_repeat"
+  ],
+  "scope": "one fixed development split; excludes variability across different source cohorts and split selections",
+  "minimum_symbolic_gain": 0.0001,
+  "brier_margin_met": false
+}
