@@ -1,0 +1,61 @@
+{
+  "source": "https://archive.physionet.org/challenge/2012/",
+  "files": [
+    {
+      "filename": "set-a.tar.gz",
+      "url": "https://archive.physionet.org/challenge/2012/set-a.tar.gz",
+      "sha256": "8cb250f179cd0952b4b9ebcf8954b63d70383131670fac1cfee13deaa13ca920",
+      "bytes": 6632372
+    },
+    {
+      "filename": "Outcomes-a.txt",
+      "url": "https://archive.physionet.org/challenge/2012/Outcomes-a.txt",
+      "sha256": "2613ea60ccda29f87571a7d6b09ad130858a8ccd66325bd073365925026883c2",
+      "bytes": 79219
+    },
+    {
+      "filename": "set-b.tar.gz",
+      "url": "https://archive.physionet.org/challenge/2012/set-b.tar.gz",
+      "sha256": "b1637a2a423a8e76f8f087896cfc5fdf28f88519e1f4e874fbda69b2a64dac30",
+      "bytes": 6652690
+    },
+    {
+      "filename": "Outcomes-b.txt",
+      "url": "https://archive.physionet.org/challenge/2012/Outcomes-b.txt",
+      "sha256": "1305f29734da374a809483229a99f33a9230aa8d4fa74b1a2d6ad788136423d5",
+      "bytes": 79149
+    },
+    {
+      "filename": "set-c.tar.gz",
+      "url": "https://archive.physionet.org/challenge/2012/set-c.tar.gz",
+      "sha256": "a4a56b95bcee4d50a3874fe298bf2998f2ed0dd98a676579573dc10419329ee1",
+      "bytes": 6600293
+    },
+    {
+      "filename": "Outcomes-c.txt",
+      "url": "https://archive.physionet.org/challenge/2012/Outcomes-c.txt",
+      "sha256": "0b32dcb7753c0f18f2f5fde498a28618b8879c5e527ce0dae8ad120dd7e205c9",
+      "bytes": 79191
+    }
+  ],
+  "records": 12000,
+  "mapping_sha256": "f5c43913dedfc995176a0638683fd0374c1cc1b21462898de0f2c5289b27337e",
+  "cohort_sha256": "fe59f90202f93c6e7d992656c1b2637253fc2689ebe2e0b8a69face217699dcd",
+  "clinical_claim_eligible": false,
+  "missing_fraction": {
+    "age": 0.0,
+    "bmi": 0.4776666666666667,
+    "d1_heartrate_max": 0.016583333333333332,
+    "d1_sysbp_min": 0.016583333333333332,
+    "d1_temp_max": 0.017,
+    "d1_lactate_max": 0.5070833333333333,
+    "d1_bun_max": 0.023916666666666666,
+    "d1_creatinine_max": 0.023833333333333335,
+    "d1_glucose_max": 0.06266666666666666,
+    "d1_wbc_max": 0.035,
+    "d1_spo2_min": 1.0,
+    "d1_platelets_min": 0.0315,
+    "elective_surgery": 1.0,
+    "gender": 0.001
+  }
+}
