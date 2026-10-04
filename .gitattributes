@@ -1,5 +1,8 @@
 results/hospital_study/**/*.joblib filter=lfs diff=lfs merge=lfs -text
 results/hospital_study/**/*.npz filter=lfs diff=lfs merge=lfs -text
+results/cross_source_sensitivity/**/*.npz filter=lfs diff=lfs merge=lfs -text
+results/cross_source_sensitivity/physionet2012/cohort.csv -text
+results/cross_source_sensitivity/physionet2012/mapping.json -text
 data/acquired_tcga/** -text
 results/**/traces/raw_test.csv -text
 results/**/traces/replay_spec.json -text
