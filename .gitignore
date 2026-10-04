@@ -226,3 +226,8 @@ __marimo__/
 results/hospital_study/**/*.joblib
 results/hospital_study/**/*.npz
 results/cross_source_sensitivity/**/*.npz
+
+# Restricted source data and fresh blinded study materials stay local.
+data/private/
+results/private/
+results/reviewer_private/
