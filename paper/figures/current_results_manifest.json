@@ -1,0 +1,21 @@
+{
+  "conditions": {
+    "WiDS KNN": "results/hospital_study/knn",
+    "WiDS median": "results/hospital_study/median",
+    "WiDS KNN, no APACHE": "results/hospital_study/knn_no_apache",
+    "WiDS median, no APACHE": "results/hospital_study/median_no_apache",
+    "TCGA fused": "results/tcga_study/fused",
+    "TCGA clinical": "results/tcga_study/clinical",
+    "TCGA genomic": "results/tcga_study/genomic"
+  },
+  "training_seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "mc_samples": 50,
+  "mc_repeats": 3,
+  "scope": "fixed development splits; no prospective or independent-cohort confirmation"
+}

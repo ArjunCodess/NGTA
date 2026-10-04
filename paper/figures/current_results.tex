@@ -1,0 +1,41 @@
+\begin{table}[t]
+\caption{Current development evaluation: five training seeds per condition on fixed held-out cases. Brier values are means with seed standard deviations, not case-bootstrap confidence intervals. The APACHE score remains a score-only comparator when removed from predictor inputs.}
+\label{tab:current_results}
+\centering\scriptsize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llcc@{}}
+\toprule
+Condition & Variant & AUROC & Brier (seed SD) \\
+\midrule
+WiDS KNN & Ungated & 0.875721 & 0.057830 (0.000109) \\
+WiDS KNN & MC-only & 0.875711 & 0.057828 (0.000112) \\
+WiDS KNN & NARS & 0.875713 & 0.057828 (0.000112) \\
+WiDS KNN & Boosting & 0.873278 & 0.057864 (0.000156) \\
+WiDS KNN & Recalibrated & 0.875721 & 0.057782 (0.000145) \\
+TCGA fused & Ungated & 0.692941 & 0.229410 (0.009980) \\
+TCGA fused & MC-only & 0.692101 & 0.229534 (0.010085) \\
+TCGA fused & NARS & 0.692101 & 0.229548 (0.010068) \\
+TCGA fused & Boosting & 0.661345 & 0.243924 (0.000000) \\
+TCGA fused & Recalibrated & 0.692941 & 0.226140 (0.008783) \\
+\bottomrule
+\end{tabular}
+\end{table}
+\begin{table}[t]
+\caption{Matched symbolic contrasts, NARS-minus-MC Brier, with hierarchical 95\% intervals over cases/hospitals, training seeds, and three dropout repeats. Negative is better. These development comparisons do not meet the prespecified $10^{-4}$ minimum benefit.}
+\label{tab:current_symbolic}
+\centering\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Condition & Difference & Lower & Upper \\
+\midrule
+WiDS KNN & -2.43e-07 & -6.91e-07 & 1.64e-07 \\
+WiDS median & -4.04e-07 & -1.19e-06 & 5.79e-07 \\
+WiDS KNN, no APACHE & -1.68e-07 & -4.31e-07 & 3.11e-07 \\
+WiDS median, no APACHE & -2.35e-07 & -7.85e-07 & 6.53e-07 \\
+TCGA fused & 1.26e-05 & -5.69e-05 & 1.06e-04 \\
+TCGA clinical & 2.63e-05 & -5.74e-05 & 1.33e-04 \\
+TCGA genomic & -1.04e-05 & -4.35e-05 & 8.06e-06 \\
+\bottomrule
+\end{tabular}
+\end{table}
