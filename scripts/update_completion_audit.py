@@ -49,6 +49,9 @@ def update():
         "Fourth: Strengthen baselines and validation":(False,"external evidence required","Full internal baselines, APACHE dependence, rule controls, ensembles and masking are executed. Independent cohorts, score timing, clinical expert review and favorable research acceptance remain unresolved; the audit specifies the required inputs."),
     }
     replacements={
+        "Review imputation":"Training-standardized KNN distances, separate raw/imputed values and observed-only predicates are tested. Full KNN/median, with/without-APACHE paired fits and both five-seed masking studies now evaluate the imputer choices.",
+        "Improve artifact preservation":"All fitted artifacts, exact sources/splits, pass arrays, RNG and dependency versions are preserved. Restoring all 36 full-study model/preprocessor/RNG combinations reproduces every 50-pass probability matrix exactly, with maximum residual zero.",
+        "Preserve negative results":"Full hierarchical symbolic intervals span zero and fail the benefit margin; masking accepts only 12/15 median and 1/15 KNN conditions. Attention-confidence error intervals span chance. These failed findings remain explicit in the README, audit and manuscript.",
         "Add matched inference baselines":"Ungated, uniform, MC-only and NARS gates use identical cached passes in all 35 full study fits, with independent numerical replay.",
         "Add stronger predictive baselines":"Full studies include deterministic/mean-logit inference, validation recalibration, calibrated logistic regression, ExtraTrees, validation-selected boosting and WiDS score-only comparators.",
         "Test encoder-level intervention":"Acquired TCGA fused runs compare genuine encoder key bias with readout gating under replayed RNG. Identity and contextual changes are tested; clinical advantage is not established.",

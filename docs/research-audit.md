@@ -66,6 +66,10 @@ Frozen raw masking tests 0/10/30/50/70% additional removal under random, feature
 
 Five-member ensembles, MC variance and predictive entropy use a common ensemble-error reference. Each condition reports actual seed means/SDs and seed-mean Student-t intervals separately from case intervals. Fixed demographic subgroup and MC-inclusive decision curves exist for every full hospital fit.
 
+The paired degradation/harm criterion passes in 12/15 median and 1/15 KNN seed/scenario combinations. KNN passes neither random nor feature-dependent masking in any seed. The complete study therefore does not establish general routing robustness; [missingness_acceptance.csv](../results/research_checks/missingness_acceptance.csv) preserves every passing and failing condition.
+
+The fixed WiDS KNN ensemble's mean MC variance detects common ensemble errors with AUROC 0.842276, hospital-bootstrap interval [0.833229, 0.857306]. Neural attention instability gives 0.514950 [0.493533, 0.531916], and revised attention instability gives 0.500647 [0.477047, 0.515520]. The attention-confidence intervals span chance, so a useful predictive uncertainty estimator does not validate the routing trust signal. These intervals condition on the fitted ensemble and exclude model-refitting variability.
+
 Frozen external evaluation implements documented target/landmark, units/windows/availability for every input and rule-only source, unit conversion, canonical identities, case/patient overlap checks, frozen preprocessing and complete replay. Clustered compatibility requires Brier upper bound <0.001 and AUROC lower bound >-0.01.
 
 Required input: an authorized independent institution/time cohort with verified feature/target provenance and canonical patient identities. No eligible independent cohort was supplied. Internal benchmark hospitals and separate TCGA/WiDS models do not provide external validation. For confirmation, preregister the entire procedure on genuinely untouched outcomes; inspected labels cannot become unseen.
@@ -77,6 +81,8 @@ Caches verify source hashes, partitions, options and preprocessing code identity
 Hospital model/NPZ binaries use Git LFS. Run `git lfs install` and `git lfs pull` after cloning; pointers cannot restore models. This checkout's local LFS cache uses G: to avoid duplicating large files on constrained C:; other clones need no such drive configuration.
 
 The regression suite passes 76 tests, including exact weighted-bootstrap equivalence with duplicated-case/tie reconstruction, independent replay corruption checks, predicate edges and external patient/unit/rule-only mappings. Current figure sources explicitly select five TCGA fused and five WiDS KNN seeds and reject source/split/rule/configuration mismatches. The compiled 13-page PDF was rendered and inspected, with no undefined references or overfull boxes. NeurIPS formatting files are inside `paper/` only; the former top-level directory is absent.
+
+All 36 full-study checkpoints were restored with their fitted processors and saved dropout RNG. Every saved 50-pass probability matrix reproduced exactly, with maximum residual zero. [checkpoint_verification.json](../results/research_checks/checkpoint_verification.json) records source/split/feature checks, independent event replay and fitted-estimator hashes; this is numerical reproducibility, not clinical confirmation.
 
 All 28 cited entries have primary bibliographic metadata verification, links and recorded conflicts. This verifies reference identity, not every scientific claim attributed to each work.
 
