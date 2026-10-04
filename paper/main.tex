@@ -305,7 +305,9 @@ The current system remains a methods prototype rather than a clinical decision d
 \section{Limitations}
 \label{sec:limitations}
 
-The current evidence is a methods development evaluation, not a clinical validation study. TCGA has only 69 held-out cases; WiDS holds out hospitals within one benchmark, which does not supply an independent external institution cohort. Both rule bases remain prototype probes without expert review. Ensemble and frozen raw-masking outputs are retained, while cohort-selection uncertainty and prospective confirmation remain unmeasured. The neural-to-NAL initializer can also over-trust a prediction when MC dropout underestimates uncertainty under shift; future work should compare ensembles and shift-aware estimators on temporally or institutionally independent cohorts.
+The evidence comes from inspected development cohorts. TCGA has 69 held-out cases; held-out WiDS hospitals remain within one benchmark. Both rule bases lack expert review. Ensemble and masking studies omit cohort-selection and prospective-confirmation uncertainty, and MC dropout may understate uncertainty under shift. These results do not establish clinical validation.
+
+An exploratory sensitivity evaluates ten frozen no-APACHE checkpoints on 12,000 PhysioNet/CinC 2012 records\footnote{Source release: \url{https://physionet.org/content/challenge-2012/1.0.0/}.}, using first-24-hour inputs and complete replay. Missing SpO2/surgery inputs, original $\geq48$-hour stay selection, and unverified identity/window equivalence prevent independent clinical claims; intervals resample cases within one institution. Separately, none of 507 selected TCGA pathology records has a pathology date/timepoint, leaving cross-table chronology unresolved.
 
 Finally, the repository implements NAL truth-value functions and feature-level rule revision, but not the complete NARS architecture. It does not maintain concept priority dynamics, task scheduling, or explicit evidential-base records. The claims should therefore be read as interface-level claims about truth-value-guided fusion and attention control.
 
@@ -314,7 +316,7 @@ Finally, the repository implements NAL truth-value functions and feature-level r
 
 Dynamic evidential routing is an auditable inference-time interface for uncertainty-conditioned symbolic intervention. Explicit rules can revise confidence and change attention, and the run leaves arithmetic traces. The saved comparisons do not show that symbolic revision improves clinical prediction. External cohorts, expert-curated rules, reported ensemble comparisons, and human evaluation are needed before clinical use.
 
-\paragraph{Ethics and reproducibility.} This study uses public, de-identified benchmarks and collected no new patient data. An anonymized implementation accompanies the submission. Large language models assisted with drafting, formulation, and code generation; the authors checked the derivations, implementation, references, and results and take responsibility for the work.
+\paragraph{Ethics and reproducibility.} This study uses existing de-identified benchmarks and collected no new patient data. The WiDS publisher requires registered access and a data-use agreement. An anonymized implementation accompanies the submission. Large language models assisted with drafting, formulation, and code generation; the authors checked the derivations, implementation, references, and results and take responsibility for the work.
 
 \bibliographystyle{plainnat}
 \bibliography{references}
