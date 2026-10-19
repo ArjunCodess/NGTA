@@ -1489,5 +1489,7 @@
   "total_files": 297,
   "total_bytes": 8691914602,
   "local_files_preserved": true,
-  "action": "remove these exact paths from branch tip; historical commits and remote LFS storage remain"
+  "action": "Removed these exact paths from branch tip and published version-2 history; GitHub-side LFS/cached-reference purge remains unconfirmed",
+  "history_rewrite_date": "2026-10-20",
+  "history_rewrite_verification": "results/research_checks/github_purge/verification.json"
 }

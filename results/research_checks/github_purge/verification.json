@@ -1,0 +1,28 @@
+{
+  "repository": "ArjunCodess/NGTA",
+  "repository_url": "https://github.com/ArjunCodess/NGTA",
+  "branch": "version-2",
+  "old_head": "34a44d43ccf8928c5f5bc321940145ee361840a5",
+  "rewritten_head": "96ea50b3c26e78a60e3cd625743442dd91e865e7",
+  "first_changed_commit": "869667a390bf1c8cc59dc3f0f0ff604f932c030e",
+  "affected_pull_requests": [
+    7
+  ],
+  "affected_pull_request_count": 1,
+  "target_paths": 297,
+  "unique_lfs_objects": 220,
+  "unique_lfs_bytes": 8427676003,
+  "all_rewritten_commit_trees_checked": true,
+  "target_paths_remaining": 0,
+  "current_branch_tip_tree_unchanged": true,
+  "main_unchanged": true,
+  "forks_count_at_preflight": 0,
+  "orphan_report_method": "Independently inventoried historical LFS pointer blobs and matched SHA256 object IDs to the removed-file manifest. git-filter-repo skipped its own LFS inventory because the current tip no longer tracks LFS files.",
+  "audit_date": "2026-10-20",
+  "history_force_push_succeeded": true,
+  "support_request_status": "being prepared in signed-in Chrome; remote LFS deletion not yet confirmed",
+  "local_original_files_verified": 297,
+  "local_recovery_set": "same-volume hard links; not an independent backup",
+  "independent_backup_blocker": "Insufficient free disk space for a second physical copy",
+  "history_backup": "Verified local Git bundle retained outside checkout; it contains the old history and must never be pushed"
+}
