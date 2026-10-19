@@ -20,9 +20,19 @@
   "orphan_report_method": "Independently inventoried historical LFS pointer blobs and matched SHA256 object IDs to the removed-file manifest. git-filter-repo skipped its own LFS inventory because the current tip no longer tracks LFS files.",
   "audit_date": "2026-10-20",
   "history_force_push_succeeded": true,
-  "support_request_status": "being prepared in signed-in Chrome; remote LFS deletion not yet confirmed",
+  "support_request_status": "submitted; initially closed as self-service-only, then reopened with an LFS storage-team routing request; open when verified",
   "local_original_files_verified": 297,
   "local_recovery_set": "same-volume hard links; not an independent backup",
   "independent_backup_blocker": "Insufficient free disk space for a second physical copy",
-  "history_backup": "Verified local Git bundle retained outside checkout; it contains the old history and must never be pushed"
+  "history_backup": "Verified local Git bundle retained outside checkout; it contains the old history and must never be pushed",
+  "support_ticket_id": 4878649,
+  "support_ticket_url": "https://help.github.com/ticket/personal/0/4878649",
+  "remote_lfs_purge_confirmed": false,
+  "remote_storage_reclamation_confirmed": false,
+  "post_rewrite_git_fsck_passed": true,
+  "object_report_delivery": "Immutable GitHub report links; browser file attachments require additional extension permission, which was not enabled",
+  "additional_lfs_workflow": "Attempted dedicated virtual agent. Its object-ID input has a 500-character maximum and truncated the 220-ID list. The incomplete confirmation was rejected and no duplicate request was submitted. The reopened support ticket links the complete list.",
+  "historical_lfs_inventory_matches_requested_objects": true,
+  "complete_historical_lfs_object_count": 220,
+  "support_ticket_status_when_verified": "open"
 }
