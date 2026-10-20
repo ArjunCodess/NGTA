@@ -1,4 +1,5 @@
 """Generate manuscript tables from completed, independently replayed studies."""
+import argparse
 import json
 from pathlib import Path
 import sys
@@ -18,10 +19,11 @@ CONDITIONS={
 }
 
 
-def refresh():
+def refresh(results_root='results', output_dir='paper/figures'):
     records=[]
     hierarchy=[]
-    for condition,root in CONDITIONS.items():
+    resolved = {condition: str(Path(results_root)/Path(root).relative_to("results")) for condition,root in CONDITIONS.items()}
+    for condition,root in resolved.items():
         frame=pd.read_csv(Path(root)/"analysis/seed_variability.csv")
         for variant in ("baseline","mc_confidence_only","nars_gated","hist_gradient_boosting","transformer_recalibrated"):
             row=frame.set_index("variant").loc[variant]
@@ -29,8 +31,8 @@ def refresh():
                 brier_seed_std=row.brier_std))
         report=json.loads((Path(root)/"analysis/hierarchical_symbolic_comparison.json").read_text())
         hierarchy.append(dict(condition=condition,**report))
-    root=Path("paper/figures")
-    root.mkdir(exist_ok=True)
+    root=Path(output_dir)
+    root.mkdir(parents=True,exist_ok=True)
     pd.DataFrame(records).to_csv(root/"current_results.csv",index=False)
     labels={"baseline":"Ungated","mc_confidence_only":"MC-only","nars_gated":"NARS","hist_gradient_boosting":"Boosting","transformer_recalibrated":"Recalibrated"}
     lines=[r"\begin{table}[t]",r"\caption{Current development evaluation: five training seeds per condition on fixed held-out cases. Brier values are means with seed standard deviations, not case-bootstrap confidence intervals. The APACHE score remains a score-only comparator when removed from predictor inputs.}",
@@ -44,11 +46,14 @@ def refresh():
         lines.append(f'{row["condition"]} & {row["brier_nars_minus_mc"]:.2e} & {row["lower_95"]:.2e} & {row["upper_95"]:.2e} '+r"\\")
     lines += [r"\bottomrule",r"\end{tabular}",r"\end{table}"]
     (root/"current_results.tex").write_text("\n".join(lines)+"\n")
-    (root/"current_results_manifest.json").write_text(json.dumps(dict(conditions=CONDITIONS,
+    (root/"current_results_manifest.json").write_text(json.dumps(dict(conditions=resolved,
         training_seeds=list(range(5)),mc_samples=50,mc_repeats=3,
         scope="fixed development splits; no prospective or independent-cohort confirmation"),indent=2))
     return records,hierarchy
 
 
 if __name__=="__main__":
-    refresh()
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--results-root",default="results")
+    parser.add_argument("--output-dir",default="paper/figures")
+    refresh(**vars(parser.parse_args()))

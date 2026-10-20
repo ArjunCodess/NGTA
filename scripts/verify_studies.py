@@ -20,9 +20,14 @@ from src.pipeline import DATASET_METADATA,PipelineConfig
 from src.trace_replay import replay_bundle
 
 
-def verify(checkpoint_replay=False):
-    roots=[Path('results/hospital_study')/name for name in ('knn','median','knn_no_apache','median_no_apache','shuffled_labels')]
-    roots += [Path('results/tcga_study')/name for name in ('fused','clinical','genomic')]
+def verify(checkpoint_replay=False, results_root='results'):
+    roots=[Path(results_root)/'hospital_study'/name for name in ('knn','median','knn_no_apache','median_no_apache','shuffled_labels')]
+    roots += [Path(results_root)/'tcga_study'/name for name in ('fused','clinical','genomic')]
+    expected = {root / f'seed_{seed}' / ('tcga' if 'tcga_study' in root.parts else 'wids') / 'metrics/run_summary.json'
+                for root in roots for seed in ([0] if root.name == 'shuffled_labels' else range(5))}
+    actual = {path for root in roots for path in root.glob('seed_*/*/metrics/run_summary.json')}
+    if actual != expected:
+        raise ValueError(f'Full-study inventory differs: missing={sorted(map(str, expected-actual))}; unexpected={sorted(map(str, actual-expected))}')
     bundles={}
     records=[]
     for root in roots:
@@ -93,7 +98,8 @@ def verify(checkpoint_replay=False):
             print(f'Verified {directory}',flush=True)
     report=dict(passed=True,bundles=len(records),checkpoint_replay=checkpoint_replay,records=records,
         scope='full development studies; synthetic external integration is tested separately')
-    output=Path('results/research_checks')/('checkpoint_verification.json' if checkpoint_replay else 'artifact_verification.json')
+    output=Path(results_root)/'research_checks'/('checkpoint_verification.json' if checkpoint_replay else 'artifact_verification.json')
+    output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(report,indent=2))
     return report
 
@@ -101,4 +107,5 @@ def verify(checkpoint_replay=False):
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--checkpoint-replay',action='store_true')
+    parser.add_argument('--results-root',default='results')
     verify(**vars(parser.parse_args()))
