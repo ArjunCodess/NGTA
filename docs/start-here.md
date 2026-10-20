@@ -1,12 +1,12 @@
 # NGTA: optional help with future validation
 
-The original plan has 52 satisfied criteria, four owner-excluded expert/participant criteria and 16 active unresolved criteria. See [next work](next-work.md). External validation was previously deferred, but its criteria remain required by plan.md. The existing implementation and development experiments can be used while the evidence below is unavailable. The steps below are optional preparation for later validation; the current [technical reproduction guide](reproducibility.md) covers the finished implementation and experiments.
+The original plan has 52 satisfied criteria, five owner-excluded expert/participant or WiDS clarification criteria and 15 active unresolved criteria. See [next work](next-work.md). External validation was previously deferred, but its criteria remain required by plan.md. The existing implementation and development experiments can be used while the evidence below is unavailable. The steps below are optional preparation for later validation; the current [technical reproduction guide](reproducibility.md) covers the finished implementation and experiments.
 
 I can handle downloads that are openly available, source inspection, coding, data preparation, experiments, analysis, paper updates and repository maintenance. You do not need to design a study or negotiate a hospital data agreement. Start with the small actions below; send back the original replies/files and I will work out the technical next step.
 
 ## 1. Current experiment data are available
 
-The original training data and fitted studies are available. Additional download verification is not an active task. Keep local research files in place. The relevant remaining work is source interpretation and the additional public pathology-report audit described in [next work](next-work.md).
+The original training data and fitted studies are available. Additional download verification is not an active task. Keep local research files in place. Current WiDS experiments use these existing data. Further WiDS interpretation checks are not prerequisites. Website-only cohort access suggestions are in [internet-data.md](internet-data.md).
 
 ## 2. Source questions sent
 

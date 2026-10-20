@@ -1,6 +1,6 @@
 # Reproducing NGTA
 
-This is the technical release for the inspected development studies in `plan.md`. External clinical expert review and participant collection are excluded by the owner; source clarification and eligible independent-cohort validation remain unresolved. Failed symbolic-benefit and robustness criteria remain failed; the release does not change them into completed scientific claims.
+This is the technical release for the inspected development studies in `plan.md`. External clinical expert review and participant collection are excluded by the owner; further WiDS source clarification is excluded as an execution prerequisite, while eligible independent-cohort validation remains unresolved. Failed symbolic-benefit and robustness criteria remain failed; the release does not change them into completed scientific claims.
 
 ## What is included
 
@@ -105,7 +105,7 @@ python scripts/package_reproducibility.py --output .cache/NGTA-reproducibility.z
 python scripts/package_reproducibility.py --verify --output .cache/NGTA-reproducibility.zip
 ```
 
-Choose a new filename if it already exists; the builder does not overwrite an existing package. Exact fitted replay additionally requires a separate permitted full-study archive with source data and trace/checkpoint files. The 297-file preservation manifest alone does not reconstruct all other files in those directories. There is no approved external fitted-archive location yet; see [artifact storage](artifact-storage.md).
+Choose a new filename if it already exists; the builder does not overwrite an existing package. Exact fitted replay additionally requires a separate permitted full-study archive with source data and trace/checkpoint files. The 297-file preservation manifest alone does not reconstruct all other files in those directories or the new private encoder probability arrays. There is no approved external fitted-archive location yet; see [artifact storage](artifact-storage.md).
 
 No researcher recruitment, additional data download or favorable result is needed to use this technical release. Any future clinical validation should begin with its own reviewed protocol, qualified source data and untouched outcomes.
 
@@ -115,4 +115,10 @@ The original public demonstration is unsuitable for blinded recruitment. Its pre
 
 Only the individual `participant/reviewer_*` folder assigned to a reviewer is intended for delivery after protocol finalization. It contains that reviewer's assigned evaluation format once per case and a free-text correction response sheet. Master cross-format tasks, assignments and the investigator grading template are moved into `investigator/`. Do not distribute the root directory, protocol seed, investigator folder or other reviewers' materials. Empty response sheets cannot produce a human-study result. The prepared private package has 24 reviewer folders and 1,920 balanced assignments for 80 evaluation cases, but zero recruited participants and zero human responses.
 
-The current [scope policy](scope-policy.json) crosses out four expert/participant criteria without marking them complete. [Next work](next-work.md) records the remaining official-source and cohort tasks. The source package includes this policy so regenerated checklists retain the owner decision.
+The current [scope policy](scope-policy.json) crosses out five expert/participant or WiDS clarification criteria without marking them complete. [Next work](next-work.md) records the remaining official-source and cohort tasks. The source package includes this policy so regenerated checklists retain the owner decision.
+
+## Frozen WiDS encoder extension
+
+Run `python scripts/evaluate_wids_encoder.py` to evaluate the existing 20 WiDS checkpoints with uniform, MC-confidence and NARS-confidence gates inside every encoder layer. The uniform gate must reproduce all original 50 probability passes within 1e-7. This uses the saved processor, weights and primary dropout RNG, with no refitting or downloads. Probability arrays and case-level outputs go only to `results/private/wids_encoder_study/`; the aggregate report is `results/research_checks/wids_encoder.json`. Existing results resume only when their checkpoint/specification/RNG identity and saved probability hash match. A partial result is preserved and rejected instead of overwritten.
+
+Intervals resample hospitals and fitted seeds. The primary original dropout draw is fixed; these new intervals do not include the original study's three-repeat uncertainty. Twelve secondary condition/contrast comparisons receive Bonferroni family intervals. All results remain exploratory on already inspected development cases.

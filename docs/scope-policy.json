@@ -1,13 +1,18 @@
 {
-  "decision_date": "2026-10-20",
-  "authority": "Owner instruction: assume external researcher-dependent work is impossible and cross it out.",
+  "decision_date": "2026-10-21",
+  "authority": "Owner instruction: assume external researcher-dependent work is impossible and cross it out. Owner continuation: use the available WiDS data; extra download and source-interpretation checks are not prerequisites.",
   "excluded_requirements": [
     "Improve the rule base",
     "Expand rule validation",
     "Evaluate human oversight",
-    "Experiment 8: Evaluate auditability"
+    "Experiment 8: Evaluate auditability",
+    "Check APACHE data"
   ],
-  "reason": "External clinical expert review and real participant collection are unavailable and will not be pursued. Existing source documentation, software controls and private preparation are retained.",
+  "reason": "External expert review, participant collection and further WiDS source clarification are excluded from active work by the owner. Existing experiments and preparation remain preserved.",
   "evidence_rule": "Exclusion does not satisfy the original scientific criterion and must never be counted as completion. Clinical validation and reviewer-benefit claims remain unsupported.",
-  "still_in_scope": "Official-source research, obtainable data and independent technical preparation. An external dataset does not automatically require recruiting an external researcher; access and eligibility must be assessed separately."
+  "still_in_scope": "Official-source research, obtainable data and independent technical preparation. An external dataset does not automatically require recruiting an external researcher; access and eligibility must be assessed separately.",
+  "exclusion_reasons": {
+    "Check APACHE data": "Owner excludes further WiDS source-interpretation checks from active work. Invalid probabilities remain unavailable; the completed with/without-APACHE and creatinine-rule-off studies are retained. Exact score timing and the source-unit definition remain unverified limitations, not execution blockers."
+  },
+  "downloads": "Do not resume the stopped recursive WiDS download. Use the existing study data. Internet-hosted cohort options may be researched without downloading patient data."
 }

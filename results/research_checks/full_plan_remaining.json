@@ -3,8 +3,8 @@
   "total": 72,
   "satisfied": 52,
   "not_satisfied": 20,
-  "owner_excluded": 4,
-  "active_unsatisfied": 16,
+  "owner_excluded": 5,
+  "active_unsatisfied": 15,
   "group_counts": {
     "scientific_acceptance": 3,
     "qualified_clinical_review": 2,
@@ -53,8 +53,8 @@
       "requirement": "Check APACHE data",
       "remaining_type": "source_provenance",
       "scientific_criterion_satisfied": false,
-      "owner_excluded": false,
-      "required_evidence_or_action": "2,371 invalid probabilities are masked and twenty full with/without-score fits are saved. The supplied 188-variable WiDS dictionary confirms APACHE IVa but does not resolve negative sentinels or score availability. Publisher clarification remains required. It also reveals a creatinine-unit conflict with the frozen rule; clinical interpretation and external unit harmonization remain unverified."
+      "owner_excluded": true,
+      "required_evidence_or_action": "Owner excludes further WiDS source-interpretation checks from active work. Invalid probabilities remain unavailable; the completed with/without-APACHE and creatinine-rule-off studies are retained. Exact score timing and the source-unit definition remain unverified limitations, not execution blockers."
     },
     {
       "requirement": "Use stronger data splits",
@@ -117,7 +117,7 @@
       "remaining_type": "combined_acceptance_and_provenance",
       "scientific_criterion_satisfied": false,
       "owner_excluded": false,
-      "required_evidence_or_action": "Twenty full hospital fits, APACHE/recalibrated/logistic/boosting comparisons and paired intervals are saved. Authoritative score availability remains unverified, and a clinically significant gain over the strongest locked comparator is not established."
+      "required_evidence_or_action": "Twenty full hospital fits, APACHE/recalibrated/logistic/boosting comparisons and paired intervals are saved. Further WiDS source clarification is excluded as an execution prerequisite; its unresolved definitions remain limitations. A clinically significant gain over the strongest locked comparator is not established."
     },
     {
       "requirement": "Experiment 6: Test missingness and uncertainty",

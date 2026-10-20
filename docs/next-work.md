@@ -1,6 +1,6 @@
 # Remaining work after the source search
 
-The owner has removed external clinical expert review and the human participant study from active work. Their four checklist entries are struck through, not counted as completed. The original criteria remain 52 satisfied out of 72; the active scope has 52 satisfied and 16 unresolved entries. Those entries overlap across the work below.
+The owner has removed external clinical expert review, the human participant study and further WiDS source clarification from active work. Five checklist entries are excluded without being counted as satisfied. The original criteria remain 52 satisfied out of 72; active scope has 52 satisfied and 15 unresolved entries out of 67. Existing WiDS data are sufficient for the current development work. No stopped download will be resumed.
 
 ## 1. Inspect the public TCGA pathology reports
 
@@ -10,15 +10,15 @@ The next independent task is to check disk space, acquire the PDFs into the igno
 
 The [GDC pipeline documentation](https://docs.gdc.cancer.gov/Data/Bioinformatics_Pipelines/DNA_Seq_Variant_Calling_Pipeline/) explicitly explains that public MAF masking can remove true somatic variants. No searched source establishes a complete case/gene callable panel for the frozen THCA inputs. Keep unavailable genes unknown unless a sourced assay/coverage record establishes otherwise. The source request is already sent; no sequencing download is justified merely to make a checklist green.
 
-## 2. Finish the WiDS provenance assessment
+## 2. WiDS development uses the existing data
 
-The [publisher issue](https://github.com/MIT-LCP/gossis/issues/5) recommends replacing eICU -1 values with NULL. Its [pinned cohort SQL](https://github.com/MIT-LCP/gossis/blob/95b69b99620d322b088262a41cd8098a1aed2f3e/eicu/sql/cohort.sql) also uses an APACHE IVa prediction of -1 with score greater than 1 as a readmission proxy. This supports the existing unavailable-value treatment at the source-family level. It does not identify the exact WiDS extraction revision or prove when its exported score became available.
+Further source clarification is excluded as an execution prerequisite at the owner's instruction. The frozen cleaning and rule conventions are retained, together with the existing with/without-APACHE and creatinine-rule-off analyses. Exact score timing and the dictionary/unit discrepancy remain stated limitations; no new interpretation is asserted because data stay out of Git.
 
-The creatinine conflict also remains: the inspected dictionary says micromol/L while the source SQL and observed scale are consistent with a different convention. Values alone cannot certify the unit. Record the source-family findings, seek an exact release definition or publisher correction, and preserve the existing no-APACHE and creatinine-rule-off results. No further model fit is needed unless authoritative information changes the interpretation. The GOSSIS request is already sent.
+The additional available-data experiment evaluates encoder-level MC and NARS confidence gates across all 20 frozen WiDS checkpoints, matching the saved 50-pass dropout draw and retaining uniform-encoder identity controls. It is an exploratory extension on inspected cases, with no refitting or new data. Its results are separate from the original readout experiment and cannot replace its negative finding.
 
 ## 3. Decide whether independent-cohort access is feasible
 
-An external dataset is separate from recruiting an external researcher. [SICdb](https://physionet.org/content/sicdb/1.0.8/) is a possible Austrian source with hospital-mortality information. Its publisher requires PhysioNet credentialing, CITI Data or Specimens Only Research training, a signed DUA and contributor approval of the proposed study. These steps do not establish eligibility for NGTA automatically.
+The practical website-only choices and access steps are in [internet-data.md](internet-data.md). Zigong is the first candidate to assess because the currently listed policy does not require contributor study approval beyond normal credentialing and the DUA. No independent eligibility is claimed. An external dataset is separate from recruiting an external researcher. [SICdb](https://physionet.org/content/sicdb/1.0.8/) is a possible Austrian source with hospital-mortality information. Its publisher requires PhysioNet credentialing, CITI Data or Specimens Only Research training, a signed DUA and contributor approval of the proposed study. These steps do not establish eligibility for NGTA automatically.
 
 If the owner pursues access, the practical order is to complete the [PhysioNet training/credentialing process](https://physionet.org/about/citi-course/), then submit the prepared research question through SICdb's access page. Before inspecting outcomes, freeze the no-APACHE checkpoint choice, first-day measurement mapping, units, hospital-death definition, source-independence checks and analysis. I can prepare and implement that technical work. In particular, SICdb's OffsetOfDeath includes deaths outside hospital and cannot simply be used as the WiDS hospital-death label. Personal training, identity verification and agreement acceptance belong to the owner.
 

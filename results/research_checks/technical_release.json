@@ -1,10 +1,10 @@
 {
-  "verified_utc": "2026-10-20T11:25:49.001571+00:00",
+  "verified_utc": "2026-10-20T20:45:02.250669+00:00",
   "branch": "version-2",
-  "scope": "Original plan 52/72 satisfied. Owner excludes four external expert/participant criteria without satisfying them; active scope has 52 satisfied and 16 unresolved out of 68.",
+  "scope": "Original plan 52/72 satisfied. Owner excludes five expert/participant or WiDS clarification criteria without satisfying them; active scope has 52 satisfied and 15 unresolved out of 67. WiDS uses existing data and adds a completed 20-checkpoint frozen encoder evaluation.",
   "tests": {
-    "passed": 100,
-    "extracted_source_package_passed": 100,
+    "passed": 103,
+    "extracted_source_package_passed": 103,
     "environment": "same recorded Windows/Python environment; separate source extraction, not a fresh environment or independent scientific evaluation"
   },
   "checkpoint_replay": {
@@ -34,7 +34,7 @@
   },
   "paper": {
     "path": "paper/main.pdf",
-    "pages": 12,
+    "pages": 13,
     "undefined_references": false,
     "overfull_boxes": false,
     "rendered_and_visually_inspected": true,
@@ -50,13 +50,12 @@
   "scientific_checklist": {
     "completed": 52,
     "total": 72,
-    "owner_excluded": 4,
-    "active_total": 68,
-    "active_unsatisfied": 16
+    "owner_excluded": 5,
+    "active_total": 67,
+    "active_unsatisfied": 15
   },
   "deferred": [
     "callable TCGA panels and clinical/genomic availability",
-    "APACHE sentinel/availability and creatinine-unit clarification",
     "eligible independent untouched cohort"
   ],
   "negative_findings": [
@@ -90,6 +89,18 @@
   "next_work": "docs/next-work.md",
   "owner_excluded": [
     "qualified clinical rule review",
-    "real blinded participant evaluation"
-  ]
+    "real blinded participant evaluation",
+    "further WiDS source clarification as an execution prerequisite"
+  ],
+  "wids_encoder": {
+    "checkpoints": 20,
+    "passes_per_checkpoint": 50,
+    "new_training": false,
+    "new_data_download": false,
+    "uniform_gate_max_pass_residual": 0.0,
+    "saved_array_brier_max_residual": 0.0,
+    "all_four_family_intervals_include_zero": true,
+    "clinical_benefit_margin_established": false,
+    "report": "results/research_checks/wids_encoder.json"
+  }
 }

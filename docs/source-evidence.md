@@ -53,3 +53,7 @@ The XML confirms 515 tumor procurement/pathology-review offset occurrences, whil
 ## Search follow-up and owner scope decision
 
 The [next-work assessment](next-work.md) records the latest official-source findings: 515 open THCA pathology PDFs totaling 79,840,335 bytes, publisher evidence relevant to APACHE -1 handling, and gated HiRID/SICdb cohort routes. The pathology PDFs are inventoried but their contents have not yet been audited. Four expert/participant requirements are excluded from active work, without becoming completed scientific criteria.
+
+## WiDS execution decision, 2026-10-21
+
+The owner excludes further WiDS source clarification from active execution requirements. Existing input conventions, unavailable-value handling, score-removal and creatinine-rule-off results are preserved; no unit or timestamp is newly certified. This does not block the completed 20-checkpoint WiDS encoder extension. No stopped download was resumed. [Internet-only cohort options](internet-data.md) include a credentialing/DUA route whose listed policy does not require an additional outside researcher or contributor study review; compatibility remains unestablished.

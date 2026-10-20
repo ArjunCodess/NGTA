@@ -1,8 +1,8 @@
 # Full plan status
 
-`plan.md` remains the specification. The original plan has 52 of 72 criteria satisfied. The owner has now excluded four external expert/participant criteria as unavailable; active work has 52 satisfied and 16 unresolved criteria out of 68. Excluded criteria remain scientifically unsatisfied. A source-code release, executed negative experiment, or private study package does not satisfy a missing scientific criterion.
+`plan.md` remains the specification. The original plan has 52 of 72 criteria satisfied. The owner has now excluded five expert/participant or WiDS clarification criteria as unavailable; active work has 52 satisfied and 15 unresolved criteria out of 67. Excluded criteria remain scientifically unsatisfied. A source-code release, executed negative experiment, or private study package does not satisfy a missing scientific criterion.
 
-The 20 scientifically unsatisfied entries comprise four owner exclusions and 16 active unresolved entries. They overlap. They reduce to the dependencies below; each original requirement and its exact remaining input is recorded in [the machine-readable ledger](../results/research_checks/full_plan_remaining.json).
+The 20 scientifically unsatisfied entries comprise five owner exclusions and 15 active unresolved entries. They overlap. They reduce to the dependencies below; each original requirement and its exact remaining input is recorded in [the machine-readable ledger](../results/research_checks/full_plan_remaining.json).
 
 | Dependency | Unchecked entries | What can finish it |
 |---|---:|---|
@@ -10,7 +10,7 @@ The 20 scientifically unsatisfied entries comprise four owner exclusions and 16 
 | ~~Qualified clinical review~~ | 2 | Excluded by owner; no expert approval is claimed. |
 | ~~Real participant study~~ | 2 | Excluded by owner; no participant benefit is claimed. |
 | Eligible untouched cohort | 5 | An authorized cohort with verified source identity, target, units, windows and patient independence, locked before outcome inspection. |
-| Source provenance | 4 | Sourced gene callability and clinical/genomic availability, plus the exact WiDS APACHE/unit provenance. Public acquisition is audited separately from these claims. |
+| Source provenance | 4, including 1 excluded | Sourced gene callability and clinical/genomic availability, plus the exact WiDS APACHE/unit provenance. Public acquisition is audited separately from these claims. |
 | Combined criteria | 4 | The corresponding source, review, cohort and benefit requirements above; these are not four separate coding projects. |
 
 ## Independent work completed in the continuation
@@ -24,3 +24,5 @@ A human study or institutional access cannot be replaced with a model-generated 
 The prepared GDC/GOSSIS source questions were sent and verified on 2026-10-20. Source clarification is still pending; sending a request does not complete a source-provenance criterion. The download verifier additionally detects three partial data files, while the original fitted-study source matches the frozen hash.
 
 The official-source search found another 515 open THCA pathology PDFs to inspect and evaluated gated external-cohort routes. [The next-work list](next-work.md) separates independent work, optional owner access steps and failed scientific goals. No additional download verification is an active completion task.
+
+On 2026-10-21 the owner removed further WiDS source clarification as an execution prerequisite and stopped the unused download. Existing input conventions remain frozen and documented. Additional WiDS encoder-gate experiments use the existing fitted studies only. See [internet dataset steps](internet-data.md) for a personal-access route that does not require recruiting a researcher.

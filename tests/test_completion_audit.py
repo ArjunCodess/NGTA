@@ -25,13 +25,13 @@ def test_owner_exclusion_is_struck_out_without_becoming_completion(tmp_path, mon
     (tmp_path / 'results/research_checks').mkdir(parents=True)
     monkeypatch.setattr(update_completion_audit, 'ROOT', tmp_path)
     report = update_completion_audit.update()
-    assert report['owner_excluded'] == 4
-    assert report['active_total'] == 68
+    assert report['owner_excluded'] == 5
+    assert report['active_total'] == 67
     assert report['completed'] + report['active_unsatisfied'] + report['owner_excluded'] == 72
     assert all(not row['completed'] and row['status'] == 'excluded by owner'
                for row in report['tasks'] if row['owner_excluded'])
     content = (tmp_path / 'list.md').read_text()
-    assert content.count('~~') == 8
+    assert content.count('~~') == 10
     assert update_completion_audit.update() == report
     assert (tmp_path / 'list.md').read_text() == content
 
