@@ -1,10 +1,10 @@
 {
-  "verified_utc": "2026-10-20T04:42:17.072376+00:00",
+  "verified_utc": "2026-10-20T10:35:32.179042+00:00",
   "branch": "version-2",
-  "scope": "Implementation, fixed-cohort development experiments, technical reproducibility and paper; external clinical/human validation explicitly deferred by owner.",
+  "scope": "Verified implementation and inspected development experiments; the full plan remains incomplete at 52/72. Negative scientific criteria and missing source, cohort, expert and participant evidence remain unsatisfied.",
   "tests": {
-    "passed": 89,
-    "extracted_source_package_passed": 89,
+    "passed": 93,
+    "extracted_source_package_passed": 93,
     "environment": "same recorded Windows/Python environment; separate source extraction, not a fresh environment or independent scientific evaluation"
   },
   "checkpoint_replay": {
@@ -63,5 +63,20 @@
     "general missingness robustness criterion not met",
     "attention-confidence error intervals span chance"
   ],
-  "new_model_training": false
+  "new_model_training": false,
+  "public_xml_audit": {
+    "files": 1554,
+    "cases": 507,
+    "bytes": 65507832,
+    "publisher_checksums_and_case_identity_verified": true,
+    "callability_and_report_availability_verified": false
+  },
+  "private_reviewer_preparation": {
+    "reviewers_planned": 24,
+    "evaluation_cases": 80,
+    "assignments": 1920,
+    "participants_recruited": 0,
+    "responses": 0,
+    "answers_excluded_from_git": true
+  }
 }

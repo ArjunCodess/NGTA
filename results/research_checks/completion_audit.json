@@ -48,7 +48,7 @@
       "task": "Audit TCGA record merging",
       "completed": false,
       "status": "timing evidence required",
-      "evidence_or_action": "The five-table/68-input audit remains valid. Nineteen checksum-pinned public biotabs add 515 tumor procurement/review offset pairs across 507 cases, all linked by sample UUID with matching patient barcodes. These specimen dates do not establish availability of the selected pathology/genomic model inputs; source-reviewed episode and report linkage remain required."
+      "evidence_or_action": "The five-table/68-input audit remains valid. Nineteen checksum-pinned public biotabs add 515 tumor procurement/review offset pairs across 507 cases, all linked by sample UUID with matching patient barcodes. These specimen dates do not establish availability of the selected pathology/genomic model inputs; The complete 1,554-file public XML audit also passes checksum/case checks, but selected-input availability and case/gene callability remain unverified; source-reviewed episode and report linkage remain required."
     },
     {
       "task": "Clarify prediction timing",
@@ -216,7 +216,7 @@
       "task": "Evaluate human oversight",
       "completed": false,
       "status": "participants required",
-      "evidence_or_action": "A balanced 24-reviewer/80-case crossover demonstration, separate practice cases, seeded faults, power sensitivity and crossed reviewer/case analysis are built. Recruit qualified reviewers under an approved protocol, generate a fresh private answer key, collect independent responses and grade corrections; no participant results exist."
+      "evidence_or_action": "A balanced 24-reviewer/80-case crossover demonstration, separate practice cases, seeded faults, power sensitivity and crossed reviewer/case analysis are built. A fresh secret-seeded private package now has opaque case IDs, shuffled faults and 24 individual delivery folders with 1,920 verified balanced assignments. Finalize the protocol, recruit qualified reviewers, collect independent responses and grade corrections; no participant results exist."
     },
     {
       "task": "Test missingness robustness",
@@ -402,7 +402,7 @@
       "task": "Experiment 8: Evaluate auditability",
       "completed": false,
       "status": "participants required",
-      "evidence_or_action": "Protocol, randomized assignments, prospective power sensitivity, fault package and crossed reviewer/case analysis are implemented. The public demo key must be replaced with a private fresh key, and real qualified participant responses are needed to test the 10-point localization and 5-point false-reassurance margins."
+      "evidence_or_action": "Protocol, randomized assignments, prospective power sensitivity, fault package and crossed reviewer/case analysis are implemented. A fresh private key and individually isolated reviewer materials are now generated and verified. Real qualified participant responses are still needed to test the 10-point localization and 5-point false-reassurance margins."
     },
     {
       "task": "First: Fix data validity",
@@ -446,7 +446,10 @@
   "data_access_instructions": "docs/get-needed-data.md",
   "outreach_templates": "docs/email-templates.md",
   "technical_reproduction_guide": "docs/reproducibility.md",
-  "validation_scope": "deferred by owner; no external or human validation claimed",
+  "validation_scope": "full plan remains incomplete; no external or human validation claimed",
   "public_supplement_inventory": "results/research_checks/tcga_supplements/inventory.json",
+  "public_xml_inventory": "results/research_checks/tcga_xml/inventory.json",
+  "private_reviewer_preparation": "results/research_checks/reviewer_preparation.json",
+  "full_plan_remaining": "results/research_checks/full_plan_remaining.json",
   "evidence_scope": "full development evaluation on inspected fixed cohorts; no prospective confirmation"
 }

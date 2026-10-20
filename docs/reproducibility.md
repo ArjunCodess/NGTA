@@ -108,3 +108,9 @@ python scripts/package_reproducibility.py --verify --output .cache/NGTA-reproduc
 Choose a new filename if it already exists; the builder does not overwrite an existing package. Exact fitted replay additionally requires a separate permitted full-study archive with source data and trace/checkpoint files. The 297-file preservation manifest alone does not reconstruct all other files in those directories. There is no approved external fitted-archive location yet; see [artifact storage](artifact-storage.md).
 
 No researcher recruitment, additional data download or favorable result is needed to use this technical release. Any future clinical validation should begin with its own reviewed protocol, qualified source data and untouched outcomes.
+
+## Fresh private reviewer materials
+
+The original public demonstration is unsuitable for blinded recruitment. Its predictable case/fault sequence is now replaced in newly generated packages with opaque case IDs and shuffled fault assignments. Use `python scripts/reviewer_study.py --private --output-dir results/reviewer_private/NEW_DIRECTORY` to prepare a new secret-seeded package. The CLI refuses a repository-public destination and does not print the seed or answer key. An existing package is never overwritten.
+
+Only the individual `participant/reviewer_*` folder assigned to a reviewer is intended for delivery after protocol finalization. It contains that reviewer's assigned evaluation format once per case and a free-text correction response sheet. Master cross-format tasks, assignments and the investigator grading template are moved into `investigator/`. Do not distribute the root directory, protocol seed, investigator folder or other reviewers' materials. Empty response sheets cannot produce a human-study result. The prepared private package has 24 reviewer folders and 1,920 balanced assignments for 80 evaluation cases, but zero recruited participants and zero human responses.

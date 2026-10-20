@@ -73,11 +73,13 @@ For the fixed WiDS KNN ensemble, predictive variance detects threshold errors ab
 
 A checksum-pinned audit of 19 public GDC supplements adds 515 linked tumor specimen procurement/pathology-review offset pairs across 507 cases. These dates and 27 reported BRAF results do not establish model-input availability or complete gene-panel callability. Reproduce the inventory with `python scripts/audit_tcga_supplements.py`; raw downloads stay in the ignored cache. The full-plan checklist is 52/72 because completed experiments that fail their scientific criterion remain unchecked.
 
+The subsequent full XML audit verifies all 1,554 public supplements (65.5 MB) across 507 cases, with zero unavailable files. It still does not establish selected-input availability or gene callability. A fresh private reviewer package contains 1,920 balanced assignments but no participant responses. See [full-plan status](docs/plan-status.md) for all 20 unmet criteria and their exact dependencies.
+
 [list.md](list.md) tracks genuinely completed work. The detailed research audit is in [docs/research-audit.md](docs/research-audit.md), leaving this README focused on the project and its use.
 
 To help with access or contacts without taking on the technical work, use the [practical action kit](docs/start-here.md). It contains three small tasks and prepared messages; no institutional authority is assumed.
 
-The implementation, development experiments and technical reproduction deliverables are ready for use with the available data. External clinical/human validation is deferred at the owner's request. The [technical verification record](results/research_checks/technical_release.json) records the checks. The [reproduction guide](docs/reproducibility.md) provides the exact 36-fit recipe, verification commands, source-only package and storage requirements; [list.md](list.md) retains the full scientific criteria, including failed and deferred items.
+The technical release covers the current implementation, development experiments and reproduction tools; it does not complete every scientific requirement in `plan.md`. External clinical/human validation is deferred at the owner's request. The [technical verification record](results/research_checks/technical_release.json) records the checks. The [reproduction guide](docs/reproducibility.md) provides the exact 36-fit recipe, verification commands, source-only package and storage requirements; [list.md](list.md) retains the full scientific criteria, including failed and deferred items.
 
 ## Running
 

@@ -1,12 +1,12 @@
 # NGTA: optional help with future validation
 
-The owner has deferred external validation. No further download, researcher contact or recruitment is required to finish the current technical deliverables. The steps below are optional preparation for later validation; the current [technical reproduction guide](reproducibility.md) covers the finished implementation and experiments.
+The full plan is not complete: 52 of 72 criteria are satisfied. External validation was previously deferred, but its criteria remain required by plan.md. The existing implementation and development experiments can be used while the evidence below is unavailable. The steps below are optional preparation for later validation; the current [technical reproduction guide](reproducibility.md) covers the finished implementation and experiments.
 
 I can handle downloads that are openly available, source inspection, coding, data preparation, experiments, analysis, paper updates and repository maintenance. You do not need to design a study or negotiate a hospital data agreement. Start with the small actions below; send back the original replies/files and I will work out the technical next step.
 
 ## 1. WiDS dictionary received
 
-Completed on 2026-10-20: the dictionary is present under `data/private/` and parses into 188 unique variable definitions. Its source definition confirms APACHE IVa but does not resolve negative score values or score availability. A creatinine unit conflict also needs publisher clarification. No further download is needed for this step. The rest of the recursive download was still active when inspected.
+Completed on 2026-10-20: the dictionary is present under `data/private/` and parses into 188 unique variable definitions. Its source definition confirms APACHE IVa but does not resolve negative score values or score availability. A creatinine unit conflict also needs publisher clarification. No further download is needed for this step. The rest of the recursive download is not verified complete. In particular, WiDSDatathonOverview.pdf is only 212,974 bytes and fails its publisher checksum; it is not usable source evidence. Resume the existing authenticated terminal download, or download that PDF from the signed-in PhysioNet page, and leave the original partial file in place until a complete copy passes verification. This does not prevent running the current fitted studies.
 
 I will handle file verification and analysis. Leave the files in place; you do not need to sort or rename them.
 
@@ -41,4 +41,4 @@ Bring back an introduction, a willingness to review, or the reply saying they ca
 
 You do not need to make the negative results positive, choose a more favorable analysis, or obtain a hospital dataset immediately. The paper can report an auditable implementation and negative development findings. A stronger scientific claim needs new evidence and may remain unavailable. I will keep that boundary clear rather than give you an impossible administrative checklist.
 
-The detailed source requirements remain in [get-needed-data.md](get-needed-data.md). This page is the practical starting point; do only steps 1–3 for now, and report any step you cannot complete.
+The detailed source requirements remain in [get-needed-data.md](get-needed-data.md). This page is the practical starting point; do only steps 1â€“3 for now, and report any step you cannot complete.
