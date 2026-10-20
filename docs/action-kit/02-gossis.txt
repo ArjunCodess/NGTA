@@ -1,0 +1,17 @@
+To: gossis@mit.edu
+Subject: WiDS 2020 documentation question: APACHE score and source overlap
+Attachments: none
+
+Dear GOSSIS team,
+
+I am working on NGTA, an independent research project using the WiDS Datathon 2020 ICU mortality benchmark: https://github.com/ArjunCodess/NGTA/tree/version-2
+
+Could you direct me to documentation for apache_4a_hospital_death_prob, specifically:
+
+1. What do negative values mean? Our local labeled file contains 2,371 probabilities outside the valid range; we currently treat them as unavailable.
+2. Which APACHE model/version and collection window produced this field, and when was the probability available relative to the end of the first 24 ICU hours?
+3. What documentation identifies the cohort's collection period and possible overlap with BIDMC/MIMIC or eICU sources? We need to assess whether a proposed external evaluation would actually be independent.
+
+We have already evaluated the model with and without the APACHE field. General eICU documentation has not resolved these questions for the exact WiDS export. No identifiable patient records are requested. A public reference, dictionary definition, clarification of unavailable metadata, or referral to the appropriate custodian would help.
+
+Thank you.

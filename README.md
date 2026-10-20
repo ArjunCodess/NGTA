@@ -75,6 +75,8 @@ A checksum-pinned audit of 19 public GDC supplements adds 515 linked tumor speci
 
 [list.md](list.md) tracks genuinely completed work. The detailed research audit is in [docs/research-audit.md](docs/research-audit.md), leaving this README focused on the project and its use.
 
+To help with access or contacts without taking on the technical work, use the [practical action kit](docs/start-here.md). It contains three small tasks and prepared messages; no institutional authority is assumed.
+
 ## Running
 
 Create an environment and install dependencies:

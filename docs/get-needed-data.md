@@ -1,5 +1,7 @@
 # What to get next
 
+For a small set of actions you can do without institutional authority, start with [the practical action kit](start-here.md). It includes copy-and-paste source questions and a collaborator introduction request; the details below are reference material for the technical work.
+
 The current implementation and internal studies are checked. The research plan is 52/72 because the remaining claims need source evidence, new evaluation data or real people. These instructions identify the inputs; they do not promise that every missing field exists or that a new study will produce a positive result.
 
 ## 1. Thyroid data: was the gene tested, and when was the result available?
