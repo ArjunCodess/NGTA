@@ -13,7 +13,7 @@ SUFFIXES = {'src': {'.py'}, 'scripts': {'.py', '.json'}, 'tests': {'.py'},
             'docs': {'.md', '.txt', '.csv'}, 'paper': {'.tex', '.bib', '.bst', '.sty', '.png', '.pdf', '.csv', '.json'}}
 EVIDENCE = tuple('results/research_checks/'+name for name in (
     'artifact_archive_manifest.json', 'artifact_verification.json', 'checkpoint_verification.json',
-    'completion_audit.json', 'missingness_acceptance.csv', 'creatinine_sensitivity.json', 'reference_metadata.json'))
+    'completion_audit.json', 'technical_release.json', 'missingness_acceptance.csv', 'creatinine_sensitivity.json', 'reference_metadata.json'))
 
 
 def build(root, destination):

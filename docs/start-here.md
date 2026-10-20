@@ -1,4 +1,6 @@
-# NGTA: the few things I need you to do
+# NGTA: optional help with future validation
+
+The owner has deferred external validation. No further download, researcher contact or recruitment is required to finish the current technical deliverables. The steps below are optional preparation for later validation; the current [technical reproduction guide](reproducibility.md) covers the finished implementation and experiments.
 
 I can handle downloads that are openly available, source inspection, coding, data preparation, experiments, analysis, paper updates and repository maintenance. You do not need to design a study or negotiate a hospital data agreement. Start with the small actions below; send back the original replies/files and I will work out the technical next step.
 

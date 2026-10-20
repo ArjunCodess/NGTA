@@ -1,0 +1,67 @@
+{
+  "verified_utc": "2026-10-20T04:42:17.072376+00:00",
+  "branch": "version-2",
+  "scope": "Implementation, fixed-cohort development experiments, technical reproducibility and paper; external clinical/human validation explicitly deferred by owner.",
+  "tests": {
+    "passed": 89,
+    "extracted_source_package_passed": 89,
+    "environment": "same recorded Windows/Python environment; separate source extraction, not a fresh environment or independent scientific evaluation"
+  },
+  "checkpoint_replay": {
+    "fits": 36,
+    "passes_per_fit": 50,
+    "all_restored": true,
+    "maximum_probability_residual": 0.0
+  },
+  "archive_preservation": {
+    "files": 297,
+    "hashes_verified": true,
+    "removed_paths_untracked": true
+  },
+  "creatinine_rule_off": {
+    "fits": 20,
+    "threshold_changes": 0,
+    "all_brier_intervals_span_zero": true,
+    "unit_conflict_resolved": false,
+    "source": "results/research_checks/creatinine_sensitivity.json"
+  },
+  "recipe": {
+    "fits": 36,
+    "path": "study_recipe.json",
+    "sha256": "0b0f897e6053e406f1b0bb779f86575917ff064b6b1707ca94651773850bfd99",
+    "dry_run_verified": true,
+    "original_output_protection": true
+  },
+  "paper": {
+    "path": "paper/main.pdf",
+    "pages": 12,
+    "undefined_references": false,
+    "overfull_boxes": false,
+    "rendered_and_visually_inspected": true,
+    "historical_results_preserved": "paper/legacy_results.tex"
+  },
+  "package": {
+    "command": "python scripts/package_reproducibility.py",
+    "member_integrity_verified": true,
+    "source_only": true,
+    "datasets_and_private_materials_excluded": true,
+    "extracted_tests_passed": true
+  },
+  "scientific_checklist": {
+    "completed": 52,
+    "total": 72
+  },
+  "deferred": [
+    "callable TCGA panels and clinical/genomic availability",
+    "APACHE sentinel/availability and creatinine-unit clarification",
+    "qualified clinical rule review",
+    "eligible independent untouched cohort",
+    "real blinded participant evaluation"
+  ],
+  "negative_findings": [
+    "symbolic benefit criterion not met",
+    "general missingness robustness criterion not met",
+    "attention-confidence error intervals span chance"
+  ],
+  "new_model_training": false
+}

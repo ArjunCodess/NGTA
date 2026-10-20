@@ -264,7 +264,7 @@
       "task": "Fix stale outputs",
       "completed": true,
       "status": "completed",
-      "evidence_or_action": "All-seed submission exports and MC decision curves are refreshed from saved predictions. Paper tables and figures explicitly select five verified current sources, record manifests, distinguish mapped/all events and seed/case intervals, and the current 13-page PDF compiles."
+      "evidence_or_action": "All-seed submission exports and MC decision curves are refreshed from saved predictions. Paper tables and figures explicitly select five verified current sources, record manifests, distinguish mapped/all events and seed/case intervals, and the current 12-page PDF compiles."
     },
     {
       "task": "Correct ablation implementations",
@@ -445,6 +445,8 @@
   "artifact_storage_manifest": "results/research_checks/artifact_archive_manifest.json",
   "data_access_instructions": "docs/get-needed-data.md",
   "outreach_templates": "docs/email-templates.md",
+  "technical_reproduction_guide": "docs/reproducibility.md",
+  "validation_scope": "deferred by owner; no external or human validation claimed",
   "public_supplement_inventory": "results/research_checks/tcga_supplements/inventory.json",
   "evidence_scope": "full development evaluation on inspected fixed cohorts; no prospective confirmation"
 }

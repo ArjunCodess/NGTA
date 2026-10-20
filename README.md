@@ -77,6 +77,8 @@ A checksum-pinned audit of 19 public GDC supplements adds 515 linked tumor speci
 
 To help with access or contacts without taking on the technical work, use the [practical action kit](docs/start-here.md). It contains three small tasks and prepared messages; no institutional authority is assumed.
 
+The implementation, development experiments and technical reproduction deliverables are ready for use with the available data. External clinical/human validation is deferred at the owner's request. The [technical verification record](results/research_checks/technical_release.json) records the checks. The [reproduction guide](docs/reproducibility.md) provides the exact 36-fit recipe, verification commands, source-only package and storage requirements; [list.md](list.md) retains the full scientific criteria, including failed and deferred items.
+
 ## Running
 
 Create an environment and install dependencies:
@@ -90,8 +92,8 @@ pip install -r requirements.txt
 Run one dataset:
 
 ```bash
-python main.py --dataset tcga
-python main.py --dataset wids
+python main.py --dataset tcga --data-dir data/acquired_tcga --output-dir results/private/example
+python main.py --dataset wids --split-mode hospital --output-dir results/private/example
 ```
 
 Run the whole repository pipeline:
@@ -100,7 +102,7 @@ Run the whole repository pipeline:
 python main.py --run-all
 ```
 
-`--run-all` is the full orchestration entrypoint. It runs the complete TCGA pipeline and the complete WiDS pipeline sequentially, computes every metric/chart/trace artifact for both datasets, and writes an aggregate `run_all_summary.json` at the chosen output root.
+`--run-all` runs the configured TCGA and WiDS pipelines sequentially and writes an aggregate `run_all_summary.json`. Its defaults do not reproduce the paper's full study matrix or select the acquired TCGA source automatically. Use `python scripts/reproduce_studies.py` to inspect the frozen recipe before executing it.
 
 Useful flags:
 
@@ -196,7 +198,7 @@ Preprocessing fits training data only: clean invalid values, standardize numeric
 
 APACHE values outside [0,1] are unavailable: 2,371 such values occur locally. Selected-feature missingness after cleaning is 10.3559%, while lactate is 74.5761% missing. Authoritative sentinel semantics and score availability remain to be verified.
 
-Rules require observed values: lactate >=4 mmol/L, systolic pressure in [0,90] mmHg, age >=75 years and creatinine >=2 mg/dL. Imputed values and suppressed imputed-only triggers are separate diagnostics; the masking study names its imputed-rule comparator explicitly.
+Rules require observed values: lactate >=4 mmol/L, systolic pressure in [0,90] mmHg, age >=75 years and creatinine >=2 under the frozen mg/dL assumption. The supplied dictionary labels creatinine micromol/L, so its source unit remains unresolved. A cached rule-off sensitivity across all 20 WiDS fits changes no 0.5-threshold decisions and leaves every rule-off-versus-MC Brier interval spanning zero; this does not resolve the unit conflict. Imputed values and suppressed imputed-only triggers are separate diagnostics; the masking study names its imputed-rule comparator explicitly.
 
 ## Interpretation Caveats
 
