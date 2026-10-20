@@ -2,16 +2,16 @@
   "files": [
     {
       "file": "LICENSE.txt",
-      "bytes": 1198,
       "expected_sha256": "6569260e99684cc2d22ec37b29c0f4f69b123f7ff7b615cd0cf2e801f30af030",
       "actual_sha256": "6569260e99684cc2d22ec37b29c0f4f69b123f7ff7b615cd0cf2e801f30af030",
+      "bytes": 1198,
       "passed": true
     },
     {
       "file": "WiDSDatathonOverview.pdf",
-      "bytes": 212974,
       "expected_sha256": "3930f63cf8ba61585a6941cfb4af0c01f7ef36181ef6e2dde0ebbd1da3a8aac9",
       "actual_sha256": "b5d611a7c9741325580748e5dfb8360d194f1a15283c556bda0a7140a56dbb69",
+      "bytes": 212974,
       "passed": false
     }
   ],
@@ -21,5 +21,48 @@
   "unauthenticated_official_download_http_status": 403,
   "dictionary_independently_inspected": true,
   "action": "Retain partial file unchanged. Resume authenticated official download, then require the publisher checksum before extracting evidence. Training data and dictionary availability do not imply the entire recursive download is complete.",
-  "signed_in_browser_retrieval": "Existing signed-in PhysioNet page was inspected; supported download operation timed out after 30 seconds and no completed local file was produced."
+  "signed_in_browser_retrieval": "Existing signed-in PhysioNet page was inspected; supported download operation timed out after 30 seconds and no completed local file was produced.",
+  "data_file_sizes": [
+    {
+      "file": "data/WiDS_Datathon_2020_Dictionary.csv",
+      "expected_bytes": 29944,
+      "actual_bytes": 29944,
+      "passed": true
+    },
+    {
+      "file": "data/samplesubmission.csv",
+      "expected_bytes": 52,
+      "actual_bytes": 52,
+      "passed": true
+    },
+    {
+      "file": "data/solution_template.csv",
+      "expected_bytes": 320363,
+      "actual_bytes": 0,
+      "passed": false
+    },
+    {
+      "file": "data/training_v2.csv",
+      "expected_bytes": 64747327,
+      "actual_bytes": 15865,
+      "passed": false
+    },
+    {
+      "file": "data/unlabeled.csv",
+      "expected_bytes": 27733653,
+      "actual_bytes": 196608,
+      "passed": false
+    }
+  ],
+  "publisher_checksum_entries_pass": false,
+  "listed_data_sizes_match": false,
+  "dictionary_matches_inspected_copy": true,
+  "original_study_source": {
+    "bytes": 64747327,
+    "sha256": "27861c711f8c196c2a5c858005075fff61df4fb48f6d350c5120cdf45317adeb",
+    "matches_frozen_recipe": true
+  },
+  "size_provenance": "WiDS 1.0.0 publisher data-directory listing saved with the authorized download; byte counts do not establish file integrity.",
+  "interpretation": "Publisher checksums cover only their listed files. Other size checks detect truncation but cannot certify full-release integrity. The existing fitted-study source is checked separately against the frozen recipe. No files were modified.",
+  "signed_in_browser_retry": "Official download click produced no completed download event within 20 seconds and no completed local copy. Browser security policy prevented inspection of chrome://downloads; no workaround was attempted."
 }
