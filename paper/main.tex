@@ -221,6 +221,10 @@ For the fixed five-model WiDS KNN ensemble, mean predictive MC variance detects 
 
 The reviewer protocol, power sensitivity and crossed reviewer/case analysis are implemented. A fresh private package now randomizes fault assignment, uses opaque case IDs and isolates each reviewer's assigned format; it contains 1,920 balanced assignments for 24 planned reviewers and 80 evaluation cases. No participants were recruited, no responses were generated as human evidence, and no reviewer benefit is claimed. External evaluation similarly requires a documented independent cohort with matched units, windows, outcomes, and patient identities; no such cohort was supplied.
 
+\paragraph{WiDS encoder extension.} A separate exploratory experiment applies fixed MC and revised confidence to feature keys inside every encoder layer across all 20 saved WiDS checkpoints. It reuses fitted preprocessing, weights and each checkpoint's primary 50-pass dropout RNG, without refitting or changing the data. Uniform encoder gates must reproduce every original probability pass within $10^{-7}$. Table~\ref{tab:wids_encoder} reports the matched encoder NARS-minus-MC contrast; the full export also compares encoder and readout locations. Intervals resample hospitals and fitted seeds with Bonferroni adjustment across twelve secondary contrasts, conditional on the primary dropout draw. These inspected development outcomes do not provide independent confirmation or replace the original readout results.
+
+\input{figures/wids_encoder_results.tex}
+
 \paragraph{Historical corrections.} Earlier unmatched-aggregation tables and sparse-source genomic demonstrations are retained in the repository archive, not used as current evidence. Their apparent calibration differences did not isolate a gate effect; the earlier genomic test split had no observed mutations, imputed values could trigger rules, and the revision audit reused production arithmetic. The present matched evaluation and independent persisted replay address these implementation errors without establishing clinical benefit.
 
 \section{Discussion and Ablation}

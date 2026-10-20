@@ -1,0 +1,16 @@
+\begin{table}[t]
+\caption{Exploratory WiDS encoder intervention on four fixed conditions and five saved checkpoints each. NARS-minus-MC Brier and family intervals resample hospitals and training seeds, with Bonferroni adjustment across twelve secondary contrasts. The primary 50-pass dropout draw is fixed; no external confirmation or repeated-draw uncertainty is claimed. Negative is better.}
+\label{tab:wids_encoder}
+\centering\scriptsize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Condition & Difference & Family lower & Family upper \\
+\midrule
+KNN & -1.87e-06 & -4.42e-06 & 3.54e-07 \\
+Median & -2.50e-06 & -8.05e-06 & 2.74e-06 \\
+KNN, no APACHE & -2.06e-06 & -4.93e-06 & 2.86e-06 \\
+Median, no APACHE & -2.89e-06 & -8.32e-06 & 9.93e-06 \\
+\bottomrule
+\end{tabular}
+\end{table}
