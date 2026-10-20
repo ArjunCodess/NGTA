@@ -71,6 +71,8 @@ The full masking study passes its paired degradation/harm criteria in 12 of 15 m
 
 For the fixed WiDS KNN ensemble, predictive variance detects threshold errors above chance (AUROC 0.842276), while neural and revised attention-confidence scores yield 0.514950 and 0.500647 with hospital-bootstrap intervals spanning 0.5. The routing confidence therefore remains an unvalidated trust signal even when predictive uncertainty is informative.
 
+A checksum-pinned audit of 19 public GDC supplements adds 515 linked tumor specimen procurement/pathology-review offset pairs across 507 cases. These dates and 27 reported BRAF results do not establish model-input availability or complete gene-panel callability. Reproduce the inventory with `python scripts/audit_tcga_supplements.py`; raw downloads stay in the ignored cache. The full-plan checklist is 52/72 because completed experiments that fail their scientific criterion remain unchecked.
+
 [list.md](list.md) tracks genuinely completed work. The detailed research audit is in [docs/research-audit.md](docs/research-audit.md), leaving this README focused on the project and its use.
 
 ## Running

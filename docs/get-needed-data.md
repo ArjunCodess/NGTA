@@ -1,6 +1,6 @@
 # What to get next
 
-The current implementation and internal studies are checked. The research plan is still 53/72 because the remaining claims need source evidence, new evaluation data or real people. These instructions identify the inputs; they do not promise that every missing field exists or that a new study will produce a positive result.
+The current implementation and internal studies are checked. The research plan is 52/72 because the remaining claims need source evidence, new evaluation data or real people. These instructions identify the inputs; they do not promise that every missing field exists or that a new study will produce a positive result.
 
 ## 1. Thyroid data: was the gene tested, and when was the result available?
 
@@ -11,7 +11,7 @@ The exact public case IDs and selected genes are in [required-tcga-cases.csv](da
 ### Where and how
 
 1. Open the [GDC Data Portal](https://portal.gdc.cancer.gov/). Select project **TCGA-THCA** in the cohort/repository filters. Follow the [official repository guide](https://docs.gdc.cancer.gov/Data_Portal/Users_Guide/Repository/) if the interface differs.
-2. In Repository, filter Data Type to **Clinical Supplement**, then **Biospecimen Supplement**. Download the available XML/biotab supplements, their file metadata and the download manifest. These are additional source records, not a replacement for the already pinned mutation files. GDC explicitly identifies these supplement types as sources of cancer-specific clinical fields. [Official supplement instructions](https://gdc.cancer.gov/content/where-can-i-find-clinical-data-elements-specific-my-cancer-research-interest).
+2. In Repository, filter Data Type to **Clinical Supplement**, then **Biospecimen Supplement**. The 19 public biotabs have now been downloaded, checksum-pinned and inventoried locally with `python scripts/audit_tcga_supplements.py`. They add sample-linked procurement/review offsets and some reported genotyping results, but do not establish model-input availability or panel callability. Inspect XML supplements only if the custodian identifies additional relevant fields, and retain their metadata/manifest. These are additional source records, not a replacement for the already pinned mutation files. GDC explicitly identifies these supplement types as sources of cancer-specific clinical fields. [Official supplement instructions](https://gdc.cancer.gov/content/where-can-i-find-clinical-data-elements-specific-my-cancer-research-interest).
 3. Email **support@nci-gdc.datacommons.io**, the address on the [GDC Help Desk page](https://gdc.cancer.gov/support/help-desk). Ask whether the selected cases have gene-level assay coverage/quality evidence, specimen-to-case links, pathology dates and assay/report availability dates. Ask for the exact files or fields and their definitions. Ask them to state explicitly if these were never collected or cannot be released.
 4. Only if the necessary evidence requires controlled sequencing files, follow [GDC controlled-access instructions](https://gdc.cancer.gov/access-data/obtaining-access-controlled-data). A research PI obtains an eRA Commons account and requests the relevant TCGA dataset in [dbGaP Authorized Access](https://dbgap.ncbi.nlm.nih.gov/aa/wga.cgi?page=login). After approval, the PI can add authorized lab members as downloaders. Log in to GDC with eRA Commons and obtain the permitted files/token. If you lack an institutional PI, seek a research collaborator first; a portal account alone does not grant controlled access.
 
@@ -23,7 +23,7 @@ Do not begin a large BAM download until GDC confirms what it can resolve. Sequen
 - Case/specimen links and dates or relative-day offsets for tissue collection, pathology, genomic testing and result availability, with definitions of each date. A diagnosis date alone is insufficient.
 - The publisher's manifest, metadata/dictionary, source version, and the custodian's explanation of unavailable fields.
 
-The currently selected pathology records have no pathology dates. The supplements may add information, but I have not established that they contain the missing availability dates. If the source never recorded them, that part of the audit must remain unresolved or the claim must stay retrospective.
+The currently selected pathology records have no pathology dates. The acquired biotabs supply specimen procurement/review dates, but the required clinical/genomic report-availability linkage remains unverified. If the source never recorded them, that part of the audit must remain unresolved or the claim must stay retrospective.
 
 ## 2. WiDS: what does the APACHE field mean?
 

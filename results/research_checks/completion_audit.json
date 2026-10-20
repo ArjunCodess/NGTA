@@ -1,5 +1,5 @@
 {
-  "audit_date": "2026-10-04",
+  "audit_date": "2026-10-20",
   "branch": "version-2",
   "tasks": [
     {
@@ -48,7 +48,7 @@
       "task": "Audit TCGA record merging",
       "completed": false,
       "status": "timing evidence required",
-      "evidence_or_action": "The physical-record audit covers all five tables and 68 model/rule inputs. All 507 selected diagnosis records have day zero; none of the 507 pathology records has a pathology date/timepoint. Molecular-test dates are absent. Source-level measurement availability and encounter links are still required; diagnosis offsets cannot certify cross-table chronology."
+      "evidence_or_action": "The five-table/68-input audit remains valid. Nineteen checksum-pinned public biotabs add 515 tumor procurement/review offset pairs across 507 cases, all linked by sample UUID with matching patient barcodes. These specimen dates do not establish availability of the selected pathology/genomic model inputs; source-reviewed episode and report linkage remain required."
     },
     {
       "task": "Clarify prediction timing",
@@ -388,9 +388,9 @@
     },
     {
       "task": "Experiment 6: Test missingness and uncertainty",
-      "completed": true,
-      "status": "completed",
-      "evidence_or_action": "Five-seed/imputer raw-masking studies, five-member ensembles and hospital-bootstrap uncertainty/degradation intervals execute the planned evaluation. Report the per-scenario acceptance results and failure cases; no claim of general clinical robustness follows."
+      "completed": false,
+      "status": "criterion not met",
+      "evidence_or_action": "The full evaluation is executed, but only 12/15 median and 1/15 KNN seed/scenario combinations pass paired degradation/harm criteria, and attention-confidence error intervals span chance. Plan acceptance is not met. Preserve the failed findings; a revised hypothesis requires fresh locked confirmation rather than tuning on inspected outcomes."
     },
     {
       "task": "Experiment 7: Test external compatibility",
@@ -435,7 +435,7 @@
       "evidence_or_action": "The source manuscript and documentation preserve legacy negative evidence and distinguish implemented mechanics from unproven research claims."
     }
   ],
-  "completed": 53,
+  "completed": 52,
   "total": 72,
   "masking_complete": true,
   "uncertainty_intervals_complete": true,
@@ -445,5 +445,6 @@
   "artifact_storage_manifest": "results/research_checks/artifact_archive_manifest.json",
   "data_access_instructions": "docs/get-needed-data.md",
   "outreach_templates": "docs/email-templates.md",
+  "public_supplement_inventory": "results/research_checks/tcga_supplements/inventory.json",
   "evidence_scope": "full development evaluation on inspected fixed cohorts; no prospective confirmation"
 }

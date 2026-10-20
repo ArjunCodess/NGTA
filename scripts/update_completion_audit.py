@@ -1,5 +1,6 @@
 """Update the plan checklist using current artifacts and explicit external blockers."""
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 import re
 
@@ -20,7 +21,7 @@ def update():
         "Improve the rule base":(False,"external review required","All eight rules have source/version/prototype status and sensitivity controls, but remain not_reviewed. A thyroid oncology and critical-care expert must review predicate definitions, truth weights, shared evidence and clinically defensible contradiction policies; record signed review evidence before expanding the registry."),
         "Add external validation":(False,"external cohort required","Frozen raw-masking studies and independent-cohort tooling exist. Provide an authorized independent cohort, canonical patient IDs, binary target definition, institutional clusters and verified input units/windows; freeze the mapping before accessing labels. No eligible independent cohort was supplied."),
         "Fix TCGA genomic coverage":(False,"assay evidence required","498 UUID/checksum-pinned public MAF files were acquired; selected-panel positives cover 254/50/50 train/validation/test cases. Sixteen expected clinical cases lack file-associated coverage. Complete callable panels and verified negatives remain absent; supply sourced case/gene assay callability rather than treating missing variant rows as negative."),
-        "Audit TCGA record merging":(False,"timing evidence required","The physical-record audit covers all five tables and 68 model/rule inputs. All 507 selected diagnosis records have day zero; none of the 507 pathology records has a pathology date/timepoint. Molecular-test dates are absent. Source-level measurement availability and encounter links are still required; diagnosis offsets cannot certify cross-table chronology."),
+        "Audit TCGA record merging":(False,"timing evidence required","The five-table/68-input audit remains valid. Nineteen checksum-pinned public biotabs add 515 tumor procurement/review offset pairs across 507 cases, all linked by sample UUID with matching patient barcodes. These specimen dates do not establish availability of the selected pathology/genomic model inputs; source-reviewed episode and report linkage remain required."),
         "Check APACHE data":(False,"source dictionary required","2,371 invalid probabilities are masked and twenty full with/without-score fits are saved. Official eICU prediction/APS documentation was reviewed, but does not resolve this WiDS column's negative sentinel or score timestamp. The authoritative WiDS dictionary requires registered source access; provide its versioned definition and calculation/availability provenance."),
         "Use stronger data splits":(False,"partially completed","All 20 WiDS fits use patient/hospital/ICU-disjoint held-out hospitals. TCGA partitions and positive coverage are verified, but the task also requires sourced callable genomic coverage, which remains unavailable."),
         "Test APACHE dependence":(True,"completed","Five paired with/without-APACHE seeds under each imputer, score-only/recalibrated comparators and paired hospital/seed intervals are saved. Removing APACHE lowers KNN mean ungated AUROC from 0.875721 to 0.841118. Execution establishes dependence, not superiority over the best comparator."),
@@ -44,7 +45,7 @@ def update():
         "Experiment 3: Test clinical rule value":(False,"criterion not met","Full rule-content controls and hierarchical comparisons are executed, but no symbolic effect meets the 0.0001 benefit margin with favorable adjusted evidence. A negative study is complete as an experiment; its requested positive scientific goal remains unestablished."),
         "Experiment 4: Validate extraction and trace replay":(True,"completed","All eight predicates have edge/unknown/missing tests; full observed-only exports independently replay including unmapped triggers, closed-form revision, gates, probabilities and rule-off effects. Masking retains a separately labeled imputed-rule control."),
         "Experiment 5: Challenge APACHE dependence":(False,"source dictionary and benefit required","Twenty full hospital fits, APACHE/recalibrated/logistic/boosting comparisons and paired intervals are saved. Authoritative score availability remains unverified, and a clinically significant gain over the strongest locked comparator is not established."),
-        "Experiment 6: Test missingness and uncertainty":(masking_complete and intervals_complete,"completed" if masking_complete and intervals_complete else "running","Five-seed/imputer raw-masking studies, five-member ensembles and hospital-bootstrap uncertainty/degradation intervals execute the planned evaluation. Report the per-scenario acceptance results and failure cases; no claim of general clinical robustness follows."),
+        "Experiment 6: Test missingness and uncertainty":(False,"criterion not met","The full evaluation is executed, but only 12/15 median and 1/15 KNN seed/scenario combinations pass paired degradation/harm criteria, and attention-confidence error intervals span chance. Plan acceptance is not met. Preserve the failed findings; a revised hypothesis requires fresh locked confirmation rather than tuning on inspected outcomes."),
         "Experiment 7: Test external compatibility":(False,"external cohort required","The public cross-source sensitivity executes frozen predictions and numerical margins, but explicitly cannot establish independent clinical compatibility. A qualified untouched cohort with canonical source identities and reviewed measurement/outcome harmonization remains required."),
         "Experiment 8: Evaluate auditability":(False,"participants required","Protocol, randomized assignments, prospective power sensitivity, fault package and crossed reviewer/case analysis are implemented. The public demo key must be replaced with a private fresh key, and real qualified participant responses are needed to test the 10-point localization and 5-point false-reassurance margins."),
         "First: Fix data validity":(False,"assay and timing evidence required","Train-only selection, observed predicates, missingness handling, acquisition and positive genomic coverage are fixed. Full callability and clinical chronology cannot be inferred from current public variant and clinical records."),
@@ -68,8 +69,9 @@ def update():
     }
     content=(ROOT/'list.md').read_text()
     content=content.replace('# NGTA v2 completion checklist','# NGTA completion checklist')
-    content=re.sub(r'The full evidence matrix and reasons are in .*?\.',
-        'The evidence and exact blockers are in [docs/research-audit.md](docs/research-audit.md) and `results/research_checks/completion_audit.json`.',content,count=1)
+    intro='This checklist follows [plan.md](plan.md). An `x` means the full named criterion is supported by evidence; executing a study does not establish its scientific acceptance criterion. Partial and failed criteria stay unchecked. The evidence and exact blockers are in [docs/research-audit.md](docs/research-audit.md) and `results/research_checks/completion_audit.json`.'
+    content=re.sub(r'This checklist follows[^\n]*',intro,content,count=1)
+    expected_tasks=len(re.findall(r'^- \[[ x]\]',content,re.MULTILINE))
     tasks=[]
     def replace_task(match):
         mark,title,description,oldnote=match.groups()
@@ -82,23 +84,27 @@ def update():
         return f'- [{"x" if done else " "}] **{title}.** {description} Audit: **{status}**. {note}'
     pattern=r'- \[([ x])\] \*\*(.*?)\.\*\* (.*?) Audit: \*\*.*?\*\*\. ([^\n]+)'
     content=re.sub(pattern,replace_task,content)
+    if len(tasks)!=expected_tasks or len({task['task'] for task in tasks})!=len(tasks) or len(tasks)!=72:
+        raise ValueError('Checklist contains missing, duplicate or unparsed requirements; no files updated')
     verification='''## Verification evidence
 
-- The current regression suite passes 81 tests, including predicate edges, replay corruption, external mapping, weighted bootstrap equivalence, selected physical-record dates and public-cohort timestamp/sentinel/identity boundaries.
+- The current regression suite passes 85 tests, including predicate edges, replay corruption, external mapping, weighted bootstrap equivalence, selected physical-record dates, supplement checksum/specimen-linkage checks and public-cohort timestamp/sentinel/identity boundaries.
 - Full evaluation includes 35 five-seed condition fits plus a shuffled-neural-label control, with 50 matched dropout passes, three repeats, frozen fitted artifacts and recorded dependency versions. Current figures and tables explicitly identify their source seeds; the 13-page PDF compiles without undefined references or overfull boxes.
 - `results/research_checks/completion_audit.json` records every task and its exact evidence or required input. Historical `results/v2_validation/` files retain earlier snapshots and are superseded for current completion counts.
 - Unchecked items remain because their scientific criterion failed or they require verified assay/timing metadata, qualified expert review, an eligible independent untouched cohort, or real reviewer responses. Those inputs cannot be fabricated by code.
 - Public cross-source sensitivity and selected-record timing audits are additional evidence, not substitutes for source chronology or independent clinical eligibility. Source evidence and current publication/storage status are documented in `docs/source-evidence.md` and `docs/push-status.md`. Official data-access steps, request forms and unsent outreach drafts are in `docs/get-needed-data.md` and `docs/email-templates.md`.
+- All 36 full-study bundles passed fresh source/checkpoint/preprocessor identity checks and independent persisted event/prediction replay on 2026-10-20. All 297 removed artifacts remain local and match their archive hashes. The 19 public supplement files are pinned and inventoried under `results/research_checks/tcga_supplements/`; raw downloads remain in the ignored cache.
 '''
     content=content[:content.index('## Verification evidence')]+verification
     (ROOT/'list.md').write_text(content)
-    report=dict(audit_date='2026-10-04',branch='version-2',tasks=tasks,
+    report=dict(audit_date=datetime.now(timezone.utc).date().isoformat(),branch='version-2',tasks=tasks,
         completed=sum(t['completed'] for t in tasks),total=len(tasks),
         masking_complete=masking_complete,uncertainty_intervals_complete=intervals_complete,
         cross_source_sensitivity_complete=sensitivity_complete,selected_record_timing_audit_complete=timing_audit_complete,
         historical_audit='results/v2_validation/documentation_audit.json',
         artifact_storage_manifest='results/research_checks/artifact_archive_manifest.json',
         data_access_instructions='docs/get-needed-data.md',outreach_templates='docs/email-templates.md',
+        public_supplement_inventory='results/research_checks/tcga_supplements/inventory.json',
         evidence_scope='full development evaluation on inspected fixed cohorts; no prospective confirmation')
     target=ROOT/'results/research_checks/completion_audit.json'
     target.write_text(json.dumps(report,indent=2))
