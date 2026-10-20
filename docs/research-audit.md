@@ -144,3 +144,9 @@ The publisher GOSSIS extraction-code audit pins seven source files and confirms 
 The full public XML audit is complete with zero unavailable files in the pinned snapshot. The fresh private reviewer package contains 78 local files; only its non-answer preparation checks are committed. The regression suite now passes 93 tests. [Full-plan status](plan-status.md) maps the 20 unsatisfied checklist entries to their overlapping scientific, source and human-evidence dependencies, without redefining the plan or treating the technical release as plan completion.
 
 The WiDS recursive download is not certified complete: its 212,974-byte overview PDF fails the publisher SHA256 and Poppler parsing. The dictionary and original training data remain independently inspected. Unauthenticated official download returned HTTP 403; signed-in browser retrieval timed out. The partial source remains untouched and is excluded from scientific evidence. See [download integrity](../results/research_checks/wids_download_integrity.json).
+
+## 13. Source requests and partial-download verification
+
+The two prepared GDC/GOSSIS source requests were sent on 2026-10-20 after a duplicate check. Sent copies were read back, including the GDC public case/gene attachment inventory. Mail identifiers stay private. No reply or new authoritative clarification is claimed; source-provenance criteria remain unsatisfied.
+
+The repeatable download verifier detects the incomplete overview and three truncated data files under the recursive private download. The original 64,747,327-byte study source independently matches the frozen recipe SHA256, and the dictionary matches its inspected copy. No downloaded file was altered. Run `python scripts/verify_wids_download.py`; a failed check returns exit code 1. Publisher hashes and size-only checks are reported separately, without certifying unlisted files. The regression suite now contains 98 tests.

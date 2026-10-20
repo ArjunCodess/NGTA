@@ -22,3 +22,5 @@ The 20 unchecked entries overlap. They reduce to the dependencies below; each or
 The supplied WiDS dictionary is complete, but the overview PDF fails its publisher checksum and cannot be used as evidence. Unauthenticated download returns HTTP 403; a signed-in browser retrieval timed out. Resume the authorized download and verify the publisher hash; the partial file remains preserved.
 
 A human study or institutional access cannot be replaced with a model-generated review, synthetic responses or an invented approval. None of those substitutions has been used. The completed numerical results and the paper remain available while these requirements are unsatisfied.
+
+The prepared GDC/GOSSIS source questions were sent and verified on 2026-10-20. Source clarification is still pending; sending a request does not complete a source-provenance criterion. The download verifier additionally detects three partial data files, while the original fitted-study source matches the frozen hash.

@@ -88,7 +88,7 @@ def update():
         raise ValueError('Checklist contains missing, duplicate or unparsed requirements; no files updated')
     verification='''## Verification evidence
 
-- The current regression suite passes 93 tests, including predicate edges, replay corruption, external mapping, weighted bootstrap equivalence, selected physical-record dates, supplement checksum/specimen-linkage checks and public-cohort timestamp/sentinel/identity boundaries.
+- The current regression suite passes 98 tests, including predicate edges, replay corruption, external mapping, weighted bootstrap equivalence, selected physical-record dates, supplement checksum/specimen-linkage checks and public-cohort timestamp/sentinel/identity boundaries.
 - Full evaluation includes 35 five-seed condition fits plus a shuffled-neural-label control, with 50 matched dropout passes, three repeats, frozen fitted artifacts and recorded dependency versions. Current figures and tables explicitly identify their source seeds; the 12-page PDF compiles without undefined references or overfull boxes.
 - `results/research_checks/completion_audit.json` records every task and its exact evidence or required input. Historical `results/v2_validation/` files retain earlier snapshots and are superseded for current completion counts.
 - Unchecked items remain because their scientific criterion failed or they require verified assay/timing metadata, qualified expert review, an eligible independent untouched cohort, or real reviewer responses. Those inputs cannot be fabricated by code.

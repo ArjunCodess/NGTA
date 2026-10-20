@@ -6,20 +6,24 @@ I can handle downloads that are openly available, source inspection, coding, dat
 
 ## 1. WiDS dictionary received
 
-Completed on 2026-10-20: the dictionary is present under `data/private/` and parses into 188 unique variable definitions. Its source definition confirms APACHE IVa but does not resolve negative score values or score availability. A creatinine unit conflict also needs publisher clarification. No further download is needed for this step. The rest of the recursive download is not verified complete. In particular, WiDSDatathonOverview.pdf is only 212,974 bytes and fails its publisher checksum; it is not usable source evidence. Resume the existing authenticated terminal download, or download that PDF from the signed-in PhysioNet page, and leave the original partial file in place until a complete copy passes verification. This does not prevent running the current fitted studies.
+Completed on 2026-10-20: the dictionary is present under `data/private/` and parses into 188 unique variable definitions. Its source definition confirms APACHE IVa but does not resolve negative score values or score availability. A creatinine unit conflict also needs publisher clarification. No further download is needed for this step. The rest of the recursive download is incomplete: training_v2.csv is 15,865 of 64,747,327 bytes, unlabeled.csv is 196,608 of 27,733,653 bytes, and solution_template.csv is empty instead of 320,363 bytes. The separate data/wids_icu.csv used for experiments is complete and matches the frozen recipe hash. In particular, WiDSDatathonOverview.pdf is only 212,974 bytes and fails its publisher checksum; it is not usable source evidence. Resume the existing authenticated terminal download, or download that PDF from the signed-in PhysioNet page, and leave the original partial file in place until a complete copy passes verification. This does not prevent running the current fitted studies.
 
-I will handle file verification and analysis. Leave the files in place; you do not need to sort or rename them.
+Leave partial files in place; you do not need to sort or rename them. Run this from the repository root to check the download again:
 
-## 2. Send two prepared source questions
+```powershell
+.\venv\Scripts\python.exe scripts/verify_wids_download.py
+```
 
-These ask for documentation, not permission to obtain patient records. No institutional title is claimed. Open each text file, copy its To, Subject and Body into your email app, and send it from your own account. You can add your name at the end. Nothing has been sent automatically.
+Exit code 1 means at least one required check fails; the command does not modify source files. It checks publisher hashes, directory-listing sizes, the inspected dictionary hash and the separately frozen study source. Matching byte counts alone are not proof of full-release integrity.
 
-- [GDC message](action-kit/01-gdc.txt): attach [required-tcga-cases.csv](data-requests/required-tcga-cases.csv) and [required-tcga-genes.csv](data-requests/required-tcga-genes.csv). These are public TCGA IDs and gene names.
-- [GOSSIS message](action-kit/02-gossis.txt): no attachment needed.
+## 2. Source questions sent
 
-When a reply arrives, bring back its exact text and any public documentation links. If it includes restricted material or account details, keep the original locally and tell me where it is. You do not need to interpret the answer. If they request technical detail, I will draft the reply. If they say the evidence does not exist or requires institutional access, that is a useful answer too.
+Both prepared requests were sent through the connected Gmail account on 2026-10-20 after checking for duplicates. Their Sent labels, recipients and message bodies were read back and verified. The GDC request includes the public case and gene CSV attachments. Neither request asks for identifiable records or claims institutional authority. Do not send another copy while these requests are pending.
 
-Contacts were checked against the [official GDC help desk](https://gdc.cancer.gov/support/help-desk) and [GOSSIS contact page](https://gossis.mit.edu/contact/) on 2026-10-20. We will continue independent work while replies are pending.
+- [GDC request text](action-kit/01-gdc.txt) asks about gene callability and linked report availability after the public biotab/XML audit.
+- [GOSSIS request text](action-kit/02-gossis.txt) asks about APACHE sentinels, timing, source overlap and the creatinine-unit conflict.
+
+A sent question is not source evidence, so these checklist criteria remain unsatisfied. Mail identifiers and correspondence records are stored only in the ignored private directory. When a reply arrives, its source claims must be checked against the frozen data before changing scientific conclusions.
 
 ## 3. An introduction is optional if you have a suitable contact
 
@@ -41,4 +45,4 @@ Bring back an introduction, a willingness to review, or the reply saying they ca
 
 You do not need to make the negative results positive, choose a more favorable analysis, or obtain a hospital dataset immediately. The paper can report an auditable implementation and negative development findings. A stronger scientific claim needs new evidence and may remain unavailable. I will keep that boundary clear rather than give you an impossible administrative checklist.
 
-The detailed source requirements remain in [get-needed-data.md](get-needed-data.md). This page is the practical starting point; do only steps 1â€“3 for now, and report any step you cannot complete.
+The detailed source requirements remain in [get-needed-data.md](get-needed-data.md). This page is the practical starting point; do only steps 1Ã¢â‚¬â€œ3 for now, and report any step you cannot complete.
