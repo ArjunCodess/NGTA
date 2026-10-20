@@ -65,8 +65,8 @@
     {
       "task": "Check APACHE data",
       "completed": false,
-      "status": "source dictionary required",
-      "evidence_or_action": "2,371 invalid probabilities are masked and twenty full with/without-score fits are saved. Official eICU prediction/APS documentation was reviewed, but does not resolve this WiDS column's negative sentinel or score timestamp. The authoritative WiDS dictionary requires registered source access; provide its versioned definition and calculation/availability provenance."
+      "status": "source clarification required",
+      "evidence_or_action": "2,371 invalid probabilities are masked and twenty full with/without-score fits are saved. The supplied 188-variable WiDS dictionary confirms APACHE IVa but does not resolve negative sentinels or score availability. Publisher clarification remains required. It also reveals a creatinine-unit conflict with the frozen rule; clinical interpretation and external unit harmonization remain unverified."
     },
     {
       "task": "Review imputation",
@@ -383,7 +383,7 @@
     {
       "task": "Experiment 5: Challenge APACHE dependence",
       "completed": false,
-      "status": "source dictionary and benefit required",
+      "status": "source clarification and benefit required",
       "evidence_or_action": "Twenty full hospital fits, APACHE/recalibrated/logistic/boosting comparisons and paired intervals are saved. Authoritative score availability remains unverified, and a clinically significant gain over the strongest locked comparator is not established."
     },
     {

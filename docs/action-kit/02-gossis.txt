@@ -12,6 +12,8 @@ Could you direct me to documentation for apache_4a_hospital_death_prob, specific
 2. Which APACHE model/version and collection window produced this field, and when was the probability available relative to the end of the first 24 ICU hours?
 3. What documentation identifies the cohort's collection period and possible overlap with BIDMC/MIMIC or eICU sources? We need to assess whether a proposed external evaluation would actually be independent.
 
-We have already evaluated the model with and without the APACHE field. General eICU documentation has not resolved these questions for the exact WiDS export. No identifiable patient records are requested. A public reference, dictionary definition, clarification of unavailable metadata, or referral to the appropriate custodian would help.
+4. The downloaded WiDS dictionary labels d1_creatinine_max as micromol/L, while the local training values have a median of 1.0 and range 0.34 to 11.11, and our prototype rule assumes mg/dL. Could you confirm the actual exported unit and whether a dictionary correction exists? We have not converted the values based on this discrepancy.
+
+We have already evaluated the model with and without the APACHE field. We have now obtained the WiDS dictionary; it confirms the APACHE IVa definition but does not resolve the sentinel/timestamp questions. No identifiable patient records are requested. A public reference, dictionary definition, clarification of unavailable metadata, or referral to the appropriate custodian would help.
 
 Thank you.

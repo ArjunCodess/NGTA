@@ -2,15 +2,11 @@
 
 I can handle downloads that are openly available, source inspection, coding, data preparation, experiments, analysis, paper updates and repository maintenance. You do not need to design a study or negotiate a hospital data agreement. Start with the small actions below; send back the original replies/files and I will work out the technical next step.
 
-## 1. Get the WiDS dictionary
+## 1. WiDS dictionary received
 
-1. Open the [official WiDS release](https://physionet.org/content/widsdatathon2020/1.0.0/).
-2. Sign in or create your own PhysioNet account and verify your email.
-3. Read the access agreement shown on that release. Accept it only if you agree and can meet its terms. This release lists registered access with a signed agreement; do not start the MIMIC/CITI process for this task.
-4. After access is granted, look for the WiDS Datathon 2020 Dictionary in the file list and download it. Its exact filename may differ. If the page does not expose it, tell me the wording you see and I will troubleshoot the next step.
-5. Put the unchanged downloaded file in `data/private/`, or tell me its local path. Tell me the release URL you used. Do not send your password, session cookie or access token.
+Completed on 2026-10-20: the dictionary is present under `data/private/` and parses into 188 unique variable definitions. Its source definition confirms APACHE IVa but does not resolve negative score values or score availability. A creatinine unit conflict also needs publisher clarification. No further download is needed for this step. The rest of the recursive download was still active when inspected.
 
-That is enough for your part. I will inspect the score definition and determine what it resolves. Access does not guarantee that the dictionary answers the score-timing questions.
+I will handle file verification and analysis. Leave the files in place; you do not need to sort or rename them.
 
 ## 2. Send two prepared source questions
 
@@ -23,7 +19,7 @@ When a reply arrives, bring back its exact text and any public documentation lin
 
 Contacts were checked against the [official GDC help desk](https://gdc.cancer.gov/support/help-desk) and [GOSSIS contact page](https://gossis.mit.edu/contact/) on 2026-10-20. We will continue independent work while replies are pending.
 
-## 3. Ask for one introduction, not an entire research team
+## 3. An introduction is optional if you have a suitable contact
 
 Reply to an existing conversation with someone who has already given feedback on NGTA, or contact a researcher you actually know. Use the [introduction message](action-kit/03-introduction.txt). Attach the [short project brief](action-kit/project-brief.md), or paste it beneath the message if their email app does not handle Markdown attachments.
 

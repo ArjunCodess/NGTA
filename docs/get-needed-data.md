@@ -29,6 +29,8 @@ The currently selected pathology records have no pathology dates. The acquired b
 
 ## 2. WiDS: what does the APACHE field mean?
 
+Update: the dictionary download is complete and has been inspected. You do not need to repeat the account/download steps below. Remaining publisher questions cover APACHE sentinel/timing/source provenance and a creatinine unit conflict; use the updated [ready-to-send message](action-kit/02-gossis.txt).
+
 We need documentation for `apache_4a_hospital_death_prob`: the meaning of negative values, which APACHE model produced it, which time window was used, and when the probability became available. We also need the cohort's actual collection period and source-institution provenance to evaluate possible overlap with a new cohort.
 
 ### Where and how
