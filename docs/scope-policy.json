@@ -1,0 +1,13 @@
+{
+  "decision_date": "2026-10-20",
+  "authority": "Owner instruction: assume external researcher-dependent work is impossible and cross it out.",
+  "excluded_requirements": [
+    "Improve the rule base",
+    "Expand rule validation",
+    "Evaluate human oversight",
+    "Experiment 8: Evaluate auditability"
+  ],
+  "reason": "External clinical expert review and real participant collection are unavailable and will not be pursued. Existing source documentation, software controls and private preparation are retained.",
+  "evidence_rule": "Exclusion does not satisfy the original scientific criterion and must never be counted as completion. Clinical validation and reviewer-benefit claims remain unsupported.",
+  "still_in_scope": "Official-source research, obtainable data and independent technical preparation. An external dataset does not automatically require recruiting an external researcher; access and eligibility must be assessed separately."
+}

@@ -3,6 +3,8 @@
   "total": 72,
   "satisfied": 52,
   "not_satisfied": 20,
+  "owner_excluded": 4,
+  "active_unsatisfied": 16,
   "group_counts": {
     "scientific_acceptance": 3,
     "qualified_clinical_review": 2,
@@ -16,122 +18,142 @@
       "requirement": "Prove the symbolic component matters",
       "remaining_type": "scientific_acceptance",
       "scientific_criterion_satisfied": false,
+      "owner_excluded": false,
       "required_evidence_or_action": "Full matched clinical comparisons, direct boosts, rule removal, randomized truth, fixed priors and 100 predicate permutations are saved. Every hierarchical symbolic Brier interval spans zero and the 0.0001 minimum gain is not met. A favorable finding cannot be manufactured; a new clinically justified hypothesis needs fresh confirmation data."
     },
     {
       "requirement": "Improve the rule base",
       "remaining_type": "qualified_clinical_review",
       "scientific_criterion_satisfied": false,
-      "required_evidence_or_action": "All eight rules have source/version/prototype status and sensitivity controls, but remain not_reviewed. A thyroid oncology and critical-care expert must review predicate definitions, truth weights, shared evidence and clinically defensible contradiction policies; record signed review evidence before expanding the registry."
+      "owner_excluded": true,
+      "required_evidence_or_action": "Not pursued: external expert review or real participants are unavailable. Technical preparation is retained; the original scientific criterion is not satisfied."
     },
     {
       "requirement": "Add external validation",
       "remaining_type": "eligible_untouched_cohort",
       "scientific_criterion_satisfied": false,
+      "owner_excluded": false,
       "required_evidence_or_action": "Frozen raw-masking studies and independent-cohort tooling exist. Provide an authorized independent cohort, canonical patient IDs, binary target definition, institutional clusters and verified input units/windows; freeze the mapping before accessing labels. No eligible independent cohort was supplied."
     },
     {
       "requirement": "Fix TCGA genomic coverage",
       "remaining_type": "source_provenance",
       "scientific_criterion_satisfied": false,
+      "owner_excluded": false,
       "required_evidence_or_action": "498 UUID/checksum-pinned public MAF files were acquired; selected-panel positives cover 254/50/50 train/validation/test cases. Sixteen expected clinical cases lack file-associated coverage. Complete callable panels and verified negatives remain absent; supply sourced case/gene assay callability rather than treating missing variant rows as negative."
     },
     {
       "requirement": "Audit TCGA record merging",
       "remaining_type": "source_provenance",
       "scientific_criterion_satisfied": false,
+      "owner_excluded": false,
       "required_evidence_or_action": "The five-table/68-input audit remains valid. Nineteen checksum-pinned public biotabs add 515 tumor procurement/review offset pairs across 507 cases, all linked by sample UUID with matching patient barcodes. These specimen dates do not establish availability of the selected pathology/genomic model inputs; The complete 1,554-file public XML audit also passes checksum/case checks, but selected-input availability and case/gene callability remain unverified; source-reviewed episode and report linkage remain required."
     },
     {
       "requirement": "Check APACHE data",
       "remaining_type": "source_provenance",
       "scientific_criterion_satisfied": false,
+      "owner_excluded": false,
       "required_evidence_or_action": "2,371 invalid probabilities are masked and twenty full with/without-score fits are saved. The supplied 188-variable WiDS dictionary confirms APACHE IVa but does not resolve negative sentinels or score availability. Publisher clarification remains required. It also reveals a creatinine-unit conflict with the frozen rule; clinical interpretation and external unit harmonization remain unverified."
     },
     {
       "requirement": "Use stronger data splits",
       "remaining_type": "source_provenance",
       "scientific_criterion_satisfied": false,
+      "owner_excluded": false,
       "required_evidence_or_action": "All 20 WiDS fits use patient/hospital/ICU-disjoint held-out hospitals. TCGA partitions and positive coverage are verified, but the task also requires sourced callable genomic coverage, which remains unavailable."
     },
     {
       "requirement": "Expand rule validation",
       "remaining_type": "qualified_clinical_review",
       "scientific_criterion_satisfied": false,
-      "required_evidence_or_action": "Extraction edges, provenance, collision handling, frequency/confidence sensitivity and randomized controls pass. Clinical correlated-evidence semantics, truth weights and rule correctness still require expert review; software tests cannot certify them."
+      "owner_excluded": true,
+      "required_evidence_or_action": "Not pursued: external expert review or real participants are unavailable. Technical preparation is retained; the original scientific criterion is not satisfied."
     },
     {
       "requirement": "Evaluate human oversight",
       "remaining_type": "real_participant_study",
       "scientific_criterion_satisfied": false,
-      "required_evidence_or_action": "A balanced 24-reviewer/80-case crossover demonstration, separate practice cases, seeded faults, power sensitivity and crossed reviewer/case analysis are built. A fresh secret-seeded private package now has opaque case IDs, shuffled faults and 24 individual delivery folders with 1,920 verified balanced assignments. Finalize the protocol, recruit qualified reviewers, collect independent responses and grade corrections; no participant results exist."
+      "owner_excluded": true,
+      "required_evidence_or_action": "Not pursued: external expert review or real participants are unavailable. Technical preparation is retained; the original scientific criterion is not satisfied."
     },
     {
       "requirement": "Test institutional generalization",
       "remaining_type": "eligible_untouched_cohort",
       "scientific_criterion_satisfied": false,
+      "owner_excluded": false,
       "required_evidence_or_action": "Twenty full WiDS models are evaluated on internal held-out hospitals without refitting preprocessing or rules. An independent source institution/time cohort is still required; internal benchmark hospitals cannot establish that broader claim."
     },
     {
       "requirement": "Check external compatibility",
       "remaining_type": "eligible_untouched_cohort",
       "scientific_criterion_satisfied": false,
+      "owner_excluded": false,
       "required_evidence_or_action": "Frozen mapping, overlap checks, replay and noninferiority tooling exist. A public 12,000-case PhysioNet sensitivity evaluates ten no-APACHE fits with conditional case intervals and explicit clinical_claim_eligible=false. Source identity/window equivalence, original >=48-hour selection and unavailable inputs prevent it from meeting independent clinical eligibility; supply a qualified untouched cohort."
     },
     {
       "requirement": "Prevent test-set tuning",
       "remaining_type": "eligible_untouched_cohort",
       "scientific_criterion_satisfied": false,
+      "owner_excluded": false,
       "required_evidence_or_action": "Training/validation fit selection, immutable checkpoint provenance and source/split/rule locks are enforced. Already inspected outcomes cannot become unseen; acquire or reserve a genuinely untouched cohort and preregister the final procedure before labels are accessed."
     },
     {
       "requirement": "Experiment 1: Establish valid data coverage and replay",
       "remaining_type": "combined_acceptance_and_provenance",
       "scientific_criterion_satisfied": false,
+      "owner_excluded": false,
       "required_evidence_or_action": "Source pinning, missingness, training-only selection, split disjointness and independent full-study replay pass. Complete callable panels and source-level prediction-time availability remain external evidence requirements."
     },
     {
       "requirement": "Experiment 3: Test clinical rule value",
       "remaining_type": "scientific_acceptance",
       "scientific_criterion_satisfied": false,
+      "owner_excluded": false,
       "required_evidence_or_action": "Full rule-content controls and hierarchical comparisons are executed, but no symbolic effect meets the 0.0001 benefit margin with favorable adjusted evidence. A negative study is complete as an experiment; its requested positive scientific goal remains unestablished."
     },
     {
       "requirement": "Experiment 5: Challenge APACHE dependence",
       "remaining_type": "combined_acceptance_and_provenance",
       "scientific_criterion_satisfied": false,
+      "owner_excluded": false,
       "required_evidence_or_action": "Twenty full hospital fits, APACHE/recalibrated/logistic/boosting comparisons and paired intervals are saved. Authoritative score availability remains unverified, and a clinically significant gain over the strongest locked comparator is not established."
     },
     {
       "requirement": "Experiment 6: Test missingness and uncertainty",
       "remaining_type": "scientific_acceptance",
       "scientific_criterion_satisfied": false,
+      "owner_excluded": false,
       "required_evidence_or_action": "The full evaluation is executed, but only 12/15 median and 1/15 KNN seed/scenario combinations pass paired degradation/harm criteria, and attention-confidence error intervals span chance. Plan acceptance is not met. Preserve the failed findings; a revised hypothesis requires fresh locked confirmation rather than tuning on inspected outcomes."
     },
     {
       "requirement": "Experiment 7: Test external compatibility",
       "remaining_type": "eligible_untouched_cohort",
       "scientific_criterion_satisfied": false,
+      "owner_excluded": false,
       "required_evidence_or_action": "The public cross-source sensitivity executes frozen predictions and numerical margins, but explicitly cannot establish independent clinical compatibility. A qualified untouched cohort with canonical source identities and reviewed measurement/outcome harmonization remains required."
     },
     {
       "requirement": "Experiment 8: Evaluate auditability",
       "remaining_type": "real_participant_study",
       "scientific_criterion_satisfied": false,
-      "required_evidence_or_action": "Protocol, randomized assignments, prospective power sensitivity, fault package and crossed reviewer/case analysis are implemented. A fresh private key and individually isolated reviewer materials are now generated and verified. Real qualified participant responses are still needed to test the 10-point localization and 5-point false-reassurance margins."
+      "owner_excluded": true,
+      "required_evidence_or_action": "Not pursued: external expert review or real participants are unavailable. Technical preparation is retained; the original scientific criterion is not satisfied."
     },
     {
       "requirement": "First: Fix data validity",
       "remaining_type": "combined_acceptance_and_provenance",
       "scientific_criterion_satisfied": false,
+      "owner_excluded": false,
       "required_evidence_or_action": "Train-only selection, observed predicates, missingness handling, acquisition and positive genomic coverage are fixed. Full callability and clinical chronology cannot be inferred from current public variant and clinical records."
     },
     {
       "requirement": "Fourth: Strengthen baselines and validation",
       "remaining_type": "combined_acceptance_and_provenance",
       "scientific_criterion_satisfied": false,
-      "required_evidence_or_action": "Full internal baselines, APACHE dependence, rule controls, ensembles and masking are executed. Independent cohorts, score timing, clinical expert review and favorable research acceptance remain unresolved; the audit specifies the required inputs."
+      "owner_excluded": false,
+      "required_evidence_or_action": "Full internal baselines, APACHE dependence, rule controls, ensembles and masking are executed. Clinical expert review is excluded by owner decision. Independent cohorts, score timing and favorable research acceptance remain unresolved; the audit specifies the required inputs."
     }
   ],
-  "interpretation": "Full-plan status, not a rescope or declaration of completion. Negative experiments and private study preparation do not satisfy unmet scientific or human-evidence criteria."
+  "interpretation": "Original scientific status with explicit owner exclusions. Excluded criteria are not completed; negative experiments and private study preparation do not establish favorable scientific or human-evidence results."
 }

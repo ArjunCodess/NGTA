@@ -24,12 +24,15 @@ def summarize(root=Path(__file__).resolve().parents[1]):
         if len(groups) != 1:
             raise ValueError(f"Unclassified or multiply classified plan requirement: {task['task']}")
         rows.append(dict(requirement=task['task'], remaining_type=groups[0], scientific_criterion_satisfied=False,
+                         owner_excluded=task.get('owner_excluded',False),
                          required_evidence_or_action=task['evidence_or_action']))
     if len(rows)+audit['completed'] != audit['total']:
         raise ValueError('Checklist counts differ from task records')
     report = dict(plan='plan.md', total=audit['total'], satisfied=audit['completed'], not_satisfied=len(rows),
+                  owner_excluded=sum(row['owner_excluded'] for row in rows),
+                  active_unsatisfied=sum(not row['owner_excluded'] for row in rows),
                   group_counts={key: sum(row['remaining_type']==key for row in rows) for key in GROUPS}, requirements=rows,
-                  interpretation='Full-plan status, not a rescope or declaration of completion. Negative experiments and private study preparation do not satisfy unmet scientific or human-evidence criteria.')
+                  interpretation='Original scientific status with explicit owner exclusions. Excluded criteria are not completed; negative experiments and private study preparation do not establish favorable scientific or human-evidence results.')
     (root/'results/research_checks/full_plan_remaining.json').write_text(json.dumps(report, indent=2))
     return report
 

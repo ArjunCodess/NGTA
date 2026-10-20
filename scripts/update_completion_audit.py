@@ -8,6 +8,9 @@ ROOT=Path(__file__).resolve().parents[1]
 
 
 def update():
+    policy_path=ROOT/"docs/scope-policy.json"
+    policy=json.loads(policy_path.read_text()) if policy_path.exists() else {"excluded_requirements": []}
+    excluded=set(policy["excluded_requirements"])
     masking_complete=all((ROOT/f"results/hospital_study/{mode}/seed_{seed}/wids/metrics/missingness/robustness_acceptance.json").exists()
         for mode in ("knn","median") for seed in range(5))
     intervals_complete=masking_complete and all((ROOT/f"results/hospital_study/{mode}/seed_{seed}/wids/metrics/missingness/uncertainty_intervals.csv").exists()
@@ -50,7 +53,7 @@ def update():
         "Experiment 8: Evaluate auditability":(False,"participants required","Protocol, randomized assignments, prospective power sensitivity, fault package and crossed reviewer/case analysis are implemented. A fresh private key and individually isolated reviewer materials are now generated and verified. Real qualified participant responses are still needed to test the 10-point localization and 5-point false-reassurance margins."),
         "First: Fix data validity":(False,"assay and timing evidence required","Train-only selection, observed predicates, missingness handling, acquisition and positive genomic coverage are fixed. Full callability and clinical chronology cannot be inferred from current public variant and clinical records."),
         "Third: Make traces independently replayable":(True,"completed","Independent predicates/revision/gating, complete mapped and unmapped events, integrity hashes and full predicate edge coverage pass on current studies."),
-        "Fourth: Strengthen baselines and validation":(False,"external evidence required","Full internal baselines, APACHE dependence, rule controls, ensembles and masking are executed. Independent cohorts, score timing, clinical expert review and favorable research acceptance remain unresolved; the audit specifies the required inputs."),
+        "Fourth: Strengthen baselines and validation":(False,"external evidence required","Full internal baselines, APACHE dependence, rule controls, ensembles and masking are executed. Clinical expert review is excluded by owner decision. Independent cohorts, score timing and favorable research acceptance remain unresolved; the audit specifies the required inputs."),
     }
     replacements={
         "Review imputation":"Training-standardized KNN distances, separate raw/imputed values and observed-only predicates are tested. Full KNN/median, with/without-APACHE paired fits and both five-seed masking studies now evaluate the imputer choices.",
@@ -70,6 +73,7 @@ def update():
     content=(ROOT/'list.md').read_text()
     content=content.replace('# NGTA v2 completion checklist','# NGTA completion checklist')
     intro='This checklist follows [plan.md](plan.md). An `x` means the full named criterion is supported by evidence; executing a study does not establish its scientific acceptance criterion. Partial and failed criteria stay unchecked. The evidence and exact blockers are in [docs/research-audit.md](docs/research-audit.md) and `results/research_checks/completion_audit.json`.'
+    intro += f' Owner-excluded expert/participant requirements are struck through and remain scientifically unsatisfied; see docs/scope-policy.json.' if excluded else ''
     content=re.sub(r'This checklist follows[^\n]*',intro,content,count=1)
     expected_tasks=len(re.findall(r'^- \[[ x]\]',content,re.MULTILINE))
     tasks=[]
@@ -80,31 +84,43 @@ def update():
         else:
             done,status=mark=='x','completed' if mark=='x' else 'partial'
             note=replacements.get(title,oldnote.replace('corrected v2','current').replace('v2','current implementation'))
-        tasks.append(dict(task=title,completed=done,status=status,evidence_or_action=note))
+        owner_excluded=title in excluded
+        description=description.removeprefix('~~').removesuffix('~~')
+        if owner_excluded:
+            done,status=False,'excluded by owner'
+            note='Not pursued: external expert review or real participants are unavailable. Technical preparation is retained; the original scientific criterion is not satisfied.'
+            description=f'~~{description}~~'
+        tasks.append(dict(task=title,completed=done,status=status,evidence_or_action=note,owner_excluded=owner_excluded))
         return f'- [{"x" if done else " "}] **{title}.** {description} Audit: **{status}**. {note}'
     pattern=r'- \[([ x])\] \*\*(.*?)\.\*\* (.*?) Audit: \*\*.*?\*\*\. ([^\n]+)'
     content=re.sub(pattern,replace_task,content)
     if len(tasks)!=expected_tasks or len({task['task'] for task in tasks})!=len(tasks) or len(tasks)!=72:
         raise ValueError('Checklist contains missing, duplicate or unparsed requirements; no files updated')
+    if excluded-{task['task'] for task in tasks}:
+        raise ValueError('Scope policy names unknown requirements; no files updated')
     verification='''## Verification evidence
 
-- The current regression suite passes 98 tests, including predicate edges, replay corruption, external mapping, weighted bootstrap equivalence, selected physical-record dates, supplement checksum/specimen-linkage checks and public-cohort timestamp/sentinel/identity boundaries.
+- The current regression suite passes 100 tests, including predicate edges, replay corruption, external mapping, weighted bootstrap equivalence, selected physical-record dates, supplement checksum/specimen-linkage checks and public-cohort timestamp/sentinel/identity boundaries.
 - Full evaluation includes 35 five-seed condition fits plus a shuffled-neural-label control, with 50 matched dropout passes, three repeats, frozen fitted artifacts and recorded dependency versions. Current figures and tables explicitly identify their source seeds; the 12-page PDF compiles without undefined references or overfull boxes.
 - `results/research_checks/completion_audit.json` records every task and its exact evidence or required input. Historical `results/v2_validation/` files retain earlier snapshots and are superseded for current completion counts.
-- Unchecked items remain because their scientific criterion failed or they require verified assay/timing metadata, qualified expert review, an eligible independent untouched cohort, or real reviewer responses. Those inputs cannot be fabricated by code.
-- Public cross-source sensitivity and selected-record timing audits are additional evidence, not substitutes for source chronology or independent clinical eligibility. Source evidence and current publication/storage status are documented in `docs/source-evidence.md` and `docs/push-status.md`. Official data-access steps, request forms and unsent outreach drafts are in `docs/get-needed-data.md` and `docs/email-templates.md`.
+- Four expert/participant criteria are excluded by owner decision and struck through, without being counted as complete. Remaining active criteria concern source metadata, eligible untouched cohorts and unmet scientific acceptance; see docs/next-work.md.
+- Public cross-source sensitivity and selected-record timing audits are additional evidence, not substitutes for source chronology or independent clinical eligibility. Source evidence and current publication/storage status are documented in `docs/source-evidence.md` and `docs/push-status.md`. Official data-access steps, request forms and unsent outreach templates are in `docs/get-needed-data.md` and `docs/email-templates.md`.
 - All 36 full-study bundles passed fresh source/checkpoint/preprocessor identity checks and independent persisted event/prediction replay on 2026-10-20. All 297 removed artifacts remain local and match their archive hashes. The 19 public supplement files are pinned and inventoried under `results/research_checks/tcga_supplements/`; raw downloads remain in the ignored cache.
 '''
     content=content[:content.index('## Verification evidence')]+verification
     (ROOT/'list.md').write_text(content)
     report=dict(audit_date=datetime.now(timezone.utc).date().isoformat(),branch='version-2',tasks=tasks,
         completed=sum(t['completed'] for t in tasks),total=len(tasks),
+        owner_excluded=sum(t['owner_excluded'] for t in tasks),
+        active_total=sum(not t['owner_excluded'] for t in tasks),
+        active_unsatisfied=sum(not t['completed'] and not t['owner_excluded'] for t in tasks),
+        scope_policy='docs/scope-policy.json',
         masking_complete=masking_complete,uncertainty_intervals_complete=intervals_complete,
         cross_source_sensitivity_complete=sensitivity_complete,selected_record_timing_audit_complete=timing_audit_complete,
         historical_audit='results/v2_validation/documentation_audit.json',
         artifact_storage_manifest='results/research_checks/artifact_archive_manifest.json',
         data_access_instructions='docs/get-needed-data.md',outreach_templates='docs/email-templates.md',
-        technical_reproduction_guide='docs/reproducibility.md',validation_scope='full plan remains incomplete; no external or human validation claimed',
+        technical_reproduction_guide='docs/reproducibility.md',validation_scope='four external expert/participant requirements excluded by owner; original scientific criteria remain unsatisfied; no external or human validation claimed',
         public_supplement_inventory='results/research_checks/tcga_supplements/inventory.json',
         public_xml_inventory='results/research_checks/tcga_xml/inventory.json',private_reviewer_preparation='results/research_checks/reviewer_preparation.json',full_plan_remaining='results/research_checks/full_plan_remaining.json',
         evidence_scope='full development evaluation on inspected fixed cohorts; no prospective confirmation')
