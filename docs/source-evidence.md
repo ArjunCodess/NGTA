@@ -34,7 +34,7 @@ All ten fits pass independent replay and the conditional numerical margins. Mean
 
 ## Inputs that still need people
 
-Qualified thyroid-oncology and critical-care reviewers must sign off on the prototype predicates, truth weights and correlated-evidence policies. Real reviewer participants must complete the prepared crossover protocol using a fresh private answer key. Source documentation cannot substitute for either activity. A new independent cohort also needs verified source identities, clinical harmonization and a procedure locked before outcome inspection.
+The owner has excluded external clinical expert review and participant collection as unavailable. Prototype rule validity and human benefit therefore remain unsupported; the prepared materials are retained, with no further recruitment requested. Source documentation does not substitute for either type of evidence. A new independent cohort also needs verified source identities, clinical harmonization and a procedure locked before outcome inspection.
 
 ## Newly identified source-unit conflict
 
@@ -49,3 +49,7 @@ The [official GOSSIS extraction repository](https://github.com/MIT-LCP/gossis) i
 `python scripts/audit_tcga_xml.py` now acquires and verifies all 1,554 pinned public XML supplements, totaling 65,507,832 bytes across 507 cases: 1,014 BCR XML files, 507 specimen-supplement XML files and 33 other-malignancy XML files. The [inventory](../results/research_checks/tcga_xml/inventory.json) records 94 matching full field paths, source SHA256s and case identity checks. Publisher MD5/size and associated patient barcodes are verified before counting a file. Raw XML remains in the ignored cache. The API batch failure was recovered through smaller requests and individual-file fallback; no source files remain unavailable in this snapshot.
 
 The XML confirms 515 tumor procurement/pathology-review offset occurrences, while the generic sample-procurement field is empty for 1,053 sample entries. Diagnosis offsets remain zero in all 507 clinical records. Upload and form-completion dates refer to their named administrative events. The audit does not establish the availability of the selected pathology/model measurements or genomic reports, and does not provide verified case/gene callability. Those criteria remain unmet after checking the complete public supplement snapshot. [Official batch-download API](https://docs.gdc.cancer.gov/API/Users_Guide/Downloading_Files/) describes the acquisition mechanism.
+
+## Search follow-up and owner scope decision
+
+The [next-work assessment](next-work.md) records the latest official-source findings: 515 open THCA pathology PDFs totaling 79,840,335 bytes, publisher evidence relevant to APACHE -1 handling, and gated HiRID/SICdb cohort routes. The pathology PDFs are inventoried but their contents have not yet been audited. Four expert/participant requirements are excluded from active work, without becoming completed scientific criteria.

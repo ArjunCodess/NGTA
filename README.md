@@ -77,9 +77,9 @@ The subsequent full XML audit verifies all 1,554 public supplements (65.5 MB) ac
 
 [list.md](list.md) tracks genuinely completed work. The detailed research audit is in [docs/research-audit.md](docs/research-audit.md), leaving this README focused on the project and its use.
 
-To help with access or contacts without taking on the technical work, use the [practical action kit](docs/start-here.md). It contains three small tasks and prepared messages; no institutional authority is assumed.
+The owner has removed clinical expert review and participant recruitment from active work. Four corresponding checklist criteria are struck through as exclusions, leaving 52 satisfied and 16 unresolved active criteria. The [next-work list](docs/next-work.md) records the official-source search and concrete remaining tasks; no clinical or human validation is claimed.
 
-The technical release covers the current implementation, development experiments and reproduction tools; it does not complete every scientific requirement in `plan.md`. External clinical/human validation is deferred at the owner's request. The [technical verification record](results/research_checks/technical_release.json) records the checks. The [reproduction guide](docs/reproducibility.md) provides the exact 36-fit recipe, verification commands, source-only package and storage requirements; [list.md](list.md) retains the full scientific criteria, including failed and deferred items.
+The technical release covers the current implementation, development experiments and reproduction tools; it does not complete every scientific requirement in `plan.md`. External clinical expert review and the human participant study are excluded at the owner's request; independent-cohort validation remains unresolved. The [technical verification record](results/research_checks/technical_release.json) records the checks. The [reproduction guide](docs/reproducibility.md) provides the exact 36-fit recipe, verification commands, source-only package and storage requirements; [list.md](list.md) retains the full scientific criteria, including failed and deferred items.
 
 ## Running
 

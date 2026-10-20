@@ -1,10 +1,10 @@
 {
-  "verified_utc": "2026-10-20T10:59:40.615489+00:00",
+  "verified_utc": "2026-10-20T11:25:49.001571+00:00",
   "branch": "version-2",
-  "scope": "Verified implementation and inspected development experiments; the full plan remains incomplete at 52/72. Negative scientific criteria and missing source, cohort, expert and participant evidence remain unsatisfied.",
+  "scope": "Original plan 52/72 satisfied. Owner excludes four external expert/participant criteria without satisfying them; active scope has 52 satisfied and 16 unresolved out of 68.",
   "tests": {
-    "passed": 98,
-    "extracted_source_package_passed": 98,
+    "passed": 100,
+    "extracted_source_package_passed": 100,
     "environment": "same recorded Windows/Python environment; separate source extraction, not a fresh environment or independent scientific evaluation"
   },
   "checkpoint_replay": {
@@ -49,14 +49,15 @@
   },
   "scientific_checklist": {
     "completed": 52,
-    "total": 72
+    "total": 72,
+    "owner_excluded": 4,
+    "active_total": 68,
+    "active_unsatisfied": 16
   },
   "deferred": [
     "callable TCGA panels and clinical/genomic availability",
     "APACHE sentinel/availability and creatinine-unit clarification",
-    "qualified clinical rule review",
-    "eligible independent untouched cohort",
-    "real blinded participant evaluation"
+    "eligible independent untouched cohort"
   ],
   "negative_findings": [
     "symbolic benefit criterion not met",
@@ -84,5 +85,11 @@
     "sent_copies_verified": true,
     "authoritative_clarification_received": false,
     "mail_metadata_public": false
-  }
+  },
+  "owner_scope_policy": "docs/scope-policy.json",
+  "next_work": "docs/next-work.md",
+  "owner_excluded": [
+    "qualified clinical rule review",
+    "real blinded participant evaluation"
+  ]
 }

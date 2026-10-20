@@ -1,6 +1,6 @@
 # Reproducing NGTA
 
-This is the technical release for the inspected development studies in `plan.md`. External cohort validation, clinical rule review, source clarification and participant evaluation are deferred. Failed symbolic-benefit and robustness criteria remain failed; the release does not change them into completed scientific claims.
+This is the technical release for the inspected development studies in `plan.md`. External clinical expert review and participant collection are excluded by the owner; source clarification and eligible independent-cohort validation remain unresolved. Failed symbolic-benefit and robustness criteria remain failed; the release does not change them into completed scientific claims.
 
 ## What is included
 
@@ -114,3 +114,5 @@ No researcher recruitment, additional data download or favorable result is neede
 The original public demonstration is unsuitable for blinded recruitment. Its predictable case/fault sequence is now replaced in newly generated packages with opaque case IDs and shuffled fault assignments. Use `python scripts/reviewer_study.py --private --output-dir results/reviewer_private/NEW_DIRECTORY` to prepare a new secret-seeded package. The CLI refuses a repository-public destination and does not print the seed or answer key. An existing package is never overwritten.
 
 Only the individual `participant/reviewer_*` folder assigned to a reviewer is intended for delivery after protocol finalization. It contains that reviewer's assigned evaluation format once per case and a free-text correction response sheet. Master cross-format tasks, assignments and the investigator grading template are moved into `investigator/`. Do not distribute the root directory, protocol seed, investigator folder or other reviewers' materials. Empty response sheets cannot produce a human-study result. The prepared private package has 24 reviewer folders and 1,920 balanced assignments for 80 evaluation cases, but zero recruited participants and zero human responses.
+
+The current [scope policy](scope-policy.json) crosses out four expert/participant criteria without marking them complete. [Next work](next-work.md) records the remaining official-source and cohort tasks. The source package includes this policy so regenerated checklists retain the owner decision.
