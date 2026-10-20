@@ -43,3 +43,24 @@ def test_synthetic_response_fixture_exercises_crossed_analysis(tmp_path):
     assert report["response_count"] == 32
     assert report["mixed_effects_sensitivity"]["method"].startswith("variational Bayes")
     assert not report["acceptance_criteria_met"]
+
+
+def test_private_review_materials_have_opaque_ids_and_only_assigned_formats(tmp_path):
+    root = tmp_path / "sealed"
+    create_reviewer_package(root, reviewers=4, cases=8, seed=812391)
+    assigned = pd.read_csv(root / "participant" / "assignments.csv")
+    assert assigned.case_id.str.match(r"case_[0-9a-f]{16}$").all()
+    keys = []
+    for participant_id, selected in assigned.groupby("participant_id"):
+        directory = root / "participant" / participant_id
+        tasks = json.loads((directory / "tasks.json").read_text())
+        assert {(row["case_id"], row["format"]) for row in tasks["evaluation"]} == set(zip(selected.case_id, selected["format"]))
+        assert len(tasks["evaluation"]) == len(selected)
+        assert not any("fault" in row or "seed" in row for row in tasks["evaluation"])
+        assert "correction_correct" not in pd.read_csv(directory / "responses.csv").columns
+        keys.extend((row["case_id"], row["format"]) for row in tasks["evaluation"])
+    second = tmp_path / "different"
+    create_reviewer_package(second, reviewers=4, cases=8, seed=812392)
+    a = json.loads((root / "investigator" / "truth.json").read_text())
+    b = json.loads((second / "investigator" / "truth.json").read_text())
+    assert a["truth"] != b["truth"]

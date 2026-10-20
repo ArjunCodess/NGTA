@@ -68,9 +68,12 @@ def create_reviewer_package(output_dir, reviewers=24, cases=80, seed=0):
     arm_names = dict(zip(("structured", "trace"), rng.permutation(["format_a", "format_b"])))
     order = rng.permutation(cases)
     truth, tasks = [], []
+    # A public case number must not reveal its seeded fault.
+    case_ids = [f"case_{int(value):016x}" for value in rng.choice(2**62, size=cases, replace=False)]
+    fault_sequence = rng.permutation(np.resize(np.array(FAULTS), cases))
     for index in range(cases + 4):
-        case_id = f"practice_{index}" if index >= cases else f"case_{index:03d}"
-        fault = FAULTS[index % len(FAULTS)]
+        case_id = f"practice_{index-cases}" if index >= cases else case_ids[index]
+        fault = FAULTS[index-cases] if index >= cases else str(fault_sequence[index])
         raw = float(rng.uniform(2, 6))
         extracted = raw
         imputed = False
@@ -103,13 +106,26 @@ def create_reviewer_package(output_dir, reviewers=24, cases=80, seed=0):
         sequence = order if participant % 2 == 0 else order[::-1]
         for position, case in enumerate(sequence):
             arm = "structured" if (case + participant) % 2 == 0 else "trace"
-            assignments.append(dict(participant_id=f"reviewer_{participant:02d}", case_id=f"case_{case:03d}",
+            assignments.append(dict(participant_id=f"reviewer_{participant:02d}", case_id=case_ids[case],
                                     period=1 if position < cases//2 else 2, order=position+1, format=arm_names[arm]))
     assignments = pd.DataFrame(assignments)
     assignments.to_csv(public / "assignments.csv", index=False)
-    responses = assignments.assign(localized_fault="", correction_correct="", completion_seconds="", reassured="")
+    responses = assignments.assign(localized_fault="", correction_text="", correction_correct="", completion_seconds="", reassured="")
     responses.to_csv(public / "responses_template.csv", index=False)
     (public / "tasks.json").write_text(json.dumps(tasks, indent=2), encoding="utf-8")
+    task_lookup = {(row["case_id"], row["format"]): row for row in tasks}
+    practice = [row for row in tasks if row["case_id"].startswith("practice_")]
+    for participant_id, selected in assignments.groupby("participant_id", sort=True):
+        directory = public / participant_id
+        directory.mkdir()
+        delivered = [task_lookup[(row.case_id, row.format)] for row in selected.itertuples()]
+        (directory / "tasks.json").write_text(json.dumps(dict(evaluation=delivered, practice=practice), indent=2))
+        selected.assign(localized_fault="", correction_text="", completion_seconds="", reassured="").to_csv(directory / "responses.csv", index=False)
+        (directory / "instructions.txt").write_text(
+            "Preparation only; begin only after receiving the finalized study information and consent process. "
+            "Use practice cases first. For each assigned evaluation case, record extraction, imputation, rule_version or none, "
+            "describe the correction in your own words, record elapsed seconds, and record reassured as 0 or 1. "
+            "Do not request another participant's materials. An investigator grades correction accuracy later.\n")
     (private / "truth.json").write_text(json.dumps(dict(arm_names=arm_names, truth=truth), indent=2), encoding="utf-8")
     protocol = dict(seed=seed, materials="synthetic ICU-style records, not patient data",
         practice_cases=4, evaluation_cases=cases, reviewers=reviewers,
@@ -132,7 +148,10 @@ def analyze_reviewer_responses(package_dir, responses_csv, iterations=2000, seed
     from statsmodels.genmod.bayes_mixed_glm import BinomialBayesMixedGLM
     root = Path(package_dir)
     key = json.loads((root / "investigator" / "truth.json").read_text())
-    assigned = pd.read_csv(root / "participant" / "assignments.csv")
+    assignment_path = root / "participant" / "assignments.csv"
+    if not assignment_path.exists():
+        assignment_path = root / "investigator" / "assignments.csv"
+    assigned = pd.read_csv(assignment_path)
     responses = pd.read_csv(responses_csv)
     identity = ["participant_id", "case_id"]
     if responses.duplicated(identity).any() or len(responses) != len(assigned):
