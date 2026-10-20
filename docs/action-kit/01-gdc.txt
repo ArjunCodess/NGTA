@@ -13,6 +13,6 @@ I do not have institutional authority to request controlled patient data. Could 
 
 We have already acquired 498 public mutation files and all 19 public THCA clinical/biospecimen biotabs. The latter provide 515 sample-UUID-linked tumor procurement/pathology-review offset pairs across 507 cases and some reported clinical genotyping results. We have not treated these specimen dates as clinical/genomic report availability, or clinical genotyping negatives as callability for the whole WXS gene panel.
 
-Please point us to exact public files, fields and definitions if they exist, including any relevant XML supplement fields not represented in the biotabs. If the missing information was not collected, is not public, or requires a qualified institutional collaborator, please say so and identify the appropriate route. We would like to resolve the documentation question before considering large sequencing downloads.
+We also acquired and checksum/case-identity audited all 1,554 public XML supplements across 507 cases; the timing/pathology/genotyping inventory still does not establish selected-input report availability or full gene-panel callability. Please point us to exact public files, fields and definitions if they exist beyond these inspected supplements. If the missing information was not collected, is not public, or requires a qualified institutional collaborator, please say so and identify the appropriate route. We would like to resolve the documentation question before considering large sequencing downloads.
 
 Thank you.

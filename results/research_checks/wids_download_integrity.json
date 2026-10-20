@@ -1,0 +1,25 @@
+{
+  "files": [
+    {
+      "file": "LICENSE.txt",
+      "bytes": 1198,
+      "expected_sha256": "6569260e99684cc2d22ec37b29c0f4f69b123f7ff7b615cd0cf2e801f30af030",
+      "actual_sha256": "6569260e99684cc2d22ec37b29c0f4f69b123f7ff7b615cd0cf2e801f30af030",
+      "passed": true
+    },
+    {
+      "file": "WiDSDatathonOverview.pdf",
+      "bytes": 212974,
+      "expected_sha256": "3930f63cf8ba61585a6941cfb4af0c01f7ef36181ef6e2dde0ebbd1da3a8aac9",
+      "actual_sha256": "b5d611a7c9741325580748e5dfb8360d194f1a15283c556bda0a7140a56dbb69",
+      "passed": false
+    }
+  ],
+  "whole_download_verified": false,
+  "overview_usable_as_evidence": false,
+  "overview_parse": "Poppler rejected the incomplete PDF: missing trailer dictionary / invalid cross-reference entries",
+  "unauthenticated_official_download_http_status": 403,
+  "dictionary_independently_inspected": true,
+  "action": "Retain partial file unchanged. Resume authenticated official download, then require the publisher checksum before extracting evidence. Training data and dictionary availability do not imply the entire recursive download is complete.",
+  "signed_in_browser_retrieval": "Existing signed-in PhysioNet page was inspected; supported download operation timed out after 30 seconds and no completed local file was produced."
+}
