@@ -200,3 +200,9 @@ The repository suite now passes 115 tests. All 297 previously removed artifacts 
 
 
 All 115 tests also pass from a separately extracted, integrity-verified 169-file source-only package using the same installed environment. This checks packaging completeness rather than a fresh environment or independent scientific validation. Final packaging includes the updated verification notes; datasets, fitted arrays, private subgroup details, molecular-source extracts and rejected experiment outputs remain excluded.
+
+## 19. Zigong unavailable; current evidence remains the paper scope
+
+The owner reports that Zigong cannot be accessed. No exact cause was supplied and no new credential or network probe was performed. Earlier Zigong access instructions are removed from active next steps; prepared purpose text remains preserved. No further owner download or researcher recruitment is requested. The current paper and source package report the completed internal studies and the PhysioNet/Nepal sensitivities, with matched independent hospital-mortality validation explicitly unestablished. SUPPORT2 remains an optional separate study-day-three benchmark, not a substitute for that criterion.
+
+This access update does not change scientific completion: 52 of 72 satisfied, five owner-excluded and 15 active unresolved. A documentation consistency check also found stale checklist verification prose naming 103 tests and a 13-page paper. The checklist generator now reflects the existing verified release record of 115 tests and 14 pages, without claiming a new test or paper run.

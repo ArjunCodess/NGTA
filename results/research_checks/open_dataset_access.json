@@ -123,5 +123,13 @@
     "api_status": 403,
     "acquired": false,
     "limitation": "AFICILL reports a death-or-ICU-transfer composite in a step-down unit. Dresden is a selected cardiogenic-shock cohort. Neither is a verified first-day WiDS substitute."
+  },
+  "zigong": {
+    "status": "unavailable_per_owner_report",
+    "reason": "not supplied",
+    "new_access_probe_performed": false,
+    "acquired": false,
+    "owner_action_requested": false,
+    "eligible_external_cohort_established": false
   }
 }

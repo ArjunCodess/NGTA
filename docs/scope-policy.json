@@ -14,5 +14,11 @@
   "exclusion_reasons": {
     "Check APACHE data": "Owner excludes further WiDS source-interpretation checks from active work. Invalid probabilities remain unavailable; the completed with/without-APACHE and creatinine-rule-off studies are retained. Exact score timing and the source-unit definition remain unverified limitations, not execution blockers."
   },
-  "downloads": "Do not resume the stopped recursive WiDS download. Use the existing study data. Internet-hosted cohort options may be researched without downloading patient data."
+  "downloads": "Do not resume the stopped recursive WiDS download. Use the existing study data. Internet-hosted cohort options may be researched without downloading patient data.",
+  "cohort_access": {
+    "zigong": "Unavailable per owner report; exact reason not supplied. No new access probe performed.",
+    "release_dependency": false,
+    "external_criterion": "Unsatisfied; not completed or newly owner-excluded.",
+    "current_route": "Report existing methods, internal studies and exploratory sensitivities without matched external clinical validation. No further owner download requested."
+  }
 }

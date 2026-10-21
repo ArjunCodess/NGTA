@@ -2,19 +2,11 @@
 
 No outside researcher is needed to continue the current WiDS development experiments. The original data, preprocessing and fitted models are available. The stopped WiDS download is not needed and will not be resumed.
 
-## Closest practical candidate: Zigong ICU infection data
+## Zigong access is unavailable
 
-The [official release](https://physionet.org/content/icu-infection-zigong-fourth/1.1/) describes 2,790 adult infection patients from a hospital in Sichuan, China, collected in 2019-2020. It includes hospital-discharge mortality, laboratory measurements, nursing observations and department transfers. This is a candidate for another source population, not an already eligible or evaluated NGTA cohort.
+The owner reports that Zigong cannot be accessed. The reason was not supplied, and no new access test was performed. It is no longer an active download or credentialing task. The earlier [official release](https://physionet.org/content/icu-infection-zigong-fourth/1.1/) assessment and [prepared purpose text](data-requests/zigong-purpose.txt) remain historical preparation, not evidence of access or cohort eligibility.
 
-The listed access requirements are personal PhysioNet credentialing, CITI Data or Specimens Only Research training and signing the project's data-use agreement. Unlike the currently checked SICdb and HiRID policies, this release does not list an additional contributor study-approval step. Account approval is still not guaranteed, and being registered for WiDS does not establish credentialed access.
-
-Practical steps:
-
-1. Sign into [PhysioNet credentialing](https://physionet.org/settings/credentialing/) and check whether the account is already credentialed. If it is not, follow its training and credentialing instructions. The dataset's [required-training page](https://physionet.org/content/icu-infection-zigong-fourth/view-required-training/1.1/) names the exact CITI course. Personal training must be completed by the account owner.
-2. Return to the [dataset page](https://physionet.org/content/icu-infection-zigong-fourth/1.1/) and complete its data-use agreement if willing to accept its terms. The prepared [research-purpose text](data-requests/zigong-purpose.txt) describes NGTA without claiming an institutional appointment or clinical approval.
-3. Once access is granted, save only the documentation and directory listing under `data/private/zigong/` first. Do not start a recursive download. I can inspect the available columns and sizes and identify the smallest necessary tables before any bulk transfer. There is no need to inspect outcomes or send patient rows in chat.
-
-Technical work after access: identify first ICU entry from transfer records, map measurements within its first 24 hours, preserve unsupported features as unavailable, resolve units from the actual source definitions, verify repeated-patient grouping and construct hospital-death labels only after the mapping/analysis is locked. The publisher's timestamps are offsets from hospital admission, so using zero as ICU admission would be wrong. Infection-only case selection is an explicit population shift. These checks determine whether frozen evaluation is defensible; the data's presence on a website alone does not establish compatibility.
+NGTA's current implementation, experiments, reproducibility tools and paper use the existing WiDS, TCGA, PhysioNet 2012 and Nepal evidence. Reporting those studies does not depend on obtaining Zigong or recruiting an outside researcher. The original plan's matched independent hospital-mortality criterion remains unsatisfied. No dataset should be substituted solely to mark that criterion complete.
 
 ## Immediate open download: SUPPORT2, for a separate benchmark
 
@@ -38,4 +30,4 @@ The release includes `icudis_status`, but no explicit hospital-death or hospital
 
 The AFICILL and Dresden Impella Mendeley releases were also searched. Their public API requests returned HTTP 403 challenges, so neither is counted as acquired. AFICILL uses a death-or-ICU-transfer composite in a step-down population; Dresden selects cardiogenic-shock patients. Those task differences need explicit handling rather than relabeling their outcomes.
 
-SUPPORT2 is now locally available for a separate benchmark. The Nepal workbook is locally prepared and evaluated under a limited frozen-model sensitivity, with no further owner download action. Zigong remains the credentialed fallback for a closer hospital-mortality candidate. No candidate has yet established all of the original plan's independent first-day compatibility requirements.
+SUPPORT2 is now locally available for a separate benchmark. The Nepal workbook is locally prepared and evaluated under a limited frozen-model sensitivity, with no further owner download action. Zigong is unavailable under the owner-reported access constraint; no further owner download is requested. No candidate has yet established all of the original plan's independent first-day compatibility requirements.
