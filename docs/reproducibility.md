@@ -90,6 +90,8 @@ python scripts/refresh_paper_results.py --results-root results/private/reproduct
 python -c "from src.paper_figures import generate_paper_figures; generate_paper_figures(seeds=[0,1,2,3,4], dataset_roots={'tcga':'results/private/reproduction/tcga_study/fused','wids':'results/private/reproduction/hospital_study/knn'})"
 ```
 
+Figure 1 uses the owner-supplied editable `paper/figures/figure-1.svg` and its reviewed vector PDF export. Figure generation preserves that asset and fails if its PDF is absent. After editing the SVG, export a new vector PDF and inspect it before rebuilding the paper. `figure-1-source.json` records the current source/export hashes and converter. The source package includes both SVG and PDF.
+
 Compile `paper/main.tex` using the supplied NeurIPS style and a LaTeX installation with bibliography support. With MiKTeX/TeX Live:
 
 ```powershell

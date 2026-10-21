@@ -55,8 +55,8 @@ Figure~\ref{fig:pipeline} summarizes the inference-time data flow from sparse cl
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\linewidth]{figures/figure-1.png}
-\caption{Inference-time dynamic evidential routing. A trained transformer produces a prediction and feature attention; MC dropout estimates feature attention means and variances; these initialize heuristic NAL truth values; triggered clinical rules revise those values; revised confidence gates attention; and the system exports a case-level trace showing where symbolic evidence changed the computation.}
+\includegraphics[width=\linewidth]{figures/figure-1.pdf}
+\caption{NGTA default readout intervention. Matched dropout passes supply attention statistics and cached token scores. Observed-only prototype rules revise heuristic feature confidence, which reweights the readout before averaging per-pass probabilities. Complete events support independent numerical replay; shared observations do not establish independent evidence or clinical benefit.}
 \label{fig:pipeline}
 \end{figure}
 

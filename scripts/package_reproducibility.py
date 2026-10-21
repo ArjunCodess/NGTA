@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 TOP = ('main.py', 'requirements.txt', 'requirements-lock.windows-py314.txt', 'study_recipe.json',
        'README.md')
 SUFFIXES = {'src': {'.py'}, 'scripts': {'.py', '.json'}, 'tests': {'.py'},
-            'docs': {'.md', '.txt', '.csv', '.json'}, 'paper': {'.tex', '.bib', '.bst', '.sty', '.png', '.pdf', '.csv', '.json'}}
+            'docs': {'.md', '.txt', '.csv', '.json'}, 'paper': {'.tex', '.bib', '.bst', '.sty', '.png', '.pdf', '.svg', '.csv', '.json'}}
 EVIDENCE = tuple('results/research_checks/'+name for name in (
     'artifact_archive_manifest.json', 'artifact_verification.json', 'checkpoint_verification.json',
     'completion_audit.json', 'technical_release.json', 'merge_readiness.json', 'full_plan_remaining.json', 'reviewer_preparation.json', 'gossis_source.json', 'source_followup.json', 'wids_download_integrity.json', 'wids_encoder.json', 'wids_status.json', 'tcga_xml/manifest.json', 'tcga_xml/inventory.json', 'missingness_acceptance.csv', 'creatinine_sensitivity.json', 'reference_metadata.json', 'open_dataset_access.json', 'nepal_sensitivity.json', 'nepal_preprocessing.json', 'nepal_source_evidence.json', 'nepal_diagnostics.json', 'tcga_pathology.json', 'tcga_pathology_date_review.json', 'tcga_pathology_molecular.json'))

@@ -1,0 +1,8 @@
+{
+  "source": "figure-1.svg",
+  "source_sha256": "1172021206c8571fd6a1acbe28d11e51aed868729b77bbbdf5239c093813fcf7",
+  "paper_asset": "figure-1.pdf",
+  "paper_asset_sha256": "cbd3bbe34cda449084b884f1a2eed0873339a2c372a08fa9fea651e66e875540",
+  "exporter": "PyMuPDF 1.28.2",
+  "note": "Vector SVG-to-PDF export. Bundled SVG webfont is rendered using the converter sans-serif fallback; labels and geometry visually checked. No model results altered."
+}

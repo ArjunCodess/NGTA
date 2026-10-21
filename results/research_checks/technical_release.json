@@ -46,7 +46,15 @@
       11,
       12
     ],
-    "sha256": "53b07b0e38714b1e443a259b5123ead7d7836505e47017d1e62732e4dd9bfc79"
+    "sha256": "0db35449d5b905cc2571d08a8b551f7d35f011aabf261be14eca7bedf3d82183",
+    "figure_1": {
+      "source": "paper/figures/figure-1.svg",
+      "paper_asset": "paper/figures/figure-1.pdf",
+      "provenance": "paper/figures/figure-1-source.json",
+      "rendered_page_checked": 2,
+      "pages_after_update": 14,
+      "regeneration_preserves_owner_asset": true
+    }
   },
   "package": {
     "command": "python scripts/package_reproducibility.py",
@@ -56,7 +64,7 @@
     "extracted_tests_passed": true,
     "tested_candidate_sha256": "c1a6c8ffda2da558d20156f6e98b207b55b5f53b9cd8c81c91832a48cae56b69",
     "tested_candidate_files": 154,
-    "finalization": "Final package differs from the tested cleanup candidate only in research-audit and technical-release verification notes. Runtime, test and paper bytes are identical; same installed environment."
+    "finalization": "The recorded extracted-package test refers to the documentation-cleanup candidate. Subsequent Figure 1 assets, preservation logic and SVG packaging are checked by focused preservation/rejection checks, packaging tests, fresh package integrity and a current full repository suite."
   },
   "scientific_checklist": {
     "completed": 52,

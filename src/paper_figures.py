@@ -72,6 +72,11 @@ def _save(fig: plt.Figure, figures_dir: Path, name: str) -> None:
 
 
 def _pipeline_architecture(figures_dir: Path) -> None:
+    # Preserve the owner-supplied editable diagram and its reviewed vector export.
+    if (figures_dir / "figure-1.svg").exists():
+        if not (figures_dir / "figure-1.pdf").exists():
+            raise ValueError("Export figure-1.svg to figure-1.pdf before generating paper figures")
+        return
     fig, ax = plt.subplots(figsize=(7.1, 2.8))
     ax.set_xlim(0, 12)
     ax.set_ylim(0, 4.4)
@@ -411,7 +416,7 @@ def generate_paper_figures(
     _write_auditability_table(dataset_dirs, figures_path)
 
     generated = [
-        figures_path / "figure-1.png",
+        figures_path / ("figure-1.pdf" if (figures_path / "figure-1.svg").exists() else "figure-1.png"),
         figures_path / "figure-2-performance-ci.png",
         figures_path / "figure-3-ablation.png",
         figures_path / "generated_rule_table.tex",
