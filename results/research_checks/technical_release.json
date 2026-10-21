@@ -3,9 +3,10 @@
   "branch": "version-2",
   "scope": "Original plan 52/72 satisfied; five owner exclusions leave 15 active unresolved. Existing implementation studies plus twenty frozen Nepal changed-endpoint evaluations and the 515-report pathology native-text audit are complete; scientific acceptance and clinical eligibility remain unestablished.",
   "tests": {
-    "passed": 115,
-    "extracted_source_package_passed": 115,
-    "environment": "same recorded Windows/Python environment; separate source extraction, not a fresh environment or independent scientific evaluation"
+    "passed": 112,
+    "extracted_source_package_passed": 112,
+    "environment": "same recorded Windows/Python environment; separate source extraction, not a fresh environment or independent scientific evaluation",
+    "cleanup_note": "Three tests of the retired checklist generator were removed with that generator. Model, inference and experiment tests unchanged."
   },
   "checkpoint_replay": {
     "fits": 36,
@@ -45,7 +46,7 @@
       11,
       12
     ],
-    "sha256": "a2e2dffe2ecd1af4a7acc077a086c11475c59ec98fdc195b7d1dfdc6a529f806"
+    "sha256": "53b07b0e38714b1e443a259b5123ead7d7836505e47017d1e62732e4dd9bfc79"
   },
   "package": {
     "command": "python scripts/package_reproducibility.py",
@@ -53,9 +54,9 @@
     "source_only": true,
     "datasets_and_private_materials_excluded": true,
     "extracted_tests_passed": true,
-    "tested_candidate_sha256": "bd22e96c0e4c9a4bb095d4f71a13d2f410b7be5536270b15905f0f29516a4690",
-    "tested_candidate_files": 169,
-    "finalization": "Final source package regenerates after verification-metadata updates. The tested candidate and final package have identical runtime and test sources; the environment is reused, not independently installed."
+    "tested_candidate_sha256": "c1a6c8ffda2da558d20156f6e98b207b55b5f53b9cd8c81c91832a48cae56b69",
+    "tested_candidate_files": 154,
+    "finalization": "Final package differs from the tested cleanup candidate only in research-audit and technical-release verification notes. Runtime, test and paper bytes are identical; same installed environment."
   },
   "scientific_checklist": {
     "completed": 52,
@@ -141,5 +142,6 @@
     "private_subgroup_metric_rows": 400,
     "report": "results/research_checks/nepal_sensitivity.json"
   },
-  "merge_verification": "results/research_checks/merge_readiness.json"
+  "merge_verification": "results/research_checks/merge_readiness.json",
+  "documentation_cleanup_verified_utc": "2026-10-21T07:48:05.603709+00:00"
 }
