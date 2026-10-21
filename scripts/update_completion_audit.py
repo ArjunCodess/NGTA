@@ -55,6 +55,17 @@ def update():
         "Third: Make traces independently replayable":(True,"completed","Independent predicates/revision/gating, complete mapped and unmapped events, integrity hashes and full predicate edge coverage pass on current studies."),
         "Fourth: Strengthen baselines and validation":(False,"external evidence required","Full internal baselines, APACHE dependence, rule controls, ensembles and masking are executed. Clinical expert review is excluded by owner decision. Independent cohorts, score timing and favorable research acceptance remain unresolved; the audit specifies the required inputs."),
     }
+    nepal_path=ROOT/'results/research_checks/nepal_sensitivity.json'
+    if nepal_path.exists() and json.loads(nepal_path.read_text()).get('fits')==20:
+        extra=" Twenty frozen Nepal evaluations on 18,111 adults are complete with independent replay, but use ICU mortality and first-measurement proxies with multiple unavailable inputs; hospital clusters, canonical identities and endpoint/window equivalence remain absent. This changed-task sensitivity does not meet external clinical eligibility. Obtain a cohort with documented hospital death, equivalent measurement windows/units, institutional clusters and source/person linkage; freeze the final procedure on untouched outcomes."
+        for name in ('Add external validation','Test institutional generalization','Check external compatibility','Experiment 7: Test external compatibility'):
+            done,status,evidence=notes[name]
+            notes[name]=(done,status,evidence+extra)
+    pathology_path=ROOT/'results/research_checks/tcga_pathology.json'
+    if pathology_path.exists() and json.loads(pathology_path.read_text()).get('extraction_complete') is True:
+        name='Audit TCGA record merging'
+        done,status,evidence=notes[name]
+        notes[name]=(done,status,evidence+" All 515 pinned public pathology PDFs are now acquired, publisher-checksum verified and native-text inventoried. The five date-like candidate reports contain one procurement date, three unlabeled annotations and one section-range false positive; selected-input availability and gene callability remain unverified.")
     replacements={
         "Review imputation":"Training-standardized KNN distances, separate raw/imputed values and observed-only predicates are tested. Full KNN/median, with/without-APACHE paired fits and both five-seed masking studies now evaluate the imputer choices.",
         "Improve artifact preservation":"All fitted artifacts, exact sources/splits, pass arrays, RNG and dependency versions are preserved. Restoring all 36 full-study model/preprocessor/RNG combinations reproduces every 50-pass probability matrix exactly, with maximum residual zero.",

@@ -18,7 +18,9 @@ Further source clarification is excluded as an execution prerequisite at the own
 
 The additional available-data experiment evaluates encoder-level MC and NARS confidence gates across all 20 frozen WiDS checkpoints, matching the saved 50-pass dropout draw and retaining uniform-encoder identity controls. It is an exploratory extension on inspected cases, with no refitting or new data. Its results are separate from the original readout experiment and cannot replace its negative finding.
 
-## 3. Decide whether independent-cohort access is feasible
+## 3. Nepal sensitivity is complete; clinical compatibility remains unresolved
+
+The new [Nepal study](nepal-results.md) prepares the available source and completes twenty frozen-model evaluations without retuning. It cannot close the original compatibility criterion because ICU death differs from hospital death, first measurements differ from extrema, some units remain unresolved, and hospital/person linkage is absent. No further Nepal download is needed.
 
 The practical website-only choices and access steps are in [internet-data.md](internet-data.md). Zigong is the first candidate to assess because the currently listed policy does not require contributor study approval beyond normal credentialing and the DUA. No independent eligibility is claimed. An external dataset is separate from recruiting an external researcher. [SICdb](https://physionet.org/content/sicdb/1.0.8/) is a possible Austrian source with hospital-mortality information. Its publisher requires PhysioNet credentialing, CITI Data or Specimens Only Research training, a signed DUA and contributor approval of the proposed study. These steps do not establish eligibility for NGTA automatically.
 
