@@ -307,7 +307,7 @@
       "task": "Fix stale outputs",
       "completed": true,
       "status": "completed",
-      "evidence_or_action": "All-seed submission exports and MC decision curves are refreshed from saved predictions. Paper tables and figures explicitly select five verified current sources, record manifests, distinguish mapped/all events and seed/case intervals, and the current 13-page PDF compiles.",
+      "evidence_or_action": "All-seed submission exports and MC decision curves are refreshed from saved predictions. Paper tables and figures explicitly select five verified current sources, record manifests, distinguish mapped/all events and seed/case intervals, and the current 14-page PDF compiles.",
       "owner_excluded": false
     },
     {
