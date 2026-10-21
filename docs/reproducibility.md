@@ -81,7 +81,7 @@ This disables only the creatinine revision. It does not change input units, retr
 
 ## Rebuild the paper and source package
 
-The current paper uses current development results. Historical confounded tables and case examples are preserved in `paper/legacy_results.tex`, excluded from the compiled manuscript. NeurIPS formatting files stay inside `paper/`.
+The current paper uses current development results. Historical confounded tables and case examples are preserved in `paper/legacy_results.tex`, excluded from the compiled manuscript. The preprint uses George Kour's `arxiv.sty`, linked from the [selected Overleaf template](https://www.overleaf.com/latex/templates/style-and-template-for-preprints-arxiv-bio-arxiv/fxsnsrzpnvwc). The style, upstream license and pinned provenance in `template-source.json` stay inside `paper/`.
 
 To rebuild tables from regenerated analyses, then figures from explicitly selected sources:
 
@@ -92,7 +92,7 @@ python -c "from src.paper_figures import generate_paper_figures; generate_paper_
 
 Figure 1 uses the owner-supplied editable `paper/figures/figure-1.svg` and its reviewed vector PDF export. Figure generation preserves that asset and fails if its PDF is absent. After editing the SVG, export a new vector PDF and inspect it before rebuilding the paper. `figure-1-source.json` records the current source/export hashes and converter. The source package includes both SVG and PDF.
 
-Compile `paper/main.tex` using the supplied NeurIPS style and a LaTeX installation with bibliography support. With MiKTeX/TeX Live:
+Compile `paper/main.tex` using the supplied preprint style and a LaTeX installation with bibliography support. With MiKTeX/TeX Live:
 
 ```powershell
 Set-Location paper

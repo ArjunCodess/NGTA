@@ -1,9 +1,7 @@
 \documentclass{article}
 
-% Anonymous double-blind workshop submission using the supplied NeurIPS 2026 style.
-\usepackage[dblblindworkshop]{neurips_2026}
-\workshoptitle{The Third Workshop on GenAI for Health: Agentic Systems, Clinical Trust, and Future Potential}
-
+% George Kour's preprint style, linked from the owner-selected Overleaf template.
+\usepackage{arxiv}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{amsmath,amssymb}
@@ -13,24 +11,22 @@
 \usepackage{microtype}
 \usepackage{xcolor}
 \usepackage{url}
-
- % Use \Name{Author Name} to specify the name.
-
- % Spaces are used to separate forenames from the surname so that
- % the surnames can be picked up for the page header and copyright footer.
-
- % If the surname contains spaces, enclose the surname
- % in braces, e.g. \Name{John {Smith Jones}} similarly
- % if the name has a "von" part, e.g \Name{Jane {de Winter}}.
- % If the first letter in the forenames is a diacritic
- % enclose the diacritic in braces, e.g. \Name{{\'E}louise Smith}
-
- % *** Make sure there's no spurious space before \nametag ***
+\usepackage{natbib}
+\usepackage[hidelinks]{hyperref}
 
 \title{NGTA: An Auditable Neurosymbolic Interface for Clinical Transformers with Incomplete Inputs}
-
- % Two authors with the same address
-\author{Anonymous Authors}
+\author{Arjun Vijay Prakash \\
+Independent Researcher \\
+High school student, City Montessori School \\
+\texttt{arjunv.prakash12345@gmail.com}}
+\date{}
+\renewcommand{\shorttitle}{NGTA: Auditable Neurosymbolic Intervention}
+\hypersetup{
+  pdftitle={NGTA: An Auditable Neurosymbolic Interface for Clinical Transformers with Incomplete Inputs},
+  pdfauthor={Arjun Vijay Prakash},
+  pdfsubject={Auditable neurosymbolic clinical prediction research},
+  pdfkeywords={neurosymbolic AI, uncertainty, clinical prediction, reproducibility}
+}
 
 \begin{document}
 
@@ -271,7 +267,7 @@ NGTA provides an auditable inference-time interface for uncertainty-conditioned 
 
 \paragraph{Ethics and reproducibility.} This study uses existing de-identified benchmarks and collected no new patient data. The WiDS publisher requires registered access and a data-use agreement. The additional Nepal analysis uses a public CC BY 4.0 release, with source records and case-level outputs kept outside the source package. The reproduction package includes code, frozen configurations, tests and aggregate paper assets; authorized data and private study materials remain separate. Restoring all 36 original fitted model/preprocessor/RNG bundles reproduces every saved 50-pass probability matrix exactly. The source suite passes 112 tests both in the working repository and a separately extracted package in the same installed environment; this is packaging verification, not an independent environment or scientific replication. Exact saved-run replay requires the separately retained fitted artifacts, which are excluded from the source package and have no public archive location. Large language models assisted with drafting, formulation, and code generation; the authors checked the derivations, implementation, references, and results and take responsibility for the work.
 
-\bibliographystyle{plainnat}
+\bibliographystyle{unsrtnat}
 \bibliography{references}
 
 \end{document}

@@ -9,7 +9,7 @@ NGTA is a neurosymbolic clinical prediction architecture that maps neural uncert
 - `tcga`: TCGA-THCA lymph node metastasis prediction from merged clinical tables plus a mutation-derived binary gene panel
 - `wids`: WiDS Datathon 2020 ICU hospital mortality prediction from first-day ICU measurements with feature-specific missingness
 
-The anonymous NeurIPS 2026 workshop manuscript is [`paper/main.tex`](paper/main.tex), with its compiled PDF at [`paper/main.pdf`](paper/main.pdf). NeurIPS formatting files are local to `paper/`.
+The NGTA preprint by Arjun Vijay Prakash is [`paper/main.tex`](paper/main.tex), with its compiled PDF at [`paper/main.pdf`](paper/main.pdf). It uses the [selected Overleaf preprint template](https://www.overleaf.com/latex/templates/style-and-template-for-preprints-arxiv-bio-arxiv/fxsnsrzpnvwc); its pinned style and license are local to `paper/`.
 
 ## April 21, 2026 Feedback Update
 
@@ -344,7 +344,7 @@ Role in the paper: primary scale test for missingness, calibration, and operatio
 - [`src/nars_interface.py`](src/nars_interface.py): heuristic neural truth mapping plus standard NAL deduction, revision, and evidential utility operators
 - [`src/attention_hook.py`](src/attention_hook.py): confidence-based attention gating
 - [`src/pipeline.py`](src/pipeline.py): training, baselines, evaluation, plotting, and summary generation
-- [`paper/main.tex`](paper/main.tex): anonymous NeurIPS 2026 workshop manuscript source
+- [`paper/main.tex`](paper/main.tex): NGTA preprint manuscript source
 - [`paper/main.pdf`](paper/main.pdf): compiled submission PDF
 
 ## Acknowledgments
