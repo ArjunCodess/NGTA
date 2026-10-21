@@ -1,6 +1,6 @@
 {
   "checked_on": "2026-10-21",
-  "purpose": "Access and header inspection only; no outcome values or predictive evaluation inspected.",
+  "purpose": "Dataset access and source-schema evidence. SUPPORT2 remains header-only; Nepal outcome preparation and model evaluation are documented separately in the Nepal evidence artifacts.",
   "support2": {
     "source_url": "https://hbiostat.org/data/",
     "documentation_url": "https://hbiostat.org/data/repo/supportdesc",
@@ -77,7 +77,7 @@
     "page_link_download_bytes": 0,
     "browser_download": "Normal Download file click timed out after 15000ms; browser reported no completed downloads.",
     "acquired": true,
-    "eligibility": "Not established. Repeated daily rows require encounter grouping; header names alone do not establish units, first-day windows, hospital-death equivalence or source independence. No outcome values or predictive metrics inspected.",
+    "eligibility": "Prepared recorded-adult ICU-mortality sensitivity; not hospital-mortality validation. First-versus-extrema windows, unsupported/mixed-unit inputs, absent hospital IDs and canonical person linkage prevent original external eligibility.",
     "acquisition": "Owner supplied the official workbook locally after earlier failed tool downloads.",
     "observed_bytes": 22623427,
     "observed_md5": "eeb2b9930990fa7ee44fd363dcc1758e",
@@ -110,7 +110,10 @@
       "diastolic_pressure": "adas_dbp_first",
       "heart_rate": "adas_heart_first",
       "respiratory_rate": "adas_resp_first"
-    }
+    },
+    "outcome_values_inspected": true,
+    "analysis_protocol": "docs/nepal-analysis.json",
+    "native_text_only_source_dictionary": "Generic CCAA core dictionary linked by the Nepal methods article, not a verified export-specific unit flag."
   },
   "mendeley_candidates": {
     "datasets": [

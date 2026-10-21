@@ -255,7 +255,7 @@ def replay_bundle(directory: str | Path, tolerance: float = 1e-7) -> dict:
 
 if __name__ == "__main__":
     import argparse
-    parser = argparse.ArgumentParser(description="Independently replay an NGTA v2 trace bundle")
+    parser = argparse.ArgumentParser(description="Independently replay an NGTA trace bundle")
     parser.add_argument("directory")
     args = parser.parse_args()
     result = replay_bundle(args.directory)
