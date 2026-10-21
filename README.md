@@ -87,6 +87,14 @@ The owner has removed clinical expert review and participant recruitment from ac
 
 The technical release covers the current implementation, development experiments and reproduction tools; it does not complete every scientific requirement in `plan.md`. External clinical expert review and the human participant study are excluded at the owner's request; further WiDS source clarification is not an execution prerequisite, and independent-cohort validation remains unresolved. The [technical verification record](results/research_checks/technical_release.json) records the checks. The [reproduction guide](docs/reproducibility.md) provides the exact 36-fit recipe, verification commands, source-only package and storage requirements; [list.md](list.md) retains the full scientific criteria, including failed and deferred items.
 
+### What this change improves and what merging means
+
+NGTA is more reliable as a research implementation. Matched aggregation removes the earlier apparent gate benefit caused by different averaging procedures. Training-only preprocessing, explicit unknown genomic calls and observed-only predicates correct data-handling errors. Complete persisted events and independent replay replace sampled traces and self-checking arithmetic. Thirty-six saved fits reproduce all 50 probability passes exactly after checkpoint/preprocessor/RNG restoration; repeated-seed, baseline, masking and cross-source studies make the limitations measurable.
+
+These improvements establish better experimental control and reproducibility, not clinical superiority. The planned symbolic benefit and general missingness robustness remain unestablished. The Nepal reductions are small, conditional changed-endpoint results. External clinical compatibility, complete TCGA callability/timing and reviewer benefit are not demonstrated. Merging this research implementation does not require those unavailable studies, but it must retain these claim boundaries and the 52/72 scientific completion count.
+
+Before merging [PR #7](https://github.com/ArjunCodess/NGTA/pull/7), use its current cleaned branch head and confirm that it remains conflict-free against `main`. Do not merge or push an old clone or the contaminated recovery history. The repository currently has no PR CI checks; [merge verification](results/research_checks/merge_readiness.json) records the local test, tree and history checks. Keep the existing checkout and private research files: a fresh clone lacks fitted artifacts, and an independent approved backup is still outstanding. GitHub's old-object purge is a separate pending support operation, not evidence that the current branch still tracks those artifacts. [Storage](docs/artifact-storage.md) and [purge status](docs/push-status.md) explain the remaining operational dependencies.
+
 ## Running
 
 Create an environment and install dependencies:
