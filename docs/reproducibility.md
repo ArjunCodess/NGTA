@@ -1,6 +1,6 @@
 # Reproducing NGTA
 
-This is the technical release for the inspected development studies in `plan.md`. External clinical expert review and participant collection are excluded by the owner; further WiDS source clarification is excluded as an execution prerequisite, while eligible independent-cohort validation remains unresolved. Failed symbolic-benefit and robustness criteria remain failed; the release does not change them into completed scientific claims.
+This is the technical release for the inspected development studies. External clinical expert review and participant collection are excluded by the owner; further WiDS source clarification is excluded as an execution prerequisite, while eligible independent-cohort validation remains unresolved. Failed symbolic-benefit and robustness criteria remain failed; the release does not change them into completed scientific claims.
 
 ## What is included
 
@@ -38,7 +38,7 @@ Other platforms may need a platform-specific Torch build. `requirements.txt` is 
 
 ## Regenerate the fitted studies when needed
 
-Acquire the original authorized sources at the recipe's `data/` and `data/acquired_tcga/` locations. Follow [source acquisition instructions](get-needed-data.md); do not substitute the earlier two-file sparse TCGA source. The executor verifies source hashes before any pipeline writes. The WiDS dictionary remains a separate private provenance document and is not used to silently reinterpret the frozen input units.
+Acquire the original authorized sources at the recipe's `data/` and `data/acquired_tcga/` locations. Use the registered [WiDS source](https://physionet.org/content/widsdatathon2020/1.0.0/) and the pinned GDC manifest with `python scripts/acquire_tcga.py --help`; do not substitute the earlier two-file sparse TCGA source. The executor verifies source hashes before any pipeline writes. The WiDS dictionary remains a separate private provenance document and is not used to silently reinterpret the frozen input units.
 
 ```powershell
 python scripts/reproduce_studies.py --execute
@@ -115,7 +115,7 @@ The original public demonstration is unsuitable for blinded recruitment. Its pre
 
 Only the individual `participant/reviewer_*` folder assigned to a reviewer is intended for delivery after protocol finalization. It contains that reviewer's assigned evaluation format once per case and a free-text correction response sheet. Master cross-format tasks, assignments and the investigator grading template are moved into `investigator/`. Do not distribute the root directory, protocol seed, investigator folder or other reviewers' materials. Empty response sheets cannot produce a human-study result. The prepared private package has 24 reviewer folders and 1,920 balanced assignments for 80 evaluation cases, but zero recruited participants and zero human responses.
 
-The current [scope policy](scope-policy.json) crosses out five expert/participant or WiDS clarification criteria without marking them complete. [Next work](next-work.md) records the remaining official-source and cohort tasks. The source package includes this policy so regenerated checklists retain the owner decision.
+The retained [scope decision](scope-policy.json) and [completion snapshot](../results/research_checks/completion_audit.json) preserve five owner exclusions without counting them as scientific completion. Planning/checklist regeneration and outreach drafts are retired. Current evidence and limitations are recorded in the [research audit](research-audit.md).
 
 ## Frozen WiDS encoder extension
 

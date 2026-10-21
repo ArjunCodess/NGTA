@@ -8,7 +8,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 TOP = ('main.py', 'requirements.txt', 'requirements-lock.windows-py314.txt', 'study_recipe.json',
-       'README.md', 'plan.md', 'list.md')
+       'README.md')
 SUFFIXES = {'src': {'.py'}, 'scripts': {'.py', '.json'}, 'tests': {'.py'},
             'docs': {'.md', '.txt', '.csv', '.json'}, 'paper': {'.tex', '.bib', '.bst', '.sty', '.png', '.pdf', '.csv', '.json'}}
 EVIDENCE = tuple('results/research_checks/'+name for name in (

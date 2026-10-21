@@ -1,5 +1,5 @@
 {
-  "plan": "plan.md",
+  "plan": "Original research requirements, retained in completion_audit.json; retired planning files remain in prior commits.",
   "total": 72,
   "satisfied": 52,
   "not_satisfied": 20,

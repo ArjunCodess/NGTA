@@ -1,7 +1,0 @@
-Research purpose for a personal dataset-access application
-
-I am working on NGTA, an independent methods research project studying an auditable interface between transformer predictions, uncertainty estimates and explicit prototype rules. The current project uses existing de-identified benchmark data and does not involve patient contact or clinical deployment.
-
-I would like to assess whether the Zigong ICU infection dataset supports a frozen cross-source evaluation of first-day hospital-mortality predictions. Before accessing outcomes for evaluation, I will document measurement windows, units, missing features, repeated-patient handling and the hospital-death definition. Unsupported mappings will remain unavailable rather than be invented. If compatible, I will compare fixed confidence-only and rule-conditioned inference using existing model checkpoints, without tuning on the external outcomes.
-
-Data and patient-level outputs will remain in local private storage, excluded from the public Git repository. Publications will report aggregate findings, source limitations and negative results, with the required dataset acknowledgement. This request does not claim clinical expert approval or an institutional research appointment.

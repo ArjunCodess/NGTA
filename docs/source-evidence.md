@@ -1,6 +1,6 @@
 # Source evidence and remaining inputs
 
-This supplements the data-validity and external-validation sections of [plan.md](../plan.md). Public source inspection narrows the blockers, but does not replace clinical chronology, canonical identity linkage or expert review.
+This records source provenance for the data-validity and external-validation claims. Public source inspection narrows the blockers, but does not replace clinical chronology, canonical identity linkage or expert review.
 
 ## TCGA chronology
 
@@ -52,8 +52,8 @@ The XML confirms 515 tumor procurement/pathology-review offset occurrences, whil
 
 ## Search follow-up and owner scope decision
 
-The [next-work assessment](next-work.md) records the latest official-source findings: 515 open THCA pathology PDFs totaling 79,840,335 bytes, publisher evidence relevant to APACHE -1 handling, and gated HiRID/SICdb cohort routes. The pathology PDFs are inventoried but their contents have not yet been audited. Four expert/participant requirements are excluded from active work, without becoming completed scientific criteria.
+All 515 open THCA pathology PDFs totaling 79,840,335 bytes are now acquired, checksum-verified and processed for native text. Five date-candidate reports and a 46-report molecular-keyword queue do not establish selected-input availability or complete gene callability. See the [pathology inventory](../results/research_checks/tcga_pathology.json) and [research audit](research-audit.md). Five expert/participant or WiDS clarification requirements are owner-excluded without becoming scientifically complete.
 
 ## WiDS execution decision, 2026-10-21
 
-The owner excludes further WiDS source clarification from active execution requirements. Existing input conventions, unavailable-value handling, score-removal and creatinine-rule-off results are preserved; no unit or timestamp is newly certified. This does not block the completed 20-checkpoint WiDS encoder extension. No stopped download was resumed. [Internet-only cohort options](internet-data.md) include a credentialing/DUA route whose listed policy does not require an additional outside researcher or contributor study review; compatibility remains unestablished.
+The owner excludes further WiDS source clarification from active execution requirements. Existing input conventions, unavailable-value handling, score-removal and creatinine-rule-off results are preserved; no unit or timestamp is newly certified. This does not block the completed 20-checkpoint WiDS encoder extension. No stopped download was resumed. Zigong access is unavailable per owner report. Existing PhysioNet and Nepal evaluations remain exploratory sensitivities, not verified independent hospital-mortality compatibility. No further owner download is requested.
