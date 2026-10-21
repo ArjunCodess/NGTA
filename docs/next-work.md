@@ -8,6 +8,8 @@ All 515 pinned THCA PDFs, totaling 79,840,335 bytes across 507 cases, are acquir
 
 All five numeric-date candidate reports were read. One match is a tissue-section range, one is an explicit procurement date, and three are unlabeled annotations. [The candidate review](../results/research_checks/tcga_pathology_date_review.json) pins the reviewed text hashes without publishing date text. Native extraction is not an OCR accuracy or full clinical source review. None of these candidates establishes when the selected clinical/genomic input became available.
 
+A private follow-up queue now isolates all 46 reports with molecular keywords. Candidate flags find 22 with hotspot/codon language, eight with pending-test language, four with indeterminate/poor-quality language and seven with prior-specimen language; these categories overlap. The [aggregate queue evidence](../results/research_checks/tcga_pathology_molecular.json) is public, but extracted lines stay private. A negative hotspot result is not full-gene callability, and a result from a prior aspirate or another tumor focus cannot be assigned to the selected sequencing specimen without linkage. No assay manifest or mutation-negative input was changed.
+
 The remaining input is source-reviewed linkage of the selected record/assay to its episode and result-availability timestamp, plus a complete case/gene callable assay panel. Public MAF masking can remove true somatic variants, so missing variant rows remain unknown. The prepared source request has already been sent; no further bulk sequencing download or fabricated negative calls can close this criterion.
 
 ## 2. WiDS development uses the existing data
