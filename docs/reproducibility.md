@@ -122,3 +122,21 @@ The current [scope policy](scope-policy.json) crosses out five expert/participan
 Run `python scripts/evaluate_wids_encoder.py` to evaluate the existing 20 WiDS checkpoints with uniform, MC-confidence and NARS-confidence gates inside every encoder layer. The uniform gate must reproduce all original 50 probability passes within 1e-7. This uses the saved processor, weights and primary dropout RNG, with no refitting or downloads. Probability arrays and case-level outputs go only to `results/private/wids_encoder_study/`; the aggregate report is `results/research_checks/wids_encoder.json`. Existing results resume only when their checkpoint/specification/RNG identity and saved probability hash match. A partial result is preserved and rejected instead of overwritten.
 
 Intervals resample hospitals and fitted seeds. The primary original dropout draw is fixed; these new intervals do not include the original study's three-repeat uncertainty. Twelve secondary condition/contrast comparisons receive Bonferroni family intervals. All results remain exploratory on already inspected development cases.
+
+
+## Nepal changed-endpoint sensitivity and pathology audit
+
+The Nepal extension reuses ten frozen no-APACHE WiDS checkpoints under two explicit mappings, with five seeds per imputer and 50 dropout passes. Its endpoint is ICU death, not hospital death. Place the pinned public workbook under `data/private/open_candidates/nepal_registry/nicrf_encounters.xlsx`, then run:
+
+```powershell
+python scripts/prepare_nepal.py
+python scripts/evaluate_nepal.py
+python scripts/summarize_nepal.py
+python scripts/nepal_diagnostics.py
+```
+
+Preparation checks the full source SHA256, records the protocol/mapping before loading outcomes, rejects conflicting daily duplicates, restricts to recorded adults and preserves unknowns. The recorded protocol was amended using the obtained CCAA dictionary and predictor-scale audit before model scoring; it is not an independently registered clinical protocol. Unit-conflicting temperature/creatinine/WBC fields stay unavailable. Cached preprocessing requires identical full mapped inputs, fitted processor and implementation identities, plus a saved-content hash. Full-transform batching is preserved because a duplicate-row shortcut changed tied KNN neighbors on real source samples; those rejected outputs stay private and excluded.
+
+Only `results/research_checks/nepal_sensitivity.json` and the source/preprocessing summaries are public evidence. Raw cohorts, cached pass arrays, event logs and rejected outputs stay under ignored `results/private/`. Exact reruns require the separately retained WiDS fitted artifacts; the source package does not include them. No clinical compatibility acceptance flag is produced for the changed endpoint. [Nepal results](nepal-results.md) states the limitations and actual intervals.
+
+Run `python scripts/audit_tcga_pathology.py` to acquire/verify the pinned 515 public PDFs and repeat native extraction using `pdftotext`. Publisher UUIDs, sizes and MD5 are inherited from `source_followup.json`; extracted text stays in `.cache/ngta-pathology/`. The date-candidate review records five private text hashes; rerunning extraction with another Poppler version can change text bytes and requires fresh review rather than silently preserving that review. Numeric date patterns, procurement dates and molecular keywords do not establish selected-input availability or callable negatives.
