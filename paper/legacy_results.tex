@@ -1,0 +1,66 @@
+% Historical results retained for provenance; not included in the current manuscript.
+\section{Legacy Results and Validity Audit}
+\label{sec:results}
+
+The two numerical tables in this legacy section describe the archived implementation; current performance figures and generated auditability tables are reported separately above. They use unmatched prediction aggregation and an internal row split. Only two TCGA training cases have recorded mutation inputs; validation and test contain none. No genomic held-out intervention was demonstrated. Close point estimates establish neither equivalence nor noninferiority. The short integration artifacts remain software checks; the full development studies above replace the historical runs as current numerical evidence without turning them into prospective confirmation.
+
+On TCGA-THCA, the transformer variants remain tightly clustered. Flat-confidence has the highest AUC at 0.7328 and the lowest Brier point estimate at the displayed precision; the 69-case test split does not statistically separate variants. TCGA therefore provides a limited clinical interface exercise; it does not establish held-out multimodal feasibility or symbolic-gating superiority.
+
+\begin{table}[t]
+\caption{Held-out TCGA-THCA performance for lymph node metastasis prediction. Point estimates are followed by 95\% bootstrap confidence intervals where shown.}
+\label{tab:tcga_results}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Variant & AUC & Brier & ECE & Acc. \\
+\midrule
+Random forest & 0.6613 [0.5101, 0.7908] & 0.2200 [0.1895, 0.2498] & 0.1597 [0.1317, 0.2824] & 0.5942 \\
+Baseline transformer & 0.7311 [0.5975, 0.8462] & 0.2113 [0.1825, 0.2426] & 0.1184 [0.1074, 0.2517] & 0.6812 \\
+Flat-confidence & 0.7328 [0.6028, 0.8479] & 0.2109 [0.1816, 0.2427] & 0.1178 [0.1130, 0.2641] & 0.6812 \\
+MC-confidence-only & 0.7311 [0.6008, 0.8453] & 0.2110 [0.1820, 0.2418] & 0.1184 [0.1041, 0.2481] & 0.6812 \\
+NARS-gated & 0.7311 [0.6008, 0.8453] & 0.2109 [0.1820, 0.2417] & 0.1184 [0.1042, 0.2481] & 0.6812 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The legacy TCGA clinical rules were active, but the BRAF rule never fired on test. Counts and coverage below use only recognized extrathyroid-extension categories; placeholder and unknown values cannot fire.
+
+WiDS provides the clearer scale test. All transformer variants have higher AUC point estimates than the random forest in this run, although their AUC confidence intervals overlap. Within the transformer family, the baseline has the highest AUC, while MC-confidence-only has the numerically lowest Brier and ECE point estimates. NARS-gated is nearly identical to MC-confidence-only and ties it and flat-confidence on accuracy at the reported precision.
+
+The archived intervals below describe the earlier calculation. Figure~\ref{fig:performance_ci} instead uses the explicitly selected current five-seed sources, so its values must not be compared to these legacy intervals as a controlled experiment.
+
+\begin{table}[t]
+\caption{Held-out WiDS ICU performance for hospital mortality prediction. Point estimates are followed by 95\% bootstrap confidence intervals where shown.}
+\label{tab:wids_results}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Variant & AUC & Brier & ECE & Acc. \\
+\midrule
+Random forest & 0.8768 [0.8669, 0.8868] & 0.05817 [0.05520, 0.06142] & 0.00737 [0.00596, 0.01254] & 0.9258 \\
+Baseline transformer & 0.8803 [0.8700, 0.8902] & 0.05653 [0.05371, 0.05966] & 0.00750 [0.00493, 0.01211] & 0.9285 \\
+Flat-confidence & 0.8802 [0.8698, 0.8901] & 0.05648 [0.05366, 0.05964] & 0.00618 [0.00421, 0.01098] & 0.9286 \\
+MC-confidence-only & 0.8802 [0.8698, 0.8901] & 0.05647 [0.05365, 0.05962] & 0.00581 [0.00409, 0.01062] & 0.9286 \\
+NARS-gated & 0.8802 [0.8698, 0.8901] & 0.05647 [0.05365, 0.05962] & 0.00583 [0.00411, 0.01064] & 0.9286 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+
+The symbolic pathway operated at scale: ICU rules fired on 8,551 of 13,757 held-out stays, with 13,031 feature-level revisions. The per-rule counts were 1,936 for lactate, 5,338 for hypotension, 3,443 for age, and 2,314 for creatinine. Every fired rule mapped to a feature, produced a finite trace, and changed confidence and attention. The corresponding TCGA rates were also 100\% across 79 events in 42 of 69 cases. The legacy zero revision residual reused production arithmetic and was a consistency check. Its finite in-memory values did not establish complete persisted event export. WiDS counts included imputed-value triggers; current implementation suppresses these and independently replays every exported event.
+
+\subsection{Case-Level Rule Trace}
+
+The legacy prediction export provides a concrete held-out example. For WiDS encounter 8205 (target 0), the ungated probability was 0.5006, flat-confidence gating produced 0.4995, MC-confidence-only gating produced 0.4961, and NARS-gated routing produced 0.4968. Three rules fired: hypotension, lactate, and creatinine. Their attention weights changed from 0.2564 to 0.2526, 0.0231 to 0.0248, and 0.0347 to 0.0372, respectively. The trace therefore exposes a real threshold change and the rule-level arithmetic, but it also shows why attribution requires controls: MC-confidence-only had already crossed the threshold before symbolic revision. Across the complete WiDS export, MC-confidence-only and NARS-gated produced no different threshold decisions. These legacy decision changes describe the entire inference procedure, not an isolated symbolic effect or clinical validation.
+
+\subsection{Calibration Interpretation}
+
+The legacy WiDS calibration differences are descriptive and confounded by aggregation. Relative to the ungated transformer, NARS-gated routing lowers Brier by 0.0000587 with a paired 95\% interval of [0.0000249, 0.0000911], and lowers ECE by 0.00120 with an interval of [0.0000282, 0.00202]. Both intervals exclude zero. Relative to flat-confidence and MC-confidence-only gating, however, the paired Brier and ECE intervals include zero; MC-confidence-only also has the slightly better Brier and ECE point estimates. The baseline and gated predictions use different aggregation, so even a confidence-gating benefit cannot be isolated from this run. The legacy reported deltas are bootstrap means rather than the required observed effect sizes; the current implementation exporter distinguishes them.
+
+That restraint keeps the contribution aligned with what the experiment actually supports. Dynamic evidential routing should not be described as a universal calibration booster. The supported implementation claim is that explicit rules can change a heuristic confidence readout. Robustness, predictive compatibility, and useful auditability require corrected experiments.
+

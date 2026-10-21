@@ -1,0 +1,17 @@
+{
+  "source": "paper/main.tex",
+  "pdf": "paper/main.pdf",
+  "status": "not_rebuilt",
+  "pdf_is_current": false,
+  "attempts": [
+    {
+      "compiler": "miktex latexmk",
+      "error": "installation reports incomplete setup"
+    },
+    {
+      "compiler": "bundled tectonic",
+      "error": "executable access denied, including after sandbox escalation"
+    }
+  ],
+  "source_preserved": true
+}

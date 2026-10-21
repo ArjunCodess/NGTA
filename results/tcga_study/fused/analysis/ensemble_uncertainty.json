@@ -1,0 +1,112 @@
+{
+  "estimators": [
+    "deep_ensemble_variance",
+    "mc_dropout_variance_seed_mean",
+    "ensemble_predictive_entropy",
+    "neural_attention_instability_seed_mean",
+    "revised_attention_instability_seed_mean"
+  ],
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "seed_count": 5,
+  "mean_score": {
+    "deep_ensemble_variance": 0.007100282193602793,
+    "mc_dropout_variance_seed_mean": 0.002734628089271702,
+    "ensemble_predictive_entropy": 0.6597402812956746,
+    "neural_attention_instability_seed_mean": 0.018657179177031538,
+    "revised_attention_instability_seed_mean": 0.018387155244072476
+  },
+  "pairwise_spearman": {
+    "deep_ensemble_variance_vs_mc_dropout_variance_seed_mean_spearman": 0.32630617464377054,
+    "deep_ensemble_variance_vs_ensemble_predictive_entropy_spearman": -0.6378881987577639,
+    "deep_ensemble_variance_vs_neural_attention_instability_seed_mean_spearman": 0.6343807088052612,
+    "deep_ensemble_variance_vs_revised_attention_instability_seed_mean_spearman": 0.5931311655096821,
+    "mc_dropout_variance_seed_mean_vs_ensemble_predictive_entropy_spearman": -0.1298136645962733,
+    "mc_dropout_variance_seed_mean_vs_neural_attention_instability_seed_mean_spearman": 0.6001826817683595,
+    "mc_dropout_variance_seed_mean_vs_revised_attention_instability_seed_mean_spearman": 0.6143587869930581,
+    "ensemble_predictive_entropy_vs_neural_attention_instability_seed_mean_spearman": -0.5994884910485934,
+    "ensemble_predictive_entropy_vs_revised_attention_instability_seed_mean_spearman": -0.5944464742418707,
+    "neural_attention_instability_seed_mean_vs_revised_attention_instability_seed_mean_spearman": 0.9878333942272561
+  },
+  "error_detection_auroc": {
+    "deep_ensemble_variance": 0.3772727272727273,
+    "mc_dropout_variance_seed_mean": 0.4736363636363637,
+    "ensemble_predictive_entropy": 0.65,
+    "neural_attention_instability_seed_mean": 0.44,
+    "revised_attention_instability_seed_mean": 0.4290909090909091
+  },
+  "error_reference": "same ensemble prediction errors for every estimator",
+  "ensemble_metrics": {
+    "auc": 0.7033613445378151,
+    "pr_auc": 0.6910785036753986,
+    "brier": 0.21978332435527642,
+    "log_loss": 0.6298516734234089,
+    "accuracy": 0.6376811594202898,
+    "ece": 0.04181260583193401,
+    "ece_15": 0.05680349378482153,
+    "ece_quantile_10": 0.08269571208435555,
+    "calibration_intercept": 0.03610195377789913,
+    "calibration_slope": 1.5606223422045482,
+    "sensitivity_0.1": 1.0,
+    "specificity_0.1": 0.0,
+    "ppv_0.1": 0.4927536231884058,
+    "npv_0.1": NaN,
+    "sensitivity_0.2": 1.0,
+    "specificity_0.2": 0.0,
+    "ppv_0.2": 0.4927536231884058,
+    "npv_0.2": NaN,
+    "sensitivity_0.5": 0.7058823529411765,
+    "specificity_0.5": 0.5714285714285714,
+    "ppv_0.5": 0.6153846153846154,
+    "npv_0.5": 0.6666666666666666
+  },
+  "error_detection_intervals": {
+    "deep_ensemble_variance": {
+      "lower_95": 0.2233863758269265,
+      "upper_95": 0.5139120370370369,
+      "valid_replicates": 1000,
+      "sampling_unit": "case",
+      "scope": "conditional on this fixed five-model ensemble and common errors; excludes refitting variability"
+    },
+    "mc_dropout_variance_seed_mean": {
+      "lower_95": 0.3314987990810359,
+      "upper_95": 0.6191118726952061,
+      "valid_replicates": 1000,
+      "sampling_unit": "case",
+      "scope": "conditional on this fixed five-model ensemble and common errors; excludes refitting variability"
+    },
+    "ensemble_predictive_entropy": {
+      "lower_95": 0.5160324785012285,
+      "upper_95": 0.7866079410691479,
+      "valid_replicates": 1000,
+      "sampling_unit": "case",
+      "scope": "conditional on this fixed five-model ensemble and common errors; excludes refitting variability"
+    },
+    "neural_attention_instability_seed_mean": {
+      "lower_95": 0.30137652170172496,
+      "upper_95": 0.5725636030903899,
+      "valid_replicates": 1000,
+      "sampling_unit": "case",
+      "scope": "conditional on this fixed five-model ensemble and common errors; excludes refitting variability"
+    },
+    "revised_attention_instability_seed_mean": {
+      "lower_95": 0.292295918367347,
+      "upper_95": 0.5591009750128291,
+      "valid_replicates": 1000,
+      "sampling_unit": "case",
+      "scope": "conditional on this fixed five-model ensemble and common errors; excludes refitting variability"
+    }
+  },
+  "selective_risk_area": {
+    "deep_ensemble_variance": 0.4777250314711743,
+    "mc_dropout_variance_seed_mean": 0.3852740654655657,
+    "ensemble_predictive_entropy": 0.24455249338639587,
+    "neural_attention_instability_seed_mean": 0.38885639962760543,
+    "revised_attention_instability_seed_mean": 0.39395901155694035
+  }
+}

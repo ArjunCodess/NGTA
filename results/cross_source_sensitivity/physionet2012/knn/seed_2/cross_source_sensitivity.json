@@ -1,0 +1,155 @@
+{
+  "brier_nars_minus_mc": 7.094077933666103e-06,
+  "brier_upper_95": 8.125378201263776e-06,
+  "brier_margin": 0.001,
+  "auc_nars_minus_mc": -3.7563706767329563e-06,
+  "auc_lower_95": -1.1519453954253466e-05,
+  "auc_margin": -0.01,
+  "sampling_unit": "case",
+  "interpretation": "Exploratory cross-source sensitivity with conditional case-bootstrap intervals; no independent clinical compatibility claim",
+  "study_scope": "cross_source_sensitivity",
+  "numerical_margins_met": true,
+  "clinical_claim_eligible": false,
+  "mapping": {
+    "study_scope": "cross_source_sensitivity",
+    "clinical_claim_eligible": false,
+    "independence_verified": false,
+    "cohort": "PhysioNet/CinC Challenge 2012 sets A/B/C",
+    "source_version": "challenge-2012/1.0.0; archive phase-2 records pinned by SHA256",
+    "prediction_landmark": "24 hours after ICU admission, conditional on original ICU stay >=48 hours",
+    "outcome_definition": "hospital_mortality",
+    "development_dataset": "wids",
+    "independence_evidence": "Source namespaces differ, but canonical identity linkage and WiDS institution/time provenance are unavailable; independence is unverified",
+    "id_column": "encounter_id",
+    "patient_id_column": "patient_id",
+    "target_column": "hospital_death",
+    "cluster_column": "hospital_id",
+    "features": {
+      "age": {
+        "column": "age",
+        "source_unit": "years",
+        "target_unit": "years",
+        "availability": "observed",
+        "measurement_window": "admission descriptors; time series 0 <= elapsed minutes < 1440",
+        "evidence": "https://archive.physionet.org/challenge/2012/ (source parameter table and elapsed timestamps); WiDS equivalence requires source review"
+      },
+      "bmi": {
+        "column": "bmi",
+        "source_unit": "kg/m^2",
+        "target_unit": "kg/m^2",
+        "availability": "observed",
+        "measurement_window": "admission descriptors; time series 0 <= elapsed minutes < 1440",
+        "evidence": "https://archive.physionet.org/challenge/2012/ (source parameter table and elapsed timestamps); WiDS equivalence requires source review"
+      },
+      "d1_heartrate_max": {
+        "column": "d1_heartrate_max",
+        "source_unit": "bpm",
+        "target_unit": "bpm",
+        "availability": "observed",
+        "measurement_window": "admission descriptors; time series 0 <= elapsed minutes < 1440",
+        "evidence": "https://archive.physionet.org/challenge/2012/ (source parameter table and elapsed timestamps); WiDS equivalence requires source review"
+      },
+      "d1_sysbp_min": {
+        "column": "d1_sysbp_min",
+        "source_unit": "mmHg",
+        "target_unit": "mmHg",
+        "availability": "observed",
+        "measurement_window": "admission descriptors; time series 0 <= elapsed minutes < 1440",
+        "evidence": "https://archive.physionet.org/challenge/2012/ (source parameter table and elapsed timestamps); WiDS equivalence requires source review"
+      },
+      "d1_temp_max": {
+        "column": "d1_temp_max",
+        "source_unit": "degrees Celsius",
+        "target_unit": "degrees Celsius",
+        "availability": "observed",
+        "measurement_window": "admission descriptors; time series 0 <= elapsed minutes < 1440",
+        "evidence": "https://archive.physionet.org/challenge/2012/ (source parameter table and elapsed timestamps); WiDS equivalence requires source review"
+      },
+      "d1_lactate_max": {
+        "column": "d1_lactate_max",
+        "source_unit": "mmol/L",
+        "target_unit": "mmol/L",
+        "availability": "observed",
+        "measurement_window": "admission descriptors; time series 0 <= elapsed minutes < 1440",
+        "evidence": "https://archive.physionet.org/challenge/2012/ (source parameter table and elapsed timestamps); WiDS equivalence requires source review"
+      },
+      "d1_bun_max": {
+        "column": "d1_bun_max",
+        "source_unit": "mg/dL",
+        "target_unit": "mg/dL",
+        "availability": "observed",
+        "measurement_window": "admission descriptors; time series 0 <= elapsed minutes < 1440",
+        "evidence": "https://archive.physionet.org/challenge/2012/ (source parameter table and elapsed timestamps); WiDS equivalence requires source review"
+      },
+      "d1_creatinine_max": {
+        "column": "d1_creatinine_max",
+        "source_unit": "mg/dL",
+        "target_unit": "mg/dL",
+        "availability": "observed",
+        "measurement_window": "admission descriptors; time series 0 <= elapsed minutes < 1440",
+        "evidence": "https://archive.physionet.org/challenge/2012/ (source parameter table and elapsed timestamps); WiDS equivalence requires source review"
+      },
+      "d1_glucose_max": {
+        "column": "d1_glucose_max",
+        "source_unit": "mg/dL",
+        "target_unit": "mg/dL",
+        "availability": "observed",
+        "measurement_window": "admission descriptors; time series 0 <= elapsed minutes < 1440",
+        "evidence": "https://archive.physionet.org/challenge/2012/ (source parameter table and elapsed timestamps); WiDS equivalence requires source review"
+      },
+      "d1_wbc_max": {
+        "column": "d1_wbc_max",
+        "source_unit": "10^9/L = 10^3/uL",
+        "target_unit": "10^9/L = 10^3/uL",
+        "availability": "observed",
+        "measurement_window": "admission descriptors; time series 0 <= elapsed minutes < 1440",
+        "evidence": "https://archive.physionet.org/challenge/2012/ (source parameter table and elapsed timestamps); WiDS equivalence requires source review"
+      },
+      "d1_spo2_min": {
+        "column": null,
+        "source_unit": "unavailable",
+        "target_unit": "unavailable",
+        "availability": "unavailable",
+        "measurement_window": "admission descriptors; time series 0 <= elapsed minutes < 1440",
+        "evidence": "https://archive.physionet.org/challenge/2012/ (source parameter table and elapsed timestamps); WiDS equivalence requires source review; arterial SaO2 is not substituted for pulse-oximetry SpO2"
+      },
+      "d1_platelets_min": {
+        "column": "d1_platelets_min",
+        "source_unit": "10^9/L = 10^3/uL",
+        "target_unit": "10^9/L = 10^3/uL",
+        "availability": "observed",
+        "measurement_window": "admission descriptors; time series 0 <= elapsed minutes < 1440",
+        "evidence": "https://archive.physionet.org/challenge/2012/ (source parameter table and elapsed timestamps); WiDS equivalence requires source review"
+      },
+      "elective_surgery": {
+        "column": null,
+        "source_unit": "unavailable",
+        "target_unit": "unavailable",
+        "availability": "unavailable",
+        "measurement_window": "admission descriptors; time series 0 <= elapsed minutes < 1440",
+        "evidence": "https://archive.physionet.org/challenge/2012/ (source parameter table and elapsed timestamps); WiDS equivalence requires source review"
+      },
+      "gender": {
+        "column": "gender",
+        "source_unit": "F/M",
+        "target_unit": "F/M",
+        "availability": "observed",
+        "measurement_window": "admission descriptors; time series 0 <= elapsed minutes < 1440",
+        "evidence": "https://archive.physionet.org/challenge/2012/ (source parameter table and elapsed timestamps); WiDS equivalence requires source review"
+      }
+    },
+    "limitations": [
+      "One source institution cannot estimate institution-level uncertainty",
+      "Original >=48-hour stay selection excludes early deaths/discharges",
+      "WiDS day-1 versus elapsed 24-hour equivalence is unverified",
+      "SpO2, elective surgery and APACHE probability are unavailable",
+      "Admission BMI and mixed-method blood pressure need clinical harmonization review",
+      "Public challenge data are already inspected; this is not untouched confirmation"
+    ]
+  },
+  "checkpoint_sha256": "89694959ee00ad12029e2aa7c47b03eebfcbf4b0e05249bade152e1ac82cc756",
+  "preprocessor_sha256": "f6859259db4684ab76535919ebfcadf2dfcd2291b227c2473269ed33639d8da2",
+  "cohort_sha256": "fe59f90202f93c6e7d992656c1b2637253fc2689ebe2e0b8a69face217699dcd",
+  "mc_samples": 50,
+  "independence_verification": "Identifier-string overlap checked only; different source namespaces cannot establish canonical patient independence"
+}

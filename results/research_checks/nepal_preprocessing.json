@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "imputation": "median",
+      "scenario": "demographics",
+      "sample_size": 64,
+      "max_residual": 0.0,
+      "metadata_equal": true
+    },
+    {
+      "imputation": "median",
+      "scenario": "admission_core",
+      "sample_size": 64,
+      "max_residual": 0.0,
+      "metadata_equal": true
+    },
+    {
+      "imputation": "knn",
+      "scenario": "demographics",
+      "sample_size": 64,
+      "max_residual": 0.0,
+      "metadata_equal": true
+    },
+    {
+      "imputation": "knn",
+      "scenario": "admission_core",
+      "sample_size": 64,
+      "max_residual": 0.0,
+      "metadata_equal": true
+    }
+  ],
+  "rejected_shortcut": "Duplicate-row preprocessing changed tied KNN neighbors on source samples and was removed. Affected outputs are retained under ignored rejected_knn_duplicate_optimization and excluded from evaluation.",
+  "strategy": "Cache whole unmodified transformations, keyed by processor, full mapped cohort and implementation identities; validate content hash on reuse."
+}

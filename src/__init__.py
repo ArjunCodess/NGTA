@@ -20,7 +20,11 @@ from .nars_interface import (
     revise_truth_values,
     truth_to_expectation,
 )
-from .pipeline import PipelineConfig, run_pipeline
+def __getattr__(name):
+    if name in {"PipelineConfig", "run_pipeline"}:
+        from .pipeline import PipelineConfig, run_pipeline
+        return {"PipelineConfig": PipelineConfig, "run_pipeline": run_pipeline}[name]
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 __all__ = [
     "DEFAULT_CATEGORICAL_COLUMNS",

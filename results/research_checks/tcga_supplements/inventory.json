@@ -1,0 +1,1169 @@
+{
+  "schema_version": 1,
+  "files": 19,
+  "tables": [
+    {
+      "file_id": "005ae689-64d7-489f-b77a-81f65e21c628",
+      "file_name": "nationwidechildrens.org_biospecimen_portion_thca.txt",
+      "sha256": "a184acca891abbfe31c85f398c983ef6c2310853f51ddf9d9e1b0ce50dae5b3e",
+      "bytes": 162462,
+      "records": 1053,
+      "columns": 10,
+      "fields": [
+        {
+          "column_index": 0,
+          "field": "bcr_patient_uuid",
+          "dictionary_alias": "bcr_patient_uuid",
+          "observed_rows": 1053
+        },
+        {
+          "column_index": 1,
+          "field": "bcr_sample_barcode",
+          "dictionary_alias": "bcr_sample_barcode",
+          "observed_rows": 1053
+        },
+        {
+          "column_index": 2,
+          "field": "bcr_portion_barcode",
+          "dictionary_alias": "bcr_portion_barcode",
+          "observed_rows": 1053
+        },
+        {
+          "column_index": 3,
+          "field": "bcr_portion_uuid",
+          "dictionary_alias": "bcr_portion_uuid",
+          "observed_rows": 1053
+        },
+        {
+          "column_index": 5,
+          "field": "date_of_creation",
+          "dictionary_alias": "date_of_creation",
+          "observed_rows": 1053
+        }
+      ]
+    },
+    {
+      "file_id": "0604b260-0981-49dd-a6f1-4e083385f94f",
+      "file_name": "nationwidechildrens.org_biospecimen_sample_thca.txt",
+      "sha256": "b8709b0ac34b116f9aa4cb0eb01ac06d70a31f1791bbcbce473f32f174f5120f",
+      "bytes": 459675,
+      "records": 1053,
+      "columns": 27,
+      "fields": [
+        {
+          "column_index": 0,
+          "field": "bcr_patient_uuid",
+          "dictionary_alias": "bcr_patient_uuid",
+          "observed_rows": 1053
+        },
+        {
+          "column_index": 1,
+          "field": "bcr_sample_barcode",
+          "dictionary_alias": "bcr_sample_barcode",
+          "observed_rows": 1053
+        },
+        {
+          "column_index": 2,
+          "field": "bcr_sample_uuid",
+          "dictionary_alias": "bcr_sample_uuid",
+          "observed_rows": 1053
+        },
+        {
+          "column_index": 6,
+          "field": "days_to_collection",
+          "dictionary_alias": "days_to_collection",
+          "observed_rows": 1053,
+          "finite_numeric_rows": 1053,
+          "minimum": -138.0,
+          "maximum": 6870.0
+        },
+        {
+          "column_index": 7,
+          "field": "days_to_sample_procurement",
+          "dictionary_alias": "days_to_sample_procurement",
+          "observed_rows": 0,
+          "finite_numeric_rows": 0,
+          "minimum": null,
+          "maximum": null
+        },
+        {
+          "column_index": 13,
+          "field": "method_of_sample_procurement",
+          "dictionary_alias": "method_of_sample_procurement",
+          "observed_rows": 0
+        },
+        {
+          "column_index": 15,
+          "field": "other_method_of_sample_procurement",
+          "dictionary_alias": "other_method_of_sample_procurement",
+          "observed_rows": 0
+        },
+        {
+          "column_index": 16,
+          "field": "pathology_report_file_name",
+          "dictionary_alias": "pathology_report_file_name",
+          "observed_rows": 515
+        },
+        {
+          "column_index": 17,
+          "field": "pathology_report_uuid",
+          "dictionary_alias": "pathology_report_uuid",
+          "observed_rows": 515
+        }
+      ]
+    },
+    {
+      "file_id": "0e25c2af-1d14-4f78-90e3-06e0e7957cb0",
+      "file_name": "nationwidechildrens.org_clinical_follow_up_v4.0_nte_thca.txt",
+      "sha256": "a8286da4c84019371da22ebd85a88eab6b6cac4530a687eaf10a754b899f5c31",
+      "bytes": 17879,
+      "records": 42,
+      "columns": 25,
+      "fields": [
+        {
+          "column_index": 0,
+          "field": "bcr_patient_uuid",
+          "dictionary_alias": "bcr_patient_uuid",
+          "observed_rows": 42
+        },
+        {
+          "column_index": 1,
+          "field": "bcr_patient_barcode",
+          "dictionary_alias": "bcr_patient_barcode",
+          "observed_rows": 42
+        },
+        {
+          "column_index": 2,
+          "field": "bcr_followup_barcode",
+          "dictionary_alias": "bcr_followup_barcode",
+          "observed_rows": 42
+        },
+        {
+          "column_index": 6,
+          "field": "new_tumor_event_dx_days_to",
+          "dictionary_alias": "days_to_new_tumor_event_after_initial_treatment",
+          "observed_rows": 41,
+          "finite_numeric_rows": 41,
+          "minimum": 6.0,
+          "maximum": 2093.0
+        },
+        {
+          "column_index": 15,
+          "field": "new_tumor_event_surgery_days_to",
+          "dictionary_alias": "days_to_new_tumor_event_additional_surgery_procedure",
+          "observed_rows": 24,
+          "finite_numeric_rows": 24,
+          "minimum": 91.0,
+          "maximum": 2382.0
+        }
+      ]
+    },
+    {
+      "file_id": "1aeca2df-c179-4554-98e8-8d73a2154e1f",
+      "file_name": "nationwidechildrens.org_clinical_follow_up_v2.0_thca.txt",
+      "sha256": "20ec21abc03c46a5135c76f1474b7935f7844349bdae9f811ef676317c4bed91",
+      "bytes": 36981,
+      "records": 103,
+      "columns": 20,
+      "fields": [
+        {
+          "column_index": 0,
+          "field": "bcr_patient_uuid",
+          "dictionary_alias": "bcr_patient_uuid",
+          "observed_rows": 103
+        },
+        {
+          "column_index": 1,
+          "field": "bcr_patient_barcode",
+          "dictionary_alias": "bcr_patient_barcode",
+          "observed_rows": 103
+        },
+        {
+          "column_index": 2,
+          "field": "bcr_followup_barcode",
+          "dictionary_alias": "bcr_followup_barcode",
+          "observed_rows": 103
+        },
+        {
+          "column_index": 3,
+          "field": "bcr_followup_uuid",
+          "dictionary_alias": "bcr_followup_uuid",
+          "observed_rows": 103
+        },
+        {
+          "column_index": 4,
+          "field": "form_completion_date",
+          "dictionary_alias": "form_completion_date",
+          "observed_rows": 103
+        },
+        {
+          "column_index": 9,
+          "field": "last_contact_days_to",
+          "dictionary_alias": "days_to_last_followup",
+          "observed_rows": 101,
+          "finite_numeric_rows": 101,
+          "minimum": 21.0,
+          "maximum": 4429.0
+        },
+        {
+          "column_index": 10,
+          "field": "death_days_to",
+          "dictionary_alias": "days_to_death",
+          "observed_rows": 1,
+          "finite_numeric_rows": 1,
+          "minimum": 1023.0,
+          "maximum": 1023.0
+        },
+        {
+          "column_index": 19,
+          "field": "followup_reason",
+          "dictionary_alias": "followup_case_report_form_submission_reason",
+          "observed_rows": 103
+        }
+      ]
+    },
+    {
+      "file_id": "20d4bfe3-262e-4a9c-80bb-08ecd7e965a7",
+      "file_name": "nationwidechildrens.org_biospecimen_aliquot_thca.txt",
+      "sha256": "6f4d48c0a4b67857c54642396b53434d8e95d3a7356de006b0dfcfbd87662c66",
+      "bytes": 968368,
+      "records": 5497,
+      "columns": 15,
+      "fields": [
+        {
+          "column_index": 0,
+          "field": "bcr_patient_uuid",
+          "dictionary_alias": "bcr_patient_uuid",
+          "observed_rows": 5497
+        },
+        {
+          "column_index": 1,
+          "field": "bcr_sample_barcode",
+          "dictionary_alias": "bcr_sample_barcode",
+          "observed_rows": 5497
+        },
+        {
+          "column_index": 2,
+          "field": "bcr_aliquot_barcode",
+          "dictionary_alias": "bcr_aliquot_barcode",
+          "observed_rows": 5497
+        },
+        {
+          "column_index": 3,
+          "field": "bcr_aliquot_uuid",
+          "dictionary_alias": "bcr_aliquot_uuid",
+          "observed_rows": 5497
+        },
+        {
+          "column_index": 4,
+          "field": "biospecimen_barcode_bottom",
+          "dictionary_alias": "biospecimen_barcode_bottom",
+          "observed_rows": 5497
+        },
+        {
+          "column_index": 7,
+          "field": "date_of_shipment",
+          "dictionary_alias": "date_of_shipment",
+          "observed_rows": 5497
+        }
+      ]
+    },
+    {
+      "file_id": "451ba679-d075-4078-abd8-d6e62118e39b",
+      "file_name": "nationwidechildrens.org_clinical_follow_up_v4.0_thca.txt",
+      "sha256": "c0a62004262c3ebca9018cac346fcde7c17f76940cafb2fb976550395ab48588",
+      "bytes": 189704,
+      "records": 574,
+      "columns": 21,
+      "fields": [
+        {
+          "column_index": 0,
+          "field": "bcr_patient_uuid",
+          "dictionary_alias": "bcr_patient_uuid",
+          "observed_rows": 574
+        },
+        {
+          "column_index": 1,
+          "field": "bcr_patient_barcode",
+          "dictionary_alias": "bcr_patient_barcode",
+          "observed_rows": 574
+        },
+        {
+          "column_index": 2,
+          "field": "bcr_followup_barcode",
+          "dictionary_alias": "bcr_followup_barcode",
+          "observed_rows": 574
+        },
+        {
+          "column_index": 3,
+          "field": "bcr_followup_uuid",
+          "dictionary_alias": "bcr_followup_uuid",
+          "observed_rows": 574
+        },
+        {
+          "column_index": 4,
+          "field": "form_completion_date",
+          "dictionary_alias": "form_completion_date",
+          "observed_rows": 574
+        },
+        {
+          "column_index": 10,
+          "field": "last_contact_days_to",
+          "dictionary_alias": "days_to_last_followup",
+          "observed_rows": 560,
+          "finite_numeric_rows": 560,
+          "minimum": 9.0,
+          "maximum": 5423.0
+        },
+        {
+          "column_index": 11,
+          "field": "death_days_to",
+          "dictionary_alias": "days_to_death",
+          "observed_rows": 2,
+          "finite_numeric_rows": 2,
+          "minimum": 243.0,
+          "maximum": 1011.0
+        }
+      ]
+    },
+    {
+      "file_id": "4eb4870b-e8b3-43c8-ab40-47ce19683667",
+      "file_name": "nationwidechildrens.org_clinical_radiation_thca.txt",
+      "sha256": "b83d3cf718b16b5819d99dfb681386d20566a9885f94903df0b985b625215475",
+      "bytes": 74936,
+      "records": 293,
+      "columns": 18,
+      "fields": [
+        {
+          "column_index": 0,
+          "field": "bcr_patient_uuid",
+          "dictionary_alias": "bcr_patient_uuid",
+          "observed_rows": 293
+        },
+        {
+          "column_index": 1,
+          "field": "bcr_patient_barcode",
+          "dictionary_alias": "bcr_patient_barcode",
+          "observed_rows": 293
+        },
+        {
+          "column_index": 2,
+          "field": "bcr_radiation_barcode",
+          "dictionary_alias": "bcr_radiation_barcode",
+          "observed_rows": 293
+        },
+        {
+          "column_index": 3,
+          "field": "bcr_radiation_uuid",
+          "dictionary_alias": "bcr_radiation_uuid",
+          "observed_rows": 293
+        },
+        {
+          "column_index": 4,
+          "field": "form_completion_date",
+          "dictionary_alias": "form_completion_date",
+          "observed_rows": 293
+        },
+        {
+          "column_index": 10,
+          "field": "radiation_therapy_started_days_to",
+          "dictionary_alias": "days_to_radiation_therapy_start",
+          "observed_rows": 289,
+          "finite_numeric_rows": 289,
+          "minimum": 1.0,
+          "maximum": 3470.0
+        },
+        {
+          "column_index": 12,
+          "field": "radiation_therapy_ended_days_to",
+          "dictionary_alias": "days_to_radiation_therapy_end",
+          "observed_rows": 284,
+          "finite_numeric_rows": 284,
+          "minimum": 1.0,
+          "maximum": 3490.0
+        }
+      ]
+    },
+    {
+      "file_id": "5c81bd45-ab70-4bcd-895c-5fe916f272d6",
+      "file_name": "nationwidechildrens.org_clinical_patient_thca.txt",
+      "sha256": "486ab2248802c1353ae82c10f6e4a90726e009351dcce4b88371e6b6b5e7d601",
+      "bytes": 466862,
+      "records": 507,
+      "columns": 77,
+      "fields": [
+        {
+          "column_index": 0,
+          "field": "bcr_patient_uuid",
+          "dictionary_alias": "bcr_patient_uuid",
+          "observed_rows": 507
+        },
+        {
+          "column_index": 1,
+          "field": "bcr_patient_barcode",
+          "dictionary_alias": "bcr_patient_barcode",
+          "observed_rows": 507
+        },
+        {
+          "column_index": 2,
+          "field": "form_completion_date",
+          "dictionary_alias": "form_completion_date",
+          "observed_rows": 507
+        },
+        {
+          "column_index": 3,
+          "field": "prospective_collection",
+          "dictionary_alias": "tissue_prospective_collection_indicator",
+          "observed_rows": 507
+        },
+        {
+          "column_index": 4,
+          "field": "retrospective_collection",
+          "dictionary_alias": "tissue_retrospective_collection_indicator",
+          "observed_rows": 507
+        },
+        {
+          "column_index": 5,
+          "field": "birth_days_to",
+          "dictionary_alias": "days_to_birth",
+          "observed_rows": 507,
+          "finite_numeric_rows": 507,
+          "minimum": -32682.0,
+          "maximum": -5612.0
+        },
+        {
+          "column_index": 13,
+          "field": "last_contact_days_to",
+          "dictionary_alias": "days_to_last_followup",
+          "observed_rows": 492,
+          "finite_numeric_rows": 492,
+          "minimum": 0.0,
+          "maximum": 4484.0
+        },
+        {
+          "column_index": 14,
+          "field": "death_days_to",
+          "dictionary_alias": "days_to_death",
+          "observed_rows": 14,
+          "finite_numeric_rows": 14,
+          "minimum": 174.0,
+          "maximum": 1854.0
+        },
+        {
+          "column_index": 26,
+          "field": "initial_pathologic_dx_year",
+          "dictionary_alias": "year_of_initial_pathologic_diagnosis",
+          "observed_rows": 507
+        },
+        {
+          "column_index": 27,
+          "field": "age_at_diagnosis",
+          "dictionary_alias": "age_at_initial_pathologic_diagnosis",
+          "observed_rows": 507
+        },
+        {
+          "column_index": 36,
+          "field": "ajcc_tumor_pathologic_pt",
+          "dictionary_alias": "pathologic_T",
+          "observed_rows": 507
+        },
+        {
+          "column_index": 37,
+          "field": "ajcc_nodes_pathologic_pn",
+          "dictionary_alias": "pathologic_N",
+          "observed_rows": 507
+        },
+        {
+          "column_index": 38,
+          "field": "ajcc_metastasis_pathologic_pm",
+          "dictionary_alias": "pathologic_M",
+          "observed_rows": 506
+        },
+        {
+          "column_index": 39,
+          "field": "ajcc_pathologic_tumor_stage",
+          "dictionary_alias": "pathologic_stage",
+          "observed_rows": 505
+        },
+        {
+          "column_index": 42,
+          "field": "genotypic_analysis_detected",
+          "dictionary_alias": "genotype_analysis_performed_indicator",
+          "observed_rows": 317,
+          "reported_values": {
+            "NO": 288,
+            "YES": 29,
+            "[Not Available]": 178,
+            "[Unknown]": 12
+          }
+        },
+        {
+          "column_index": 43,
+          "field": "braf_mutation_result",
+          "dictionary_alias": "braf_gene_genotyping_outcome_lab_results_text",
+          "observed_rows": 27,
+          "reported_values": {
+            "(p.V600E, c.1799T>A)": 1,
+            "(pV600E, c.1799)": 1,
+            "600 (pV600E, c1799T>A": 1,
+            "Negative": 3,
+            "POSITIVE for V600E mutation of BRAF (c.1799T>A, p.Val600Glu).": 1,
+            "V600E": 2,
+            "V600E identified": 4,
+            "V600E mutation detected": 1,
+            "[Not Available]": 480,
+            "negative": 1,
+            "not identified": 5,
+            "p. V600E, c.1799T >A": 1,
+            "p.V600E, c.1799T>A": 1,
+            "pV600E, c.199T>A identified": 1,
+            "positive": 3,
+            "v 600 E": 1
+          }
+        },
+        {
+          "column_index": 44,
+          "field": "ras_mutation_result",
+          "dictionary_alias": "ras_family_gene_genotyping_outcome_lab_results_text",
+          "observed_rows": 11,
+          "reported_values": {
+            "HRAS 61 identified": 2,
+            "NRAS 61 codon identified": 1,
+            "NRAS positive KRAS positive": 1,
+            "NRAS61, HRAS61, KRAS12/13 not identified": 3,
+            "[Not Available]": 496,
+            "not identifed": 1,
+            "not identified": 3
+          }
+        },
+        {
+          "column_index": 45,
+          "field": "ret_ptc_rearrangement_result",
+          "dictionary_alias": "ret_ptc_rearrangement_genotyping_outcome_lab_results_text",
+          "observed_rows": 11,
+          "reported_values": {
+            "FISH test negative": 1,
+            "FISH test results negative": 1,
+            "Negative": 1,
+            "RET/PTC 1 rearrangement  identified": 1,
+            "RET/PTC1, RET/PTC3 and PAX8/PPARg not identified": 1,
+            "[Not Available]": 496,
+            "negative": 1,
+            "not identified": 5
+          }
+        },
+        {
+          "column_index": 46,
+          "field": "genotypic_analysis_results_other",
+          "dictionary_alias": "other_genotyping_outcome_lab_results_text",
+          "observed_rows": 2,
+          "reported_values": {
+            "PAX8/PPARg rearrangement identified": 1,
+            "[Not Available]": 505,
+            "not identified": 1
+          }
+        },
+        {
+          "column_index": 62,
+          "field": "days_to_initial_pathologic_diagnosis",
+          "dictionary_alias": "days_to_initial_pathologic_diagnosis",
+          "observed_rows": 507,
+          "finite_numeric_rows": 507,
+          "minimum": 0.0,
+          "maximum": 0.0
+        },
+        {
+          "column_index": 65,
+          "field": "genotyping_results_gene_mutation_not_reported_reason",
+          "dictionary_alias": "genotyping_results_gene_mutation_not_reported_reason",
+          "observed_rows": 15,
+          "reported_values": {
+            "No BRAF Mutation Detected|No RAS Mutation Detected|No RET/PTC Rearrangement Detected": 7,
+            "No BRAF Mutation Detected|[Not Available]|No RET/PTC Rearrangement Detected": 1,
+            "No BRAF Mutation Detected|[Not Available]|[Not Available]": 1,
+            "No BRAF Mutation Detected|[Not Evaluated]|[Not Evaluated]": 2,
+            "[Not Available]|No RAS Mutation Detected|No RET/PTC Rearrangement Detected": 3,
+            "[Not Available]|[Not Available]|[Not Available]": 269,
+            "[Not Available]|[Not Evaluated]|[Not Evaluated]": 3,
+            "[Not Available]|[Unknown]|[Unknown]": 1,
+            "[Not Evaluated]|[Not Evaluated]|No RET/PTC Rearrangement Detected": 1,
+            "[Not Evaluated]|[Not Evaluated]|[Not Evaluated]": 219
+          }
+        }
+      ]
+    },
+    {
+      "file_id": "63b97058-0dac-4032-9dba-9db109ef29d5",
+      "file_name": "nationwidechildrens.org_clinical_nte_thca.txt",
+      "sha256": "a8f49a48bbf881ade1521a00df94fd62dc6f67f0f8e0c8fddbcad03389c1df1b",
+      "bytes": 7954,
+      "records": 17,
+      "columns": 24,
+      "fields": [
+        {
+          "column_index": 0,
+          "field": "bcr_patient_uuid",
+          "dictionary_alias": "bcr_patient_uuid",
+          "observed_rows": 17
+        },
+        {
+          "column_index": 1,
+          "field": "bcr_patient_barcode",
+          "dictionary_alias": "bcr_patient_barcode",
+          "observed_rows": 17
+        },
+        {
+          "column_index": 5,
+          "field": "new_tumor_event_dx_days_to",
+          "dictionary_alias": "days_to_new_tumor_event_after_initial_treatment",
+          "observed_rows": 13,
+          "finite_numeric_rows": 13,
+          "minimum": 110.0,
+          "maximum": 1855.0
+        },
+        {
+          "column_index": 14,
+          "field": "new_tumor_event_surgery_days_to",
+          "dictionary_alias": "days_to_new_tumor_event_additional_surgery_procedure",
+          "observed_rows": 6,
+          "finite_numeric_rows": 6,
+          "minimum": 271.0,
+          "maximum": 1855.0
+        }
+      ]
+    },
+    {
+      "file_id": "691b6ca1-51a1-4a62-9558-dedc3c3dc691",
+      "file_name": "nationwidechildrens.org_biospecimen_shipment_portion_thca.txt",
+      "sha256": "ed3c803d334985b858051718afd4cb31a05aae3d8a778f480ff8b3f8282d84a3",
+      "bytes": 55314,
+      "records": 381,
+      "columns": 12,
+      "fields": [
+        {
+          "column_index": 0,
+          "field": "bcr_patient_uuid",
+          "dictionary_alias": "bcr_patient_uuid",
+          "observed_rows": 381
+        },
+        {
+          "column_index": 1,
+          "field": "bcr_sample_barcode",
+          "dictionary_alias": "bcr_sample_barcode",
+          "observed_rows": 381
+        },
+        {
+          "column_index": 2,
+          "field": "shipment_portion_bcr_aliquot_barcode",
+          "dictionary_alias": "shipment_portion_bcr_aliquot_barcode",
+          "observed_rows": 381
+        },
+        {
+          "column_index": 3,
+          "field": "bcr_shipment_portion_uuid",
+          "dictionary_alias": "bcr_shipment_portion_uuid",
+          "observed_rows": 381
+        },
+        {
+          "column_index": 9,
+          "field": "shipment_portion_day_of_shipment",
+          "dictionary_alias": "shipment_portion_day_of_shipment",
+          "observed_rows": 381
+        },
+        {
+          "column_index": 10,
+          "field": "shipment_portion_month_of_shipment",
+          "dictionary_alias": "shipment_portion_month_of_shipment",
+          "observed_rows": 381
+        },
+        {
+          "column_index": 11,
+          "field": "shipment_portion_year_of_shipment",
+          "dictionary_alias": "shipment_portion_year_of_shipment",
+          "observed_rows": 381
+        }
+      ]
+    },
+    {
+      "file_id": "799ca45e-ec42-4a24-b243-2f404a0a8328",
+      "file_name": "nationwidechildrens.org_biospecimen_slide_thca.txt",
+      "sha256": "ad4338729338a9c955ff791c9b1b7a3418a0fe26dbc42ef6bf0f588b4922d752",
+      "bytes": 132086,
+      "records": 639,
+      "columns": 15,
+      "fields": [
+        {
+          "column_index": 0,
+          "field": "bcr_patient_uuid",
+          "dictionary_alias": "bcr_patient_uuid",
+          "observed_rows": 639
+        },
+        {
+          "column_index": 1,
+          "field": "bcr_sample_barcode",
+          "dictionary_alias": "bcr_sample_barcode",
+          "observed_rows": 639
+        },
+        {
+          "column_index": 2,
+          "field": "bcr_slide_barcode",
+          "dictionary_alias": "bcr_slide_barcode",
+          "observed_rows": 639
+        },
+        {
+          "column_index": 3,
+          "field": "bcr_slide_uuid",
+          "dictionary_alias": "bcr_slide_uuid",
+          "observed_rows": 639
+        }
+      ]
+    },
+    {
+      "file_id": "7f53f27d-ff74-4696-9736-ae68fa6f2b5e",
+      "file_name": "nationwidechildrens.org_ssf_tumor_samples_thca.txt",
+      "sha256": "1bc0dcd7b31e4bb8e056c0d22f80e8b1b8cb86c50362643b25ab2563324ad527",
+      "bytes": 183633,
+      "records": 515,
+      "columns": 34,
+      "fields": [
+        {
+          "column_index": 0,
+          "field": "bcr_patient_barcode",
+          "dictionary_alias": "bcr_patient_barcode",
+          "observed_rows": 515
+        },
+        {
+          "column_index": 1,
+          "field": "bcr_sample_uuid",
+          "dictionary_alias": "bcr_sample_uuid",
+          "observed_rows": 515
+        },
+        {
+          "column_index": 5,
+          "field": "tumor_sample_procurement_method",
+          "dictionary_alias": "method_of_sample_procurement",
+          "observed_rows": 515
+        },
+        {
+          "column_index": 13,
+          "field": "tumor_sample_procurement_country",
+          "dictionary_alias": "country",
+          "observed_rows": 515
+        },
+        {
+          "column_index": 20,
+          "field": "tss_pathology_submitted",
+          "dictionary_alias": "path_confirm_report_attached",
+          "observed_rows": 512
+        },
+        {
+          "column_index": 26,
+          "field": "tss_pathology_review_days_to",
+          "dictionary_alias": "days_to_pathology_review",
+          "observed_rows": 515,
+          "finite_numeric_rows": 515,
+          "minimum": -166.0,
+          "maximum": 6853.0
+        },
+        {
+          "column_index": 27,
+          "field": "patient_consent_days_to",
+          "dictionary_alias": "days_to_consent",
+          "observed_rows": 502,
+          "finite_numeric_rows": 502,
+          "minimum": -256.0,
+          "maximum": 3999.0
+        },
+        {
+          "column_index": 28,
+          "field": "tumor_sample_procurement_days_to",
+          "dictionary_alias": "days_to_sample_procurement",
+          "observed_rows": 515,
+          "finite_numeric_rows": 515,
+          "minimum": -211.0,
+          "maximum": 271.0
+        }
+      ]
+    },
+    {
+      "file_id": "8d0af6c0-ef14-4dd2-a67c-926a668967d9",
+      "file_name": "nationwidechildrens.org_ssf_normal_controls_thca.txt",
+      "sha256": "78a5e2315485c3784b582a9d5d69cefe5ae31c610e11830887e4a095fbf053a9",
+      "bytes": 96327,
+      "records": 537,
+      "columns": 12,
+      "fields": [
+        {
+          "column_index": 0,
+          "field": "bcr_patient_barcode",
+          "dictionary_alias": "bcr_patient_barcode",
+          "observed_rows": 537
+        },
+        {
+          "column_index": 1,
+          "field": "bcr_sample_uuid",
+          "dictionary_alias": "bcr_sample_uuid",
+          "observed_rows": 537
+        },
+        {
+          "column_index": 6,
+          "field": "normal_control_method",
+          "dictionary_alias": "method_of_normal_sample_procurement",
+          "observed_rows": 536
+        },
+        {
+          "column_index": 9,
+          "field": "normal_control_method_other",
+          "dictionary_alias": "other_method_of_normal_sample_procurement",
+          "observed_rows": 3
+        },
+        {
+          "column_index": 11,
+          "field": "normal_control_procurement_days_to",
+          "dictionary_alias": "days_to_normal_sample_procurement",
+          "observed_rows": 537,
+          "finite_numeric_rows": 537,
+          "minimum": -731.0,
+          "maximum": 4032.0
+        }
+      ]
+    },
+    {
+      "file_id": "99870506-fc98-4396-9a40-83fd749f8e51",
+      "file_name": "nationwidechildrens.org_clinical_omf_v4.0_thca.txt",
+      "sha256": "46e5fbb09789a2cc54c75ef866d210fbcba41e51637f212a44d1f6f71db53d61",
+      "bytes": 17085,
+      "records": 33,
+      "columns": 30,
+      "fields": [
+        {
+          "column_index": 0,
+          "field": "bcr_patient_uuid",
+          "dictionary_alias": "bcr_patient_uuid",
+          "observed_rows": 33
+        },
+        {
+          "column_index": 1,
+          "field": "bcr_patient_barcode",
+          "dictionary_alias": "bcr_patient_barcode",
+          "observed_rows": 33
+        },
+        {
+          "column_index": 2,
+          "field": "bcr_omf_barcode",
+          "dictionary_alias": "bcr_omf_barcode",
+          "observed_rows": 33
+        },
+        {
+          "column_index": 3,
+          "field": "bcr_omf_uuid",
+          "dictionary_alias": "bcr_omf_uuid",
+          "observed_rows": 33
+        },
+        {
+          "column_index": 4,
+          "field": "form_completion_date",
+          "dictionary_alias": "form_completion_date",
+          "observed_rows": 33
+        },
+        {
+          "column_index": 6,
+          "field": "other_malignancy_dx_days_to",
+          "dictionary_alias": "days_to_other_malignancy_dx",
+          "observed_rows": 11,
+          "finite_numeric_rows": 11,
+          "minimum": -5761.0,
+          "maximum": -63.0
+        },
+        {
+          "column_index": 9,
+          "field": "other_malignancy_surgery_days_to",
+          "dictionary_alias": "days_to_surgical_resection",
+          "observed_rows": 16,
+          "finite_numeric_rows": 16,
+          "minimum": -5761.0,
+          "maximum": 24.0
+        },
+        {
+          "column_index": 13,
+          "field": "pharmaceutical_tx_started_days_to",
+          "dictionary_alias": "days_to_drug_therapy_start",
+          "observed_rows": 1,
+          "finite_numeric_rows": 1,
+          "minimum": -1891.0,
+          "maximum": -1891.0
+        },
+        {
+          "column_index": 17,
+          "field": "radiation_therapy_started_days_to",
+          "dictionary_alias": "days_to_radiation_therapy_start",
+          "observed_rows": 4,
+          "finite_numeric_rows": 4,
+          "minimum": -5251.0,
+          "maximum": -21.0
+        },
+        {
+          "column_index": 19,
+          "field": "ajcc_tumor_pathologic_pt",
+          "dictionary_alias": "pathologic_T",
+          "observed_rows": 6
+        },
+        {
+          "column_index": 20,
+          "field": "ajcc_nodes_pathologic_pn",
+          "dictionary_alias": "pathologic_N",
+          "observed_rows": 6
+        },
+        {
+          "column_index": 21,
+          "field": "ajcc_metastasis_pathologic_pm",
+          "dictionary_alias": "pathologic_M",
+          "observed_rows": 6
+        },
+        {
+          "column_index": 22,
+          "field": "ajcc_pathologic_tumor_stage",
+          "dictionary_alias": "pathologic_stage",
+          "observed_rows": 6
+        }
+      ]
+    },
+    {
+      "file_id": "9c8845c9-2ab0-4cc4-a57a-148020cb9139",
+      "file_name": "nationwidechildrens.org_clinical_follow_up_v2.0_nte_thca.txt",
+      "sha256": "f4d461e2f0ed8321ebe81d2e3c424830f8f69472ea679c4a5d76e5957879ba84",
+      "bytes": 45882,
+      "records": 102,
+      "columns": 26,
+      "fields": [
+        {
+          "column_index": 0,
+          "field": "bcr_patient_uuid",
+          "dictionary_alias": "bcr_patient_uuid",
+          "observed_rows": 102
+        },
+        {
+          "column_index": 1,
+          "field": "bcr_patient_barcode",
+          "dictionary_alias": "bcr_patient_barcode",
+          "observed_rows": 102
+        },
+        {
+          "column_index": 2,
+          "field": "bcr_followup_barcode",
+          "dictionary_alias": "bcr_followup_barcode",
+          "observed_rows": 102
+        },
+        {
+          "column_index": 7,
+          "field": "new_tumor_event_dx_days_to",
+          "dictionary_alias": "days_to_new_tumor_event_after_initial_treatment",
+          "observed_rows": 11,
+          "finite_numeric_rows": 11,
+          "minimum": 158.0,
+          "maximum": 1215.0
+        },
+        {
+          "column_index": 25,
+          "field": "days_to_additional_surgery_metastatic_procedure",
+          "dictionary_alias": "days_to_additional_surgery_metastatic_procedure",
+          "observed_rows": 8,
+          "finite_numeric_rows": 8,
+          "minimum": 232.0,
+          "maximum": 1215.0
+        }
+      ]
+    },
+    {
+      "file_id": "b64997f4-6785-4b05-9cf8-ce82315420e2",
+      "file_name": "nationwidechildrens.org_clinical_drug_thca.txt",
+      "sha256": "7627b7c93cc87d88713d74e4a1f061a3694acb70a208b0da9a10a6939f9cb684",
+      "bytes": 26179,
+      "records": 56,
+      "columns": 28,
+      "fields": [
+        {
+          "column_index": 0,
+          "field": "bcr_patient_uuid",
+          "dictionary_alias": "bcr_patient_uuid",
+          "observed_rows": 56
+        },
+        {
+          "column_index": 1,
+          "field": "bcr_patient_barcode",
+          "dictionary_alias": "bcr_patient_barcode",
+          "observed_rows": 56
+        },
+        {
+          "column_index": 2,
+          "field": "bcr_drug_barcode",
+          "dictionary_alias": "bcr_drug_barcode",
+          "observed_rows": 56
+        },
+        {
+          "column_index": 3,
+          "field": "bcr_drug_uuid",
+          "dictionary_alias": "bcr_drug_uuid",
+          "observed_rows": 56
+        },
+        {
+          "column_index": 4,
+          "field": "form_completion_date",
+          "dictionary_alias": "form_completion_date",
+          "observed_rows": 56
+        },
+        {
+          "column_index": 8,
+          "field": "pharmaceutical_tx_started_days_to",
+          "dictionary_alias": "days_to_drug_therapy_start",
+          "observed_rows": 56,
+          "finite_numeric_rows": 56,
+          "minimum": 1.0,
+          "maximum": 761.0
+        },
+        {
+          "column_index": 10,
+          "field": "pharmaceutical_tx_ended_days_to",
+          "dictionary_alias": "days_to_drug_therapy_end",
+          "observed_rows": 14,
+          "finite_numeric_rows": 14,
+          "minimum": 20.0,
+          "maximum": 322.0
+        },
+        {
+          "column_index": 12,
+          "field": "days_to_stem_cell_transplantation",
+          "dictionary_alias": "days_to_stem_cell_transplantation",
+          "observed_rows": 0,
+          "finite_numeric_rows": 0,
+          "minimum": null,
+          "maximum": null
+        }
+      ]
+    },
+    {
+      "file_id": "c9ea28a4-68f6-4ffe-b554-6b8765cb63a0",
+      "file_name": "nationwidechildrens.org_biospecimen_protocol_thca.txt",
+      "sha256": "2e5a1aacd1a9fa1152744b7067085df2ba9df016e7039159f18a91177f0ed14d",
+      "bytes": 335448,
+      "records": 2674,
+      "columns": 6,
+      "fields": [
+        {
+          "column_index": 0,
+          "field": "bcr_patient_uuid",
+          "dictionary_alias": "bcr_patient_uuid",
+          "observed_rows": 2674
+        },
+        {
+          "column_index": 1,
+          "field": "bcr_sample_barcode",
+          "dictionary_alias": "bcr_sample_barcode",
+          "observed_rows": 2674
+        },
+        {
+          "column_index": 2,
+          "field": "bcr_analyte_barcode",
+          "dictionary_alias": "bcr_analyte_barcode",
+          "observed_rows": 2674
+        }
+      ]
+    },
+    {
+      "file_id": "cae3da86-e43c-4627-a9ab-d2dbd45ed6ee",
+      "file_name": "nationwidechildrens.org_biospecimen_analyte_thca.txt",
+      "sha256": "31877b8351bd570d1620dfaaf593122a714022acaf288b0770ef453ec039a5fe",
+      "bytes": 731853,
+      "records": 2674,
+      "columns": 17,
+      "fields": [
+        {
+          "column_index": 0,
+          "field": "bcr_patient_uuid",
+          "dictionary_alias": "bcr_patient_uuid",
+          "observed_rows": 2674
+        },
+        {
+          "column_index": 1,
+          "field": "bcr_sample_barcode",
+          "dictionary_alias": "bcr_sample_barcode",
+          "observed_rows": 2674
+        },
+        {
+          "column_index": 2,
+          "field": "bcr_analyte_barcode",
+          "dictionary_alias": "bcr_analyte_barcode",
+          "observed_rows": 2674
+        },
+        {
+          "column_index": 3,
+          "field": "bcr_analyte_uuid",
+          "dictionary_alias": "bcr_analyte_uuid",
+          "observed_rows": 2674
+        },
+        {
+          "column_index": 10,
+          "field": "normal_tumor_genotype_match",
+          "dictionary_alias": "normal_tumor_genotype_match",
+          "observed_rows": 2100,
+          "reported_values": {
+            "YES": 2100,
+            "[Not Available]": 574
+          }
+        }
+      ]
+    },
+    {
+      "file_id": "d00c0c8e-7dd8-4721-9117-b55ae9c8de9e",
+      "file_name": "nationwidechildrens.org_biospecimen_diagnostic_slides_thca.txt",
+      "sha256": "4046ba97cff77545f02bafa7a9031f5137b09ef7f8864e9c80f8d4014091e618",
+      "bytes": 54170,
+      "records": 520,
+      "columns": 4,
+      "fields": [
+        {
+          "column_index": 0,
+          "field": "bcr_patient_uuid",
+          "dictionary_alias": "bcr_patient_uuid",
+          "observed_rows": 520
+        },
+        {
+          "column_index": 1,
+          "field": "bcr_patient_barcode",
+          "dictionary_alias": "bcr_patient_barcode",
+          "observed_rows": 520
+        },
+        {
+          "column_index": 2,
+          "field": "bcr_sample_barcode",
+          "dictionary_alias": "bcr_sample_barcode",
+          "observed_rows": 520
+        },
+        {
+          "column_index": 3,
+          "field": "ffpe_slide_uuid",
+          "dictionary_alias": "ffpe_slide_uuid",
+          "observed_rows": 520
+        }
+      ]
+    }
+  ],
+  "specimen_linkage": {
+    "tumor_records": 515,
+    "matched_sample_uuid_records": 515,
+    "matched_cases": 507,
+    "records_with_both_offsets": 515,
+    "review_before_procurement_records": 0,
+    "clinical_feature_availability_verified": false,
+    "interpretation": "UUID linkage and source offsets only; tissue review is not the availability date of the selected model pathology or genomic reports."
+  },
+  "cross_table_chronology_verified": false,
+  "callable_panel_verified": false,
+  "models_refitted": false,
+  "interpretation": "Source inventory only. Form completion, processing and shipment dates are not clinical result availability. Reported genotyping outcomes do not certify the frozen WXS panel's callability. No source rows are merged into frozen model inputs.",
+  "missing_evidence": [
+    "Source-reviewed linkage of pathology and genomic report availability to the prediction episode",
+    "Case/gene assay quality and callability for the frozen mutation panel"
+  ],
+  "manifest_sha256": "06d86f227f898cc7800f5f77b0d1c43b2cd058d1b8c9f335f1c9493f7233fb79"
+}

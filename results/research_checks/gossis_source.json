@@ -1,0 +1,89 @@
+{
+  "publisher_repository": "https://github.com/MIT-LCP/gossis",
+  "pinned_revision": "95b69b99620d322b088262a41cd8098a1aed2f3e",
+  "files": [
+    {
+      "path": "README.md",
+      "url": "https://raw.githubusercontent.com/MIT-LCP/gossis/95b69b99620d322b088262a41cd8098a1aed2f3e/README.md",
+      "bytes": 814,
+      "git_blob": "6f5776099cd5d9f990c5f0ea85416ddbfcd55090",
+      "sha256": "bafada2075f676a06c3b6f20bb9432596675bd470b191983b4a26d84e7df9f72"
+    },
+    {
+      "path": "eicu/sql/data.sql",
+      "url": "https://raw.githubusercontent.com/MIT-LCP/gossis/95b69b99620d322b088262a41cd8098a1aed2f3e/eicu/sql/data.sql",
+      "bytes": 16202,
+      "git_blob": "cd9d00100eb7819f941554e374660f56e6caed6b",
+      "sha256": "c428cf05b8bb7b9bb22aa2e3829eabaff73e6f664917118df3dd90e4e794ecd0"
+    },
+    {
+      "path": "eicu/sql/lab.sql",
+      "url": "https://raw.githubusercontent.com/MIT-LCP/gossis/95b69b99620d322b088262a41cd8098a1aed2f3e/eicu/sql/lab.sql",
+      "bytes": 4142,
+      "git_blob": "f2574616a53379598c531fdc04042648a84ad7cb",
+      "sha256": "c43adb69b097282eb31609a54ed21ec6e82f91aba9e3df776a2eff4676027bf7"
+    },
+    {
+      "path": "eicu/sql/lab-d1.sql",
+      "url": "https://raw.githubusercontent.com/MIT-LCP/gossis/95b69b99620d322b088262a41cd8098a1aed2f3e/eicu/sql/lab-d1.sql",
+      "bytes": 1236,
+      "git_blob": "02fe46781ff8d5cfd0025ec58c6b7be6e2883ec1",
+      "sha256": "b736a6b3c29a85754c327f3e24c94d176e9d2b428e10719e27c218917e08115a"
+    },
+    {
+      "path": "eicu/load-data.ipynb",
+      "url": "https://raw.githubusercontent.com/MIT-LCP/gossis/95b69b99620d322b088262a41cd8098a1aed2f3e/eicu/load-data.ipynb",
+      "bytes": 10299,
+      "git_blob": "3ad74f791836f8c8ae9c9d1fc7884679dcacd31c",
+      "sha256": "a36e775d2cc188228196009c41337e6b6705a4976e5502bfb517f5f8c60a2327"
+    },
+    {
+      "path": "merge-data.ipynb",
+      "url": "https://raw.githubusercontent.com/MIT-LCP/gossis/95b69b99620d322b088262a41cd8098a1aed2f3e/merge-data.ipynb",
+      "bytes": 8965,
+      "git_blob": "4411112b32dfbbbd78b535d3c38c219187dc7984",
+      "sha256": "71225af597b573e0b02d87d26cd4778929744a675b205168bd8210a7ea018ebd"
+    },
+    {
+      "path": "hdr/variable-definitions.yaml",
+      "url": "https://raw.githubusercontent.com/MIT-LCP/gossis/95b69b99620d322b088262a41cd8098a1aed2f3e/hdr/variable-definitions.yaml",
+      "bytes": 85950,
+      "git_blob": "eeb851b29c5f56f319bbfed468da3a74994914b7",
+      "sha256": "c4353f38ec387e3589bb9a7d2b337ca9994040211f12c536554a9dc292518358"
+    }
+  ],
+  "observations": [
+    {
+      "file": "eicu/sql/data.sql",
+      "lines": [
+        199
+      ],
+      "observation": "The eICU extraction projects aggregated day-one creatinine directly into the named output field."
+    },
+    {
+      "file": "eicu/sql/lab.sql",
+      "lines": [
+        60
+      ],
+      "observation": "The eICU raw-lab filter uses a 0.1 to 28.28 creatinine range, not the micromol-scale example in the dictionary."
+    },
+    {
+      "file": "eicu/sql/data.sql",
+      "lines": [
+        314
+      ],
+      "observation": "The APACHE hospital prediction is cast from the eICU APACHE result table in this extraction."
+    },
+    {
+      "file": "hdr/variable-definitions.yaml",
+      "lines": [
+        1576
+      ],
+      "observation": "The header source retains the micromol/L creatinine definition also found in the downloaded WiDS dictionary."
+    }
+  ],
+  "exact_wids_extraction_revision_verified": false,
+  "creatinine_unit_resolved": false,
+  "apache_score_availability_verified": false,
+  "interpretation": "Publisher extraction code supplies a plausible source lineage and exposes an internal unit-definition conflict. It does not prove that the inspected revision generated the frozen WiDS release, resolve clinical availability, or establish independent cohort identity."
+}

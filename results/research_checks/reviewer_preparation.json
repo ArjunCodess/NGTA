@@ -1,0 +1,17 @@
+{
+  "materials": "fresh private synthetic tasks only",
+  "reviewers_planned": 24,
+  "evaluation_cases": 80,
+  "assignment_rows": 1920,
+  "individual_delivery_folders": 24,
+  "case_and_format_balance_verified": true,
+  "master_and_grading_materials_in_investigator_only": true,
+  "opaque_case_ids": true,
+  "randomized_fault_assignment": true,
+  "secret_seed_not_published": true,
+  "empty_response_rejection_verified": true,
+  "participants_recruited": 0,
+  "human_responses_collected": 0,
+  "human_benefit_established": false,
+  "remaining": "Finalize protocol with appropriate review and obtain real qualified participant responses. No synthetic responses have been used as human evidence."
+}

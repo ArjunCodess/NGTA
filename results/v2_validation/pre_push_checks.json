@@ -1,0 +1,70 @@
+{
+  "unit_tests_passed": 47,
+  "bundles": [
+    {
+      "directory": "results/v2_smoke/tcga",
+      "replay_passed": true,
+      "events": 74,
+      "checkpoint_mc_exact_match": true,
+      "prediction_export_match": true,
+      "split_hash_verified": true,
+      "inference_device": "cuda"
+    },
+    {
+      "directory": "results/v2_multiseed_smoke/seed_0/tcga",
+      "replay_passed": true,
+      "events": 74,
+      "checkpoint_mc_exact_match": true,
+      "prediction_export_match": true,
+      "split_hash_verified": true,
+      "inference_device": "cuda"
+    },
+    {
+      "directory": "results/v2_multiseed_smoke/seed_1/tcga",
+      "replay_passed": true,
+      "events": 74,
+      "checkpoint_mc_exact_match": true,
+      "prediction_export_match": true,
+      "split_hash_verified": true,
+      "inference_device": "cuda"
+    },
+    {
+      "directory": "results/v2_multiseed_smoke/seed_2/tcga",
+      "replay_passed": true,
+      "events": 74,
+      "checkpoint_mc_exact_match": true,
+      "prediction_export_match": true,
+      "split_hash_verified": true,
+      "inference_device": "cuda"
+    },
+    {
+      "directory": "results/v2_multiseed_smoke/seed_3/tcga",
+      "replay_passed": true,
+      "events": 74,
+      "checkpoint_mc_exact_match": true,
+      "prediction_export_match": true,
+      "split_hash_verified": true,
+      "inference_device": "cuda"
+    },
+    {
+      "directory": "results/v2_multiseed_smoke/seed_4/tcga",
+      "replay_passed": true,
+      "events": 74,
+      "checkpoint_mc_exact_match": true,
+      "prediction_export_match": true,
+      "split_hash_verified": true,
+      "inference_device": "cuda"
+    }
+  ],
+  "scope": "implementation checks; smoke runs do not establish clinical performance",
+  "synthetic_wids": {
+    "replay_passed": true,
+    "events": 65
+  },
+  "python_compileall_passed": true,
+  "git_diff_check_passed": true,
+  "source_manifests_verified": [
+    "tcga",
+    "wids"
+  ]
+}

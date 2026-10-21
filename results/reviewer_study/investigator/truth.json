@@ -1,0 +1,512 @@
+{
+  "arm_names": {
+    "structured": "format_a",
+    "trace": "format_b"
+  },
+  "truth": [
+    {
+      "case_id": "case_000",
+      "fault": "extraction",
+      "practice": false,
+      "correction": "use the raw observed value"
+    },
+    {
+      "case_id": "case_001",
+      "fault": "imputation",
+      "practice": false,
+      "correction": "suppress the unobserved trigger"
+    },
+    {
+      "case_id": "case_002",
+      "fault": "rule_version",
+      "practice": false,
+      "correction": "restore the approved rule version"
+    },
+    {
+      "case_id": "case_003",
+      "fault": "none",
+      "practice": false,
+      "correction": "no correction needed"
+    },
+    {
+      "case_id": "case_004",
+      "fault": "extraction",
+      "practice": false,
+      "correction": "use the raw observed value"
+    },
+    {
+      "case_id": "case_005",
+      "fault": "imputation",
+      "practice": false,
+      "correction": "suppress the unobserved trigger"
+    },
+    {
+      "case_id": "case_006",
+      "fault": "rule_version",
+      "practice": false,
+      "correction": "restore the approved rule version"
+    },
+    {
+      "case_id": "case_007",
+      "fault": "none",
+      "practice": false,
+      "correction": "no correction needed"
+    },
+    {
+      "case_id": "case_008",
+      "fault": "extraction",
+      "practice": false,
+      "correction": "use the raw observed value"
+    },
+    {
+      "case_id": "case_009",
+      "fault": "imputation",
+      "practice": false,
+      "correction": "suppress the unobserved trigger"
+    },
+    {
+      "case_id": "case_010",
+      "fault": "rule_version",
+      "practice": false,
+      "correction": "restore the approved rule version"
+    },
+    {
+      "case_id": "case_011",
+      "fault": "none",
+      "practice": false,
+      "correction": "no correction needed"
+    },
+    {
+      "case_id": "case_012",
+      "fault": "extraction",
+      "practice": false,
+      "correction": "use the raw observed value"
+    },
+    {
+      "case_id": "case_013",
+      "fault": "imputation",
+      "practice": false,
+      "correction": "suppress the unobserved trigger"
+    },
+    {
+      "case_id": "case_014",
+      "fault": "rule_version",
+      "practice": false,
+      "correction": "restore the approved rule version"
+    },
+    {
+      "case_id": "case_015",
+      "fault": "none",
+      "practice": false,
+      "correction": "no correction needed"
+    },
+    {
+      "case_id": "case_016",
+      "fault": "extraction",
+      "practice": false,
+      "correction": "use the raw observed value"
+    },
+    {
+      "case_id": "case_017",
+      "fault": "imputation",
+      "practice": false,
+      "correction": "suppress the unobserved trigger"
+    },
+    {
+      "case_id": "case_018",
+      "fault": "rule_version",
+      "practice": false,
+      "correction": "restore the approved rule version"
+    },
+    {
+      "case_id": "case_019",
+      "fault": "none",
+      "practice": false,
+      "correction": "no correction needed"
+    },
+    {
+      "case_id": "case_020",
+      "fault": "extraction",
+      "practice": false,
+      "correction": "use the raw observed value"
+    },
+    {
+      "case_id": "case_021",
+      "fault": "imputation",
+      "practice": false,
+      "correction": "suppress the unobserved trigger"
+    },
+    {
+      "case_id": "case_022",
+      "fault": "rule_version",
+      "practice": false,
+      "correction": "restore the approved rule version"
+    },
+    {
+      "case_id": "case_023",
+      "fault": "none",
+      "practice": false,
+      "correction": "no correction needed"
+    },
+    {
+      "case_id": "case_024",
+      "fault": "extraction",
+      "practice": false,
+      "correction": "use the raw observed value"
+    },
+    {
+      "case_id": "case_025",
+      "fault": "imputation",
+      "practice": false,
+      "correction": "suppress the unobserved trigger"
+    },
+    {
+      "case_id": "case_026",
+      "fault": "rule_version",
+      "practice": false,
+      "correction": "restore the approved rule version"
+    },
+    {
+      "case_id": "case_027",
+      "fault": "none",
+      "practice": false,
+      "correction": "no correction needed"
+    },
+    {
+      "case_id": "case_028",
+      "fault": "extraction",
+      "practice": false,
+      "correction": "use the raw observed value"
+    },
+    {
+      "case_id": "case_029",
+      "fault": "imputation",
+      "practice": false,
+      "correction": "suppress the unobserved trigger"
+    },
+    {
+      "case_id": "case_030",
+      "fault": "rule_version",
+      "practice": false,
+      "correction": "restore the approved rule version"
+    },
+    {
+      "case_id": "case_031",
+      "fault": "none",
+      "practice": false,
+      "correction": "no correction needed"
+    },
+    {
+      "case_id": "case_032",
+      "fault": "extraction",
+      "practice": false,
+      "correction": "use the raw observed value"
+    },
+    {
+      "case_id": "case_033",
+      "fault": "imputation",
+      "practice": false,
+      "correction": "suppress the unobserved trigger"
+    },
+    {
+      "case_id": "case_034",
+      "fault": "rule_version",
+      "practice": false,
+      "correction": "restore the approved rule version"
+    },
+    {
+      "case_id": "case_035",
+      "fault": "none",
+      "practice": false,
+      "correction": "no correction needed"
+    },
+    {
+      "case_id": "case_036",
+      "fault": "extraction",
+      "practice": false,
+      "correction": "use the raw observed value"
+    },
+    {
+      "case_id": "case_037",
+      "fault": "imputation",
+      "practice": false,
+      "correction": "suppress the unobserved trigger"
+    },
+    {
+      "case_id": "case_038",
+      "fault": "rule_version",
+      "practice": false,
+      "correction": "restore the approved rule version"
+    },
+    {
+      "case_id": "case_039",
+      "fault": "none",
+      "practice": false,
+      "correction": "no correction needed"
+    },
+    {
+      "case_id": "case_040",
+      "fault": "extraction",
+      "practice": false,
+      "correction": "use the raw observed value"
+    },
+    {
+      "case_id": "case_041",
+      "fault": "imputation",
+      "practice": false,
+      "correction": "suppress the unobserved trigger"
+    },
+    {
+      "case_id": "case_042",
+      "fault": "rule_version",
+      "practice": false,
+      "correction": "restore the approved rule version"
+    },
+    {
+      "case_id": "case_043",
+      "fault": "none",
+      "practice": false,
+      "correction": "no correction needed"
+    },
+    {
+      "case_id": "case_044",
+      "fault": "extraction",
+      "practice": false,
+      "correction": "use the raw observed value"
+    },
+    {
+      "case_id": "case_045",
+      "fault": "imputation",
+      "practice": false,
+      "correction": "suppress the unobserved trigger"
+    },
+    {
+      "case_id": "case_046",
+      "fault": "rule_version",
+      "practice": false,
+      "correction": "restore the approved rule version"
+    },
+    {
+      "case_id": "case_047",
+      "fault": "none",
+      "practice": false,
+      "correction": "no correction needed"
+    },
+    {
+      "case_id": "case_048",
+      "fault": "extraction",
+      "practice": false,
+      "correction": "use the raw observed value"
+    },
+    {
+      "case_id": "case_049",
+      "fault": "imputation",
+      "practice": false,
+      "correction": "suppress the unobserved trigger"
+    },
+    {
+      "case_id": "case_050",
+      "fault": "rule_version",
+      "practice": false,
+      "correction": "restore the approved rule version"
+    },
+    {
+      "case_id": "case_051",
+      "fault": "none",
+      "practice": false,
+      "correction": "no correction needed"
+    },
+    {
+      "case_id": "case_052",
+      "fault": "extraction",
+      "practice": false,
+      "correction": "use the raw observed value"
+    },
+    {
+      "case_id": "case_053",
+      "fault": "imputation",
+      "practice": false,
+      "correction": "suppress the unobserved trigger"
+    },
+    {
+      "case_id": "case_054",
+      "fault": "rule_version",
+      "practice": false,
+      "correction": "restore the approved rule version"
+    },
+    {
+      "case_id": "case_055",
+      "fault": "none",
+      "practice": false,
+      "correction": "no correction needed"
+    },
+    {
+      "case_id": "case_056",
+      "fault": "extraction",
+      "practice": false,
+      "correction": "use the raw observed value"
+    },
+    {
+      "case_id": "case_057",
+      "fault": "imputation",
+      "practice": false,
+      "correction": "suppress the unobserved trigger"
+    },
+    {
+      "case_id": "case_058",
+      "fault": "rule_version",
+      "practice": false,
+      "correction": "restore the approved rule version"
+    },
+    {
+      "case_id": "case_059",
+      "fault": "none",
+      "practice": false,
+      "correction": "no correction needed"
+    },
+    {
+      "case_id": "case_060",
+      "fault": "extraction",
+      "practice": false,
+      "correction": "use the raw observed value"
+    },
+    {
+      "case_id": "case_061",
+      "fault": "imputation",
+      "practice": false,
+      "correction": "suppress the unobserved trigger"
+    },
+    {
+      "case_id": "case_062",
+      "fault": "rule_version",
+      "practice": false,
+      "correction": "restore the approved rule version"
+    },
+    {
+      "case_id": "case_063",
+      "fault": "none",
+      "practice": false,
+      "correction": "no correction needed"
+    },
+    {
+      "case_id": "case_064",
+      "fault": "extraction",
+      "practice": false,
+      "correction": "use the raw observed value"
+    },
+    {
+      "case_id": "case_065",
+      "fault": "imputation",
+      "practice": false,
+      "correction": "suppress the unobserved trigger"
+    },
+    {
+      "case_id": "case_066",
+      "fault": "rule_version",
+      "practice": false,
+      "correction": "restore the approved rule version"
+    },
+    {
+      "case_id": "case_067",
+      "fault": "none",
+      "practice": false,
+      "correction": "no correction needed"
+    },
+    {
+      "case_id": "case_068",
+      "fault": "extraction",
+      "practice": false,
+      "correction": "use the raw observed value"
+    },
+    {
+      "case_id": "case_069",
+      "fault": "imputation",
+      "practice": false,
+      "correction": "suppress the unobserved trigger"
+    },
+    {
+      "case_id": "case_070",
+      "fault": "rule_version",
+      "practice": false,
+      "correction": "restore the approved rule version"
+    },
+    {
+      "case_id": "case_071",
+      "fault": "none",
+      "practice": false,
+      "correction": "no correction needed"
+    },
+    {
+      "case_id": "case_072",
+      "fault": "extraction",
+      "practice": false,
+      "correction": "use the raw observed value"
+    },
+    {
+      "case_id": "case_073",
+      "fault": "imputation",
+      "practice": false,
+      "correction": "suppress the unobserved trigger"
+    },
+    {
+      "case_id": "case_074",
+      "fault": "rule_version",
+      "practice": false,
+      "correction": "restore the approved rule version"
+    },
+    {
+      "case_id": "case_075",
+      "fault": "none",
+      "practice": false,
+      "correction": "no correction needed"
+    },
+    {
+      "case_id": "case_076",
+      "fault": "extraction",
+      "practice": false,
+      "correction": "use the raw observed value"
+    },
+    {
+      "case_id": "case_077",
+      "fault": "imputation",
+      "practice": false,
+      "correction": "suppress the unobserved trigger"
+    },
+    {
+      "case_id": "case_078",
+      "fault": "rule_version",
+      "practice": false,
+      "correction": "restore the approved rule version"
+    },
+    {
+      "case_id": "case_079",
+      "fault": "none",
+      "practice": false,
+      "correction": "no correction needed"
+    },
+    {
+      "case_id": "practice_80",
+      "fault": "extraction",
+      "practice": true,
+      "correction": "use the raw observed value"
+    },
+    {
+      "case_id": "practice_81",
+      "fault": "imputation",
+      "practice": true,
+      "correction": "suppress the unobserved trigger"
+    },
+    {
+      "case_id": "practice_82",
+      "fault": "rule_version",
+      "practice": true,
+      "correction": "restore the approved rule version"
+    },
+    {
+      "case_id": "practice_83",
+      "fault": "none",
+      "practice": true,
+      "correction": "no correction needed"
+    }
+  ]
+}

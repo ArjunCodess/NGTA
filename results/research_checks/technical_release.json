@@ -1,0 +1,166 @@
+{
+  "verified_utc": "2026-10-20T20:45:02.250669+00:00",
+  "branch": "version-2",
+  "scope": "Original plan 52/72 satisfied; five owner exclusions leave 15 active unresolved. Existing implementation studies plus twenty frozen Nepal changed-endpoint evaluations and the 515-report pathology native-text audit are complete; scientific acceptance and clinical eligibility remain unestablished.",
+  "tests": {
+    "passed": 112,
+    "extracted_source_package_passed": 112,
+    "environment": "same recorded Windows/Python environment; separate source extraction, not a fresh environment or independent scientific evaluation",
+    "cleanup_note": "Three tests of the retired checklist generator were removed with that generator. Model, inference and experiment tests unchanged."
+  },
+  "checkpoint_replay": {
+    "fits": 36,
+    "passes_per_fit": 50,
+    "all_restored": true,
+    "maximum_probability_residual": 0.0
+  },
+  "archive_preservation": {
+    "files": 297,
+    "hashes_verified": true,
+    "removed_paths_untracked": true
+  },
+  "creatinine_rule_off": {
+    "fits": 20,
+    "threshold_changes": 0,
+    "all_brier_intervals_span_zero": true,
+    "unit_conflict_resolved": false,
+    "source": "results/research_checks/creatinine_sensitivity.json"
+  },
+  "recipe": {
+    "fits": 36,
+    "path": "study_recipe.json",
+    "sha256": "0b0f897e6053e406f1b0bb779f86575917ff064b6b1707ca94651773850bfd99",
+    "dry_run_verified": true,
+    "original_output_protection": true
+  },
+  "paper": {
+    "path": "paper/main.pdf",
+    "pages": 13,
+    "undefined_references": false,
+    "overfull_boxes": false,
+    "rendered_and_visually_inspected": true,
+    "historical_results_preserved": "paper/legacy_results.tex",
+    "inspected_updated_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13
+    ],
+    "sha256": "be9f4c64494f5f090e10fea5d6fc53f4918e7c75575e38377550d30d429f9852",
+    "figure_1": {
+      "source": "paper/figures/figure-1.svg",
+      "paper_asset": "paper/figures/figure-1.pdf",
+      "provenance": "paper/figures/figure-1-source.json",
+      "rendered_page_checked": 2,
+      "pages_after_update": 13,
+      "regeneration_preserves_owner_asset": true
+    },
+    "template": "paper/template-source.json",
+    "author": "Arjun Vijay Prakash"
+  },
+  "package": {
+    "command": "python scripts/package_reproducibility.py",
+    "member_integrity_verified": true,
+    "source_only": true,
+    "datasets_and_private_materials_excluded": true,
+    "extracted_tests_passed": true,
+    "tested_candidate_sha256": "c1a6c8ffda2da558d20156f6e98b207b55b5f53b9cd8c81c91832a48cae56b69",
+    "tested_candidate_files": 154,
+    "finalization": "The recorded extracted-package suite refers to the documentation-cleanup candidate. Later Figure 1 and preprint-template changes have focused packaging tests, fresh package integrity verification and rendered PDF checks. Scientific manuscript body unchanged by template migration."
+  },
+  "scientific_checklist": {
+    "completed": 52,
+    "total": 72,
+    "owner_excluded": 5,
+    "active_total": 67,
+    "active_unsatisfied": 15
+  },
+  "deferred": [
+    "callable TCGA panels and clinical/genomic availability",
+    "eligible independent untouched cohort"
+  ],
+  "negative_findings": [
+    "symbolic benefit criterion not met",
+    "general missingness robustness criterion not met",
+    "attention-confidence error intervals span chance"
+  ],
+  "new_model_training": false,
+  "public_xml_audit": {
+    "files": 1554,
+    "cases": 507,
+    "bytes": 65507832,
+    "publisher_checksums_and_case_identity_verified": true,
+    "callability_and_report_availability_verified": false
+  },
+  "private_reviewer_preparation": {
+    "reviewers_planned": 24,
+    "evaluation_cases": 80,
+    "assignments": 1920,
+    "participants_recruited": 0,
+    "responses": 0,
+    "answers_excluded_from_git": true
+  },
+  "source_requests": {
+    "sent": 2,
+    "sent_copies_verified": true,
+    "authoritative_clarification_received": false,
+    "mail_metadata_public": false
+  },
+  "owner_scope_policy": "docs/scope-policy.json",
+  "next_work": "docs/next-work.md",
+  "owner_excluded": [
+    "qualified clinical rule review",
+    "real blinded participant evaluation",
+    "further WiDS source clarification as an execution prerequisite"
+  ],
+  "wids_encoder": {
+    "checkpoints": 20,
+    "passes_per_checkpoint": 50,
+    "new_training": false,
+    "new_data_download": false,
+    "uniform_gate_max_pass_residual": 0.0,
+    "saved_array_brier_max_residual": 0.0,
+    "all_four_family_intervals_include_zero": true,
+    "clinical_benefit_margin_established": false,
+    "report": "results/research_checks/wids_encoder.json"
+  },
+  "continuation_verified_utc": "2026-10-21T02:25:13.428065+00:00",
+  "public_pathology_audit": {
+    "files": 515,
+    "cases": 507,
+    "bytes": 79840335,
+    "all_publisher_checksums_verified": true,
+    "native_text_files": 515,
+    "numeric_date_candidate_reports_reviewed": 5,
+    "molecular_source_queue_reports": 46,
+    "selected_input_availability_verified": false,
+    "whole_gene_negative_calls_derived": 0
+  },
+  "nepal_sensitivity": {
+    "evaluations": 20,
+    "checkpoints_reused": 10,
+    "new_training": false,
+    "adult_admissions": 18111,
+    "icu_deaths": 3316,
+    "independent_persisted_replay_all_passed": true,
+    "maximum_uniform_residual": 1.6433362892698256e-08,
+    "maximum_saved_metric_residual": 1.6431300764452317e-14,
+    "endpoint": "ICU mortality; changed from WiDS hospital mortality",
+    "all_four_family_brier_intervals_below_zero": true,
+    "clinical_benefit_margin_established": false,
+    "independent_clinical_eligibility": false,
+    "private_subgroup_metric_rows": 400,
+    "report": "results/research_checks/nepal_sensitivity.json"
+  },
+  "merge_verification": "results/research_checks/merge_readiness.json",
+  "documentation_cleanup_verified_utc": "2026-10-21T07:48:05.603709+00:00"
+}

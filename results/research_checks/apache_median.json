@@ -1,0 +1,132 @@
+{
+  "left": "results/hospital_study/median_no_apache",
+  "right": "results/hospital_study/median",
+  "dataset": "wids",
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "comparisons": [
+    {
+      "variant": "apache_only_logistic",
+      "brier_left_minus_right": 0.0,
+      "lower_95": 0.0,
+      "upper_95": 0.0,
+      "lower_family_95": 0.0,
+      "upper_family_95": 0.0
+    },
+    {
+      "variant": "apache_raw",
+      "brier_left_minus_right": 0.0,
+      "lower_95": 0.0,
+      "upper_95": 0.0,
+      "lower_family_95": 0.0,
+      "upper_family_95": 0.0
+    },
+    {
+      "variant": "apache_recalibrated",
+      "brier_left_minus_right": 0.0,
+      "lower_95": 0.0,
+      "upper_95": 0.0,
+      "lower_family_95": 0.0,
+      "upper_family_95": 0.0
+    },
+    {
+      "variant": "baseline",
+      "brier_left_minus_right": 0.004881922615557409,
+      "lower_95": 0.003160201709597108,
+      "upper_95": 0.006943036208931841,
+      "lower_family_95": 0.0025558460307198386,
+      "upper_family_95": 0.00802984464807993
+    },
+    {
+      "variant": "calibrated_logistic_regression",
+      "brier_left_minus_right": 0.006055405980819452,
+      "lower_95": 0.003919250035139771,
+      "upper_95": 0.008568801527126003,
+      "lower_family_95": 0.003272988202143223,
+      "upper_family_95": 0.009624264009353558
+    },
+    {
+      "variant": "deterministic",
+      "brier_left_minus_right": 0.004917787853628397,
+      "lower_95": 0.0031341789290308952,
+      "upper_95": 0.007014840841293335,
+      "lower_family_95": 0.002503546653315425,
+      "upper_family_95": 0.0077892085537314415
+    },
+    {
+      "variant": "extra_trees",
+      "brier_left_minus_right": 0.005249482567204608,
+      "lower_95": 0.0031661755707652517,
+      "upper_95": 0.00773648890991667,
+      "lower_family_95": 0.0025420803303422353,
+      "upper_family_95": 0.008943692271995292
+    },
+    {
+      "variant": "flat_confidence",
+      "brier_left_minus_right": 0.004881922609269232,
+      "lower_95": 0.0031058093411397794,
+      "upper_95": 0.0069785518433784595,
+      "lower_family_95": 0.002491943800899948,
+      "upper_family_95": 0.007831045682762348
+    },
+    {
+      "variant": "hist_gradient_boosting",
+      "brier_left_minus_right": 0.0047663789053329795,
+      "lower_95": 0.0028310850912493584,
+      "upper_95": 0.007261744355791516,
+      "lower_family_95": 0.0021969015302562575,
+      "upper_family_95": 0.008277808662571075
+    },
+    {
+      "variant": "mc_confidence_only",
+      "brier_left_minus_right": 0.004892967779878253,
+      "lower_95": 0.003110071199448015,
+      "upper_95": 0.0069302433787477025,
+      "lower_family_95": 0.002577041794038534,
+      "upper_family_95": 0.007878350408905672
+    },
+    {
+      "variant": "mean_logit",
+      "brier_left_minus_right": 0.004890777274106388,
+      "lower_95": 0.0031403825407429827,
+      "upper_95": 0.006933795546336872,
+      "lower_family_95": 0.0024254856859493874,
+      "upper_family_95": 0.00788334126442123
+    },
+    {
+      "variant": "nars_gated",
+      "brier_left_minus_right": 0.0048931883005905496,
+      "lower_95": 0.003243805153064868,
+      "upper_95": 0.007022675641600281,
+      "lower_family_95": 0.0024253236219060528,
+      "upper_family_95": 0.007824977212927454
+    },
+    {
+      "variant": "random_forest",
+      "brier_left_minus_right": 0.004852904833040422,
+      "lower_95": 0.003000058954407639,
+      "upper_95": 0.007019600208712331,
+      "lower_family_95": 0.0023372183496285716,
+      "upper_family_95": 0.007913236493937045
+    },
+    {
+      "variant": "transformer_recalibrated",
+      "brier_left_minus_right": 0.004915586262463796,
+      "lower_95": 0.0030853211883956687,
+      "upper_95": 0.007104090081828921,
+      "lower_family_95": 0.0025911078935962513,
+      "upper_family_95": 0.007941689346533116
+    }
+  ],
+  "bootstrap_units": [
+    "training_seed",
+    "hospital"
+  ],
+  "bootstrap_iterations": 1000,
+  "scope": "paired development conditions on one fixed split; not prospective confirmation"
+}

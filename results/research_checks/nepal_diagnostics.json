@@ -1,0 +1,736 @@
+{
+  "evaluation_report_sha256": "51c0909ec560c554588236abaf0756641873244e7a10572a04a40aad87019887",
+  "evaluations": 20,
+  "private_subgroup_metric_rows": 400,
+  "fixed_age_cutoff": 65,
+  "fixed_thresholds": [
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.5
+  ],
+  "interpretation": "Additional descriptive diagnostics using pre-existing NGTA strata/thresholds, not a separately preregistered clinical analysis. Small-stratum results remain private. No protected-group safety, clinical threshold validation or hospital-mortality compatibility is claimed.",
+  "mean_over_five_seeds": [
+    {
+      "scenario": "admission_core",
+      "imputation": "knn",
+      "variant": "baseline",
+      "threshold": 0.05,
+      "net_benefit": 0.051624339962046906,
+      "treat_all": 0.1400980503270766,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "knn",
+      "variant": "baseline",
+      "threshold": 0.1,
+      "net_benefit": 0.015888441033380572,
+      "treat_all": 0.09232571978969197,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "knn",
+      "variant": "baseline",
+      "threshold": 0.2,
+      "net_benefit": 0.0032880569819446746,
+      "treat_all": -0.02113356523659654,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "knn",
+      "variant": "baseline",
+      "threshold": 0.3,
+      "net_benefit": 0.001028577738864305,
+      "treat_all": -0.1670097888418246,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "knn",
+      "variant": "baseline",
+      "threshold": 0.5,
+      "net_benefit": 0.0001325161504058307,
+      "treat_all": -0.6338137043785546,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "knn",
+      "variant": "flat_confidence",
+      "threshold": 0.05,
+      "net_benefit": 0.051624339962046906,
+      "treat_all": 0.1400980503270766,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "knn",
+      "variant": "flat_confidence",
+      "threshold": 0.1,
+      "net_benefit": 0.015888441033380572,
+      "treat_all": 0.09232571978969197,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "knn",
+      "variant": "flat_confidence",
+      "threshold": 0.2,
+      "net_benefit": 0.0032880569819446746,
+      "treat_all": -0.02113356523659654,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "knn",
+      "variant": "flat_confidence",
+      "threshold": 0.3,
+      "net_benefit": 0.001028577738864305,
+      "treat_all": -0.1670097888418246,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "knn",
+      "variant": "flat_confidence",
+      "threshold": 0.5,
+      "net_benefit": 0.0001325161504058307,
+      "treat_all": -0.6338137043785546,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "knn",
+      "variant": "mc_confidence_only",
+      "threshold": 0.05,
+      "net_benefit": 0.051599929092235305,
+      "treat_all": 0.1400980503270766,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "knn",
+      "variant": "mc_confidence_only",
+      "threshold": 0.1,
+      "net_benefit": 0.015868809011098224,
+      "treat_all": 0.09232571978969197,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "knn",
+      "variant": "mc_confidence_only",
+      "threshold": 0.2,
+      "net_benefit": 0.00328529622881122,
+      "treat_all": -0.02113356523659654,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "knn",
+      "variant": "mc_confidence_only",
+      "threshold": 0.3,
+      "net_benefit": 0.0010064917137966665,
+      "treat_all": -0.1670097888418246,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "knn",
+      "variant": "mc_confidence_only",
+      "threshold": 0.5,
+      "net_benefit": 0.0001325161504058307,
+      "treat_all": -0.6338137043785546,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "knn",
+      "variant": "nars_gated",
+      "threshold": 0.05,
+      "net_benefit": 0.05159934788104932,
+      "treat_all": 0.1400980503270766,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "knn",
+      "variant": "nars_gated",
+      "threshold": 0.1,
+      "net_benefit": 0.015877398020846752,
+      "treat_all": 0.09232571978969197,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "knn",
+      "variant": "nars_gated",
+      "threshold": 0.2,
+      "net_benefit": 0.00328529622881122,
+      "treat_all": -0.02113356523659654,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "knn",
+      "variant": "nars_gated",
+      "threshold": 0.3,
+      "net_benefit": 0.0010064917137966665,
+      "treat_all": -0.1670097888418246,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "knn",
+      "variant": "nars_gated",
+      "threshold": 0.5,
+      "net_benefit": 0.0001325161504058307,
+      "treat_all": -0.6338137043785546,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "median",
+      "variant": "baseline",
+      "threshold": 0.05,
+      "net_benefit": 0.0299265639666501,
+      "treat_all": 0.1400980503270766,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "median",
+      "variant": "baseline",
+      "threshold": 0.1,
+      "net_benefit": 0.002309216620960865,
+      "treat_all": 0.09232571978969197,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "median",
+      "variant": "baseline",
+      "threshold": 0.2,
+      "net_benefit": 0.00042791673568549503,
+      "treat_all": -0.02113356523659654,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "median",
+      "variant": "baseline",
+      "threshold": 0.3,
+      "net_benefit": 0.00014671430937788398,
+      "treat_all": -0.1670097888418246,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "median",
+      "variant": "baseline",
+      "threshold": 0.5,
+      "net_benefit": 4.41720501352769e-05,
+      "treat_all": -0.6338137043785546,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "median",
+      "variant": "flat_confidence",
+      "threshold": 0.05,
+      "net_benefit": 0.0299265639666501,
+      "treat_all": 0.1400980503270766,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "median",
+      "variant": "flat_confidence",
+      "threshold": 0.1,
+      "net_benefit": 0.002309216620960865,
+      "treat_all": 0.09232571978969197,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "median",
+      "variant": "flat_confidence",
+      "threshold": 0.2,
+      "net_benefit": 0.00042791673568549503,
+      "treat_all": -0.02113356523659654,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "median",
+      "variant": "flat_confidence",
+      "threshold": 0.3,
+      "net_benefit": 0.00014671430937788398,
+      "treat_all": -0.1670097888418246,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "median",
+      "variant": "flat_confidence",
+      "threshold": 0.5,
+      "net_benefit": 4.41720501352769e-05,
+      "treat_all": -0.6338137043785546,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "median",
+      "variant": "mc_confidence_only",
+      "threshold": 0.05,
+      "net_benefit": 0.03004106257029023,
+      "treat_all": 0.1400980503270766,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "median",
+      "variant": "mc_confidence_only",
+      "threshold": 0.1,
+      "net_benefit": 0.0022957196056417528,
+      "treat_all": 0.09232571978969197,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "median",
+      "variant": "mc_confidence_only",
+      "threshold": 0.2,
+      "net_benefit": 0.00042791673568549503,
+      "treat_all": -0.02113356523659654,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "median",
+      "variant": "mc_confidence_only",
+      "threshold": 0.3,
+      "net_benefit": 0.00014671430937788398,
+      "treat_all": -0.1670097888418246,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "median",
+      "variant": "mc_confidence_only",
+      "threshold": 0.5,
+      "net_benefit": 4.41720501352769e-05,
+      "treat_all": -0.6338137043785546,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "median",
+      "variant": "nars_gated",
+      "threshold": 0.05,
+      "net_benefit": 0.030039318936732257,
+      "treat_all": 0.1400980503270766,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "median",
+      "variant": "nars_gated",
+      "threshold": 0.1,
+      "net_benefit": 0.0022957196056417528,
+      "treat_all": 0.09232571978969197,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "median",
+      "variant": "nars_gated",
+      "threshold": 0.2,
+      "net_benefit": 0.00042791673568549503,
+      "treat_all": -0.02113356523659654,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "median",
+      "variant": "nars_gated",
+      "threshold": 0.3,
+      "net_benefit": 0.00014671430937788398,
+      "treat_all": -0.1670097888418246,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "admission_core",
+      "imputation": "median",
+      "variant": "nars_gated",
+      "threshold": 0.5,
+      "net_benefit": 4.41720501352769e-05,
+      "treat_all": -0.6338137043785546,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "knn",
+      "variant": "baseline",
+      "threshold": 0.05,
+      "net_benefit": 0.07598987530114006,
+      "treat_all": 0.1400980503270766,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "knn",
+      "variant": "baseline",
+      "threshold": 0.1,
+      "net_benefit": 0.020046748753059833,
+      "treat_all": 0.09232571978969197,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "knn",
+      "variant": "baseline",
+      "threshold": 0.2,
+      "net_benefit": 0.001570868532935785,
+      "treat_all": -0.02113356523659654,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "knn",
+      "variant": "baseline",
+      "threshold": 0.3,
+      "net_benefit": -0.0006625807520291535,
+      "treat_all": -0.1670097888418246,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "knn",
+      "variant": "baseline",
+      "threshold": 0.5,
+      "net_benefit": -0.0011043012533819227,
+      "treat_all": -0.6338137043785546,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "knn",
+      "variant": "flat_confidence",
+      "threshold": 0.05,
+      "net_benefit": 0.07598987530114006,
+      "treat_all": 0.1400980503270766,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "knn",
+      "variant": "flat_confidence",
+      "threshold": 0.1,
+      "net_benefit": 0.020046748753059833,
+      "treat_all": 0.09232571978969197,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "knn",
+      "variant": "flat_confidence",
+      "threshold": 0.2,
+      "net_benefit": 0.001570868532935785,
+      "treat_all": -0.02113356523659654,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "knn",
+      "variant": "flat_confidence",
+      "threshold": 0.3,
+      "net_benefit": -0.0006625807520291535,
+      "treat_all": -0.1670097888418246,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "knn",
+      "variant": "flat_confidence",
+      "threshold": 0.5,
+      "net_benefit": -0.0011043012533819227,
+      "treat_all": -0.6338137043785546,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "knn",
+      "variant": "mc_confidence_only",
+      "threshold": 0.05,
+      "net_benefit": 0.07598522561165212,
+      "treat_all": 0.1400980503270766,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "knn",
+      "variant": "mc_confidence_only",
+      "threshold": 0.1,
+      "net_benefit": 0.019932637623543702,
+      "treat_all": 0.09232571978969197,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "knn",
+      "variant": "mc_confidence_only",
+      "threshold": 0.2,
+      "net_benefit": 0.001579150792336149,
+      "treat_all": -0.02113356523659654,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "knn",
+      "variant": "mc_confidence_only",
+      "threshold": 0.3,
+      "net_benefit": -0.0006625807520291535,
+      "treat_all": -0.1670097888418246,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "knn",
+      "variant": "mc_confidence_only",
+      "threshold": 0.5,
+      "net_benefit": -0.0011043012533819227,
+      "treat_all": -0.6338137043785546,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "knn",
+      "variant": "nars_gated",
+      "threshold": 0.05,
+      "net_benefit": 0.07598522561165212,
+      "treat_all": 0.1400980503270766,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "knn",
+      "variant": "nars_gated",
+      "threshold": 0.1,
+      "net_benefit": 0.019932637623543702,
+      "treat_all": 0.09232571978969197,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "knn",
+      "variant": "nars_gated",
+      "threshold": 0.2,
+      "net_benefit": 0.001579150792336149,
+      "treat_all": -0.02113356523659654,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "knn",
+      "variant": "nars_gated",
+      "threshold": 0.3,
+      "net_benefit": -0.0006625807520291535,
+      "treat_all": -0.1670097888418246,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "knn",
+      "variant": "nars_gated",
+      "threshold": 0.5,
+      "net_benefit": -0.0011043012533819227,
+      "treat_all": -0.6338137043785546,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "median",
+      "variant": "baseline",
+      "threshold": 0.05,
+      "net_benefit": 0.026904265799499578,
+      "treat_all": 0.1400980503270766,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "median",
+      "variant": "baseline",
+      "threshold": 0.1,
+      "net_benefit": 0.0,
+      "treat_all": 0.09232571978969197,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "median",
+      "variant": "baseline",
+      "threshold": 0.2,
+      "net_benefit": 0.0,
+      "treat_all": -0.02113356523659654,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "median",
+      "variant": "baseline",
+      "threshold": 0.3,
+      "net_benefit": 0.0,
+      "treat_all": -0.1670097888418246,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "median",
+      "variant": "baseline",
+      "threshold": 0.5,
+      "net_benefit": 0.0,
+      "treat_all": -0.6338137043785546,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "median",
+      "variant": "flat_confidence",
+      "threshold": 0.05,
+      "net_benefit": 0.026904265799499578,
+      "treat_all": 0.1400980503270766,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "median",
+      "variant": "flat_confidence",
+      "threshold": 0.1,
+      "net_benefit": 0.0,
+      "treat_all": 0.09232571978969197,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "median",
+      "variant": "flat_confidence",
+      "threshold": 0.2,
+      "net_benefit": 0.0,
+      "treat_all": -0.02113356523659654,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "median",
+      "variant": "flat_confidence",
+      "threshold": 0.3,
+      "net_benefit": 0.0,
+      "treat_all": -0.1670097888418246,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "median",
+      "variant": "flat_confidence",
+      "threshold": 0.5,
+      "net_benefit": 0.0,
+      "treat_all": -0.6338137043785546,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "median",
+      "variant": "mc_confidence_only",
+      "threshold": 0.05,
+      "net_benefit": 0.027130356950849876,
+      "treat_all": 0.1400980503270766,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "median",
+      "variant": "mc_confidence_only",
+      "threshold": 0.1,
+      "net_benefit": 0.0,
+      "treat_all": 0.09232571978969197,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "median",
+      "variant": "mc_confidence_only",
+      "threshold": 0.2,
+      "net_benefit": 0.0,
+      "treat_all": -0.02113356523659654,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "median",
+      "variant": "mc_confidence_only",
+      "threshold": 0.3,
+      "net_benefit": 0.0,
+      "treat_all": -0.1670097888418246,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "median",
+      "variant": "mc_confidence_only",
+      "threshold": 0.5,
+      "net_benefit": 0.0,
+      "treat_all": -0.6338137043785546,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "median",
+      "variant": "nars_gated",
+      "threshold": 0.05,
+      "net_benefit": 0.027130356950849876,
+      "treat_all": 0.1400980503270766,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "median",
+      "variant": "nars_gated",
+      "threshold": 0.1,
+      "net_benefit": 0.0,
+      "treat_all": 0.09232571978969197,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "median",
+      "variant": "nars_gated",
+      "threshold": 0.2,
+      "net_benefit": 0.0,
+      "treat_all": -0.02113356523659654,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "median",
+      "variant": "nars_gated",
+      "threshold": 0.3,
+      "net_benefit": 0.0,
+      "treat_all": -0.1670097888418246,
+      "treat_none": 0.0
+    },
+    {
+      "scenario": "demographics",
+      "imputation": "median",
+      "variant": "nars_gated",
+      "threshold": 0.5,
+      "net_benefit": 0.0,
+      "treat_all": -0.6338137043785546,
+      "treat_none": 0.0
+    }
+  ]
+}

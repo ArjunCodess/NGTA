@@ -1,0 +1,29 @@
+{
+  "reviewers": 24,
+  "evaluation_cases": 80,
+  "simulations": 2000,
+  "seed": 0,
+  "baseline": "logistic intercept .4 plus crossed random intercepts",
+  "alternative": "10 percentage-point probability improvement, capped at 1",
+  "method": "crossed-cluster normal approximation; confirm design before recruitment",
+  "sensitivity": [
+    {
+      "reviewer_logit_sd": 0.25,
+      "case_logit_sd": 0.25,
+      "superiority_power": 0.9955,
+      "superiority_and_observed_10pp_power": 0.499
+    },
+    {
+      "reviewer_logit_sd": 0.5,
+      "case_logit_sd": 0.5,
+      "superiority_power": 0.9965,
+      "superiority_and_observed_10pp_power": 0.5025
+    },
+    {
+      "reviewer_logit_sd": 1.0,
+      "case_logit_sd": 1.0,
+      "superiority_power": 0.9975,
+      "superiority_and_observed_10pp_power": 0.4135
+    }
+  ]
+}

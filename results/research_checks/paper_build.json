@@ -1,0 +1,11 @@
+{
+  "compiler": "miktex 25.12",
+  "exit_code": 0,
+  "pdf_exists": true,
+  "pdf": "paper/main.pdf",
+  "pages": 13,
+  "rendered_and_reviewed": true,
+  "undefined_references": false,
+  "overfull_boxes": false,
+  "pdf_sha256": "8ceb2f4e153cb543939b575877e32b1d8e450f60b56a636be1495f68c4d7560f"
+}

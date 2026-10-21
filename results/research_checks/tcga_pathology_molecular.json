@@ -1,0 +1,14 @@
+{
+  "inventory_sha256": "34679516962f834396672c250c345b49e4eb30e622348879430499052e667192",
+  "queued_reports": 46,
+  "private_queue_sha256": "562ab61e58d9ce7d9a9671d9aaf813872dd2465a4c36221536587ad3cadc90ed",
+  "candidate_flags": {
+    "hotspot_or_codon_mentions": 22,
+    "pending_test_mentions": 8,
+    "indeterminate_mentions": 4,
+    "prior_specimen_mentions": 7
+  },
+  "verified_whole_gene_negative_calls_derived": 0,
+  "assay_manifest_modified": false,
+  "interpretation": "Keyword scope flags are a review queue, not specimen-linked assay results. Hotspot-only, pending, indeterminate and prior-specimen text cannot establish full selected-panel negative callability. Native extraction and literature mentions can be misleading. No mutation status or availability date is inferred."
+}

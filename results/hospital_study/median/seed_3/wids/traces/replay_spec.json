@@ -1,0 +1,89 @@
+{
+  "schema_version": 2,
+  "dataset": "wids",
+  "gamma": 2.0,
+  "feature_names": [
+    "age",
+    "bmi",
+    "d1_heartrate_max",
+    "d1_sysbp_min",
+    "d1_temp_max",
+    "d1_lactate_max",
+    "d1_bun_max",
+    "d1_creatinine_max",
+    "d1_glucose_max",
+    "d1_wbc_max",
+    "d1_spo2_min",
+    "d1_platelets_min",
+    "apache_4a_hospital_death_prob",
+    "elective_surgery",
+    "gender_F",
+    "gender_M"
+  ],
+  "id_column": "encounter_id",
+  "rules": {
+    "rule_lactate": {
+      "condition": "maximum day-1 lactate >= 4.0 mmol/L",
+      "description": "Elevated lactate supplies prototype evidence of metabolic stress.",
+      "clinical_interpretation": "The rule increases support for the lactate feature without diagnosing shock or determining mortality.",
+      "source_column": "d1_lactate_max",
+      "target_key": "d1_lactate_max",
+      "truth_value": {
+        "frequency": 0.85,
+        "confidence": 0.8
+      },
+      "source": "Prototype lactate probe at 4 mmol/L, a historical severe-sepsis screen. Not a Surviving Sepsis treatment instruction.",
+      "provenance": "ngta.rule.wids.lactate.v1",
+      "expert_review": "not_reviewed",
+      "contradiction_group": "lactate_at_least_4"
+    },
+    "rule_hypotension": {
+      "condition": "minimum day-1 systolic blood pressure <= 90 mmHg",
+      "description": "Low systolic blood pressure supplies prototype evidence of hemodynamic instability.",
+      "clinical_interpretation": "The rule increases support for the blood-pressure feature; it is not a stand-alone mortality decision.",
+      "source_column": "d1_sysbp_min",
+      "target_key": "d1_sysbp_min",
+      "truth_value": {
+        "frequency": 0.75,
+        "confidence": 0.7
+      },
+      "source": "Prototype hypotension screen at a systolic pressure of 90 mmHg. Not an expert-reviewed NGTA rule.",
+      "provenance": "ngta.rule.wids.hypotension.v1",
+      "expert_review": "not_reviewed",
+      "contradiction_group": "systolic_at_most_90"
+    },
+    "rule_age": {
+      "condition": "age >= 75 years",
+      "description": "Age of at least 75 years supplies prototype demographic evidence.",
+      "clinical_interpretation": "The rule increases support for the age feature without treating age as sufficient for mortality.",
+      "source_column": "age",
+      "target_key": "age",
+      "truth_value": {
+        "frequency": 0.65,
+        "confidence": 0.6
+      },
+      "source": "Prototype age stratum at 75 years. Not a treatment threshold.",
+      "provenance": "ngta.rule.wids.age.v1",
+      "expert_review": "not_reviewed",
+      "contradiction_group": "age_at_least_75"
+    },
+    "rule_creatinine": {
+      "condition": "maximum day-1 creatinine >= 2.0 mg/dL",
+      "description": "Elevated creatinine supplies prototype evidence of renal dysfunction.",
+      "clinical_interpretation": "The rule increases support for the creatinine feature without diagnosing kidney injury or determining mortality.",
+      "source_column": "d1_creatinine_max",
+      "target_key": "d1_creatinine_max",
+      "truth_value": {
+        "frequency": 0.7,
+        "confidence": 0.65
+      },
+      "source": "Prototype creatinine flag at 2.0 mg/dL. This is not a KDIGO acute-kidney-injury definition.",
+      "provenance": "ngta.rule.wids.creatinine.v1",
+      "expert_review": "not_reviewed",
+      "contradiction_group": "creatinine_at_least_2"
+    }
+  },
+  "rule_input_policy": "observed_only",
+  "aggregation": "mean_per_pass_probability",
+  "evidential_independence": "not established; neural and symbolic paths share clinical inputs"
+}

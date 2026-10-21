@@ -15,8 +15,6 @@ from torch.utils.data import DataLoader, Dataset
 
 from .gdc_downloader import ensure_tcga_thca_maf
 
-pd.set_option("future.no_silent_downcasting", True)
-
 DEFAULT_TARGET_COLUMN = "diagnoses.ajcc_pathologic_n"
 DEFAULT_ID_COLUMN = "case_submitter_id"
 DEFAULT_NUMERIC_COLUMNS = (
@@ -158,8 +156,14 @@ class TabularPreprocessor:
             raise ValueError(f"Missing required columns: {missing_columns}")
 
         feature_columns = self.numeric_columns + self.binary_columns + self.categorical_columns
+        self.dropped_missing_columns = [
+            column for column in feature_columns
+            if not column.startswith(GENOMIC_FEATURE_PREFIX) and frame[column].isna().mean() > 0.70
+        ]
+        self.numeric_columns = [c for c in self.numeric_columns if c not in self.dropped_missing_columns]
+        self.categorical_columns = [c for c in self.categorical_columns if c not in self.dropped_missing_columns]
         self.dropped_constant_columns = [
-            column for column in feature_columns if frame[column].nunique(dropna=False) <= 1
+            column for column in feature_columns if frame[column].nunique(dropna=False) <= 1 and not column.startswith(GENOMIC_FEATURE_PREFIX)
         ]
         self.numeric_columns = [
             column for column in self.numeric_columns if column not in self.dropped_constant_columns
@@ -175,23 +179,30 @@ class TabularPreprocessor:
         categorical_frame = frame[self.categorical_columns].astype("object")
 
         self.numeric_imputer = KNNImputer(n_neighbors=5)
-        numeric_imputed = self.numeric_imputer.fit_transform(numeric_frame)
+        self.distance_scaler = StandardScaler()
+        if self.numeric_columns:
+            numeric_scaled = self.distance_scaler.fit_transform(numeric_frame)
+            numeric_imputed = self.numeric_imputer.fit_transform(numeric_scaled)
+        else:
+            numeric_imputed = np.empty((len(frame), 0))
         self.scaler = StandardScaler()
-        self.scaler.fit(numeric_imputed)
+        if self.numeric_columns:
+            self.scaler.fit(numeric_imputed)
 
         self.categorical_imputer = SimpleImputer(strategy="most_frequent")
-        categorical_imputed = self.categorical_imputer.fit_transform(categorical_frame)
+        categorical_imputed = self.categorical_imputer.fit_transform(categorical_frame) if self.categorical_columns else np.empty((len(frame), 0))
         try:
             self.encoder = OneHotEncoder(handle_unknown="ignore", sparse_output=False)
         except TypeError:
             self.encoder = OneHotEncoder(handle_unknown="ignore", sparse=False)
-        self.encoder.fit(categorical_imputed)
+        if self.categorical_columns:
+            self.encoder.fit(categorical_imputed)
 
         numeric_feature_names = list(self.numeric_columns)
         categorical_feature_names = list(
-            self.encoder.get_feature_names_out(self.categorical_columns)
+            self.encoder.get_feature_names_out(self.categorical_columns) if self.categorical_columns else []
         )
-        self.output_feature_names_ = numeric_feature_names + list(self.binary_columns) + categorical_feature_names
+        self.output_feature_names_ = numeric_feature_names + list(self.binary_columns) + categorical_feature_names + [f"missing__{c}" for c in self.binary_columns if c.startswith(GENOMIC_FEATURE_PREFIX)]
         return self
 
     def transform(self, frame: pd.DataFrame) -> EncodedFrame:
@@ -215,14 +226,17 @@ class TabularPreprocessor:
         )
         categorical_frame = frame[self.categorical_columns].astype("object")
 
-        numeric_transformed = self.scaler.transform(self.numeric_imputer.transform(numeric_frame))
+        numeric_transformed = self.scaler.transform(self.numeric_imputer.transform(self.distance_scaler.transform(numeric_frame))) if self.numeric_columns else np.empty((len(frame), 0))
         categorical_transformed = self.encoder.transform(
             self.categorical_imputer.transform(categorical_frame)
-        )
+        ) if self.categorical_columns else np.empty((len(frame), 0))
         feature_blocks = [numeric_transformed.astype(np.float32)]
         if self.binary_columns:
             feature_blocks.append(binary_frame.to_numpy(dtype=np.float32, copy=True))
         feature_blocks.append(categorical_transformed.astype(np.float32))
+        genomic_columns = [c for c in self.binary_columns if c.startswith(GENOMIC_FEATURE_PREFIX)]
+        if genomic_columns:
+            feature_blocks.append(frame[genomic_columns].isna().to_numpy(dtype=np.float32))
         features = np.concatenate(feature_blocks, axis=1)
 
         return EncodedFrame(features=features, target=target, metadata=metadata)
@@ -288,28 +302,13 @@ def _collapse_case_table(frame: pd.DataFrame, prefer_primary: bool = False) -> p
         if primary_mask.any():
             frame = frame.loc[primary_mask].copy()
 
-    collapsed = frame.groupby(DEFAULT_ID_COLUMN, dropna=False).agg(_first_non_null)
+    # Select one actual record per case. Never construct a synthetic record
+    # from non-null fields belonging to different visits or diagnoses.
+    frame = frame.copy()
+    frame["_completeness"] = frame.notna().sum(axis=1)
+    frame = frame.sort_values("_completeness", ascending=False, kind="stable")
+    return frame.drop_duplicates(DEFAULT_ID_COLUMN).drop(columns="_completeness").reset_index(drop=True)
 
-    if "treatments.treatment_or_therapy" in frame.columns:
-        treatment_flag = frame.groupby(DEFAULT_ID_COLUMN)["treatments.treatment_or_therapy"].agg(
-            lambda series: (
-                "yes"
-                if series.fillna("").astype(str).str.lower().eq("yes").any()
-                else (
-                    "no"
-                    if series.fillna("").astype(str).str.lower().eq("no").any()
-                    else np.nan
-                )
-            )
-        )
-        collapsed = collapsed.join(
-            treatment_flag.rename("derived.any_treatment_or_therapy"),
-            how="left",
-        )
-
-    # Defragment after the wide groupby aggregation so downstream resets/joins do not
-    # emit the pandas fragmentation warning during the TCGA pipeline.
-    return collapsed.copy().reset_index()
 
 
 def _drop_sparse_columns(frame: pd.DataFrame, threshold: float = 0.70) -> tuple[pd.DataFrame, list[str]]:
@@ -333,7 +332,7 @@ def _find_genomic_maf_files(data_dir: Path) -> list[Path]:
 
 def _load_genomic_binary_matrix(
     data_dir: str | Path,
-    max_genes: int = MAX_GENOMIC_GENES,
+    max_genes: int | None = None,
 ) -> tuple[pd.DataFrame, list[str], list[str]]:
     maf_paths = _find_genomic_maf_files(Path(data_dir))
     maf_frames = [pd.read_csv(path, sep="\t", comment="#", low_memory=False) for path in maf_paths]
@@ -352,7 +351,7 @@ def _load_genomic_binary_matrix(
         & maf_frame["case_submitter_id"].notna()
     ].copy()
     top_genes = (
-        filtered["Hugo_Symbol"].value_counts().head(max_genes).index.astype(str).tolist()
+        filtered["Hugo_Symbol"].value_counts().index.astype(str).tolist()
     )
     filtered = filtered.loc[filtered["Hugo_Symbol"].isin(top_genes)].copy()
     filtered["mutated"] = 1
@@ -385,13 +384,32 @@ def load_merged_tcga_frame(data_dir: str | Path) -> tuple[pd.DataFrame, list[str
         collapsed = _collapse_case_table(_read_tcga_table(base_dir / table_name))
         merged = merged.merge(collapsed, on=DEFAULT_ID_COLUMN, how="left", suffixes=("", f"__{table_name}"))
 
-    merged, dropped_columns = _drop_sparse_columns(merged, threshold=0.70)
+    dropped_columns: list[str] = []
     genomic_matrix, genomic_columns, maf_names = _load_genomic_binary_matrix(base_dir)
     merged = merged.merge(genomic_matrix, on=DEFAULT_ID_COLUMN, how="left")
     if genomic_columns:
-        merged[genomic_columns] = (
-            merged[genomic_columns].fillna(0).astype(np.int8)
-        )
+        # A MAF establishes positive variants, not full negative assay coverage.
+        merged[genomic_columns] = merged[genomic_columns].replace(0, np.nan)
+        manifest_path = base_dir / "assay_manifest.csv"
+        if manifest_path.exists():
+            manifest = pd.read_csv(manifest_path, dtype=str)
+            required = {DEFAULT_ID_COLUMN, "gene", "source", "verified"}
+            if not required.issubset(manifest.columns):
+                raise ValueError(f"Assay manifest requires {sorted(required)}")
+            if manifest.duplicated([DEFAULT_ID_COLUMN, "gene"]).any():
+                raise ValueError("Duplicate case/gene assay records")
+            if not manifest["verified"].isin(["true", "false"]).all():
+                raise ValueError("Assay verified must be true or false")
+            verified = manifest.loc[manifest["verified"].eq("true")]
+            if verified["source"].fillna("").str.strip().eq("").any():
+                raise ValueError("Verified assays require source provenance")
+            for gene, rows in verified.groupby("gene"):
+                column = f"{GENOMIC_FEATURE_PREFIX}{gene}"
+                if column not in merged:
+                    merged[column] = np.nan
+                    genomic_columns.append(column)
+                covered = merged[DEFAULT_ID_COLUMN].isin(rows[DEFAULT_ID_COLUMN])
+                merged.loc[covered, column] = merged.loc[covered, column].fillna(0.0)
     return merged, dropped_columns, genomic_columns, maf_names
 
 
@@ -440,8 +458,11 @@ def load_data_bundle(
         seed=seed,
     )
 
+    # Rank genes by training case prevalence only, with stable lexical ties.
+    prevalence = train_frame[genomic_columns].eq(1).sum().sort_index().sort_values(ascending=False, kind="stable")
+    genomic_columns = prevalence.loc[prevalence > 0].head(MAX_GENOMIC_GENES).index.tolist()
     preprocessor = TabularPreprocessor(binary_columns=tuple(genomic_columns)).fit(train_frame)
-    preprocessor.dropped_missing_columns = dropped_missing_columns
+    dropped_missing_columns = preprocessor.dropped_missing_columns
     encoded_train = preprocessor.transform(train_frame)
     encoded_val = preprocessor.transform(val_frame)
     encoded_test = preprocessor.transform(test_frame)
@@ -463,6 +484,14 @@ def load_data_bundle(
         "target_column": DEFAULT_TARGET_COLUMN,
         "id_column": DEFAULT_ID_COLUMN,
         "maf_files": maf_file_names,
+        "prediction_landmark": "retrospective post-pathology association; not preoperative prediction",
+        "record_policy": "one most-complete primary record per source table; cross-table timing unverified",
+        "selection_fit_split": "train",
+        "genomic_coverage": {
+            name: {"cases_with_any_recorded_variant": int(part[genomic_columns].eq(1).any(axis=1).sum()),
+                   "cases_with_complete_panel": int(part[genomic_columns].notna().all(axis=1).sum()) if genomic_columns else 0}
+            for name, part in (("train", train_frame), ("val", val_frame), ("test", test_frame))
+        },
         "numeric_columns": preprocessor.numeric_columns,
         "binary_columns": preprocessor.binary_columns,
         "categorical_columns": preprocessor.categorical_columns,

@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "locked_on": "2026-10-21",
+  "source_sha256": "77eb122ec4db0dfdc27cbb8d805b61bb3817670b5d4610a50bb1780d07a8dd06",
+  "source_doi": "10.6084/m9.figshare.22263847.v1",
+  "study_scope": "cross_task_sensitivity",
+  "clinical_claim_eligible": false,
+  "independence_verified": false,
+  "outcome_definition": "icu_mortality",
+  "development_outcome_definition": "hospital_mortality",
+  "population": "All adult admissions with consistent admission fields and explicit alive/dead ICU status; no selection by predictions or effect sizes.",
+  "grouping": "One physical row per patient_number, after all selected admission fields and discharge status are checked identical including missingness across repeated daily rows. Conflicting identifiers are excluded and reported, not combined field by field.",
+  "predictor_exclusions": [
+    "daily measurements",
+    "length of stay",
+    "discharge destination",
+    "discharge year",
+    "outcomes",
+    "diagnoses or treatments not explicitly mapped"
+  ],
+  "scenarios": [
+    "demographics",
+    "admission_core"
+  ],
+  "demographics": [
+    "age",
+    "gender",
+    "elective_surgery"
+  ],
+  "admission_proxy": [
+    "age",
+    "gender",
+    "elective_surgery",
+    "first heart rate as day-one maximum",
+    "first systolic pressure as day-one minimum"
+  ],
+  "unit_assumptions": {},
+  "unit_evidence_status": "Core dictionary specifies heart rate b/min and systolic pressure mmHg; age years. Temperature is listed Fahrenheit and creatinine micromol/L, but exported predictor scales are mixed and no per-record unit flags are present, so both fields and WBC remain unavailable.",
+  "unavailable_inputs": [
+    "bmi",
+    "temperature",
+    "lactate",
+    "bun",
+    "creatinine",
+    "glucose",
+    "wbc",
+    "spo2",
+    "platelets",
+    "apache_probability"
+  ],
+  "models": "Five median and five KNN frozen no-APACHE WiDS checkpoints; no training or recalibration; gamma and all rules fixed.",
+  "inference": "50 matched MC-dropout draws, seed 0 per checkpoint/scenario; uniform-gate identity and independent persisted replay.",
+  "analysis": "All two scenarios and ten frozen models per scenario reported; paired ICU-outcome Brier and AUROC deltas with conditional admission bootstrap and Bonferroni family intervals across four imputation/scenario contrasts; five-seed mean and SD. No hospital clustering or canonical person grouping possible. No external acceptance or numerical compatibility claim under a changed endpoint.",
+  "primary_contrast": "NARS minus MC-only, exploratory, with no outcome-driven scenario selection.",
+  "claim_boundary": "Changes in endpoint, measurement summaries, missing inputs, assumed units and unverified source independence prevent completion of plan experiment 7. No human or clinical validation.",
+  "amendment": "Before any model evaluation: the obtained CCAA core dictionary and predictor-only scale audit reveal unresolved mixed-unit fields. Replace hypothetical unit mappings with exclusion of temperature, WBC and creatinine. No model performance used in this amendment. ICU status categories have now been inspected for decoding.",
+  "dictionary": {
+    "doi": "10.6084/m9.figshare.15167406.v3",
+    "filename": "CORE Data dictionary_CCAA.xlsx",
+    "file_id": 30847273,
+    "bytes": 65353,
+    "md5": "dd6e25daa116d7a0fd0f7a586b367c51"
+  }
+}

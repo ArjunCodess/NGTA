@@ -1,0 +1,43 @@
+{
+  "verified_utc": "2026-10-20T03:37:25.542997+00:00",
+  "branch": "version-2",
+  "tests": {
+    "command": "venv/Scripts/python.exe -m pytest -q",
+    "passed": 85
+  },
+  "full_study_replay": {
+    "command": "venv/Scripts/python.exe scripts/verify_studies.py",
+    "bundles": 36,
+    "passed": true,
+    "artifact": "results/research_checks/artifact_verification.json"
+  },
+  "local_artifact_preservation": {
+    "command": "venv/Scripts/python.exe scripts/verify_local_artifacts.py",
+    "verified": 297,
+    "passed": true,
+    "all_removed_paths_untracked": true
+  },
+  "public_supplements": {
+    "files": 19,
+    "bytes": 4062798,
+    "inventory": "results/research_checks/tcga_supplements/inventory.json"
+  },
+  "paper": {
+    "pages": 13,
+    "compiler": "MiKTeX latexmk pdflatex",
+    "undefined_references": false,
+    "overfull_boxes": false,
+    "visually_inspected_pages": [
+      10,
+      11,
+      12,
+      13
+    ]
+  },
+  "checklist": {
+    "completed": 52,
+    "total": 72,
+    "changed_criterion": "experiment 6 executed but failed full scientific acceptance"
+  },
+  "new_training": false
+}

@@ -1,0 +1,18 @@
+{
+  "permutations": 100,
+  "brier_gain_over_mc": -5.898612154275895e-11,
+  "minimum_prespecified_brier_gain": 0.0001,
+  "tests": {
+    "brier": {
+      "empirical_p": 0.1485148514851485,
+      "holm_p": 0.297029702970297,
+      "direction": "correct predicates have lower loss than permuted predicates"
+    },
+    "log_loss": {
+      "empirical_p": 0.1485148514851485,
+      "holm_p": 0.297029702970297,
+      "direction": "correct predicates have lower loss than permuted predicates"
+    }
+  },
+  "interpretation": "development diagnostics; confirm on locked hospitals across five seeds"
+}

@@ -1,0 +1,16 @@
+\begin{table}[t]
+\centering\scriptsize
+\caption{Exploratory Nepal ICU-outcome sensitivity of frozen WiDS hospital-mortality models. Five-seed mean ungated AUROC and Brier, followed by NARS-minus-MC Brier with four-comparison Bonferroni intervals resampling admissions and fitted seeds. Units with unresolved export scales are excluded. Changed outcomes and measurement summaries prevent an external compatibility claim.}
+\label{tab:nepal}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}llrrrrr@{}}
+\toprule
+Inputs & Imputer & AUROC & Brier & Difference & Family lower & Family upper \\
+\midrule
+Demographic & median & 0.565 & 0.173 & -3.80e-07 & -8.72e-07 & -7.32e-08 \\
+Demographic & knn & 0.560 & 0.166 & -1.62e-07 & -3.50e-07 & -2.23e-08 \\
+Admission core & median & 0.621 & 0.173 & -1.36e-06 & -2.34e-06 & -5.82e-07 \\
+Admission core & knn & 0.610 & 0.168 & -7.44e-07 & -1.40e-06 & -3.26e-07 \\
+\bottomrule
+\end{tabular}
+\end{table}

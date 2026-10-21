@@ -1,0 +1,17 @@
+{
+  "template": "https://www.overleaf.com/latex/templates/style-and-template-for-preprints-arxiv-bio-arxiv/fxsnsrzpnvwc",
+  "upstream": "https://github.com/kourgeorge/arxiv-style",
+  "commit": "920514696f6e7270cab0558fd97c44515c63b4c4",
+  "files": [
+    {
+      "file": "paper/arxiv.sty",
+      "url": "https://raw.githubusercontent.com/kourgeorge/arxiv-style/920514696f6e7270cab0558fd97c44515c63b4c4/arxiv.sty",
+      "sha256": "5ca551dbda41573265dd8c1e9c983ba9729f7d4070a9f1503dd8c7fd65d1dc46"
+    },
+    {
+      "file": "paper/arxiv-license.txt",
+      "url": "https://raw.githubusercontent.com/kourgeorge/arxiv-style/920514696f6e7270cab0558fd97c44515c63b4c4/License.txt",
+      "sha256": "30341c1894f9f766c1969a808d8e81d46d88108456571f4dc0f1f2937a3f6c84"
+    }
+  ]
+}

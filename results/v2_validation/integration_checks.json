@@ -1,0 +1,139 @@
+{
+  "purpose": "integration validation; two-epoch TCGA and synthetic WiDS runs are not clinical evidence",
+  "unit_tests": {
+    "passed": 34
+  },
+  "tcga": {
+    "schema_version": 2,
+    "passed": true,
+    "artifact_integrity": true,
+    "event_completeness": true,
+    "events": 74,
+    "expected_events": 74,
+    "native_float32_logit_consistency": true,
+    "tolerance": 1e-07,
+    "max_residuals": {
+      "original_probability_passes": 5.800260138855151e-08,
+      "trigger_mask": 0.0,
+      "symbolic_frequency": 0.0,
+      "symbolic_confidence": 0.0,
+      "neural_frequency": 0.0,
+      "neural_confidence": 0.0,
+      "revised_frequency": 3.469446951953614e-18,
+      "revised_confidence": 4.440892098500626e-16,
+      "baseline": 0.0,
+      "flat_confidence": 0.0,
+      "uniform_identity": 7.096975007669926e-09,
+      "mc_confidence_only": 0.0,
+      "nars_gated": 0.0,
+      "attention_after": 8.673617379884035e-18,
+      "event_neural_frequency": 9.974659986866641e-17,
+      "event_neural_confidence": 1.1102230246251565e-16,
+      "event_revised_frequency": 8.847089727481716e-17,
+      "event_revised_confidence": 5.551115123125783e-16,
+      "event_symbolic_frequency": 0,
+      "event_symbolic_confidence": 0,
+      "event_rule_off_probability": 1.1102230246251565e-16,
+      "event_symbolic_delta": 1.1102230246251565e-16
+    }
+  },
+  "five_seed_tcga": {
+    "split_seed": 0,
+    "same_case_partitions": true,
+    "epochs": 2,
+    "models": [
+      {
+        "seed": 0,
+        "split_ids_sha256": "96be81746b992fef6390fc651d7c1bd16a52b6d942212fa4d22ebabaa12e0763",
+        "replay_passed": true,
+        "events": 74,
+        "schema_version": 2
+      },
+      {
+        "seed": 1,
+        "split_ids_sha256": "96be81746b992fef6390fc651d7c1bd16a52b6d942212fa4d22ebabaa12e0763",
+        "replay_passed": true,
+        "events": 74,
+        "schema_version": 2
+      },
+      {
+        "seed": 2,
+        "split_ids_sha256": "96be81746b992fef6390fc651d7c1bd16a52b6d942212fa4d22ebabaa12e0763",
+        "replay_passed": true,
+        "events": 74,
+        "schema_version": 2
+      },
+      {
+        "seed": 3,
+        "split_ids_sha256": "96be81746b992fef6390fc651d7c1bd16a52b6d942212fa4d22ebabaa12e0763",
+        "replay_passed": true,
+        "events": 74,
+        "schema_version": 2
+      },
+      {
+        "seed": 4,
+        "split_ids_sha256": "96be81746b992fef6390fc651d7c1bd16a52b6d942212fa4d22ebabaa12e0763",
+        "replay_passed": true,
+        "events": 74,
+        "schema_version": 2
+      }
+    ]
+  },
+  "synthetic_wids": {
+    "rows": 256,
+    "split_mode": "hospital",
+    "replay": {
+      "schema_version": 2,
+      "passed": true,
+      "artifact_integrity": true,
+      "event_completeness": true,
+      "events": 65,
+      "expected_events": 65,
+      "native_float32_logit_consistency": true,
+      "tolerance": 1e-07,
+      "max_residuals": {
+        "original_probability_passes": 5.683986648019612e-08,
+        "trigger_mask": 0.0,
+        "symbolic_frequency": 0.0,
+        "symbolic_confidence": 1.1102230246251565e-16,
+        "neural_frequency": 0.0,
+        "neural_confidence": 0.0,
+        "revised_frequency": 2.7755575615628914e-17,
+        "revised_confidence": 3.3306690738754696e-16,
+        "baseline": 0.0,
+        "flat_confidence": 0.0,
+        "uniform_identity": 1.5826048249678593e-09,
+        "mc_confidence_only": 0.0,
+        "nars_gated": 1.1102230246251565e-16,
+        "attention_after": 5.551115123125783e-17,
+        "event_neural_frequency": 9.71445146547012e-17,
+        "event_neural_confidence": 1.1102230246251565e-16,
+        "event_revised_frequency": 9.71445146547012e-17,
+        "event_revised_confidence": 4.440892098500626e-16,
+        "event_symbolic_frequency": 0,
+        "event_symbolic_confidence": 0,
+        "event_rule_off_probability": 1.1102230246251565e-16,
+        "event_symbolic_delta": 1.1102230246251565e-16
+      }
+    },
+    "variants": [
+      "random_forest",
+      "extra_trees",
+      "hist_gradient_boosting",
+      "calibrated_logistic_regression",
+      "apache_raw",
+      "apache_only_logistic",
+      "apache_recalibrated",
+      "encoder_mc_confidence",
+      "encoder_nars_confidence",
+      "deterministic",
+      "mean_logit",
+      "baseline",
+      "flat_confidence",
+      "mc_confidence_only",
+      "nars_gated"
+    ],
+    "mask_comparisons": 40,
+    "ensemble_members": 2
+  }
+}
