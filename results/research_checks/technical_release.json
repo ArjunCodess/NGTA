@@ -44,7 +44,8 @@
       10,
       11,
       12
-    ]
+    ],
+    "sha256": "a2e2dffe2ecd1af4a7acc077a086c11475c59ec98fdc195b7d1dfdc6a529f806"
   },
   "package": {
     "command": "python scripts/package_reproducibility.py",
@@ -139,5 +140,6 @@
     "independent_clinical_eligibility": false,
     "private_subgroup_metric_rows": 400,
     "report": "results/research_checks/nepal_sensitivity.json"
-  }
+  },
+  "merge_verification": "results/research_checks/merge_readiness.json"
 }

@@ -1,0 +1,59 @@
+{
+  "checked_utc": "2026-10-21T07:43:53.116409+00:00",
+  "pull_request": "https://github.com/ArjunCodess/NGTA/pull/7",
+  "branch": "version-2",
+  "checked_head_before_documentation_commits": "50c62c3ca8df569d745f438d30232201aaf9044c",
+  "base_ref": "origin/main",
+  "base_commit": "31a0f0897e7bf5ba9aec40961957aab2a73769ee",
+  "github_snapshot": {
+    "mergeable": "MERGEABLE",
+    "merge_state": "CLEAN",
+    "status_checks": [],
+    "note": "No CI checks reported. Recheck latest head/base before merging."
+  },
+  "local_tests": {
+    "command": ".\\venv\\Scripts\\python.exe -m pytest -q",
+    "passed": 115,
+    "seconds": 30.28
+  },
+  "paper": {
+    "pages": 14,
+    "undefined_references": false,
+    "overfull_boxes": false,
+    "visually_checked_pages": [
+      1,
+      10,
+      11,
+      12
+    ],
+    "compile": "MiKTeX latexmk via latex-compile helper; isolated ignored build directory; atomic replacement of final PDF",
+    "initial_compile_issue": "In-place PDF write failed; isolated rebuild succeeded. No failed build is distributed."
+  },
+  "history": {
+    "removed_artifact_paths": 297,
+    "head_history_contains_removed_paths": false,
+    "main_history_contains_removed_paths": false,
+    "simulated_merge_conflicts": false,
+    "simulated_merge_contains_removed_paths": false,
+    "simulated_merge_contains_private_data_roots": false,
+    "neurips_style_inside_paper_only": true
+  },
+  "reviewed_working_file_sha256": {
+    "README.md": "31e1496add8b62163c195aad456870c5642be4caf501051d9dddd935ea4f8acc",
+    "paper/main.tex": "87e1c468afda74d1cf4b6880b99e49324501e19d7bb02a9e24aa2a00b541696c",
+    "paper/main.pdf": "a2e2dffe2ecd1af4a7acc077a086c11475c59ec98fdc195b7d1dfdc6a529f806"
+  },
+  "scientific_scope": {
+    "satisfied": 52,
+    "total": 72,
+    "owner_excluded": 5,
+    "active_unresolved": 15,
+    "clinical_superiority_established": false,
+    "eligible_external_compatibility_established": false
+  },
+  "merge_decision": "Suitable to merge as a research implementation with stated limitations, subject to latest-head/base checks; no clinical deployment or full-plan scientific-completion claim.",
+  "remaining_operational_dependencies": [
+    "Preserve current private fitted artifacts; approved independent backup remains outstanding. Backup is required before deleting or overwriting the only retained copies.",
+    "GitHub support controls old-object purge and storage reclamation; neither is confirmed. Do not push or merge old contaminated history."
+  ]
+}
