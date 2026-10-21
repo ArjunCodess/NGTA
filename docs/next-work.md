@@ -2,13 +2,13 @@
 
 The owner has removed external clinical expert review, the human participant study and further WiDS source clarification from active work. Five checklist entries are excluded without being counted as satisfied. The original criteria remain 52 satisfied out of 72; active scope has 52 satisfied and 15 unresolved entries out of 67. Existing WiDS data are sufficient for the current development work. No stopped download will be resumed.
 
-## 1. Inspect the public TCGA pathology reports
+## 1. Public TCGA pathology acquisition and native-text audit are complete
 
-The GDC API lists 515 open THCA pathology PDFs, totaling 79,840,335 bytes. The [search inventory](../results/research_checks/source_followup.json) pins their UUIDs, publisher sizes/checksums and case associations. Their contents have not yet been inspected in this search. This is an additional public source beyond the completed biotab/XML audits, so chronology should not be declared exhausted before inspecting it.
+All 515 pinned THCA PDFs, totaling 79,840,335 bytes across 507 cases, are acquired and publisher size/MD5 checked. Native text is extracted from every report. [The inventory](../results/research_checks/tcga_pathology.json) records file hashes, extraction coverage and source associations; raw PDFs/text remain in the ignored cache. Reproduce with `python scripts/audit_tcga_pathology.py`.
 
-The next independent task is to check disk space, acquire the PDFs into the ignored cache, extract their text with OCR where needed, and link only explicitly supported episode/report fields to the selected clinical records. Missing, redacted or administrative dates must stay missing. This may narrow the chronology gap; it cannot be assumed to establish availability of every model input.
+All five numeric-date candidate reports were read. One match is a tissue-section range, one is an explicit procurement date, and three are unlabeled annotations. [The candidate review](../results/research_checks/tcga_pathology_date_review.json) pins the reviewed text hashes without publishing date text. Native extraction is not an OCR accuracy or full clinical source review. None of these candidates establishes when the selected clinical/genomic input became available.
 
-The [GDC pipeline documentation](https://docs.gdc.cancer.gov/Data/Bioinformatics_Pipelines/DNA_Seq_Variant_Calling_Pipeline/) explicitly explains that public MAF masking can remove true somatic variants. No searched source establishes a complete case/gene callable panel for the frozen THCA inputs. Keep unavailable genes unknown unless a sourced assay/coverage record establishes otherwise. The source request is already sent; no sequencing download is justified merely to make a checklist green.
+The remaining input is source-reviewed linkage of the selected record/assay to its episode and result-availability timestamp, plus a complete case/gene callable assay panel. Public MAF masking can remove true somatic variants, so missing variant rows remain unknown. The prepared source request has already been sent; no further bulk sequencing download or fabricated negative calls can close this criterion.
 
 ## 2. WiDS development uses the existing data
 

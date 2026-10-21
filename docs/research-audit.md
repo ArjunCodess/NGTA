@@ -176,3 +176,8 @@ The public CC BY 4.0 Nepal 17-ICU release has accessible metadata and a listed 2
 
 
 The owner subsequently supplied the Nepal workbook locally. Its size and MD5 match the publisher and its ZIP CRC check passes. Read-only structural inspection finds 77,610 rows, 67 columns and 18,603 distinct `patient_number` values, with repeated daily records. Admission physiology headers are available, but only ICU discharge status is explicit; hospital death, hospital identifiers, exact measurement units/windows and patient-versus-encounter identity remain unestablished. No outcome values or predictive metrics were inspected. The access report and dataset guide now mark acquisition resolved; no additional owner download is required. Scientific completion counts remain unchanged.
+
+
+## 17. Public pathology source audit
+
+All 515 pinned public THCA pathology PDFs totaling 79,840,335 bytes across 507 cases are now acquired, publisher size/MD5 verified and processed with native `pdftotext`. Initial connection resets were retried successfully; no files remain unavailable. The inventory records SHA256 hashes and native-text diagnostics without publishing report text. All five numeric-date candidate reports were read: one tissue-section-range false positive, one explicit procurement date and three unlabeled annotations. This agent source-text review is not clinical expert review, OCR accuracy certification, selected-input episode linkage or an availability timestamp audit. No complete gene callability is established. [Inventory](../results/research_checks/tcga_pathology.json), [candidate review](../results/research_checks/tcga_pathology_date_review.json). The corresponding full scientific criteria remain unchecked.

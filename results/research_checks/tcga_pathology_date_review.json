@@ -1,0 +1,33 @@
+{
+  "method": "Agent read-only review of all five native-text numeric-date candidate reports; no clinical expert review or OCR accuracy certification.",
+  "inventory_sha256": "34679516962f834396672c250c345b49e4eb30e622348879430499052e667192",
+  "cross_table_chronology_verified": false,
+  "callable_panel_verified": false,
+  "files": [
+    {
+      "file_id": "2428fe20-fb7b-4279-9f0a-0d97111cd61b",
+      "private_text_sha256": "04f945abf45d2e51a3af8d7aef0e5c1f5b2d8814158c9bd47b256bc9d59b35a0",
+      "finding": "Unlabeled numeric annotation; no selected-input availability linkage."
+    },
+    {
+      "file_id": "35fd212d-d735-4b7d-8593-a26d0043a1fe",
+      "private_text_sha256": "10c9ecbd73d2b10e4872c2fd3f8e9e975d1dbf20c2dcae2aa3fabb8872370664",
+      "finding": "Unlabeled numeric annotation; no selected-input availability linkage."
+    },
+    {
+      "file_id": "55d03d20-c77f-4d95-871c-52dd6525368e",
+      "private_text_sha256": "3427b8f6f0d722ddcb3460615a3ecbfa5c8738e9e10355da340b56c5dd79f672",
+      "finding": "Tissue block/section ranges matched the date regex; false-positive date candidates."
+    },
+    {
+      "file_id": "d96b6198-eaba-4e92-883d-2ce579601a7d",
+      "private_text_sha256": "f54512569c32e8004df0bfa3f24d6f1aff43deb47edf773bd4f101ba720ddffc",
+      "finding": "Explicit procurement date; not a selected clinical/genomic result availability timestamp."
+    },
+    {
+      "file_id": "eb3b003e-1f25-46db-a1b0-42bbbbb52074",
+      "private_text_sha256": "68993b22c9f4eabaec1dfca4011a1eeb6b9d3553592da3d5541bed588d8fdfe3",
+      "finding": "Unlabeled numeric annotation; no selected-input availability linkage."
+    }
+  ]
+}
