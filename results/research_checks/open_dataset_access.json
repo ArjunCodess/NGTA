@@ -76,8 +76,41 @@
     "page_link_download_status": 202,
     "page_link_download_bytes": 0,
     "browser_download": "Normal Download file click timed out after 15000ms; browser reported no completed downloads.",
-    "acquired": false,
-    "eligibility": "Unestablished: schema, predictor timing, hospital versus ICU death and source overlap require assessment."
+    "acquired": true,
+    "eligibility": "Not established. Repeated daily rows require encounter grouping; header names alone do not establish units, first-day windows, hospital-death equivalence or source independence. No outcome values or predictive metrics inspected.",
+    "acquisition": "Owner supplied the official workbook locally after earlier failed tool downloads.",
+    "observed_bytes": 22623427,
+    "observed_md5": "eeb2b9930990fa7ee44fd363dcc1758e",
+    "observed_sha256": "77eb122ec4db0dfdc27cbb8d805b61bb3817670b5d4610a50bb1780d07a8dd06",
+    "publisher_size_and_md5_match": true,
+    "zip_crc_errors": 0,
+    "sheet": "nicrf_data (1)",
+    "data_rows": 77610,
+    "columns": 67,
+    "unique_patient_number_values": 18603,
+    "rows_without_patient_number": 0,
+    "identifiers_with_multiple_rows": 11558,
+    "maximum_rows_per_identifier": 217,
+    "icu_admission_years": [
+      2019,
+      2020,
+      2021,
+      2022
+    ],
+    "outcome_header": "icudis_status",
+    "explicit_hospital_death_column_present": false,
+    "explicit_hospital_identifier_column_present": false,
+    "header_candidates": {
+      "age": "ad_age",
+      "sex": "ad_sex",
+      "temperature": "adas_temp_first",
+      "white_blood_count": "adas_wbc_first",
+      "creatinine": "adas_creat_first",
+      "systolic_pressure": "adas_sbp_first",
+      "diastolic_pressure": "adas_dbp_first",
+      "heart_rate": "adas_heart_first",
+      "respiratory_rate": "adas_resp_first"
+    }
   },
   "mendeley_candidates": {
     "datasets": [
