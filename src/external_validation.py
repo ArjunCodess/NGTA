@@ -15,11 +15,49 @@ from torch.utils.data import DataLoader, TensorDataset
 from .acceptance import external_compatibility
 from .attention_hook import revise_attention_truths
 from .evaluation import binary_metrics
+from .evaluation import paired_bootstrap_indices
+from sklearn.metrics import roc_auc_score
 from .knowledge_base import build_symbolic_truth_matrices, SYMBOLIC_RULES
 from .matched_inference import score_cached_passes
 from .neural_encoder import TabularTransformerClassifier
 from .trace_replay import export_replay_bundle
 from .wids_knowledge_base import build_wids_symbolic_truth_matrices, WIDS_RULE_DEFINITIONS
+
+
+def validate_study_policy(policy, dataset):
+    scope = policy.get("study_scope", "external_validation")
+    if scope not in {"external_validation", "cross_source_sensitivity", "cross_task_sensitivity"}:
+        raise ValueError("Unknown frozen study scope")
+    exploratory = scope != "external_validation"
+    if exploratory and (policy.get("clinical_claim_eligible") is not False or policy.get("independence_verified") is not False):
+        raise ValueError("Exploratory sensitivity must explicitly disclaim clinical eligibility and verified independence")
+    expected = "hospital_mortality" if dataset == "wids" else "lymph_node_metastasis"
+    if policy.get("development_dataset") != dataset:
+        raise ValueError("External outcome and frozen development dataset do not match")
+    if scope == "cross_task_sensitivity":
+        if (dataset != "wids" or policy.get("outcome_definition") != "icu_mortality"
+                or policy.get("development_outcome_definition") != expected or not policy.get("label_shift")
+                or len(policy.get("protocol_sha256", "")) != 64):
+            raise ValueError("Cross-task sensitivity requires an explicit ICU endpoint shift and frozen protocol")
+    elif policy.get("outcome_definition") != expected:
+        raise ValueError("External outcome and frozen development dataset do not match")
+    return scope
+
+
+def task_contrast(labels, nars, mc, iterations=1000, seed=0):
+    """Descriptive changed-endpoint contrasts, with no compatibility acceptance test."""
+    y = np.asarray(labels)
+    nars, mc = np.asarray(nars, dtype=float), np.asarray(mc, dtype=float)
+    loss = (nars-y)**2 - (mc-y)**2
+    indices = paired_bootstrap_indices(y, iterations, np.random.default_rng(seed))
+    brier = [loss[i].mean() for i in indices]
+    auc = [roc_auc_score(y[i], nars[i])-roc_auc_score(y[i], mc[i]) for i in indices]
+    return dict(brier_nars_minus_mc=float(loss.mean()),
+        brier_lower_95=float(np.percentile(brier, 2.5)), brier_upper_95=float(np.percentile(brier, 97.5)),
+        auc_nars_minus_mc=float(roc_auc_score(y, nars)-roc_auc_score(y, mc)),
+        auc_lower_95=float(np.percentile(auc, 2.5)), auc_upper_95=float(np.percentile(auc, 97.5)),
+        sampling_unit="admission", clinical_claim_eligible=False,
+        interpretation="Exploratory changed-endpoint contrast; conditional admission intervals, no compatibility or superiority acceptance")
 
 
 def harmonize_cohort(frame, policy, processor, development_ids, development_patient_ids=None, rule_source_columns=()):
@@ -93,16 +131,10 @@ def evaluate_external(checkpoint_dir, cohort_csv, mapping_json, output_dir, mc_s
     if training_spec["split_ids_sha256"] not in split_hashes:
         raise ValueError("Development case partitions differ from the frozen checkpoint")
     policy = json.loads(Path(mapping_json).read_text(encoding="utf-8"))
-    study_scope = policy.get("study_scope", "external_validation")
-    if study_scope not in {"external_validation", "cross_source_sensitivity"}:
-        raise ValueError("Unknown frozen study scope")
-    sensitivity = study_scope == "cross_source_sensitivity"
-    if sensitivity and (policy.get("clinical_claim_eligible") is not False or policy.get("independence_verified") is not False):
-        raise ValueError("Cross-source sensitivity must explicitly disclaim clinical eligibility and verified independence")
     # Validate the frozen study definitions before reading any external outcomes.
-    expected_outcome = "hospital_mortality" if config["dataset"] == "wids" else "lymph_node_metastasis"
-    if policy.get("outcome_definition") != expected_outcome or policy.get("development_dataset") != config["dataset"]:
-        raise ValueError("External outcome and frozen development dataset do not match")
+    study_scope = validate_study_policy(policy, config["dataset"])
+    sensitivity = study_scope == "cross_source_sensitivity"
+    cross_task = study_scope == "cross_task_sensitivity"
     frame = pd.read_csv(cohort_csv)
     patient_ids = manifest[processor.id_column]
     if config["dataset"] == "wids":
@@ -138,7 +170,8 @@ def evaluate_external(checkpoint_dir, cohort_csv, mapping_json, output_dir, mc_s
     # Accumulate the same cached sigmoid passes in float64. A float32 reduction
     # across 50 draws can exceed the independent 1e-7 replay tolerance.
     probabilities = {"baseline": summary.probability_passes.astype(np.float64).mean(axis=0), "flat_confidence":flat,"mc_confidence_only": mc, "nars_gated": nars}
-    report = external_compatibility(encoded.target, nars, mc, groups=None if sensitivity else groups, seed=seed)
+    report = (task_contrast(encoded.target, nars, mc, seed=seed) if cross_task else
+              external_compatibility(encoded.target, nars, mc, groups=None if sensitivity else groups, seed=seed))
     report["study_scope"] = study_scope
     if sensitivity:
         report["numerical_margins_met"] = report.pop("accepted")
@@ -156,6 +189,7 @@ def evaluate_external(checkpoint_dir, cohort_csv, mapping_json, output_dir, mc_s
     report["cohort_sha256"] = hashlib.sha256(Path(cohort_csv).read_bytes()).hexdigest()
     report["mc_samples"] = mc_samples
     report["independence_verification"] = "Identifier-string overlap checked only; different source namespaces cannot establish canonical patient independence"
-    report_name = "cross_source_sensitivity.json" if sensitivity else "external_compatibility.json"
+    report_name = ("cross_task_sensitivity.json" if cross_task else
+                   "cross_source_sensitivity.json" if sensitivity else "external_compatibility.json")
     (root / report_name).write_text(json.dumps(report, indent=2), encoding="utf-8")
     return report

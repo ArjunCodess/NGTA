@@ -112,6 +112,17 @@ def test_frozen_external_fixture_replays_and_rejects_partition_tampering(tmp_pat
     assert "accepted" not in report and "numerical_margins_met" in report
     assert not (sensitivity / "external_compatibility.json").exists()
     assert replay_bundle(sensitivity / "traces")["passed"]
+    shifted = deepcopy(policy)
+    shifted.update(study_scope="cross_task_sensitivity", outcome_definition="icu_mortality",
+        development_outcome_definition="hospital_mortality", label_shift="Synthetic endpoint-shift fixture only",
+        protocol_sha256="a"*64)
+    mapping.write_text(json.dumps(shifted))
+    shifted_output = tmp_path / "shifted"
+    shifted_report = evaluate_external(checkpoint, cohort, mapping, shifted_output, mc_samples=2)
+    assert shifted_report["clinical_claim_eligible"] is False
+    assert "accepted" not in shifted_report and "numerical_margins_met" not in shifted_report
+    assert not (shifted_output / "external_compatibility.json").exists()
+    assert replay_bundle(shifted_output / "traces")["passed"]
     policy["independence_verified"] = True
     mapping.write_text(json.dumps(policy))
     with pytest.raises(ValueError, match="disclaim"):
