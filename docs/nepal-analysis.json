@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "locked_on": "2026-10-21",
+  "source_sha256": "77eb122ec4db0dfdc27cbb8d805b61bb3817670b5d4610a50bb1780d07a8dd06",
+  "source_doi": "10.6084/m9.figshare.22263847.v1",
+  "study_scope": "cross_task_sensitivity",
+  "clinical_claim_eligible": false,
+  "independence_verified": false,
+  "outcome_definition": "icu_mortality",
+  "development_outcome_definition": "hospital_mortality",
+  "population": "All adult admissions with consistent admission fields and explicit alive/dead ICU status; no selection by predictions or effect sizes.",
+  "grouping": "One physical row per patient_number, after all selected admission fields and discharge status are checked identical including missingness across repeated daily rows. Conflicting identifiers are excluded and reported, not combined field by field.",
+  "predictor_exclusions": [
+    "daily measurements",
+    "length of stay",
+    "discharge destination",
+    "discharge year",
+    "outcomes",
+    "diagnoses or treatments not explicitly mapped"
+  ],
+  "scenarios": [
+    "demographics",
+    "admission_mgdl",
+    "admission_umol"
+  ],
+  "demographics": [
+    "age",
+    "gender",
+    "elective_surgery"
+  ],
+  "admission_proxy": [
+    "age",
+    "gender",
+    "elective_surgery",
+    "first heart rate as day-one maximum",
+    "first systolic pressure as day-one minimum",
+    "first temperature as day-one maximum",
+    "first WBC as day-one maximum",
+    "first creatinine as day-one maximum"
+  ],
+  "unit_assumptions": {
+    "heart_rate": "bpm",
+    "systolic_pressure": "mmHg",
+    "temperature": "Celsius",
+    "white_blood_count": "10^9/L",
+    "creatinine_mgdl": "mg/dL, scale 1",
+    "creatinine_umol": "micromol/L, scale 1/88.4"
+  },
+  "unit_evidence_status": "Explicit hypothetical sensitivity assumptions, not verified source units. Both creatinine conventions retained regardless of results; no unit chosen using outcome performance.",
+  "unavailable_inputs": [
+    "bmi",
+    "lactate",
+    "bun",
+    "glucose",
+    "spo2",
+    "platelets",
+    "apache_probability"
+  ],
+  "models": "Five median and five KNN frozen no-APACHE WiDS checkpoints; no training or recalibration; gamma and all rules fixed.",
+  "inference": "50 matched MC-dropout draws, seed 0 per checkpoint/scenario; uniform-gate identity and independent persisted replay.",
+  "analysis": "All scenarios and seeds reported; paired ICU-outcome Brier and AUROC deltas with conditional admission bootstrap; five-seed mean and SD. No hospital clustering possible; canonical repeat-person linkage unavailable. No external acceptance or numerical compatibility claim under a changed endpoint.",
+  "primary_contrast": "NARS minus MC-only; descriptive exploratory comparison with three prespecified scenarios, no outcome-driven scenario selection.",
+  "claim_boundary": "Changes in endpoint, measurement summaries, missing inputs, assumed units and unverified source independence prevent completion of plan experiment 7. No human or clinical validation."
+}
