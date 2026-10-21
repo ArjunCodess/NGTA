@@ -110,3 +110,48 @@ def test_hierarchical_brier_uses_float64_and_fixed_seed_alignment():
     assert result["family_lower_95"] <= result["lower_95"] <= result["upper_95"] <= result["family_upper_95"]
     with pytest.raises(ValueError, match="five aligned"):
         hierarchical_brier([(nars, mc)]*4, y)
+
+
+@pytest.mark.parametrize("imputation", ["knn", "median"])
+def test_preprocessing_cache_matches_direct_transform_and_preserves_identities(tmp_path, imputation, monkeypatch):
+    import joblib
+    from dataclasses import fields
+    from src.external_validation import encode_frozen_wids
+    from src.wids_loader import WIDSPreprocessor, WIDS_CONTINUOUS_COLUMNS
+    n = 20
+    train = pd.DataFrame({c: np.arange(n, dtype=float)+1 for c in WIDS_CONTINUOUS_COLUMNS})
+    train["encounter_id"] = [f"case{i}" for i in range(n)]
+    train["hospital_death"] = np.arange(n)%2
+    train["gender"] = ["F", "M"]*(n//2)
+    train["elective_surgery"] = np.arange(n)%2
+    processor = WIDSPreprocessor(include_apache=False, imputation=imputation).fit(train)
+    external = pd.concat([train.iloc[[2, 3]], train.iloc[[2, 3]]], ignore_index=True)
+    external["encounter_id"] = ["a", "b", "c", "d"]
+    external["hospital_death"] = [0, 0, 1, 1]
+    external["d1_creatinine_max"] = np.nan
+    before = joblib.hash(processor)
+    direct = processor.transform_components(external)
+    # Preserve the complete input batch even when feature rows repeat: KNN ties
+    # can change under floating-point distance arithmetic with different batches.
+    original_transform = type(processor).transform_components
+    seen = []
+    def checked_transform(self, frame):
+        seen.append(len(frame))
+        return original_transform(self, frame)
+    monkeypatch.setattr(type(processor), "transform_components", checked_transform)
+    cached = encode_frozen_wids(processor, external, tmp_path)
+    assert seen == [len(external)]
+    for field in fields(direct):
+        left, right = getattr(direct, field.name), getattr(cached, field.name)
+        if isinstance(left, pd.DataFrame):
+            pd.testing.assert_frame_equal(left, right)
+        else:
+            np.testing.assert_allclose(left, right, rtol=0, atol=1e-12)
+    assert before == joblib.hash(processor)
+    assert joblib.hash(encode_frozen_wids(processor, external, tmp_path)) == joblib.hash(cached)
+    path = next(tmp_path.glob("*.joblib"))
+    payload = joblib.load(path)
+    payload["encoded"].target[0] = 1
+    joblib.dump(payload, path)
+    with pytest.raises(ValueError, match="content changed"):
+        encode_frozen_wids(processor, external, tmp_path)

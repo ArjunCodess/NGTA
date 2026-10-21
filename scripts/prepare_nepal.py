@@ -6,6 +6,7 @@ from pathlib import Path
 import sys
 
 import joblib
+import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from src.nepal_registry import ADMISSION_COLUMNS, SOURCE_SHA256, SCENARIOS, read_workbook, select_admissions, mapping_policy
@@ -31,8 +32,17 @@ def prepare(source, output, protocol, checkpoint):
             raise ValueError("Existing mapping changed; use a new study directory")
         path.write_text(json.dumps(policy, indent=2) + "\n", encoding="utf-8")
         policies[scenario] = policy
-    frame = read_workbook(source, ["patient_number", *ADMISSION_COLUMNS])
+    frame = read_workbook(source, ["patient_number", *ADMISSION_COLUMNS,
+                                   "adas_temp_first", "adas_creat_first", "adas_wbc_first"])
     cohort, report = select_admissions(frame)
+    first = frame.drop_duplicates("patient_number")
+    report["excluded_measurement_scale_audit"] = {}
+    for name, low, high in (("adas_temp_first", 68., 114.8), ("adas_creat_first", 9.98, 2497.3)):
+        values = pd.to_numeric(first[name], errors="coerce")
+        report["excluded_measurement_scale_audit"][name] = dict(observed=int(values.notna().sum()),
+            core_dictionary_min=low, core_dictionary_max=high,
+            below_dictionary_min=int(values.lt(low).sum()), above_dictionary_max=int(values.gt(high).sum()),
+            interpretation="Source values conflict with this generic core dictionary; no record-level unit chosen")
     report.update(source_sha256=SOURCE_SHA256, protocol_sha256=digest,
                   clinical_claim_eligible=False, scenarios={})
     for scenario, policy in policies.items():

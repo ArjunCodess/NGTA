@@ -60,6 +60,28 @@ def task_contrast(labels, nars, mc, iterations=1000, seed=0):
         interpretation="Exploratory changed-endpoint contrast; conditional admission intervals, no compatibility or superiority acceptance")
 
 
+def encode_frozen_wids(processor, mapped, cache_dir):
+    """Reuse a whole immutable transform, preserving KNN batch/tie arithmetic."""
+    identity = dict(processor=joblib.hash(processor), mapped=joblib.hash(mapped),
+        implementation=hashlib.sha256(Path(__file__).read_bytes() +
+            Path(__file__).with_name("wids_loader.py").read_bytes()).hexdigest())
+    root = Path(cache_dir)
+    root.mkdir(parents=True, exist_ok=True)
+    path = root/(joblib.hash(identity)+".joblib")
+    if path.exists():
+        cached = joblib.load(path)
+        if cached["identity"] != identity or cached["encoded_hash"] != joblib.hash(cached["encoded"]):
+            raise ValueError("Frozen preprocessing cache identity or content changed")
+        return cached["encoded"]
+    # Reducing duplicate rows can change BLAS rounding and nearest-neighbor tie
+    # selection. Cache the exact full transform rather than changing its batching.
+    encoded = processor.transform_components(mapped)
+    if identity["processor"] != joblib.hash(processor):
+        raise RuntimeError("Preprocessing changed the frozen processor")
+    joblib.dump(dict(identity=identity, encoded=encoded, encoded_hash=joblib.hash(encoded)), path)
+    return encoded
+
+
 def harmonize_cohort(frame, policy, processor, development_ids, development_patient_ids=None, rule_source_columns=()):
     required = ("cohort", "source_version", "prediction_landmark", "outcome_definition",
                 "independence_evidence", "id_column", "patient_id_column", "target_column", "cluster_column", "features")
@@ -112,7 +134,7 @@ def harmonize_cohort(frame, policy, processor, development_ids, development_pati
     return mapped, frame[policy["cluster_column"]].to_numpy()
 
 
-def evaluate_external(checkpoint_dir, cohort_csv, mapping_json, output_dir, mc_samples=50, seed=0):
+def evaluate_external(checkpoint_dir, cohort_csv, mapping_json, output_dir, mc_samples=50, seed=0, preprocessing_cache=None):
     checkpoint_dir = Path(checkpoint_dir)
     saved = torch.load(checkpoint_dir / "model.pt", map_location="cpu", weights_only=True)
     config = saved["config"]
@@ -143,7 +165,11 @@ def evaluate_external(checkpoint_dir, cohort_csv, mapping_json, output_dir, mc_s
     rule_sources=[rule["source_column"] for rule in training_spec["rules"].values()]
     mapped, groups = harmonize_cohort(frame, policy, processor, manifest[processor.id_column], patient_ids, rule_sources)
     fingerprint = joblib.hash(processor)
-    encoded = processor.transform_components(mapped) if config["dataset"] == "wids" else processor.transform(mapped)
+    if config["dataset"] == "wids":
+        encoded = (encode_frozen_wids(processor, mapped, preprocessing_cache) if preprocessing_cache is not None
+                   else processor.transform_components(mapped))
+    else:
+        encoded = processor.transform(mapped)
     knowledge = (build_wids_symbolic_truth_matrices(encoded.rule_triggers, processor.feature_names)
                  if config["dataset"] == "wids" else build_symbolic_truth_matrices(mapped, processor.feature_names))
     model = TabularTransformerClassifier(saved["input_dim"], config["d_model"], config["num_heads"],

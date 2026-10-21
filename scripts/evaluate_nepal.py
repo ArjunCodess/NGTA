@@ -20,6 +20,17 @@ def sha256(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
+def json_values(value):
+    """Keep undefined PPV/calibration values null, never zero or non-JSON NaN."""
+    if isinstance(value, dict):
+        return {k: json_values(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [json_values(v) for v in value]
+    if isinstance(value, float) and not np.isfinite(value):
+        return None
+    return value
+
+
 def hierarchical_brier(predictions, labels, iterations=2000, seed=0):
     """Resample admissions and fitted seeds, fixing their original inference draw."""
     y = np.asarray(labels, dtype=float)
@@ -65,7 +76,8 @@ def evaluate(root="results/private/nepal_sensitivity", report_path="results/rese
                 if not saved_report.exists():
                     if shutil.disk_usage(root).free < 750*1024**2:
                         raise ValueError("Need 750 MB free before another inference bundle")
-                    result = evaluate_external(checkpoint, cohort, mapping, output, mc_samples=50, seed=0)
+                    result = evaluate_external(checkpoint, cohort, mapping, output, mc_samples=50, seed=0,
+                                               preprocessing_cache=root/"preprocessing_cache")
                 else:
                     result = json.loads(saved_report.read_text())
                 for path, key in ((checkpoint/"model.pt", "checkpoint_sha256"),
@@ -110,9 +122,9 @@ def evaluate(root="results/private/nepal_sensitivity", report_path="results/rese
             report["conditions"].append(dict(scenario=scenario, imputation=imputation, fits=5,
                 metrics=aggregate, nars_minus_mc=hierarchical_brier(contrasts, labels), verification=checks))
             table.to_csv(root/scenario/imputation/"seed_metrics.csv", index=False)
-            Path(report_path).write_text(json.dumps(report, indent=2)+"\n", encoding="utf-8")
+            Path(report_path).write_text(json.dumps(json_values(report), indent=2, allow_nan=False)+"\n", encoding="utf-8")
     report["fits"] = sum(c["fits"] for c in report["conditions"])
-    Path(report_path).write_text(json.dumps(report, indent=2)+"\n", encoding="utf-8")
+    Path(report_path).write_text(json.dumps(json_values(report), indent=2, allow_nan=False)+"\n", encoding="utf-8")
     return report
 
 
