@@ -26,6 +26,8 @@ Repository updates made from that feedback:
 
 ## Key Achievements
 
+- **NeSy 2026.** The conference accepted the NGTA paper. We plan to submit an extended version to the *Neurosymbolic Artificial Intelligence* journal's special issue for NeSy 2026 papers. [NeSy 2026 call for papers](https://2026.nesyconf.org/call-for-papers/)
+- **GenAI4Health 2026.** The NeurIPS 2026 workshop accepted the NGTA paper as a non-archival contribution. [NeurIPS workshop listing](https://neurips.cc/virtual/2026/workshop/137506)
 - **Matched inference:** Ungated, uniform, MC-only and NARS readout gates use identical cached dropout passes and mean per-pass probabilities. Uniform gating reproduces ungated inference within 1e-7.
 - **Valid data handling:** Training-only feature selection, standardized KNN distances, explicit unknown genomic calls, disjoint WiDS split options and observed-only rule triggers prevent the identified preprocessing errors.
 - **Independent auditability:** Every rule trigger is exported, including unmapped triggers. Independent replay reconstructs predicates, revisions, gates, predictions and rule-off effects and checks file integrity.
